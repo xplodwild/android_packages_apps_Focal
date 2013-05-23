@@ -10,6 +10,7 @@
         android:id="@+id/camera_preview_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
+
     </FrameLayout>
 
     <FrameLayout
@@ -27,5 +28,22 @@
             android:contentDescription="@string/shutter_button"
             android:src="@drawable/btn_shutter_photo" />
     </FrameLayout>
+
+    <ScrollView
+        android:id="@+id/sidebar_scroller"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp" >
+
+        <LinearLayout
+            android:id="@+id/sidebar_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </FrameLayout>

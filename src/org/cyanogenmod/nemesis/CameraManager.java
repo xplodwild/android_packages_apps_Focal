@@ -32,7 +32,7 @@ import android.view.SurfaceView;
 public class CameraManager {
     private final static String TAG = "CameraManager";
     
-    public CameraPreview mPreview;
+    private CameraPreview mPreview;
     private Camera mCamera;
     
     public CameraManager(Context context) {

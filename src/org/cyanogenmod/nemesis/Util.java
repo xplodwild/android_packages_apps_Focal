@@ -1,12 +1,15 @@
 package org.cyanogenmod.nemesis;
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 
 public class Util {
 	// Orientation hysteresis amount used in rounding, in degrees
     public static final int ORIENTATION_HYSTERESIS = 5;
+    
+    private static Point mScreenSize = new Point();
     
     public static int getDisplayRotation(Activity activity) {
         int rotation = activity.getWindowManager().getDefaultDisplay()
@@ -34,5 +37,10 @@ public class Util {
 			return ((orientation + 45) / 90 * 90) % 360;
 		}
 		return orientationHistory;
+	}
+	
+	public static Point getScreenSize(Activity activity) {
+		activity.getWindowManager().getDefaultDisplay().getSize(mScreenSize);
+		return mScreenSize;
 	}
 }
