@@ -8,14 +8,15 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 /**
  * Base class for settings widget. Each setting widget
  * will extend this class.
  * 
  * Remember that we are working in landscape, so the GridLayout
- * column count is the height of the widget when looking landscape,
- * and become the width when looking portrait.
+ * column count is the width of the widget when looking landscape,
+ * and become the height when looking portrait.
  * 
  * What we call the "MaxWidgetWidth" is the number of ROWS in landscape,
  * that looks like COLUMNS in portrait.
@@ -23,16 +24,16 @@ import android.widget.ImageButton;
  */
 public abstract class WidgetBase {
 	private WidgetToggleButton mToggleButton;
-	private WidgetContainer mContainer;
+	private WidgetContainer mWidget;
 	private int mWidgetMaxWidth;
 	
 	public WidgetBase(Context context, int iconResId) {
-		mContainer = new WidgetContainer(context);
+		mWidget = new WidgetContainer(context);
 		mToggleButton = new WidgetToggleButton(context);
 		
 		// Setup the container
-		mContainer.setColumnCount(1);
-		mContainer.setRowCount(0);
+		mWidget.setColumnCount(1);
+		mWidget.setRowCount(0);
 		
 		// Setup the toggle button
 		mToggleButton.setImageResource(iconResId);
@@ -50,39 +51,55 @@ public abstract class WidgetBase {
 	 * @param params The Camera parameters provided by HAL
 	 * @return true if the widget is supported by the device
 	 */
-	public static boolean isSupported(Camera.Parameters params) {
-		return false;
-	}
+	public abstract boolean isSupported(Camera.Parameters params);
 	
 	/**
 	 * Add a view to the container widget
 	 * @param v The view to add
 	 */
 	public void addViewToContainer(View v) {
-		if (mContainer.getColumnCount() == mWidgetMaxWidth) {
+		if (mWidget.getRowCount() == mWidgetMaxWidth) {
 			// Add a new column instead of a line to fit the max width
-			
+			mWidget.setColumnCount(mWidget.getColumnCount()+1);
+		} else if (mWidget.getRowCount() < mWidgetMaxWidth) {
+			mWidget.setRowCount(mWidget.getRowCount()+1);
 		}
-		mContainer.setColumnCount(mContainer.getColumnCount()+1);
-		mContainer.addView(v);
+		
+		mWidget.addView(v);
 	}
+	
+	public WidgetToggleButton getToggleButton() {
+		return mToggleButton;
+	}
+	
+	public WidgetContainer getWidget() {
+		return mWidget;
+	}
+	
 	
 	/**
 	 * Represents the button that toggles the widget, in the
 	 * side bar.
 	 */
-	public static class WidgetToggleButton extends ImageButton {
+	public static class WidgetToggleButton extends ImageView {
 		public WidgetToggleButton(Context context, AttributeSet attrs,
 				int defStyle) {
 			super(context, attrs, defStyle);
+			initialize();
 		}
 		
 		public WidgetToggleButton(Context context, AttributeSet attrs) {
 			super(context, attrs);
+			initialize();
 		}
 		
 		public WidgetToggleButton(Context context) {
 			super(context);
+			initialize();
+		}
+		
+		private void initialize() {
+			this.setClickable(true);
 		}
 		
 	}

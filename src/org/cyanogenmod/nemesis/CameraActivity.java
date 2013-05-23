@@ -1,5 +1,7 @@
 package org.cyanogenmod.nemesis;
 
+import org.cyanogenmod.nemesis.widgets.FlashWidget;
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ScrollView;
 
 public class CameraActivity extends Activity {    
 	public final static String TAG = "CameraActivity";
@@ -21,6 +24,9 @@ public class CameraActivity extends Activity {
 
 	private int mOrientation = OrientationEventListener.ORIENTATION_UNKNOWN;;
 	private int mOrientationCompensation = 0;
+	
+	private ScrollView mSideBar;
+	private float mOriginalSideBarPosition;
 
 	/**
 	 * Event: Activity created
@@ -30,6 +36,9 @@ public class CameraActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_camera);
+		
+		mSideBar = (ScrollView) CameraActivity.this.findViewById(R.id.sidebar_scroller);
+		mOriginalSideBarPosition = mSideBar.getY();
 
 		// Create orientation listener. This should be done first because it
 		// takes some time to get first orientation.
@@ -48,8 +57,14 @@ public class CameraActivity extends Activity {
 				return true;
 			}
 		};
-		findViewById(R.id.camera_preview_container).setOnTouchListener(touchListener);
+
 		mCamManager.getPreviewSurface().setOnTouchListener(touchListener);
+		mSideBar.setOnTouchListener(touchListener);
+		
+		// ======= TEST ==========
+		FlashWidget flash = new FlashWidget(this, R.drawable.btn_shutter_photo);
+		ViewGroup sidebar = (ViewGroup) findViewById(R.id.sidebar_container);
+		sidebar.addView(flash.getToggleButton());
 	}
 
 
@@ -71,6 +86,17 @@ public class CameraActivity extends Activity {
 		} else {
 			Log.e(TAG, "Could not open cameras");
 		}
+	}
+	
+	public void slideSidebar(float distance) {
+		float finalY = mSideBar.getTranslationY() + distance;
+		
+		if (finalY > mSideBar.getHeight())
+			finalY = mSideBar.getHeight();
+		else if (finalY < 0)
+			finalY = 0;
+		
+		mSideBar.setTranslationY(finalY);
 	}
 
 	/**
@@ -140,28 +166,28 @@ public class CameraActivity extends Activity {
 		private static final int SWIPE_MIN_DISTANCE = 10;
 		private static final int SWIPE_MAX_OFF_PATH = 250;
 		private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-		// allow to drag the side bar up to a third of the screen
-		private static final int SIDEBAR_THRESHOLD_FACTOR = 3;
+		// allow to drag the side bar up to half of the screen
+		private static final int SIDEBAR_THRESHOLD_FACTOR = 2;
 
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 				float distanceY) {			
 			// Detect drag of the side bar
 			if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH) {
-				Log.e(TAG, "Out of path (" + Math.abs(e1.getX() - e2.getX()) + ")");
+				// Finger drifted from the path
 				return false;
-			} else if (e1.getY() > Util.getScreenSize(CameraActivity.this).y/SIDEBAR_THRESHOLD_FACTOR) {
-				if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE) {
-					Log.e(TAG, "Here we would open the bar by " + distanceX);
-				} else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE) {
-					Log.e(TAG, "Here we would close the bar by " + distanceX);
+			} else if (e1.getRawY() > Util.getScreenSize(CameraActivity.this).y/SIDEBAR_THRESHOLD_FACTOR) {
+				if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE ||
+						e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE) {
+					slideSidebar(-distanceY);
 				}
+				else {
+					Log.e(TAG, "Not reached swipe min distance");
+				}
+				
 				return true;
 			}
-			else {
-				Log.e(TAG, "Outside of threshold");
-			}
-
+			
 			return false;
 		}
 
