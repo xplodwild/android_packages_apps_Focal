@@ -1,0 +1,31 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/camera_app_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#333"
+    tools:context=".CameraActivity" >
+
+    <FrameLayout
+        android:id="@+id/camera_preview_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/shutter_button_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center"
+        android:layout_marginRight="-12dp" >
+
+        <ImageView
+            android:id="@+id/btn_shutter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:contentDescription="@string/shutter_button"
+            android:src="@drawable/btn_shutter_photo" />
+    </FrameLayout>
+
+</FrameLayout>

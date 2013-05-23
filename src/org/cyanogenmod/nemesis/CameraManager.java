@@ -32,42 +32,47 @@ import android.view.SurfaceView;
 public class CameraManager {
     private final static String TAG = "CameraManager";
     
-    public CameraPreview mPreviewFront;
-    public CameraPreview mPreviewBack;
-    private Camera mCameraFront;
-    private Camera mCameraBack;
+    public CameraPreview mPreview;
+    private Camera mCamera;
     
     public CameraManager(Context context) {
-        mPreviewFront = new CameraPreview(context);
-        mPreviewBack = new CameraPreview(context);
+        mPreview = new CameraPreview(context);
     }
     
     /**
      * Opens the camera and show its preview in the preview
      * @param facing
-     * @return
+     * @return true if the operation succeeded, false otherwise
      */
     public boolean open(int facing) {
-        /*if (mCamera != null) {
+        if (mCamera != null) {
             // Close the previous camera
             mPreview.notifyCameraChanged(null);
             mCamera.release();
             mCamera = null;
         }
-        */
+
+        // Try to open the camera
         try {
-            mCameraFront = Camera.open(facing);
-            //mCameraBack = Camera.open(1);
+            mCamera = Camera.open(facing);
         }
         catch (Exception e) {
             Log.e(TAG, "Error while opening cameras: " + e.getMessage());
             return false;
         }
         
-        mPreviewFront.notifyCameraChanged(mCameraFront);
-        //mPreviewBack.notifyCameraChanged(mCameraBack);
+        // Update the preview surface holder with the new opened camera
+        mPreview.notifyCameraChanged(mCamera);
         
         return true;
+    }
+    
+    /**
+     * Returns the preview surface used to display the Camera's preview
+     * @return CameraPreview
+     */
+    public CameraPreview getPreviewSurface() {
+    	return mPreview;
     }
     
     
