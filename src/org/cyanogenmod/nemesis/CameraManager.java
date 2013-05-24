@@ -75,6 +75,17 @@ public class CameraManager {
     	return mPreview;
     }
     
+    /**
+     * Returns the parameters structure of the current running camera
+     * @return Camera.Parameters
+     */
+    public Camera.Parameters getParameters() {
+        if (mCamera == null)
+            return null;
+        
+        return mCamera.getParameters();
+    }
+    
     
     /**
      * The CameraPreview class handles the Camera preview feed

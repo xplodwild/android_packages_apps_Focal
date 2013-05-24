@@ -29,7 +29,7 @@
             android:src="@drawable/btn_shutter_photo" />
     </FrameLayout>
 
-    <ScrollView
+    <org.cyanogenmod.nemesis.ui.SideBar
         android:id="@+id/sidebar_scroller"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,10 +40,11 @@
         <LinearLayout
             android:id="@+id/sidebar_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
 
         </LinearLayout>
 
-    </ScrollView>
+    </org.cyanogenmod.nemesis.ui.SideBar>
 
 </FrameLayout>

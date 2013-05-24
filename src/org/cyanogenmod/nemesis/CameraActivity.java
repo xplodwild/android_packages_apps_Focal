@@ -1,10 +1,11 @@
 package org.cyanogenmod.nemesis;
 
-import org.cyanogenmod.nemesis.widgets.FlashWidget;
+import org.cyanogenmod.nemesis.ui.SideBar;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -13,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.ScrollView;
 
 public class CameraActivity extends Activity {    
 	public final static String TAG = "CameraActivity";
@@ -21,12 +21,12 @@ public class CameraActivity extends Activity {
 	private CameraManager mCamManager;
 	private CameraOrientationEventListener mOrientationListener;
 	private GestureDetector mGestureDetector;
+	private Handler mHandler;
 
 	private int mOrientation = OrientationEventListener.ORIENTATION_UNKNOWN;;
 	private int mOrientationCompensation = 0;
 	
-	private ScrollView mSideBar;
-	private float mOriginalSideBarPosition;
+	private SideBar mSideBar;
 
 	/**
 	 * Event: Activity created
@@ -37,13 +37,14 @@ public class CameraActivity extends Activity {
 
 		setContentView(R.layout.activity_camera);
 		
-		mSideBar = (ScrollView) CameraActivity.this.findViewById(R.id.sidebar_scroller);
-		mOriginalSideBarPosition = mSideBar.getY();
+		mSideBar = (SideBar) CameraActivity.this.findViewById(R.id.sidebar_scroller);
 
 		// Create orientation listener. This should be done first because it
 		// takes some time to get first orientation.
 		mOrientationListener = new CameraOrientationEventListener(this);
 		mOrientationListener.enable();
+		
+		mHandler = new Handler();
 
 		// Setup the camera hardware and preview
 		setupCamera();
@@ -61,10 +62,15 @@ public class CameraActivity extends Activity {
 		mCamManager.getPreviewSurface().setOnTouchListener(touchListener);
 		mSideBar.setOnTouchListener(touchListener);
 		
-		// ======= TEST ==========
-		FlashWidget flash = new FlashWidget(this, R.drawable.btn_shutter_photo);
-		ViewGroup sidebar = (ViewGroup) findViewById(R.id.sidebar_container);
-		sidebar.addView(flash.getToggleButton());
+		// Populate the sidebar buttons a little later (so we have camera parameters)
+		mHandler.post(new Runnable() {
+		    public void run() {
+        		final ViewGroup sidebar = (ViewGroup) findViewById(R.id.sidebar_container);
+        		
+        		CameraCapabilities capa = new CameraCapabilities(CameraActivity.this);
+        		capa.populateSidebar(mCamManager.getParameters(), sidebar);
+		    }
+		});
 	}
 
 
@@ -81,24 +87,12 @@ public class CameraActivity extends Activity {
 		final FrameLayout layout = (FrameLayout) findViewById(R.id.camera_preview_container);
 		layout.addView(mCamManager.getPreviewSurface());
 
-		if (mCamManager.open(0)) {
-			Log.e(TAG, "Camera 0  open");
-		} else {
+		if (!mCamManager.open(0)) {
 			Log.e(TAG, "Could not open cameras");
 		}
 	}
 	
-	public void slideSidebar(float distance) {
-		float finalY = mSideBar.getTranslationY() + distance;
-		
-		if (finalY > mSideBar.getHeight())
-			finalY = mSideBar.getHeight();
-		else if (finalY < 0)
-			finalY = 0;
-		
-		mSideBar.setTranslationY(finalY);
-	}
-
+	
 	/**
 	 * Recursively rotates the Views of ViewGroups
 	 * @param vg the root ViewGroup
@@ -179,7 +173,7 @@ public class CameraActivity extends Activity {
 			} else if (e1.getRawY() > Util.getScreenSize(CameraActivity.this).y/SIDEBAR_THRESHOLD_FACTOR) {
 				if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE ||
 						e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE) {
-					slideSidebar(-distanceY);
+					mSideBar.slide(-distanceY);
 				}
 				else {
 					Log.e(TAG, "Not reached swipe min distance");
@@ -194,13 +188,13 @@ public class CameraActivity extends Activity {
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 			try {
-				if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+				if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH)
 					return false;
 				// right to left swipe
-				if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-					Log.e(TAG, "left swipe");
-				}  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-					Log.e(TAG, "right swipe");
+				if(e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+					Log.e(TAG, "open swipe");
+				}  else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+					Log.e(TAG, "close swipe");
 				}
 			} catch (Exception e) {
 				// nothing
