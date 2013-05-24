@@ -54,6 +54,10 @@ public class CameraActivity extends Activity {
 		View.OnTouchListener touchListener = new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent ev) {
+			    if (ev.getAction() == MotionEvent.ACTION_UP) {
+			        mSideBar.clampSliding();
+			    }
+			    
 				mGestureDetector.onTouchEvent(ev);
 				return true;
 			}
@@ -190,11 +194,12 @@ public class CameraActivity extends Activity {
 			try {
 				if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH)
 					return false;
-				// right to left swipe
+				
+				// swipes to open/close the sidebar 
 				if(e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-					Log.e(TAG, "open swipe");
+					mSideBar.slideOpen();
 				}  else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-					Log.e(TAG, "close swipe");
+				    mSideBar.slideClose();
 				}
 			} catch (Exception e) {
 				// nothing
