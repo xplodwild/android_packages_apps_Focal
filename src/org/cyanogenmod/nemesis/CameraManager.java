@@ -31,14 +31,14 @@ import android.view.SurfaceView;
  */
 public class CameraManager {
     private final static String TAG = "CameraManager";
-    
+
     private CameraPreview mPreview;
     private Camera mCamera;
-    
+
     public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
     }
-    
+
     /**
      * Opens the camera and show its preview in the preview
      * @param facing
@@ -60,21 +60,21 @@ public class CameraManager {
             Log.e(TAG, "Error while opening cameras: " + e.getMessage());
             return false;
         }
-        
+
         // Update the preview surface holder with the new opened camera
         mPreview.notifyCameraChanged(mCamera);
-        
+
         return true;
     }
-    
+
     /**
      * Returns the preview surface used to display the Camera's preview
      * @return CameraPreview
      */
     public CameraPreview getPreviewSurface() {
-    	return mPreview;
+        return mPreview;
     }
-    
+
     /**
      * Returns the parameters structure of the current running camera
      * @return Camera.Parameters
@@ -82,21 +82,21 @@ public class CameraManager {
     public Camera.Parameters getParameters() {
         if (mCamera == null)
             return null;
-        
+
         return mCamera.getParameters();
     }
-    
-    
+
+
     /**
      * The CameraPreview class handles the Camera preview feed
      * and setting the surface holder.
      */
     public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
         private final static String TAG = "CameraManager.CameraPreview";
-        
+
         private SurfaceHolder mHolder;
         private Camera mCamera;
-        
+
 
         public CameraPreview(Context context) {
             super(context);
@@ -106,10 +106,10 @@ public class CameraManager {
             mHolder = getHolder();
             mHolder.addCallback(this);
         }
-        
+
         public void notifyCameraChanged(Camera camera) {
             mCamera = camera;
-            
+
             if (mCamera != null) {
                 try {
                     mCamera.setPreviewDisplay(mHolder);
@@ -124,7 +124,7 @@ public class CameraManager {
             // The Surface has been created, now tell the camera where to draw the preview.
             if (mCamera == null)
                 return;
-            
+
             try {
                 mCamera.setPreviewDisplay(holder);
                 mCamera.startPreview();
@@ -142,15 +142,15 @@ public class CameraManager {
             // Make sure to stop the preview before resizing or reformatting it.
 
             if (mHolder.getSurface() == null){
-              // preview surface does not exist
-              return;
+                // preview surface does not exist
+                return;
             }
 
             // stop preview before making changes
             try {
                 mCamera.stopPreview();
             } catch (Exception e){
-              // ignore: tried to stop a non-existent preview
+                // ignore: tried to stop a non-existent preview
             }
 
             // set preview size and make any resize, rotate or

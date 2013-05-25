@@ -57,7 +57,7 @@ public class SideBar extends ScrollView {
         mCapabilities = new CameraCapabilities(this.getContext());
         mCapabilities.populateSidebar(param, mToggleContainer, widgetsContainer);
     }
-    
+
     /**
      * Toggles the visibility of the widget options (container)
      * @param widget The widget to toggle

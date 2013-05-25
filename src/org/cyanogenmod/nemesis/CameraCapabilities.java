@@ -17,7 +17,7 @@ import android.view.ViewGroup;
  */
 public class CameraCapabilities {
     private List<WidgetBase> mWidgets;
-    
+
     /**
      * Default constructor, initializes all the widgets. They will
      * then be sorted by populateSidebar.
@@ -25,13 +25,13 @@ public class CameraCapabilities {
      */
     public CameraCapabilities(Context context) {
         mWidgets = new ArrayList<WidgetBase>();
-        
+
         // Populate the list of widgets.
         // Basically, if we add a new widget, we just put it here. They
         // will populate the sidebar in the same order as here
         mWidgets.add(new FlashWidget(context));
     }
-    
+
     /**
      * Populates the sidebar (through sideBarContainer) with the widgets actually
      * compatible with the device.
@@ -41,10 +41,10 @@ public class CameraCapabilities {
     public void populateSidebar(Camera.Parameters params, ViewGroup sideBarContainer,
             ViewGroup widgetsContainer) {
         List<WidgetBase> unsupported = new ArrayList<WidgetBase>();
-        
+
         for (int i = 0; i < mWidgets.size(); i++) {
             final WidgetBase widget = mWidgets.get(i);
-            
+
             // Add the widget to the sidebar if it is supported by the device.
             // The compatibility is determined by widgets themselves.
             if (widget.isSupported(params)) {
@@ -54,7 +54,7 @@ public class CameraCapabilities {
                 unsupported.add(widget);
             }
         }
-        
+
         for (int i = 0; i < unsupported.size(); i++)
             mWidgets.remove(unsupported.get(i));
     }

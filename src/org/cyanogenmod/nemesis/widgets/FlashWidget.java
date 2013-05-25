@@ -10,16 +10,16 @@ import android.hardware.Camera;
  */
 public class FlashWidget extends WidgetBase {
 
-	public FlashWidget(Context context) {
-		super(context, R.drawable.ic_widget_flash_on);
-		
-		addViewToContainer(new WidgetBase.WidgetOptionButton(R.drawable.ic_widget_flash_on, context));
-	}
-	
-	@Override
-	public boolean isSupported(Camera.Parameters params) {
-		return ( params.getSupportedFlashModes() != null );
-	}
+    public FlashWidget(Context context) {
+        super(context, R.drawable.ic_widget_flash_on);
 
-	
+        addViewToContainer(new WidgetBase.WidgetOptionButton(R.drawable.ic_widget_flash_on, context));
+    }
+
+    @Override
+    public boolean isSupported(Camera.Parameters params) {
+        return ( params.getSupportedFlashModes() != null );
+    }
+
+
 }
