@@ -38,7 +38,10 @@ public class CameraCapabilities {
      * @param params The Camera parameters returned from the HAL for compatibility check
      * @param sideBarContainer The side bar layout that will contain all the toggle buttons
      */
-    public void populateSidebar(Camera.Parameters params, ViewGroup sideBarContainer) {
+    public void populateSidebar(Camera.Parameters params, ViewGroup sideBarContainer,
+            ViewGroup widgetsContainer) {
+        List<WidgetBase> unsupported = new ArrayList<WidgetBase>();
+        
         for (int i = 0; i < mWidgets.size(); i++) {
             final WidgetBase widget = mWidgets.get(i);
             
@@ -46,7 +49,13 @@ public class CameraCapabilities {
             // The compatibility is determined by widgets themselves.
             if (widget.isSupported(params)) {
                 sideBarContainer.addView(widget.getToggleButton());
+                widgetsContainer.addView(widget.getWidget());
+            } else {
+                unsupported.add(widget);
             }
         }
+        
+        for (int i = 0; i < unsupported.size(); i++)
+            mWidgets.remove(unsupported.get(i));
     }
 }

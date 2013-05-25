@@ -9,21 +9,35 @@ public class Util {
 	// Orientation hysteresis amount used in rounding, in degrees
     public static final int ORIENTATION_HYSTERESIS = 5;
     
+    // Screen size holder
     private static Point mScreenSize = new Point();
     
+    /**
+     * Returns the orientation of the display
+     * In our case, since we're locked in Landscape, it should always
+     * be 90
+     * @param activity
+     * @return Orientation angle of the display
+     */
     public static int getDisplayRotation(Activity activity) {
         int rotation = activity.getWindowManager().getDefaultDisplay()
                 .getRotation();
         switch (rotation) {
             case Surface.ROTATION_0: return 0;
             case Surface.ROTATION_90: return 90;
-            case Surface.ROTATION_180: return -90;
-            case Surface.ROTATION_270: return 180;
+            case Surface.ROTATION_180: return 180;
+            case Surface.ROTATION_270: return 270;
         }
         return 0;
     }
     
-    
+    /**
+     * Rounds the orientation so that the UI doesn't rotate if the user
+     * holds the device towards the floor or the sky
+     * @param orientation New orientation
+     * @param orientationHistory Previous orientation
+     * @return Rounded orientation
+     */
 	public static int roundOrientation(int orientation, int orientationHistory) {
 		boolean changeOrientation = false;
 		if (orientationHistory == OrientationEventListener.ORIENTATION_UNKNOWN) {
@@ -39,8 +53,15 @@ public class Util {
 		return orientationHistory;
 	}
 	
+	/**
+	 * Returns the size of the screen
+	 * @param activity
+	 * @return Point where x=width and y=height
+	 */
 	public static Point getScreenSize(Activity activity) {
 		activity.getWindowManager().getDefaultDisplay().getSize(mScreenSize);
 		return mScreenSize;
 	}
+	
+	
 }

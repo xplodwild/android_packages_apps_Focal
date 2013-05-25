@@ -6,4 +6,6 @@
     <!-- Size of a widget option button (square) -->
     <dimen name="widget_option_button_size">32dp</dimen>
     
+    <!-- Padding of the widget toggle buttons -->
+    <dimen name="widget_toggle_button_padding">8dp</dimen>
 </resources>

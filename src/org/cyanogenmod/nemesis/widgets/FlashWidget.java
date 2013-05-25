@@ -11,9 +11,9 @@ import android.hardware.Camera;
 public class FlashWidget extends WidgetBase {
 
 	public FlashWidget(Context context) {
-		super(context, R.drawable.btn_shutter_photo);
+		super(context, R.drawable.ic_widget_flash_on);
 		
-		addViewToContainer(new WidgetBase.WidgetOptionButton(R.drawable.btn_shutter_video, context));
+		addViewToContainer(new WidgetBase.WidgetOptionButton(R.drawable.ic_widget_flash_on, context));
 	}
 	
 	@Override

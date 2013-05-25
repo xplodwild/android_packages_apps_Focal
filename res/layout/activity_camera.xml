@@ -47,4 +47,14 @@
 
     </org.cyanogenmod.nemesis.ui.SideBar>
 
+    <LinearLayout
+        android:id="@+id/widgets_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="48dp"
+        android:orientation="horizontal" >
+
+    </LinearLayout>
+
 </FrameLayout>
