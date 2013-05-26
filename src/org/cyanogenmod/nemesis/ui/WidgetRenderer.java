@@ -38,7 +38,7 @@ public class WidgetRenderer extends FrameLayout {
         mTotalWidth = 0.0f;
         mSpacing = getResources().getDimension(R.dimen.widget_spacing);
     }
-    
+
 
     /**
      * Rotate the contents of open widgets
@@ -49,14 +49,14 @@ public class WidgetRenderer extends FrameLayout {
             mOpenWidgets.get(i).notifyOrientationChanged(orientation);
         }
     }
-    
+
     /**
      * Notifies the renderer a widget has been moved. The renderer
      * will then move the other widgets accordingly if needed.
      * @param widget The widget that has been moved
      */
     public void notifyWidgetMoved(WidgetBase.WidgetContainer widget) {
-        
+
     }
 
     /**
@@ -72,7 +72,7 @@ public class WidgetRenderer extends FrameLayout {
 
         mOpenWidgets.add(widget);
         widget.setX(getFreePosition());
-        mTotalWidth += widget.getWidth() + mSpacing;
+        mTotalWidth += widget.getMeasuredWidth() + mSpacing;
     }
 
     /**
@@ -82,7 +82,7 @@ public class WidgetRenderer extends FrameLayout {
      */
     public void widgetClosed(WidgetBase.WidgetContainer widget) {
         mOpenWidgets.remove(widget);
-        mTotalWidth -= widget.getWidth() + mSpacing;
+        mTotalWidth -= widget.getMeasuredWidth() + mSpacing;
     }
 
     /**

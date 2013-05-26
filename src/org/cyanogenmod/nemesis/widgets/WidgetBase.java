@@ -99,11 +99,9 @@ public abstract class WidgetBase {
      * Opens the widget, show the fade in animation
      */
     public void open() {
-        Log.e(TAG, "Widget opens!");
-
         WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
         parent.widgetOpened(mWidget);
-        
+
         mWidget.animate().alpha(1.0f).translationXBy(WIDGET_ANIM_TRANSLATE)
         .setDuration(WIDGET_FADE_DURATION_MS).start();
         mWidget.setVisibility(View.VISIBLE);
@@ -112,8 +110,6 @@ public abstract class WidgetBase {
     }
 
     public void close() {
-        Log.e(TAG, "Widget closes!");
-        
         WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
         parent.widgetClosed(mWidget);
 
@@ -206,7 +202,7 @@ public abstract class WidgetBase {
      */
     public class WidgetOptionButton extends ImageView implements WidgetOption {
         private float mTouchOffset = 0.0f;
-        
+
         public WidgetOptionButton(int resId, Context context, AttributeSet attrs,
                 int defStyle) {
             super(context, attrs, defStyle);
@@ -227,7 +223,7 @@ public abstract class WidgetBase {
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             boolean handle = false;
-            
+
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
                 mTouchOffset = mWidget.getX() - event.getRawX();
@@ -237,14 +233,14 @@ public abstract class WidgetBase {
                 parent.notifyWidgetMoved(mWidget);
                 handle = true;
             }
-            
+
             return (super.onTouchEvent(event) || handle);
         }
-        
+
         private void initialize(int resId) {
             this.setImageResource(resId);
             this.setClickable(true);
-            
+
             this.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View arg0) {
@@ -257,8 +253,8 @@ public abstract class WidgetBase {
         public int getColSpan() {
             return 1;
         }
-        
-        
+
+
     }
 
     /**
@@ -266,7 +262,7 @@ public abstract class WidgetBase {
      */
     public class WidgetContainer extends GridLayout {
         private float mTouchOffset = 0.0f;
-        
+
         public WidgetContainer(Context context, AttributeSet attrs,
                 int defStyle) {
             super(context, attrs, defStyle);
@@ -282,11 +278,20 @@ public abstract class WidgetBase {
             super(context);
             initialize();
         }
-        
+
+        /**
+         * Returns the real width of the widget, as getWidth/getMeasuredWidth
+         * doesn't return a proper value since Visibility is set to gone.
+         * @return
+         */
+        public float getRealWidth() {
+            return getWidth();
+        }
+
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             boolean handle = false;
-            
+
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
                 mTouchOffset = getX() -  event.getRawX();
@@ -294,18 +299,18 @@ public abstract class WidgetBase {
                 setX(event.getRawX() + mTouchOffset);
                 handle = true;
             }
-            
+
             return (super.onTouchEvent(event) || handle);
         }
-        
+
         @Override
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
-            
+
             FrameLayout.LayoutParams layoutParam = (FrameLayout.LayoutParams) this.getLayoutParams();
             layoutParam.width = FrameLayout.LayoutParams.WRAP_CONTENT;
         }
-        
+
         private void initialize() {
             this.setBackgroundColor(getResources().getColor(R.color.widget_background));
 
@@ -313,8 +318,8 @@ public abstract class WidgetBase {
             // obtained after the "close" animation
             setAlpha(0.0f);
             setTranslationX(-WIDGET_ANIM_TRANSLATE);
-            setVisibility(View.GONE);
-            
+            setVisibility(View.VISIBLE);
+
             // Set padding
             int padding_in_dp = 8;
             final float scale = getResources().getDisplayMetrics().density;
@@ -342,8 +347,8 @@ public abstract class WidgetBase {
                 }
             });
         }
-        
-        
+
+
         public void notifyOrientationChanged(int orientation) {
             int buttonsCount = getChildCount();
 
