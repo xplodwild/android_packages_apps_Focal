@@ -227,11 +227,17 @@ public abstract class WidgetBase {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
                 mTouchOffset = mWidget.getX() - event.getRawX();
+                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
+                parent.notifyWidgetPicked(mWidget);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 mWidget.setX(event.getRawX() + mTouchOffset);
                 parent.notifyWidgetMoved(mWidget);
+                mWidget.forceFinalX(getX());
                 handle = true;
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
+                parent.notifyWidgetDropped(mWidget);
             }
 
             return (super.onTouchEvent(event) || handle);
@@ -260,6 +266,7 @@ public abstract class WidgetBase {
      */
     public class WidgetContainer extends GridLayout {
         private float mTouchOffset = 0.0f;
+        private float mTargetX = 0.0f;
 
         public WidgetContainer(Context context, AttributeSet attrs,
                 int defStyle) {
@@ -276,6 +283,25 @@ public abstract class WidgetBase {
             super(context);
             initialize();
         }
+        
+        public void setXSmooth(float x) {
+            if (mTargetX != x) {
+                Log.e(TAG, "Animating X to " + x);
+                this.animate().cancel();
+                this.animate().x(x).setDuration(100).start();
+                mTargetX = x;
+            } else {
+                Log.e(TAG, "NOT Animating");
+            }
+        }
+        
+        public float getFinalX() {
+            return mTargetX;
+        }
+        
+        public void forceFinalX(float x) {
+            mTargetX = x;
+        }
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
@@ -284,9 +310,17 @@ public abstract class WidgetBase {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
                 mTouchOffset = getX() -  event.getRawX();
+                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
+                parent.notifyWidgetPicked(mWidget);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                 setX(event.getRawX() + mTouchOffset);
+                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
+                parent.notifyWidgetMoved(mWidget);
+                forceFinalX(getX());
                 handle = true;
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
+                parent.notifyWidgetDropped(mWidget);
             }
 
             return (super.onTouchEvent(event) || handle);
