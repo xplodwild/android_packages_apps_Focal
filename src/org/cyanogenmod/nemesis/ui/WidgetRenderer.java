@@ -17,6 +17,7 @@ public class WidgetRenderer extends FrameLayout {
     private List<WidgetBase.WidgetContainer> mOpenWidgets;
     private float mTotalWidth;
     private float mSpacing;
+    private int mOrientation;
 
     public WidgetRenderer(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -45,6 +46,8 @@ public class WidgetRenderer extends FrameLayout {
      * @param orientation
      */
     public void notifyOrientationChanged(int orientation) {
+        mOrientation = orientation;
+        
         for (int i = 0; i < mOpenWidgets.size(); i++) {
             mOpenWidgets.get(i).notifyOrientationChanged(orientation);
         }
@@ -73,6 +76,9 @@ public class WidgetRenderer extends FrameLayout {
         mOpenWidgets.add(widget);
         widget.setX(getFreePosition());
         mTotalWidth += widget.getMeasuredWidth() + mSpacing;
+        
+        // make sure the widget is properly oriented
+        widget.notifyOrientationChanged(mOrientation);
     }
 
     /**
@@ -92,6 +98,27 @@ public class WidgetRenderer extends FrameLayout {
      */
     public float getFreePosition() {
         return mTotalWidth;
+    }
+    
+    public void notifySidebarSlideStatus(float distance) {
+        float finalY = getTranslationY() + distance;
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
+        
+        if (finalY > params.bottomMargin)
+            finalY = params.bottomMargin;
+        else if (finalY < 0)
+            finalY = 0;
+        
+        setTranslationY(finalY);
+    }
+    
+    public void notifySidebarSlideClose() {
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
+        animate().translationY(params.bottomMargin).setDuration(SideBar.SLIDE_ANIMATION_DURATION_MS).start();
+    }
+    
+    public void notifySidebarSlideOpen() {
+        animate().translationY(0).setDuration(SideBar.SLIDE_ANIMATION_DURATION_MS).start();
     }
 
 }

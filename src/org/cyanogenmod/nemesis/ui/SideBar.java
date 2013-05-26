@@ -14,7 +14,7 @@ import android.widget.ScrollView;
 
 public class SideBar extends ScrollView {
     public final static String TAG = "SideBar";
-    private final static int SLIDE_ANIMATION_DURATION_MS = 300;
+    public final static int SLIDE_ANIMATION_DURATION_MS = 300;
     private CameraCapabilities mCapabilities;
     private ViewGroup mToggleContainer;
 

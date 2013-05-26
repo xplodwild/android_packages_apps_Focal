@@ -253,8 +253,6 @@ public abstract class WidgetBase {
         public int getColSpan() {
             return 1;
         }
-
-
     }
 
     /**
@@ -277,15 +275,6 @@ public abstract class WidgetBase {
         public WidgetContainer(Context context) {
             super(context);
             initialize();
-        }
-
-        /**
-         * Returns the real width of the widget, as getWidth/getMeasuredWidth
-         * doesn't return a proper value since Visibility is set to gone.
-         * @return
-         */
-        public float getRealWidth() {
-            return getWidth();
         }
 
         @Override

@@ -181,6 +181,7 @@ public class CameraActivity extends Activity {
                 if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE ||
                         e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE) {
                     mSideBar.slide(-distanceY);
+                    mWidgetRenderer.notifySidebarSlideStatus(-distanceY);
                 }
 
                 return true;
@@ -198,8 +199,10 @@ public class CameraActivity extends Activity {
                 // swipes to open/close the sidebar 
                 if(e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                     mSideBar.slideOpen();
+                    mWidgetRenderer.notifySidebarSlideOpen();
                 }  else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                     mSideBar.slideClose();
+                    mWidgetRenderer.notifySidebarSlideClose();
                 }
             } catch (Exception e) {
                 // nothing
