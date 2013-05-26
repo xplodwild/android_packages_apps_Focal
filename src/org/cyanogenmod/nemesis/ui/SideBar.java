@@ -7,14 +7,13 @@ import org.cyanogenmod.nemesis.widgets.WidgetBase;
 import android.content.Context;
 import android.hardware.Camera;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ScrollView;
 
 public class SideBar extends ScrollView {
-    private final static String TAG = "SideBar";
+    public final static String TAG = "SideBar";
     private final static int SLIDE_ANIMATION_DURATION_MS = 300;
     private CameraCapabilities mCapabilities;
     private ViewGroup mToggleContainer;
@@ -65,10 +64,8 @@ public class SideBar extends ScrollView {
      */
     public void toggleWidgetVisibility(WidgetBase widget, boolean isFling) {
         if (widget.isOpen()) {
-            Log.e(TAG, "Closing widget");
             widget.close();
         } else {
-            Log.e(TAG, "Opening widget");
             widget.open();
         }
     }

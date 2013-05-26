@@ -8,4 +8,7 @@
     
     <!-- Padding of the widget toggle buttons -->
     <dimen name="widget_toggle_button_padding">8dp</dimen>
+    
+    <!-- Padding between each open widget -->
+    <dimen name="widget_spacing">8dp</dimen>
 </resources>

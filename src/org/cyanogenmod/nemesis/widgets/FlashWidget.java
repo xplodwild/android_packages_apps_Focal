@@ -14,6 +14,7 @@ public class FlashWidget extends WidgetBase {
         super(context, R.drawable.ic_widget_flash_on);
 
         addViewToContainer(new WidgetBase.WidgetOptionButton(R.drawable.ic_widget_flash_on, context));
+        addViewToContainer(new WidgetBase.WidgetOptionButton(R.drawable.ic_widget_flash_off, context));
     }
 
     @Override

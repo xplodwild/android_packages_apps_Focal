@@ -30,6 +30,9 @@ public class CameraCapabilities {
         // Basically, if we add a new widget, we just put it here. They
         // will populate the sidebar in the same order as here
         mWidgets.add(new FlashWidget(context));
+        mWidgets.add(new FlashWidget(context));
+        mWidgets.add(new FlashWidget(context));
+        mWidgets.add(new FlashWidget(context));
     }
 
     /**

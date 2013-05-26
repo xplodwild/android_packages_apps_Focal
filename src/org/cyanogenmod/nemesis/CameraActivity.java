@@ -1,6 +1,7 @@
 package org.cyanogenmod.nemesis;
 
 import org.cyanogenmod.nemesis.ui.SideBar;
+import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
 import android.app.Activity;
 import android.content.Context;
@@ -27,6 +28,7 @@ public class CameraActivity extends Activity {
     private int mOrientationCompensation = 0;
 
     private SideBar mSideBar;
+    private WidgetRenderer mWidgetRenderer;
 
     /**
      * Event: Activity created
@@ -37,7 +39,8 @@ public class CameraActivity extends Activity {
 
         setContentView(R.layout.activity_camera);
 
-        mSideBar = (SideBar) CameraActivity.this.findViewById(R.id.sidebar_scroller);
+        mSideBar = (SideBar) findViewById(R.id.sidebar_scroller);
+        mWidgetRenderer = (WidgetRenderer) findViewById(R.id.widgets_container);
 
         // Create orientation listener. This should be done first because it
         // takes some time to get first orientation.
@@ -69,7 +72,8 @@ public class CameraActivity extends Activity {
         // Populate the sidebar buttons a little later (so we have camera parameters)
         mHandler.post(new Runnable() {
             public void run() {
-                mSideBar.checkCapabilities(mCamManager.getParameters(), (ViewGroup) findViewById(R.id.widgets_container));
+                mSideBar.checkCapabilities(mCamManager.getParameters(), 
+                        (ViewGroup) findViewById(R.id.widgets_container));
             }
         });
     }
@@ -79,6 +83,7 @@ public class CameraActivity extends Activity {
         final ViewGroup root = (ViewGroup) findViewById(R.id.shutter_button_container);
         setViewRotation(root, mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
+        mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
     }
 
     protected void setupCamera() {

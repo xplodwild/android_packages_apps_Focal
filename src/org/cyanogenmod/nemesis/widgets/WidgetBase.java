@@ -2,6 +2,7 @@ package org.cyanogenmod.nemesis.widgets;
 
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.ui.SideBar;
+import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
@@ -11,6 +12,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 
@@ -98,6 +101,9 @@ public abstract class WidgetBase {
     public void open() {
         Log.e(TAG, "Widget opens!");
 
+        WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
+        parent.widgetOpened(mWidget);
+        
         mWidget.animate().alpha(1.0f).translationXBy(WIDGET_ANIM_TRANSLATE)
         .setDuration(WIDGET_FADE_DURATION_MS).start();
         mWidget.setVisibility(View.VISIBLE);
@@ -107,6 +113,9 @@ public abstract class WidgetBase {
 
     public void close() {
         Log.e(TAG, "Widget closes!");
+        
+        WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
+        parent.widgetClosed(mWidget);
 
         mWidget.animate().alpha(0.0f).translationXBy(-WIDGET_ANIM_TRANSLATE)
         .setDuration(WIDGET_FADE_DURATION_MS).start();
@@ -195,7 +204,9 @@ public abstract class WidgetBase {
      * Note that you're not forced to use exclusively buttons,
      * TextViews can also be added (for Timer for instance)
      */
-    public static class WidgetOptionButton extends ImageView implements WidgetOption {
+    public class WidgetOptionButton extends ImageView implements WidgetOption {
+        private float mTouchOffset = 0.0f;
+        
         public WidgetOptionButton(int resId, Context context, AttributeSet attrs,
                 int defStyle) {
             super(context, attrs, defStyle);
@@ -213,21 +224,49 @@ public abstract class WidgetBase {
             initialize(resId);
         }
 
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            boolean handle = false;
+            
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                handle = true;
+                mTouchOffset = mWidget.getX() - event.getRawX();
+            } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
+                mWidget.setX(event.getRawX() + mTouchOffset);
+                parent.notifyWidgetMoved(mWidget);
+                handle = true;
+            }
+            
+            return (super.onTouchEvent(event) || handle);
+        }
+        
         private void initialize(int resId) {
             this.setImageResource(resId);
             this.setClickable(true);
+            
+            this.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    Log.e(TAG, "BUTTON CLICKED!!!");
+                }
+            });
         }
 
         @Override
         public int getColSpan() {
             return 1;
         }
+        
+        
     }
 
     /**
      * Represents the floating window of a widget.
      */
     public class WidgetContainer extends GridLayout {
+        private float mTouchOffset = 0.0f;
+        
         public WidgetContainer(Context context, AttributeSet attrs,
                 int defStyle) {
             super(context, attrs, defStyle);
@@ -243,7 +282,30 @@ public abstract class WidgetBase {
             super(context);
             initialize();
         }
-
+        
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            boolean handle = false;
+            
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                handle = true;
+                mTouchOffset = getX() -  event.getRawX();
+            } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                setX(event.getRawX() + mTouchOffset);
+                handle = true;
+            }
+            
+            return (super.onTouchEvent(event) || handle);
+        }
+        
+        @Override
+        protected void onAttachedToWindow() {
+            super.onAttachedToWindow();
+            
+            FrameLayout.LayoutParams layoutParam = (FrameLayout.LayoutParams) this.getLayoutParams();
+            layoutParam.width = FrameLayout.LayoutParams.WRAP_CONTENT;
+        }
+        
         private void initialize() {
             this.setBackgroundColor(getResources().getColor(R.color.widget_background));
 
@@ -252,6 +314,12 @@ public abstract class WidgetBase {
             setAlpha(0.0f);
             setTranslationX(-WIDGET_ANIM_TRANSLATE);
             setVisibility(View.GONE);
+            
+            // Set padding
+            int padding_in_dp = 8;
+            final float scale = getResources().getDisplayMetrics().density;
+            int pad = (int) (padding_in_dp * scale + 0.5f);
+            this.setPadding(pad, pad, pad, pad);
 
             this.animate().setListener(new AnimatorListener() {
                 @Override
@@ -273,6 +341,18 @@ public abstract class WidgetBase {
                     WidgetContainer.this.setVisibility(View.VISIBLE);
                 }
             });
+        }
+        
+        
+        public void notifyOrientationChanged(int orientation) {
+            int buttonsCount = getChildCount();
+
+            for (int i = 0; i < buttonsCount; i++) {
+                View child = getChildAt(i);
+
+                child.animate().rotation(orientation)
+                .setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
+            }
         }
     }
 }
