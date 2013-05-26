@@ -34,6 +34,7 @@ public class CameraManager {
 
     private CameraPreview mPreview;
     private Camera mCamera;
+    private int mCurrentFacing;
 
     public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
@@ -47,14 +48,13 @@ public class CameraManager {
     public boolean open(int facing) {
         if (mCamera != null) {
             // Close the previous camera
-            mPreview.notifyCameraChanged(null);
-            mCamera.release();
-            mCamera = null;
+            releaseCamera();
         }
 
         // Try to open the camera
         try {
             mCamera = Camera.open(facing);
+            mCurrentFacing = facing;
         }
         catch (Exception e) {
             Log.e(TAG, "Error while opening cameras: " + e.getMessage());
@@ -62,7 +62,7 @@ public class CameraManager {
         }
 
         // Update the preview surface holder with the new opened camera
-        mPreview.notifyCameraChanged(mCamera);
+        mPreview.notifyCameraChanged();
 
         return true;
     }
@@ -85,6 +85,24 @@ public class CameraManager {
 
         return mCamera.getParameters();
     }
+    
+    public void pause() {
+        releaseCamera();
+    }
+    
+    public void resume() {
+        reconnectToCamera();
+    }
+    
+    private void releaseCamera() {
+        mCamera.release();
+        mCamera = null;
+        mPreview.notifyCameraChanged();
+    }
+    
+    private void reconnectToCamera() {
+        open(mCurrentFacing);
+    }
 
 
     /**
@@ -95,7 +113,6 @@ public class CameraManager {
         private final static String TAG = "CameraManager.CameraPreview";
 
         private SurfaceHolder mHolder;
-        private Camera mCamera;
 
 
         public CameraPreview(Context context) {
@@ -107,9 +124,7 @@ public class CameraManager {
             mHolder.addCallback(this);
         }
 
-        public void notifyCameraChanged(Camera camera) {
-            mCamera = camera;
-
+        public void notifyCameraChanged() {
             if (mCamera != null) {
                 try {
                     mCamera.setPreviewDisplay(mHolder);

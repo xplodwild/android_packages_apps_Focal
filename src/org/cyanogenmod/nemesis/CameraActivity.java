@@ -77,6 +77,23 @@ public class CameraActivity extends Activity {
             }
         });
     }
+    
+    
+    @Override
+    protected void onPause() {
+        // Pause the camera preview
+        mCamManager.pause();
+        
+        super.onPause();
+    }
+    
+    @Override
+    protected void onResume() {
+        // Restore the camera preview
+        mCamManager.resume();
+        
+        super.onResume();
+    }
 
 
     public void updateInterfaceOrientation() {
