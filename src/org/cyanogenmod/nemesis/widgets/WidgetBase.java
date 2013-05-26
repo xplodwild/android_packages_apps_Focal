@@ -227,17 +227,15 @@ public abstract class WidgetBase {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
                 mTouchOffset = mWidget.getX() - event.getRawX();
-                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
-                parent.notifyWidgetPicked(mWidget);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 mWidget.setX(event.getRawX() + mTouchOffset);
-                parent.notifyWidgetMoved(mWidget);
+                parent.widgetMoved(mWidget);
                 mWidget.forceFinalX(getX());
                 handle = true;
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
-                parent.notifyWidgetDropped(mWidget);
+                parent.widgetDropped(mWidget);
             }
 
             return (super.onTouchEvent(event) || handle);
@@ -286,12 +284,9 @@ public abstract class WidgetBase {
         
         public void setXSmooth(float x) {
             if (mTargetX != x) {
-                Log.e(TAG, "Animating X to " + x);
                 this.animate().cancel();
                 this.animate().x(x).setDuration(100).start();
                 mTargetX = x;
-            } else {
-                Log.e(TAG, "NOT Animating");
             }
         }
         
@@ -310,17 +305,15 @@ public abstract class WidgetBase {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
                 mTouchOffset = getX() -  event.getRawX();
-                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
-                parent.notifyWidgetPicked(mWidget);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                 setX(event.getRawX() + mTouchOffset);
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
-                parent.notifyWidgetMoved(mWidget);
+                parent.widgetMoved(mWidget);
                 forceFinalX(getX());
                 handle = true;
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
-                parent.notifyWidgetDropped(mWidget);
+                parent.widgetDropped(mWidget);
             }
 
             return (super.onTouchEvent(event) || handle);

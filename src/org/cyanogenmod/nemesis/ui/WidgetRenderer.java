@@ -14,9 +14,7 @@ import android.widget.FrameLayout;
 public class WidgetRenderer extends FrameLayout {
     public final static String TAG = "WidgetRenderer";
 
-    private List<WidgetBase.WidgetContainer> mOpenWidgets;
-    private List<WidgetBase.WidgetContainer> mSlidedWidgets; 
-    private float mSlideDistance;
+    private List<WidgetBase.WidgetContainer> mOpenWidgets; 
     private float mTotalWidth;
     private float mSpacing;
     private int mOrientation;
@@ -38,7 +36,6 @@ public class WidgetRenderer extends FrameLayout {
 
     private void initialize() {
         mOpenWidgets = new ArrayList<WidgetBase.WidgetContainer>();
-        mSlidedWidgets = new ArrayList<WidgetBase.WidgetContainer>();
         mTotalWidth = 0.0f;
         mSpacing = getResources().getDimension(R.dimen.widget_spacing);
     }
@@ -61,9 +58,9 @@ public class WidgetRenderer extends FrameLayout {
      * will then move the other widgets accordingly if needed.
      * @param widget The widget that has been moved
      */
-    public void notifyWidgetMoved(WidgetBase.WidgetContainer widget) {
+    public void widgetMoved(WidgetBase.WidgetContainer widget) {
         boolean isFirst = (mOpenWidgets.get(0) == widget);
-        
+
         // Check if we overlap the top of a widget
         for (int i = 0; i < mOpenWidgets.size(); i++) {
             WidgetBase.WidgetContainer tested = mOpenWidgets.get(i);
@@ -73,13 +70,10 @@ public class WidgetRenderer extends FrameLayout {
             if (widget.getX() < tested.getFinalX()+tested.getWidth()*1.33f) {
                 // Don't try to go before the first if we're already it
                 if (isFirst && widget.getX()+widget.getWidth() < tested.getFinalX()-tested.getWidth()/2) break;
-                
+
                 // Move the widget in our list
                 mOpenWidgets.remove(widget);
                 mOpenWidgets.add(i, widget);
-
-                Log.e(TAG, "Widget new position: " + i);
-                mSlideDistance = widget.getWidth();
 
                 reorderWidgets(widget);
                 break;
@@ -87,27 +81,23 @@ public class WidgetRenderer extends FrameLayout {
         }
     }
 
-    public void notifyWidgetPicked(WidgetBase.WidgetContainer widget) {
-
-    }
-
-    public void notifyWidgetDropped(WidgetBase.WidgetContainer widget) {
-        Log.e(TAG, "Widget dropped");
+    /**
+     * Reorder the widgets and clamp their position after a widget
+     * has been dropped.
+     * @param widget
+     */
+    public void widgetDropped(WidgetBase.WidgetContainer widget) {
         reorderWidgets(null);
-        mSlidedWidgets.clear();
     }
 
     public void reorderWidgets(WidgetBase.WidgetContainer ignore) {
         mTotalWidth = 0.0f;
 
-        //Log.e(TAG, "Ordering " + mOpenWidgets.size() + " widgets");
-
         for (int i = 0; i < mOpenWidgets.size(); i++) {
             WidgetBase.WidgetContainer widget = mOpenWidgets.get(i);
-            
+
             if (widget != ignore)
                 widget.setXSmooth(mTotalWidth);
-            //Log.e(TAG, "Ordering " + i + " to: " + mTotalWidth);
 
             mTotalWidth += widget.getWidth() + mSpacing;
         }
