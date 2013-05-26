@@ -349,8 +349,8 @@ public abstract class WidgetBase {
 
                 @Override
                 public void onAnimationEnd(Animator arg0) {
-                    if (!mIsOpen)
-                        WidgetContainer.this.setVisibility(View.GONE);
+                    /*if (!mIsOpen)
+                        WidgetContainer.this.setVisibility(View.GONE);*/
                 }
 
                 @Override

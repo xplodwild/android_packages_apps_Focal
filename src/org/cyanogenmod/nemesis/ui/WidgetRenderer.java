@@ -14,6 +14,8 @@ import android.widget.FrameLayout;
 public class WidgetRenderer extends FrameLayout {
     public final static String TAG = "WidgetRenderer";
 
+    private final static float WIDGETS_MARGIN = 80.0f;
+    
     private List<WidgetBase.WidgetContainer> mOpenWidgets; 
     private float mTotalWidth;
     private float mSpacing;
@@ -36,7 +38,7 @@ public class WidgetRenderer extends FrameLayout {
 
     private void initialize() {
         mOpenWidgets = new ArrayList<WidgetBase.WidgetContainer>();
-        mTotalWidth = 0.0f;
+        mTotalWidth = WIDGETS_MARGIN;
         mSpacing = getResources().getDimension(R.dimen.widget_spacing);
     }
 
@@ -91,7 +93,7 @@ public class WidgetRenderer extends FrameLayout {
     }
 
     public void reorderWidgets(WidgetBase.WidgetContainer ignore) {
-        mTotalWidth = 0.0f;
+        mTotalWidth = WIDGETS_MARGIN;
 
         for (int i = 0; i < mOpenWidgets.size(); i++) {
             WidgetBase.WidgetContainer widget = mOpenWidgets.get(i);
@@ -115,11 +117,14 @@ public class WidgetRenderer extends FrameLayout {
         }
 
         mOpenWidgets.add(widget);
-        widget.setX(mTotalWidth);
-        mTotalWidth += widget.getMeasuredWidth() + mSpacing;
-
+        
         // make sure the widget is properly oriented
         widget.notifyOrientationChanged(mOrientation);
+        
+        // position it properly
+        widget.forceFinalX(mTotalWidth - WIDGETS_MARGIN);
+        widget.setX(mTotalWidth - WIDGETS_MARGIN);
+        mTotalWidth += widget.getWidth() + mSpacing;
     }
 
     /**
@@ -129,7 +134,9 @@ public class WidgetRenderer extends FrameLayout {
      */
     public void widgetClosed(WidgetBase.WidgetContainer widget) {
         mOpenWidgets.remove(widget);
-        mTotalWidth -= widget.getMeasuredWidth() + mSpacing;
+        
+        // reposition all the widgets
+        reorderWidgets(null);
     }
 
 
