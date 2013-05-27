@@ -115,7 +115,7 @@ public class Util {
         }
         return optimalSize;
     }
-    
+
     public static void fadeIn(View view, float startAlpha, float endAlpha, long duration) {
         if (view.getVisibility() == View.VISIBLE) return;
 

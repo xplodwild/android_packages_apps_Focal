@@ -6,6 +6,7 @@ import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Handler;
@@ -73,26 +74,34 @@ public class CameraActivity extends Activity {
         // Populate the sidebar buttons a little later (so we have camera parameters)
         mHandler.post(new Runnable() {
             public void run() {
-                mSideBar.checkCapabilities(mCamManager.getParameters(), 
-                        (ViewGroup) findViewById(R.id.widgets_container));
+                Camera.Parameters params = mCamManager.getParameters();
+
+                // We don't have the camera parameters yet, retry later
+                if (params == null) {
+                    Log.w(TAG, "No camera params yet, posting again");
+                    mHandler.post(this);
+                } else {
+                    mSideBar.checkCapabilities(mCamManager.getParameters(), 
+                            (ViewGroup) findViewById(R.id.widgets_container));
+                }
             }
         });
     }
-    
-    
+
+
     @Override
     protected void onPause() {
         // Pause the camera preview
         mCamManager.pause();
-        
+
         super.onPause();
     }
-    
+
     @Override
     protected void onResume() {
         // Restore the camera preview
         mCamManager.resume();
-        
+
         super.onResume();
     }
 
@@ -106,20 +115,20 @@ public class CameraActivity extends Activity {
 
     protected void setupCamera() {
         // Setup the Camera hardware and preview surface
-        mCamManager = new CameraManager(this);
-        
+        mCamManager = CameraManager.getSingleton(this);
+
         // Add the preview surface to its container
         final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
         layout.addView(mCamManager.getPreviewSurface());
 
-        
+
         if (!mCamManager.open(0)) {
             Log.e(TAG, "Could not open cameras");
         }
-        
+
         Size sz = Util.getOptimalPreviewSize(this, mCamManager.getParameters().getSupportedPreviewSizes(), 1.33f);
         mCamManager.setPreviewSize(sz.width, sz.height);
-        
+
         layout.setAspectRatio((double) sz.width / sz.height);
         layout.setPreviewSize(sz.width, sz.height);
     }

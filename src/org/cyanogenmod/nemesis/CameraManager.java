@@ -32,13 +32,40 @@ import android.view.SurfaceView;
  */
 public class CameraManager {
     private final static String TAG = "CameraManager";
-
+    private static CameraManager mSingleton;
+    
     private CameraPreview mPreview;
     private Camera mCamera;
     private int mCurrentFacing;
     private Point mTargetSize;
+    
+    private class AsyncParamRunnable implements Runnable {
+        private String mKey;
+        private String mValue;
+        
+        public AsyncParamRunnable(String key, String value) {
+            mKey = key;
+            mValue = value;
+        }
+        
+        public void run() {
+            Camera.Parameters parameters = mCamera.getParameters();
+            parameters.set(mKey, mValue);
+            mCamera.setParameters(parameters);
+        }
+    };
+    
+    
 
-    public CameraManager(Context context) {
+    public static CameraManager getSingleton(Context context) {
+        if (mSingleton == null) {
+            mSingleton = new CameraManager(context);
+        }
+        
+        return mSingleton;
+    }
+    
+    private CameraManager(Context context) {
         mPreview = new CameraPreview(context);
     }
 
@@ -125,6 +152,11 @@ public class CameraManager {
             mCamera.setParameters(parameters);
             mCamera.startPreview();
         }
+    }
+    
+    public void setParameterAsync(String key, String value) {
+        AsyncParamRunnable run = new AsyncParamRunnable(key, value);
+        new Thread(run).start();
     }
 
     /**

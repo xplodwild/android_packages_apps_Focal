@@ -38,7 +38,7 @@ public class PreviewFrameLayout extends RelativeLayout {
     private int mPreviewWidth;
     private int mPreviewHeight;
     private OnSizeChangedListener mListener;
-    
+
 
     public PreviewFrameLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -73,10 +73,10 @@ public class PreviewFrameLayout extends RelativeLayout {
         // Scale the preview while keeping the aspect ratio
         int fullWidth = MeasureSpec.getSize(widthSpec);
         int fullHeight = MeasureSpec.getSize(heightSpec);
-        
+
         float widthRatio = (float) fullWidth/previewWidth;
         float heightRatio = (float) fullHeight/previewHeight;
-        
+
         if (widthRatio > heightRatio) {
             previewWidth *= widthRatio;
             previewHeight *= widthRatio;

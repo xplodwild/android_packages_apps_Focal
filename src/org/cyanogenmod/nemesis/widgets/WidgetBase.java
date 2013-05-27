@@ -9,7 +9,6 @@ import android.animation.Animator.AnimatorListener;
 import android.content.Context;
 import android.hardware.Camera;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -30,7 +29,7 @@ import android.widget.ImageView;
  * 
  */
 public abstract class WidgetBase {
-    private final static String TAG = "WidgetBase";
+    public final static String TAG = "WidgetBase";
 
     private WidgetToggleButton mToggleButton;
     private WidgetContainer mWidget;
@@ -244,13 +243,6 @@ public abstract class WidgetBase {
         private void initialize(int resId) {
             this.setImageResource(resId);
             this.setClickable(true);
-
-            this.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View arg0) {
-                    Log.e(TAG, "BUTTON CLICKED!!!");
-                }
-            });
         }
 
         @Override
@@ -281,7 +273,7 @@ public abstract class WidgetBase {
             super(context);
             initialize();
         }
-        
+
         public void setXSmooth(float x) {
             if (mTargetX != x) {
                 this.animate().cancel();
@@ -289,11 +281,11 @@ public abstract class WidgetBase {
                 mTargetX = x;
             }
         }
-        
+
         public float getFinalX() {
             return mTargetX;
         }
-        
+
         public void forceFinalX(float x) {
             mTargetX = x;
         }

@@ -3,24 +3,16 @@ package org.cyanogenmod.nemesis.widgets;
 import org.cyanogenmod.nemesis.R;
 
 import android.content.Context;
-import android.hardware.Camera;
 
 /**
  * Flash Widget, manages the flash settings
  */
-public class FlashWidget extends WidgetBase {
-
+public class FlashWidget extends SimpleToggleWidget {
+    
     public FlashWidget(Context context) {
-        super(context, R.drawable.ic_widget_flash_on);
+        super(context, "flash-mode", R.drawable.ic_widget_flash_on);
 
-        addViewToContainer(new WidgetBase.WidgetOptionButton(R.drawable.ic_widget_flash_on, context));
-        addViewToContainer(new WidgetBase.WidgetOptionButton(R.drawable.ic_widget_flash_off, context));
+        addValue("on", R.drawable.ic_widget_flash_on);
+        addValue("off", R.drawable.ic_widget_flash_off);
     }
-
-    @Override
-    public boolean isSupported(Camera.Parameters params) {
-        return ( params.getSupportedFlashModes() != null );
-    }
-
-
 }
