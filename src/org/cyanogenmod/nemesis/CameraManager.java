@@ -19,6 +19,7 @@ package org.cyanogenmod.nemesis;
 import java.io.IOException;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -35,6 +36,7 @@ public class CameraManager {
     private CameraPreview mPreview;
     private Camera mCamera;
     private int mCurrentFacing;
+    private Point mTargetSize;
 
     public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
@@ -55,6 +57,11 @@ public class CameraManager {
         try {
             mCamera = Camera.open(facing);
             mCurrentFacing = facing;
+
+            if (mTargetSize != null)
+                setPreviewSize(mTargetSize.x, mTargetSize.y);
+            else
+                Log.e(TAG, "mTargetSize is null!");
         }
         catch (Exception e) {
             Log.e(TAG, "Error while opening cameras: " + e.getMessage());
@@ -85,25 +92,40 @@ public class CameraManager {
 
         return mCamera.getParameters();
     }
-    
+
     public void pause() {
         releaseCamera();
     }
-    
+
     public void resume() {
         reconnectToCamera();
     }
-    
+
     private void releaseCamera() {
         mCamera.release();
         mCamera = null;
         mPreview.notifyCameraChanged();
     }
-    
+
     private void reconnectToCamera() {
         open(mCurrentFacing);
     }
 
+    public void setPreviewSize(int width, int height) {
+        mTargetSize = new Point(width, height);
+
+        if (mCamera != null) {
+            Camera.Parameters parameters = mCamera.getParameters();
+
+            parameters.setPreviewSize(width, height);
+            
+            Log.e(TAG, "Preview size is " + width + "x" + height);
+
+            mCamera.stopPreview();
+            mCamera.setParameters(parameters);
+            mCamera.startPreview();
+        }
+    }
 
     /**
      * The CameraPreview class handles the Camera preview feed

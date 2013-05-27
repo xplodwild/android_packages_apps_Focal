@@ -1,13 +1,22 @@
 package org.cyanogenmod.nemesis;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
+import android.hardware.Camera.Size;
+import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.Surface;
+import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 
 public class Util {
+    public final static String TAG = "Nemesis.Util";
+
     // Orientation hysteresis amount used in rounding, in degrees
     public static final int ORIENTATION_HYSTERESIS = 5;
 
@@ -67,4 +76,71 @@ public class Util {
     }
 
 
+    public static Size getOptimalPreviewSize(Activity currentActivity,
+            List<Size> sizes, double targetRatio) {
+        // Use a very small tolerance because we want an exact match.
+        final double ASPECT_TOLERANCE = 0.001;
+        if (sizes == null) return null;
+
+        Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
+
+        // Because of bugs of overlay and layout, we sometimes will try to
+        // layout the viewfinder in the portrait orientation and thus get the
+        // wrong size of preview surface. When we change the preview size, the
+        // new overlay will be created before the old one closed, which causes
+        // an exception. For now, just get the screen size.
+        Point point = getScreenSize(currentActivity);
+        int targetHeight = Math.min(point.x, point.y);
+        // Try to find an size match aspect ratio and size
+        for (Size size : sizes) {
+            double ratio = (double) size.width / size.height;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(size.height - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
+            }
+        }
+        // Cannot find the one match the aspect ratio. This should not happen.
+        // Ignore the requirement.
+        if (optimalSize == null) {
+            Log.w(TAG, "No preview size match the aspect ratio");
+            minDiff = Double.MAX_VALUE;
+            for (Size size : sizes) {
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
+        }
+        return optimalSize;
+    }
+    
+    public static void fadeIn(View view, float startAlpha, float endAlpha, long duration) {
+        if (view.getVisibility() == View.VISIBLE) return;
+
+        view.setVisibility(View.VISIBLE);
+        Animation animation = new AlphaAnimation(startAlpha, endAlpha);
+        animation.setDuration(duration);
+        view.startAnimation(animation);
+    }
+
+    public static void fadeIn(View view) {
+        fadeIn(view, 0F, 1F, 400);
+
+        // We disabled the button in fadeOut(), so enable it here.
+        view.setEnabled(true);
+    }
+
+    public static void fadeOut(View view) {
+        if (view.getVisibility() != View.VISIBLE) return;
+
+        // Since the button is still clickable before fade-out animation
+        // ends, we disable the button first to block click.
+        view.setEnabled(false);
+        Animation animation = new AlphaAnimation(1F, 0F);
+        animation.setDuration(400);
+        view.startAnimation(animation);
+        view.setVisibility(View.GONE);
+    }
 }

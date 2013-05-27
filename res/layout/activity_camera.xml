@@ -6,12 +6,12 @@
     android:background="#333"
     tools:context=".CameraActivity" >
 
-    <FrameLayout
+    <org.cyanogenmod.nemesis.ui.PreviewFrameLayout
         android:id="@+id/camera_preview_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-    </FrameLayout>
+    </org.cyanogenmod.nemesis.ui.PreviewFrameLayout>
 
     <FrameLayout
         android:id="@+id/shutter_button_container"
