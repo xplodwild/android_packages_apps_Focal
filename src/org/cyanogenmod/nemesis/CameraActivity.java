@@ -1,13 +1,8 @@
 package org.cyanogenmod.nemesis;
 
-import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
-import org.cyanogenmod.nemesis.ui.SideBar;
-import org.cyanogenmod.nemesis.ui.WidgetRenderer;
-
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
-import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -17,6 +12,10 @@ import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+
+import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
+import org.cyanogenmod.nemesis.ui.SideBar;
+import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
 public class CameraActivity extends Activity {    
     public final static String TAG = "CameraActivity";
@@ -119,6 +118,11 @@ public class CameraActivity extends Activity {
 
         // Add the preview surface to its container
         final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
+
+        // if we resumed the activity, the preview surface will already be attached
+        if (mCamManager.getPreviewSurface().getParent() != null)
+            ((ViewGroup)mCamManager.getPreviewSurface().getParent()).removeView(mCamManager.getPreviewSurface());
+
         layout.addView(mCamManager.getPreviewSurface());
 
 
@@ -126,7 +130,7 @@ public class CameraActivity extends Activity {
             Log.e(TAG, "Could not open cameras");
         }
 
-        Size sz = Util.getOptimalPreviewSize(this, mCamManager.getParameters().getSupportedPreviewSizes(), 1.33f);
+        Camera.Size sz = Util.getOptimalPreviewSize(this, mCamManager.getParameters().getSupportedPreviewSizes(), 1.33f);
         mCamManager.setPreviewSize(sz.width, sz.height);
 
         layout.setAspectRatio((double) sz.width / sz.height);

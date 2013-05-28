@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Whether or not to stop preview between taking shots. -->
+    <bool name="config_stopPreviewBetweenShots">true</bool>
+
+    <!-- Whether or not to enable camera-mode for ZSL -->
+    <bool name="config_ZSLNeedsCameraMode">false</bool>
+</resources>

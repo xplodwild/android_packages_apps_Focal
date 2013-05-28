@@ -26,7 +26,7 @@ import android.view.SurfaceView;
 import java.io.IOException;
 
 /**
- * This class is responible for interacting with the Camera HAL.
+ * This class is responsible for interacting with the Camera HAL.
  * It provides easy open/close, helper methods to set parameters or 
  * toggle features, etc. in an asynchronous fashion.
  */
@@ -38,6 +38,7 @@ public class CameraManager {
     private Camera mCamera;
     private int mCurrentFacing;
     private Point mTargetSize;
+    private Camera.Parameters mParameters;
     
     private class AsyncParamRunnable implements Runnable {
         private String mKey;
@@ -49,10 +50,9 @@ public class CameraManager {
         }
         
         public void run() {
-            Log.e(TAG, "Asyncly setting parameter " + mKey + " to " + mValue);
-            Camera.Parameters parameters = mCamera.getParameters();
-            parameters.set(mKey, mValue);
-            mCamera.setParameters(parameters);
+            Log.v(TAG, "Asynchronously setting parameter " + mKey + " to " + mValue);
+            mParameters.set(mKey, mValue);
+            mCamera.setParameters(mParameters);
         }
     };
     
@@ -85,6 +85,7 @@ public class CameraManager {
         try {
             mCamera = Camera.open(facing);
             mCurrentFacing = facing;
+            mParameters = null;
 
             if (mTargetSize != null)
                 setPreviewSize(mTargetSize.x, mTargetSize.y);
@@ -118,7 +119,10 @@ public class CameraManager {
         if (mCamera == null)
             return null;
 
-        return mCamera.getParameters();
+        if (mParameters == null)
+            mParameters = mCamera.getParameters();
+
+        return mParameters;
     }
 
     public void pause() {
@@ -132,6 +136,7 @@ public class CameraManager {
     private void releaseCamera() {
         mCamera.release();
         mCamera = null;
+        mParameters = null;
         mPreview.notifyCameraChanged();
     }
 
@@ -143,14 +148,12 @@ public class CameraManager {
         mTargetSize = new Point(width, height);
 
         if (mCamera != null) {
-            Camera.Parameters parameters = mCamera.getParameters();
-
-            parameters.setPreviewSize(width, height);
+            mParameters.setPreviewSize(width, height);
             
-            Log.e(TAG, "Preview size is " + width + "x" + height);
+            Log.v(TAG, "Preview size is " + width + "x" + height);
 
             mCamera.stopPreview();
-            mCamera.setParameters(parameters);
+            mCamera.setParameters(mParameters);
             mCamera.startPreview();
         }
     }
@@ -208,9 +211,6 @@ public class CameraManager {
         }
 
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-            // If your preview can change or rotate, take care of those events here.
-            // Make sure to stop the preview before resizing or reformatting it.
-
             if (mHolder.getSurface() == null){
                 // preview surface does not exist
                 return;
@@ -223,8 +223,6 @@ public class CameraManager {
                 // ignore: tried to stop a non-existent preview
             }
 
-            // set preview size and make any resize, rotate or
-            // reformatting changes here
 
             // start preview with new settings
             try {
