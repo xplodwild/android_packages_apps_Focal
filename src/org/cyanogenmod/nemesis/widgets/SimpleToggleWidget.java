@@ -53,7 +53,8 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
         String values = params.get(mKey + "-values");
 
         // If we don't have a -values provided, or if it contains the value, add it.
-        if (values == null || Arrays.asList(values.split(",")).contains(value)) {
+        if ((values == null && filterDeviceSpecific(value)) 
+                || Arrays.asList(values.split(",")).contains(value)) {
             WidgetBase.WidgetOptionButton button = new WidgetBase.WidgetOptionButton(resId, mContext);
             button.setOnClickListener(this);
             mButtonsValues.put(button, value);
@@ -61,6 +62,18 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
         } else {
             Log.w(TAG, "Device doesn't support " + value + " for setting " + mKey);
         }
+    }
+    
+    /**
+     * This method can be overriden by each widgets. If some keys doesn't
+     * have a "-values" array, we can filter eventual device-specific incompatibilities
+     * in this method.
+     * 
+     * @param value The value tested for support
+     * @return true if the value is supported, false if it's not
+     */
+    public boolean filterDeviceSpecific(String value) {
+        return true;
     }
 
     /**
