@@ -164,6 +164,14 @@ public class CameraManager {
     }
 
     /**
+     * Takes a snapshot
+     */
+    public void takeSnapshot(Camera.ShutterCallback shutterCallback, Camera.PictureCallback raw,
+                             Camera.PictureCallback jpeg) {
+        mCamera.takePicture(shutterCallback, raw, jpeg);
+    }
+
+    /**
      * The CameraPreview class handles the Camera preview feed
      * and setting the surface holder.
      */
