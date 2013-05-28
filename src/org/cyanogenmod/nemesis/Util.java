@@ -1,7 +1,5 @@
 package org.cyanogenmod.nemesis;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
@@ -13,6 +11,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+
+import java.util.List;
 
 public class Util {
     public final static String TAG = "Nemesis.Util";
@@ -70,8 +70,10 @@ public class Util {
      * @return Point where x=width and y=height
      */
     public static Point getScreenSize(Activity activity) {
-        WindowManager service = (WindowManager)activity.getSystemService(Context.WINDOW_SERVICE);
-        service.getDefaultDisplay().getSize(mScreenSize);
+        if (activity != null) {
+            WindowManager service = (WindowManager)activity.getSystemService(Context.WINDOW_SERVICE);
+            service.getDefaultDisplay().getSize(mScreenSize);
+        }
         return mScreenSize;
     }
 

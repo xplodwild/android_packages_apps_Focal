@@ -1,9 +1,5 @@
 package org.cyanogenmod.nemesis.ui;
 
-import org.cyanogenmod.nemesis.CameraCapabilities;
-import org.cyanogenmod.nemesis.R;
-import org.cyanogenmod.nemesis.widgets.WidgetBase;
-
 import android.content.Context;
 import android.hardware.Camera;
 import android.util.AttributeSet;
@@ -11,6 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ScrollView;
+
+import org.cyanogenmod.nemesis.CameraCapabilities;
+import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.widgets.WidgetBase;
 
 public class SideBar extends ScrollView {
     public final static String TAG = "SideBar";
@@ -65,6 +65,12 @@ public class SideBar extends ScrollView {
     public void toggleWidgetVisibility(WidgetBase widget, boolean isFling) {
         if (widget.isOpen()) {
             widget.close();
+            if (isFling) {
+                // fling needs to go fast, skip animation
+                // XXX: Make something more beautiful?
+                widget.getWidget().clearAnimation();
+                widget.getWidget().setAlpha(0.0f);
+            }
         } else {
             widget.open();
         }

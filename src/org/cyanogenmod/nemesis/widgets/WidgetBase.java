@@ -5,6 +5,7 @@ import android.animation.Animator.AnimatorListener;
 import android.content.Context;
 import android.hardware.Camera;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -31,6 +32,7 @@ import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 public abstract class WidgetBase {
     public final static String TAG = "WidgetBase";
 
+    private GestureDetector mGestureDetector;
     private WidgetToggleButton mToggleButton;
     private WidgetContainer mWidget;
     private int mWidgetMaxWidth;
@@ -42,6 +44,7 @@ public abstract class WidgetBase {
     public WidgetBase(Context context, int iconResId) {
         mWidget = new WidgetContainer(context);
         mToggleButton = new WidgetToggleButton(context);
+        mGestureDetector = new GestureDetector(context, new WidgetFlingGestureListener());
         mIsOpen = false;
 
         // Setup the container
@@ -149,6 +152,14 @@ public abstract class WidgetBase {
             this.setOnClickListener(new ToggleClickListener());
         }
 
+        public void toggleBackground(boolean active) {
+            if (active) {
+                this.setBackgroundColor(getResources().getColor(R.color.widget_toggle_active));
+            } else {
+                this.setBackgroundColor(0);
+            }
+        }
+
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             // to dispatch click / long click event, we do it first
@@ -160,11 +171,7 @@ public abstract class WidgetBase {
             } else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
                 // State is not updated yet, but after ACTION_UP is received the button
                 // will likely be clicked and its state will change.
-                if (!mIsOpen) {
-                    this.setBackgroundColor(getResources().getColor(R.color.widget_toggle_active));
-                } else {
-                    this.setBackgroundColor(0);
-                }
+                toggleBackground(!mIsOpen);
             }
 
             return defaultResult;
@@ -227,6 +234,8 @@ public abstract class WidgetBase {
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             boolean handle = false;
+
+            mGestureDetector.onTouchEvent(event);
 
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
@@ -306,9 +315,15 @@ public abstract class WidgetBase {
             mTargetX = x;
         }
 
+        public WidgetBase getWidgetBase() {
+            return WidgetBase.this;
+        }
+
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             boolean handle = false;
+
+            mGestureDetector.onTouchEvent(event);
 
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
@@ -372,6 +387,8 @@ public abstract class WidgetBase {
                     WidgetContainer.this.setVisibility(View.VISIBLE);
                 }
             });
+
+
         }
 
 
@@ -384,6 +401,42 @@ public abstract class WidgetBase {
                 child.animate().rotation(orientation)
                 .setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
             }
+        }
+    }
+
+    /**
+     * Handles the swipe of widgets out of the screen (to the top/left)
+     */
+    public class WidgetFlingGestureListener extends GestureDetector.SimpleOnGestureListener {
+        //private final static String TAG = "GestureListener";
+
+        private static final int SWIPE_MIN_DISTANCE = 10;
+        private static final int SWIPE_MAX_OFF_PATH = 250;
+        private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            try {
+                if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH)
+                    return false;
+
+                // swipe top to close the widget
+
+                // Somehow, GestureDetector takes the screen orientation into account, even if our
+                // activity is locked in landscape.
+                float distance = e2.getY() - e1.getY();
+                if (distance <= 0.1f)
+                    distance = e2.getX() - e1.getX();
+
+                if(distance > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                    final SideBar sb = (SideBar) mToggleButton.getParent().getParent();
+                    sb.toggleWidgetVisibility(WidgetBase.this, true);
+                    mToggleButton.toggleBackground(false);
+                }
+            } catch (Exception e) {
+                // nothing
+            }
+            return false;
         }
     }
 }
