@@ -1,25 +1,26 @@
 package org.cyanogenmod.nemesis.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.cyanogenmod.nemesis.R;
-import org.cyanogenmod.nemesis.widgets.WidgetBase;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.FrameLayout;
 
+import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.widgets.WidgetBase;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class WidgetRenderer extends FrameLayout {
     public final static String TAG = "WidgetRenderer";
 
     private final static float WIDGETS_MARGIN = 80.0f;
-    
-    private List<WidgetBase.WidgetContainer> mOpenWidgets; 
+
+    private List<WidgetBase.WidgetContainer> mOpenWidgets;
     private float mTotalWidth;
     private float mSpacing;
     private int mOrientation;
+    private float mWidgetDragStartPoint;
 
     public WidgetRenderer(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -56,11 +57,22 @@ public class WidgetRenderer extends FrameLayout {
     }
 
     /**
+     * Notifies the renderer a widget has been pressed.
+     * @param widget The widget that has been pressed
+     */
+    public void widgetPressed(WidgetBase.WidgetContainer widget) {
+        mWidgetDragStartPoint = widget.getFinalX();
+    }
+
+    /**
      * Notifies the renderer a widget has been moved. The renderer
      * will then move the other widgets accordingly if needed.
      * @param widget The widget that has been moved
      */
     public void widgetMoved(WidgetBase.WidgetContainer widget) {
+        // Don't move widget if it was just a small tap
+        if (Math.abs(widget.getX() - mWidgetDragStartPoint) < 40.0f) return;
+
         boolean isFirst = (mOpenWidgets.get(0) == widget);
 
         // Check if we overlap the top of a widget
@@ -69,7 +81,7 @@ public class WidgetRenderer extends FrameLayout {
 
             if (tested == widget) continue;
 
-            if (widget.getX() < tested.getFinalX()+tested.getWidth()*1.33f) {
+            if (widget.getX() < tested.getFinalX()+tested.getWidth()) {
                 // Don't try to go before the first if we're already it
                 if (isFirst && widget.getX()+widget.getWidth() < tested.getFinalX()-tested.getWidth()/2) break;
 
@@ -117,10 +129,10 @@ public class WidgetRenderer extends FrameLayout {
         }
 
         mOpenWidgets.add(widget);
-        
+
         // make sure the widget is properly oriented
         widget.notifyOrientationChanged(mOrientation);
-        
+
         // position it properly
         widget.forceFinalX(mTotalWidth - WIDGETS_MARGIN);
         widget.setX(mTotalWidth - WIDGETS_MARGIN);
@@ -134,7 +146,7 @@ public class WidgetRenderer extends FrameLayout {
      */
     public void widgetClosed(WidgetBase.WidgetContainer widget) {
         mOpenWidgets.remove(widget);
-        
+
         // reposition all the widgets
         reorderWidgets(null);
     }

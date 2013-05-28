@@ -1,9 +1,5 @@
 package org.cyanogenmod.nemesis.widgets;
 
-import org.cyanogenmod.nemesis.R;
-import org.cyanogenmod.nemesis.ui.SideBar;
-import org.cyanogenmod.nemesis.ui.WidgetRenderer;
-
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.content.Context;
@@ -15,6 +11,10 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+
+import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.ui.SideBar;
+import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
 /**
  * Base class for settings widget. Each setting widget
@@ -226,6 +226,8 @@ public abstract class WidgetBase {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
                 mTouchOffset = mWidget.getX() - event.getRawX();
+                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
+                parent.widgetPressed(mWidget);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 mWidget.setX(event.getRawX() + mTouchOffset);
@@ -297,6 +299,8 @@ public abstract class WidgetBase {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
                 mTouchOffset = getX() -  event.getRawX();
+                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
+                parent.widgetPressed(mWidget);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                 setX(event.getRawX() + mTouchOffset);
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
