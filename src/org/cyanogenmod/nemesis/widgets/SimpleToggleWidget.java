@@ -1,18 +1,18 @@
 package org.cyanogenmod.nemesis.widgets;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.cyanogenmod.nemesis.CameraManager;
-import org.cyanogenmod.nemesis.IconGlower;
-
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+
+import org.cyanogenmod.nemesis.CameraManager;
+import org.cyanogenmod.nemesis.IconGlower;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Base for simple widgets simply changing a parameter
@@ -26,6 +26,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
 
     private Map<WidgetBase.WidgetOptionButton, String> mButtonsValues;
     private Context mContext;
+    private WidgetOptionButton mActiveButton;
 
     public SimpleToggleWidget(Context context, String key, int sidebarIcon) {
         super(context, sidebarIcon);
@@ -59,6 +60,10 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
             button.setOnClickListener(this);
             mButtonsValues.put(button, value);
             addViewToContainer(button);
+
+            if (params.get(mKey).equals(value)) {
+                setButtonActivated(button, value);
+            }
         } else {
             Log.w(TAG, "Device doesn't support " + value + " for setting " + mKey);
         }
@@ -106,12 +111,19 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
 
         if (value != null) {
             CameraManager.getSingleton(null).setParameterAsync(mKey, value);
-            button.setImageBitmap(IconGlower.getSingleton().getGlow(mKey+"="+value, 
-                    ((BitmapDrawable)button.getDrawable()).getBitmap()));
+            setButtonActivated(button, value);
         } else {
             Log.e(TAG, "Unknown value for this button!");
         }
     }
 
+    private void setButtonActivated(WidgetOptionButton button, String value) {
+        if (mActiveButton != null) {
+            mActiveButton.resetImage();
+        }
 
+        mActiveButton = button;
+        button.setImageBitmap(IconGlower.getSingleton().getGlow(mKey+"="+value,
+                ((BitmapDrawable)button.getDrawable()).getBitmap()));
+    }
 }

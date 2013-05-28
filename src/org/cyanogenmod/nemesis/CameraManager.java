@@ -16,14 +16,14 @@
 
 package org.cyanogenmod.nemesis;
 
-import java.io.IOException;
-
 import android.content.Context;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import java.io.IOException;
 
 /**
  * This class is responible for interacting with the Camera HAL.
@@ -49,6 +49,7 @@ public class CameraManager {
         }
         
         public void run() {
+            Log.e(TAG, "Asyncly setting parameter " + mKey + " to " + mValue);
             Camera.Parameters parameters = mCamera.getParameters();
             parameters.set(mKey, mValue);
             mCamera.setParameters(parameters);

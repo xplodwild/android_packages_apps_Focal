@@ -79,7 +79,7 @@ public abstract class WidgetBase {
             mWidget.setRowCount(mWidget.getRowCount()+1);
         }
 
-        mWidget.addView(v);
+        mWidget.addView(v, 0);
     }
 
     public WidgetToggleButton getToggleButton() {
@@ -201,6 +201,7 @@ public abstract class WidgetBase {
      */
     public class WidgetOptionButton extends ImageView implements WidgetOption {
         private float mTouchOffset = 0.0f;
+        private int mOriginalResource;
 
         public WidgetOptionButton(int resId, Context context, AttributeSet attrs,
                 int defStyle) {
@@ -217,6 +218,10 @@ public abstract class WidgetBase {
         public WidgetOptionButton(int resId, Context context) {
             super(context);
             initialize(resId);
+        }
+
+        public void resetImage() {
+            setImageResource(mOriginalResource);
         }
 
         @Override
@@ -245,6 +250,7 @@ public abstract class WidgetBase {
         private void initialize(int resId) {
             this.setImageResource(resId);
             this.setClickable(true);
+            mOriginalResource = resId;
         }
 
         @Override
@@ -276,6 +282,10 @@ public abstract class WidgetBase {
             initialize();
         }
 
+        /**
+         * Animate the movement on X
+         * @param x
+         */
         public void setXSmooth(float x) {
             if (mTargetX != x) {
                 this.animate().cancel();
@@ -284,6 +294,10 @@ public abstract class WidgetBase {
             }
         }
 
+        /**
+         * Returns the final X position, after the animation is done
+         * @return final X position
+         */
         public float getFinalX() {
             return mTargetX;
         }

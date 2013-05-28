@@ -1,14 +1,15 @@
 package org.cyanogenmod.nemesis;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.cyanogenmod.nemesis.widgets.FlashWidget;
-import org.cyanogenmod.nemesis.widgets.WidgetBase;
-
 import android.content.Context;
 import android.hardware.Camera;
 import android.view.ViewGroup;
+
+import org.cyanogenmod.nemesis.widgets.FlashWidget;
+import org.cyanogenmod.nemesis.widgets.WhiteBalanceWidget;
+import org.cyanogenmod.nemesis.widgets.WidgetBase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class holds all the possible widgets of the
@@ -30,9 +31,7 @@ public class CameraCapabilities {
         // Basically, if we add a new widget, we just put it here. They
         // will populate the sidebar in the same order as here
         mWidgets.add(new FlashWidget(context));
-        mWidgets.add(new FlashWidget(context));
-        mWidgets.add(new FlashWidget(context));
-        mWidgets.add(new FlashWidget(context));
+        mWidgets.add(new WhiteBalanceWidget(context));
     }
 
     /**
