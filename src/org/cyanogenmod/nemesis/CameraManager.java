@@ -55,6 +55,7 @@ public class CameraManager {
             Log.v(TAG, "Asynchronously setting parameter " + mKey + " to " + mValue);
             Camera.Parameters params = getParameters();
             params.set(mKey, mValue);
+            mParameters = params;
             mCamera.setParameters(params);
         }
     };
