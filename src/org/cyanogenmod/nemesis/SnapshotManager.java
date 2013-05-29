@@ -79,8 +79,7 @@ public class SnapshotManager {
             Camera.Size s = mCameraManager.getParameters().getPictureSize();
             mImageNamer.prepareUri(mContentResolver, System.currentTimeMillis(), s.width, s.height, 0);
 
-            // On shutter confirmed, play the capture sound + a small flashing animation
-            SoundManager.getSingleton().play(SoundManager.SOUND_CAPTURE);
+            // On shutter confirmed, play a small flashing animation
 
             final SnapshotInfo snap = mSnapshotsQueue.get(mCurrentShutterQueueIndex);
             for (SnapshotListener listener : mListeners) {

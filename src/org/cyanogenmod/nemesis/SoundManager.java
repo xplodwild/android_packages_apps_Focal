@@ -10,7 +10,6 @@ import android.media.SoundPool;
  * hardcoded values to play them quickly.
  */
 public class SoundManager {
-    public final static int SOUND_CAPTURE       = 0;
     public final static int SOUND_FOCUS_START   = 1;
     public final static int SOUND_FOCUS_END     = 2;
     public final static int SOUND_FOCUS_FAIL    = 3;
@@ -35,11 +34,10 @@ public class SoundManager {
      * call preload() before doing anything so the sounds are loaded!
      */
     private SoundManager() {
-        mSoundPool = new SoundPool(3, AudioManager.STREAM_NOTIFICATION, 100);
+        mSoundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
     }
 
     public void preload(Context ctx) {
-        mSoundsFD[SOUND_CAPTURE]        = mSoundPool.load(ctx, R.raw.snd_capture, 1);
         mSoundsFD[SOUND_FOCUS_START]    = mSoundPool.load(ctx, R.raw.snd_focus_start, 2);
         mSoundsFD[SOUND_FOCUS_END]      = mSoundPool.load(ctx, R.raw.snd_focus_end, 3);
         mSoundsFD[SOUND_FOCUS_FAIL]     = mSoundPool.load(ctx, R.raw.snd_focus_fail, 4);
@@ -52,7 +50,7 @@ public class SoundManager {
      * @note Make sure preload() was called before doing play!
      */
     public void play(int sound) {
-        mSoundPool.play(mSoundsFD[sound], 1.0f, 1.0f, 1, 0, 1.0f);
+        mSoundPool.play(mSoundsFD[sound], 1.0f, 1.0f, 0, 0, 1.0f);
     }
 
 }
