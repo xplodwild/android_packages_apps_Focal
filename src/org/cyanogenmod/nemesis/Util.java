@@ -2,8 +2,10 @@ package org.cyanogenmod.nemesis;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.hardware.Camera.Size;
+import android.net.Uri;
 import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.Surface;
@@ -12,6 +14,9 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class Util {
@@ -20,8 +25,17 @@ public class Util {
     // Orientation hysteresis amount used in rounding, in degrees
     public static final int ORIENTATION_HYSTERESIS = 5;
 
+    public static final String REVIEW_ACTION = "com.android.camera.action.REVIEW";
+    // See android.hardware.Camera.ACTION_NEW_PICTURE.
+    public static final String ACTION_NEW_PICTURE = "android.hardware.action.NEW_PICTURE";
+    // See android.hardware.Camera.ACTION_NEW_VIDEO.
+    public static final String ACTION_NEW_VIDEO = "android.hardware.action.NEW_VIDEO";
+
+
     // Screen size holder
     private static Point mScreenSize = new Point();
+
+    private static DateFormat mJpegDateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
 
     /**
      * Returns the orientation of the display
@@ -174,4 +188,15 @@ public class Util {
             }
         }
     }
+
+    public static String createJpegName(long dateTaken) {
+        return "IMG_" + mJpegDateFormat.format(new Date(dateTaken));
+    }
+
+    public static void broadcastNewPicture(Context context, Uri uri) {
+        context.sendBroadcast(new Intent(ACTION_NEW_PICTURE, uri));
+        // Keep compatibility
+        context.sendBroadcast(new Intent("com.android.camera.NEW_PICTURE", uri));
+    }
+
 }

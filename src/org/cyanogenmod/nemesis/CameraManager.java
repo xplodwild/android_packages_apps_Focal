@@ -16,8 +16,6 @@
 
 package org.cyanogenmod.nemesis;
 
-import java.io.IOException;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,6 +24,8 @@ import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import java.io.IOException;
 
 /**
  * This class is responsible for interacting with the Camera HAL.
@@ -54,8 +54,9 @@ public class CameraManager {
         
         public void run() {
             Log.v(TAG, "Asynchronously setting parameter " + mKey + " to " + mValue);
-            mParameters.set(mKey, mValue);
-            mCamera.setParameters(mParameters);
+            Camera.Parameters params = getParameters();
+            params.set(mKey, mValue);
+            mCamera.setParameters(params);
         }
     };
     
@@ -191,6 +192,14 @@ public class CameraManager {
                              Camera.PictureCallback jpeg) {
         Log.e(TAG, "takePicture");
         mCamera.takePicture(shutterCallback, raw, jpeg);
+    }
+
+    public void restartPreviewIfNeeded() {
+        try {
+            mCamera.startPreview();
+        } catch (Exception e) {
+            // ignore
+        }
     }
     
     /**

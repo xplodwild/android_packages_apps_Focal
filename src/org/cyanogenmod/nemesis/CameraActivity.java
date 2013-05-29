@@ -53,6 +53,9 @@ public class CameraActivity extends Activity {
         // Setup the camera hardware and preview
         setupCamera();
 
+        SoundManager.getSingleton().preload(this);
+        SnapshotManager.getSingleton().initialize(this);
+
         // Setup gesture detection
         mGestureDetector = new GestureDetector(this, new GestureListener());
         View.OnTouchListener touchListener = new View.OnTouchListener() {
