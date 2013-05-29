@@ -258,12 +258,17 @@ public class CameraManager {
             }
 
             // Set device-specifics here
-            Camera.Parameters params = mCamera.getParameters();
-            
-            if (getResources().getBoolean(R.bool.config_ZSLNeedsCameraMode))
-                params.set("camera-mode", 1);
-            
-            mCamera.setParameters(params);
+            try {
+                Camera.Parameters params = mCamera.getParameters();
+                
+                if (getResources().getBoolean(R.bool.config_qualcommZslCameraMode))
+                    params.set("camera-mode", 1);
+                
+                mCamera.setParameters(params);
+            }
+            catch (Exception e) {
+                Log.e(TAG, "Could not set device specifics");
+            }
 
             // start preview with new settings
             try {
