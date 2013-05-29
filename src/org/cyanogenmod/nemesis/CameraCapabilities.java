@@ -24,14 +24,14 @@ public class CameraCapabilities {
      * then be sorted by populateSidebar.
      * @param context The CameraActivity context
      */
-    public CameraCapabilities(Context context) {
+    public CameraCapabilities(CameraManager cam, Context context) {
         mWidgets = new ArrayList<WidgetBase>();
 
         // Populate the list of widgets.
         // Basically, if we add a new widget, we just put it here. They
         // will populate the sidebar in the same order as here
-        mWidgets.add(new FlashWidget(context));
-        mWidgets.add(new WhiteBalanceWidget(context));
+        mWidgets.add(new FlashWidget(cam, context));
+        mWidgets.add(new WhiteBalanceWidget(cam, context));
     }
 
     /**

@@ -2,6 +2,7 @@ package org.cyanogenmod.nemesis.widgets;
 
 import android.content.Context;
 
+import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 
 /**
@@ -9,8 +10,8 @@ import org.cyanogenmod.nemesis.R;
  */
 public class WhiteBalanceWidget extends SimpleToggleWidget {
 
-    public WhiteBalanceWidget(Context context) {
-        super(context, "whitebalance", R.drawable.ic_widget_wb_auto);
+    public WhiteBalanceWidget(CameraManager cam, Context context) {
+        super(cam, context, "whitebalance", R.drawable.ic_widget_wb_auto);
 
         addValue("auto", R.drawable.ic_widget_wb_auto);
         addValue("cloudy", R.drawable.ic_widget_wb_cloudy);

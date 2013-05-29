@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 
 import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
+import org.cyanogenmod.nemesis.ui.ShutterButton;
 import org.cyanogenmod.nemesis.ui.SideBar;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
@@ -21,6 +22,7 @@ public class CameraActivity extends Activity {
     public final static String TAG = "CameraActivity";
 
     private CameraManager mCamManager;
+    private SnapshotManager mSnapshotManager;
     private CameraOrientationEventListener mOrientationListener;
     private GestureDetector mGestureDetector;
     private Handler mHandler;
@@ -54,7 +56,9 @@ public class CameraActivity extends Activity {
         setupCamera();
 
         SoundManager.getSingleton().preload(this);
-        SnapshotManager.getSingleton().initialize(this);
+
+        ShutterButton shutterButton = (ShutterButton) findViewById(R.id.btn_shutter);
+        shutterButton.setOnClickListener(new ShutterButton.ClickListener(mSnapshotManager));
 
         // Setup gesture detection
         mGestureDetector = new GestureDetector(this, new GestureListener());
@@ -83,8 +87,7 @@ public class CameraActivity extends Activity {
                     Log.w(TAG, "No camera params yet, posting again");
                     mHandler.post(this);
                 } else {
-                    mSideBar.checkCapabilities(mCamManager.getParameters(), 
-                            (ViewGroup) findViewById(R.id.widgets_container));
+                    mSideBar.checkCapabilities(mCamManager, (ViewGroup) findViewById(R.id.widgets_container));
                 }
             }
         });
@@ -117,7 +120,8 @@ public class CameraActivity extends Activity {
 
     protected void setupCamera() {
         // Setup the Camera hardware and preview surface
-        mCamManager = CameraManager.getSingleton(this);
+        mCamManager = new CameraManager(this);
+        mSnapshotManager = new SnapshotManager(mCamManager, this);
 
         // Add the preview surface to its container
         final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);

@@ -34,7 +34,6 @@ import java.io.IOException;
  */
 public class CameraManager {
     private final static String TAG = "CameraManager";
-    private static CameraManager mSingleton;
     
     private CameraPreview mPreview;
     private Camera mCamera;
@@ -60,17 +59,8 @@ public class CameraManager {
         }
     };
     
-    
 
-    public static CameraManager getSingleton(Context context) {
-        if (mSingleton == null) {
-            mSingleton = new CameraManager(context);
-        }
-        
-        return mSingleton;
-    }
-    
-    private CameraManager(Context context) {
+    public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
     }
 

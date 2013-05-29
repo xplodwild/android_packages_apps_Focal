@@ -13,6 +13,7 @@ import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 
+import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.ui.SideBar;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
@@ -32,6 +33,7 @@ import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 public abstract class WidgetBase {
     public final static String TAG = "WidgetBase";
 
+    protected CameraManager mCamManager;
     private GestureDetector mGestureDetector;
     private WidgetToggleButton mToggleButton;
     private WidgetContainer mWidget;
@@ -41,7 +43,8 @@ public abstract class WidgetBase {
     private final static int WIDGET_FADE_DURATION_MS = 200;
     private final static int WIDGET_ANIM_TRANSLATE = 80;
 
-    public WidgetBase(Context context, int iconResId) {
+    public WidgetBase(CameraManager cam, Context context, int iconResId) {
+        mCamManager = cam;
         mWidget = new WidgetContainer(context);
         mToggleButton = new WidgetToggleButton(context);
         mGestureDetector = new GestureDetector(context, new WidgetFlingGestureListener());

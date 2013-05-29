@@ -1,6 +1,7 @@
 package org.cyanogenmod.nemesis;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.location.Location;
@@ -59,9 +60,6 @@ public class SnapshotManager {
         public Bitmap mThumbnail;
     }
 
-
-    private static SnapshotManager mSingleton;
-
     private List<SnapshotInfo> mSnapshotsQueue;
     private int mCurrentShutterQueueIndex;
     private List<SnapshotListener> mListeners;
@@ -70,13 +68,15 @@ public class SnapshotManager {
     private CameraActivity mActivity;
     private ImageSaver mImageSaver;
     private ImageNamer mImageNamer;
+    private CameraManager mCameraManager;
+    private Context mContext;
 
     private Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
         @Override
         public void onShutter() {
             Log.v(TAG, "onShutter");
 
-            Camera.Size s = CameraManager.getSingleton(null).getParameters().getPictureSize();
+            Camera.Size s = mCameraManager.getParameters().getPictureSize();
             mImageNamer.prepareUri(mContentResolver, System.currentTimeMillis(), s.width, s.height, 0);
 
             // On shutter confirmed, play the capture sound + a small flashing animation
@@ -99,14 +99,14 @@ public class SnapshotManager {
         @Override
         public void onPictureTaken(byte[] jpegData, Camera camera) {
             Log.v(TAG, "onPicture: Got JPEG data");
-            CameraManager.getSingleton(null).restartPreviewIfNeeded();
+            mCameraManager.restartPreviewIfNeeded();
 
             final SnapshotInfo snap = mSnapshotsQueue.get(0);
 
             // Store the jpeg on internal memory if needed
             if (snap.mSave) {
                 // Calculate the width and the height of the jpeg.
-                Camera.Size s = CameraManager.getSingleton(null).getParameters().getPictureSize();
+                Camera.Size s = mCameraManager.getParameters().getPictureSize();
                 int orientation = Exif.getOrientation(jpegData);
                 int width, height;
                 width = s.width;
@@ -118,7 +118,9 @@ public class SnapshotManager {
                         width, height, orientation);
             }
 
-            // XXX: Pass to listeners
+            for (SnapshotListener listener : mListeners) {
+                listener.onSnapshotSaved(snap);
+            }
 
             // We're done with our shot here!
             mCurrentShutterQueueIndex--;
@@ -129,32 +131,19 @@ public class SnapshotManager {
     private Runnable mCaptureRunnable = new Runnable() {
         @Override
         public void run() {
-            CameraManager.getSingleton(null).takeSnapshot(mShutterCallback, null, mJpegPictureCallback);
+            mCameraManager.takeSnapshot(mShutterCallback, null, mJpegPictureCallback);
         }
     };
 
-
-    /**
-     * @return The single instance of the class
-     */
-    public static SnapshotManager getSingleton() {
-        if (mSingleton == null)
-            mSingleton = new SnapshotManager();
-
-        return mSingleton;
-    }
-
-    private SnapshotManager() {
+    public SnapshotManager(CameraManager man, Context ctx) {
+        mContext = ctx;
+        mCameraManager = man;
         mSnapshotsQueue = new ArrayList<SnapshotInfo>();
         mListeners = new ArrayList<SnapshotListener>();
         mHandler = new Handler();
         mImageSaver = new ImageSaver();
         mImageNamer = new ImageNamer();
-    }
-
-    public void initialize(CameraActivity activity) {
-        mActivity = activity;
-        mContentResolver = activity.getContentResolver();
+        mContentResolver = ctx.getContentResolver();
     }
 
     public void addListener(SnapshotListener listener) {
@@ -311,7 +300,7 @@ public class SnapshotManager {
             boolean ok = Storage.getStorage().updateImage(mContentResolver, uri, title, loc,
                     orientation, data, width, height);
             if (ok) {
-                Util.broadcastNewPicture(mActivity, uri);
+                Util.broadcastNewPicture(mContext, uri);
             }
         }
     }

@@ -28,8 +28,8 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
     private Context mContext;
     private WidgetOptionButton mActiveButton;
 
-    public SimpleToggleWidget(Context context, String key, int sidebarIcon) {
-        super(context, sidebarIcon);
+    public SimpleToggleWidget(CameraManager cam, Context context, String key, int sidebarIcon) {
+        super(cam, context, sidebarIcon);
 
         mButtonsValues = new HashMap<WidgetBase.WidgetOptionButton, String>();
         mContext = context;
@@ -49,7 +49,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
      * @param resId The icon that represents it
      */
     public void addValue(String value, int resId) {
-        Camera.Parameters params = CameraManager.getSingleton(null).getParameters();
+        Camera.Parameters params = mCamManager.getParameters();
 
         String values = params.get(mKey + "-values");
 
@@ -110,7 +110,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
         String value = mButtonsValues.get(button);
 
         if (value != null) {
-            CameraManager.getSingleton(null).setParameterAsync(mKey, value);
+            mCamManager.setParameterAsync(mKey, value);
             setButtonActivated(button, value);
         } else {
             Log.e(TAG, "Unknown value for this button!");
