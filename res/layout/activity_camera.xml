@@ -20,7 +20,7 @@
         android:layout_gravity="right|center"
         android:layout_marginRight="-12dp" >
 
-        <ImageView
+        <org.cyanogenmod.nemesis.ui.ShutterButton
             android:id="@+id/btn_shutter"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

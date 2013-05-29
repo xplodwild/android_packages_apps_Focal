@@ -16,14 +16,16 @@
 
 package org.cyanogenmod.nemesis;
 
+import java.io.IOException;
+
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import java.io.IOException;
 
 /**
  * This class is responsible for interacting with the Camera HAL.
@@ -39,6 +41,7 @@ public class CameraManager {
     private int mCurrentFacing;
     private Point mTargetSize;
     private Camera.Parameters mParameters;
+    private byte[] mPreviewFrameBuffer;
     
     private class AsyncParamRunnable implements Runnable {
         private String mKey;
@@ -162,24 +165,43 @@ public class CameraManager {
         AsyncParamRunnable run = new AsyncParamRunnable(key, value);
         new Thread(run).start();
     }
+    
+    public Bitmap getLastPreviewFrame() {
+        // Decode the last frame bytes
+        byte[] data = mPreview.getLastFrameBytes();
+        int previewWidth = mParameters.getPreviewSize().width;
+        int previewHeight = mParameters.getPreviewSize().height;
+        
+        if (mPreviewFrameBuffer == null || mPreviewFrameBuffer.length != (previewWidth*previewHeight*3))
+            mPreviewFrameBuffer = new byte[previewWidth*previewHeight*3];
+        
+        // Convert YUV420SP preview data to RGB
+        Util.decodeYUV420SP(mPreviewFrameBuffer, data, previewWidth, previewHeight);
+        
+        // Decode the RGB data to a bitmap
+        Bitmap output = BitmapFactory.decodeByteArray(mPreviewFrameBuffer, 0, mPreviewFrameBuffer.length);
+        
+        return output;
+    }
 
     /**
      * Takes a snapshot
      */
     public void takeSnapshot(Camera.ShutterCallback shutterCallback, Camera.PictureCallback raw,
                              Camera.PictureCallback jpeg) {
+        Log.e(TAG, "takePicture");
         mCamera.takePicture(shutterCallback, raw, jpeg);
     }
-
+    
     /**
      * The CameraPreview class handles the Camera preview feed
      * and setting the surface holder.
      */
-    public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+    public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Camera.PreviewCallback {
         private final static String TAG = "CameraManager.CameraPreview";
 
         private SurfaceHolder mHolder;
-
+        private byte[] mLastFrameBytes;
 
         public CameraPreview(Context context) {
             super(context);
@@ -188,6 +210,10 @@ public class CameraManager {
             // underlying surface is created and destroyed.
             mHolder = getHolder();
             mHolder.addCallback(this);
+        }
+        
+        public byte[] getLastFrameBytes() {
+            return mLastFrameBytes;
         }
 
         public void notifyCameraChanged() {
@@ -231,6 +257,13 @@ public class CameraManager {
                 // ignore: tried to stop a non-existent preview
             }
 
+            // Set device-specifics here
+            Camera.Parameters params = mCamera.getParameters();
+            
+            if (getResources().getBoolean(R.bool.config_ZSLNeedsCameraMode))
+                params.set("camera-mode", 1);
+            
+            mCamera.setParameters(params);
 
             // start preview with new settings
             try {
@@ -240,6 +273,11 @@ public class CameraManager {
             } catch (Exception e){
                 Log.d(TAG, "Error starting camera preview: " + e.getMessage());
             }
+        }
+
+        @Override
+        public void onPreviewFrame(byte[] data, Camera camera) {
+            mLastFrameBytes = data;
         }
     }
 }

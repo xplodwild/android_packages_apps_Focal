@@ -1,23 +1,44 @@
 package org.cyanogenmod.nemesis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Handler;
-
-import java.util.Queue;
-import java.util.concurrent.SynchronousQueue;
+import android.util.Log;
 
 /**
  * This class manages taking snapshots from Camera
  */
 public class SnapshotManager {
+    public final static String TAG = "SnapshotManager";
+    
     public interface SnapshotListener {
         /**
-         * This callback is called when a snapshot is fully taken
+         * This callback is called when a snapshot is taken (shutter)
          * @param info A structure containing information about the snapshot taken
          */
-        public void onSnapshotTaken(SnapshotInfo info);
+        public void onSnapshotShutter(SnapshotInfo info);
+        
+        /**
+         * This callback is called when we have a preview for the snapshot
+         * @param info A structure containing information about the snapshot
+         */
+        public void onSnapshotPreview(SnapshotInfo info);
+        
+        /**
+         * This callback is called when a snapshot has been processed (vignetting, etc)
+         * @param info A structure containing information about the snapshot
+         */
+        public void onSnapshotProcessed(SnapshotInfo info);
+        
+        /**
+         * This callback is called when a snapshot has been saved to the internal memory
+         * @param info A structure containing information about the snapshot
+         */
+        public void onSnapshotSaved(SnapshotInfo info);
     }
 
     protected class SnapshotInfo {
@@ -39,20 +60,41 @@ public class SnapshotManager {
 
     private static SnapshotManager mSingleton;
 
-    private Queue<SnapshotInfo> mSnapshotsQueue;
+    private List<SnapshotInfo> mSnapshotsQueue;
+    private List<SnapshotListener> mListeners;
     private Handler mHandler;
 
     private Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
         @Override
         public void onShutter() {
-
+            Log.e(TAG, "onShutter");
+            
+            // On shutter confirmed, play the capture sound + a small flashing animation
+            SoundManager.getSingleton().play(SoundManager.SOUND_CAPTURE);
+            
+            final SnapshotInfo snap = mSnapshotsQueue.get(0);
+            for (SnapshotListener listener : mListeners) {
+                listener.onSnapshotShutter(snap);
+            }
+            
+            // Camera is ready to take another shot, doit
+            mSnapshotsQueue.remove(0);
+            mHandler.post(mCaptureRunnable);
+        }
+    };
+    
+    private Camera.PictureCallback mJpegPictureCallback = new Camera.PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] arg0, Camera arg1) {
+            Log.e(TAG, "Jpeg picture callback!");            
         }
     };
 
     private Runnable mCaptureRunnable = new Runnable() {
         @Override
         public void run() {
-            //CameraManager.getSingleton(null).takeSnapshot();
+            Log.e(TAG, "takeSnapshot: go!");
+            CameraManager.getSingleton(null).takeSnapshot(mShutterCallback, null, mJpegPictureCallback);
         }
     };
 
@@ -68,8 +110,13 @@ public class SnapshotManager {
     }
 
     private SnapshotManager() {
-        mSnapshotsQueue = new SynchronousQueue<SnapshotInfo>();
+        mSnapshotsQueue = new ArrayList<SnapshotInfo>();
+        mListeners = new ArrayList<SnapshotListener>();
         mHandler = new Handler();
+    }
+    
+    public void addListener(SnapshotListener listener) {
+        mListeners.add(listener);
     }
 
     /**
@@ -86,9 +133,11 @@ public class SnapshotManager {
         info.mExposureCompensation = exposureCompensation;
 
         mSnapshotsQueue.add(info);
+        Log.e(TAG, "Queued a shot");
 
         if (mSnapshotsQueue.size() == 1) {
             // We had no other snapshot queued so far, so start things up
+            Log.e(TAG, "No snapshot queued, starting runnable");
             mHandler.post(mCaptureRunnable);
         }
     }

@@ -3,6 +3,6 @@
     <!-- Whether or not to stop preview between taking shots. -->
     <bool name="config_stopPreviewBetweenShots">true</bool>
 
-    <!-- Whether or not to enable camera-mode for ZSL -->
-    <bool name="config_ZSLNeedsCameraMode">false</bool>
+    <!-- Whether or not to enable camera-mode=1 for ZSL -->
+    <bool name="config_ZSLNeedsCameraMode">true</bool>
 </resources>
