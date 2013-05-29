@@ -18,7 +18,6 @@ package org.cyanogenmod.nemesis;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.util.Log;
@@ -40,7 +39,7 @@ public class CameraManager {
     private int mCurrentFacing;
     private Point mTargetSize;
     private Camera.Parameters mParameters;
-    private byte[] mPreviewFrameBuffer;
+    private int[] mPreviewFrameBuffer;
     
     private class AsyncParamRunnable implements Runnable {
         private String mKey;
@@ -55,8 +54,9 @@ public class CameraManager {
             Log.v(TAG, "Asynchronously setting parameter " + mKey + " to " + mValue);
             Camera.Parameters params = getParameters();
             params.set(mKey, mValue);
-            mParameters = params;
             mCamera.setParameters(params);
+            // Read them from sensor next time
+            mParameters = null;
         }
     };
     
@@ -79,6 +79,7 @@ public class CameraManager {
         // Try to open the camera
         try {
             mCamera = Camera.open(facing);
+            mCamera.setPreviewCallback(mPreview);
             mCurrentFacing = facing;
             mParameters = null;
 
@@ -161,17 +162,18 @@ public class CameraManager {
     public Bitmap getLastPreviewFrame() {
         // Decode the last frame bytes
         byte[] data = mPreview.getLastFrameBytes();
-        int previewWidth = mParameters.getPreviewSize().width;
-        int previewHeight = mParameters.getPreviewSize().height;
+        int previewWidth = getParameters().getPreviewSize().width;
+        int previewHeight = getParameters().getPreviewSize().height;
         
         if (mPreviewFrameBuffer == null || mPreviewFrameBuffer.length != (previewWidth*previewHeight*3))
-            mPreviewFrameBuffer = new byte[previewWidth*previewHeight*3];
+            mPreviewFrameBuffer = new int[previewWidth*previewHeight];
         
         // Convert YUV420SP preview data to RGB
+        Log.e(TAG, "Preview is " + previewWidth + "x" + previewHeight);
         Util.decodeYUV420SP(mPreviewFrameBuffer, data, previewWidth, previewHeight);
         
         // Decode the RGB data to a bitmap
-        Bitmap output = BitmapFactory.decodeByteArray(mPreviewFrameBuffer, 0, mPreviewFrameBuffer.length);
+        Bitmap output = Bitmap.createBitmap(mPreviewFrameBuffer, previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
         
         return output;
     }
@@ -205,6 +207,8 @@ public class CameraManager {
 
         public CameraPreview(Context context) {
             super(context);
+
+            mLastFrameBytes = new byte[2100000];
 
             // Install a SurfaceHolder.Callback so we get notified when the
             // underlying surface is created and destroyed.
@@ -275,6 +279,9 @@ public class CameraManager {
                 mCamera.setPreviewDisplay(mHolder);
                 mCamera.startPreview();
 
+                mCamera.addCallbackBuffer(mLastFrameBytes);
+                mCamera.setPreviewCallbackWithBuffer(this);
+
             } catch (Exception e){
                 Log.d(TAG, "Error starting camera preview: " + e.getMessage());
             }
@@ -282,7 +289,7 @@ public class CameraManager {
 
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            mLastFrameBytes = data;
+            mCamera.addCallbackBuffer(mLastFrameBytes);
         }
     }
 }

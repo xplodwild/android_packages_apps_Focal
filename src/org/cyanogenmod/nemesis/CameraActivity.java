@@ -12,17 +12,20 @@ import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 
 import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
 import org.cyanogenmod.nemesis.ui.ShutterButton;
 import org.cyanogenmod.nemesis.ui.SideBar;
+import org.cyanogenmod.nemesis.ui.ThumbnailFlinger;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
-public class CameraActivity extends Activity {    
+public class CameraActivity extends Activity {
     public final static String TAG = "CameraActivity";
 
     private CameraManager mCamManager;
     private SnapshotManager mSnapshotManager;
+    private MainSnapshotListener mSnapshotListener;
     private CameraOrientationEventListener mOrientationListener;
     private GestureDetector mGestureDetector;
     private Handler mHandler;
@@ -122,6 +125,8 @@ public class CameraActivity extends Activity {
         // Setup the Camera hardware and preview surface
         mCamManager = new CameraManager(this);
         mSnapshotManager = new SnapshotManager(mCamManager, this);
+        mSnapshotListener = new MainSnapshotListener();
+        mSnapshotManager.addListener(mSnapshotListener);
 
         // Add the preview surface to its container
         final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
@@ -164,6 +169,35 @@ public class CameraActivity extends Activity {
         }
     }
 
+    /**
+     * Snapshot listener for when snapshots are taken, in SnapshotManager
+     */
+    private class MainSnapshotListener implements SnapshotManager.SnapshotListener {
+
+        @Override
+        public void onSnapshotShutter(SnapshotManager.SnapshotInfo info) {
+            FrameLayout layout = (FrameLayout) findViewById(R.id.thumb_flinger_container);
+            ThumbnailFlinger flinger = new ThumbnailFlinger(CameraActivity.this);
+            layout.addView(flinger);
+            flinger.setImageBitmap(info.mThumbnail);
+            flinger.doAnimation();
+        }
+
+        @Override
+        public void onSnapshotPreview(SnapshotManager.SnapshotInfo info) {
+
+        }
+
+        @Override
+        public void onSnapshotProcessed(SnapshotManager.SnapshotInfo info) {
+
+        }
+
+        @Override
+        public void onSnapshotSaved(SnapshotManager.SnapshotInfo info) {
+
+        }
+    }
 
     /**
      * Handles the orientation changes without turning the actual activity

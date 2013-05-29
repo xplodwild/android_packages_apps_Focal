@@ -80,8 +80,8 @@ public class SnapshotManager {
             mImageNamer.prepareUri(mContentResolver, System.currentTimeMillis(), s.width, s.height, 0);
 
             // On shutter confirmed, play a small flashing animation
-
             final SnapshotInfo snap = mSnapshotsQueue.get(mCurrentShutterQueueIndex);
+
             for (SnapshotListener listener : mListeners) {
                 listener.onSnapshotShutter(snap);
             }
@@ -163,6 +163,7 @@ public class SnapshotManager {
         SnapshotInfo info = new SnapshotInfo();
         info.mSave = save;
         info.mExposureCompensation = exposureCompensation;
+        info.mThumbnail = mCameraManager.getLastPreviewFrame();
 
         mSnapshotsQueue.add(info);
 
