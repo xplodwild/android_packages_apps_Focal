@@ -15,6 +15,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import org.cyanogenmod.nemesis.ui.FocusHudRing;
 import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
 import org.cyanogenmod.nemesis.ui.ShutterButton;
 import org.cyanogenmod.nemesis.ui.SideBar;
@@ -37,6 +38,7 @@ public class CameraActivity extends Activity {
 
     private SideBar mSideBar;
     private WidgetRenderer mWidgetRenderer;
+    private FocusHudRing mFocusHudRing;
 
     /**
      * Event: Activity created
@@ -65,6 +67,11 @@ public class CameraActivity extends Activity {
 
         SoundManager.getSingleton().preload(this);
 
+        // Setup HUDs
+        mFocusHudRing = (FocusHudRing) findViewById(R.id.hud_ring_focus);
+        mFocusHudRing.setManagers(mCamManager, mFocusManager);
+
+        // Setup shutter button
         ShutterButton shutterButton = (ShutterButton) findViewById(R.id.btn_shutter);
         shutterButton.setOnClickListener(new ShutterButton.ClickListener(mSnapshotManager));
 
@@ -129,10 +136,6 @@ public class CameraActivity extends Activity {
     protected void setupCamera() {
         // Setup the Camera hardware and preview surface
         mCamManager = new CameraManager(this);
-        mSnapshotManager = new SnapshotManager(mCamManager, this);
-        mSnapshotListener = new MainSnapshotListener();
-        mSnapshotManager.addListener(mSnapshotListener);
-        mFocusManager = new FocusManager(mCamManager);
 
         // Add the preview surface to its container
         final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
@@ -155,6 +158,11 @@ public class CameraActivity extends Activity {
 
         layout.setAspectRatio((double) sz.width / sz.height);
         layout.setPreviewSize(sz.width, sz.height);
+
+        mFocusManager = new FocusManager(mCamManager);
+        mSnapshotManager = new SnapshotManager(mCamManager, mFocusManager, this);
+        mSnapshotListener = new MainSnapshotListener();
+        mSnapshotManager.addListener(mSnapshotListener);
     }
 
 

@@ -19,6 +19,7 @@ package org.cyanogenmod.nemesis;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.AutoFocusMoveCallback;
@@ -27,6 +28,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is responsible for interacting with the Camera HAL.
@@ -35,6 +38,9 @@ import java.io.IOException;
  */
 public class CameraManager {
     private final static String TAG = "CameraManager";
+
+    private final static int FOCUS_WIDTH = 80;
+    private final static int FOCUS_HEIGHT = 80;
     
     private CameraPreview mPreview;
     private Camera mCamera;
@@ -84,13 +90,15 @@ public class CameraManager {
             mCamera = Camera.open(facing);
             mCamera.setPreviewCallback(mPreview);
             mCurrentFacing = facing;
-            mParameters = null;
+            mParameters = mCamera.getParameters();
 
             if (mTargetSize != null)
                 setPreviewSize(mTargetSize.x, mTargetSize.y);
             
             if (mAutoFocusMoveCallback != null)
                 mCamera.setAutoFocusMoveCallback(mAutoFocusMoveCallback);
+
+            // Default focus mode to continuous
         }
         catch (Exception e) {
             Log.e(TAG, "Error while opening cameras: " + e.getMessage());
@@ -187,7 +195,7 @@ public class CameraManager {
      */
     public void takeSnapshot(Camera.ShutterCallback shutterCallback, Camera.PictureCallback raw,
                              Camera.PictureCallback jpeg) {
-        Log.e(TAG, "takePicture");
+        Log.v(TAG, "takePicture");
         mCamera.takePicture(shutterCallback, raw, jpeg);
     }
 
@@ -212,6 +220,30 @@ public class CameraManager {
             return false;
         }
         
+    }
+
+    /**
+     * Defines the main focus point of the camera to the provided x and y values.
+     * Those values must between -1000 and 1000, where -1000 is the top/left, and 1000 the bottom/right
+     * @param x The X position of the focus point
+     * @param y The Y position of the focus point
+     */
+    public void setFocusPoint(int x, int y) {
+        Camera.Parameters params = getParameters();
+
+        if (params.getMaxNumFocusAreas() > 0) {
+            List<Camera.Area> focusArea = new ArrayList<Camera.Area>();
+            focusArea.add(new Camera.Area(new Rect(x, y, x + FOCUS_WIDTH, y + FOCUS_HEIGHT), 1000));
+
+            Log.e(TAG, "Setting focus point to " + x + ";" + y);
+            params.setFocusAreas(focusArea);
+
+            try {
+                mCamera.setParameters(params);
+            } catch (Exception e) {
+                // ignore, we might be setting it too fast since previous attempt
+            }
+        }
     }
     
     public void setAutoFocusMoveCallback(AutoFocusMoveCallback cb) {
@@ -293,7 +325,7 @@ public class CameraManager {
                 
                 if (getResources().getBoolean(R.bool.config_qualcommZslCameraMode))
                     params.set("camera-mode", 1);
-                
+
                 mCamera.setParameters(params);
             }
             catch (Exception e) {

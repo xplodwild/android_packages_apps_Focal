@@ -68,6 +68,7 @@ public class SnapshotManager {
     private ImageSaver mImageSaver;
     private ImageNamer mImageNamer;
     private CameraManager mCameraManager;
+    private FocusManager mFocusManager;
     private Context mContext;
 
     private Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
@@ -129,13 +130,15 @@ public class SnapshotManager {
     private Runnable mCaptureRunnable = new Runnable() {
         @Override
         public void run() {
+            mFocusManager.checkFocus();
             mCameraManager.takeSnapshot(mShutterCallback, null, mJpegPictureCallback);
         }
     };
 
-    public SnapshotManager(CameraManager man, Context ctx) {
+    public SnapshotManager(CameraManager man, FocusManager focusMan, Context ctx) {
         mContext = ctx;
         mCameraManager = man;
+        mFocusManager = focusMan;
         mSnapshotsQueue = new ArrayList<SnapshotInfo>();
         mListeners = new ArrayList<SnapshotListener>();
         mHandler = new Handler();
@@ -169,6 +172,7 @@ public class SnapshotManager {
         if (mSnapshotsQueue.size() == 1) {
             // We had no other snapshot queued so far, so start things up
             Log.v(TAG, "No snapshot queued, starting runnable");
+
             mCurrentShutterQueueIndex = 0;
             new Thread(mCaptureRunnable).start();
         }

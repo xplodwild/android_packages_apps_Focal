@@ -4,7 +4,6 @@ import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.AutoFocusMoveCallback;
 import android.os.Handler;
-import android.util.Log;
 
 public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
     public final static String TAG = "FocusManager";
@@ -16,6 +15,8 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
     private Handler mHandler;
     private CameraManager mCamManager;
     private boolean mIsFocusing;
+    private boolean mIsContinuousPicture;
+
 
     public FocusManager(CameraManager cam) {
         mHandler = new Handler();
@@ -23,22 +24,14 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
         mIsFocusing = false;
         
         mCamManager.setAutoFocusMoveCallback(this);
-        
-        post();
+        Camera.Parameters params = mCamManager.getParameters();
+        if (params.getSupportedFocusModes().contains("continuous-picture")) {
+            params.setFocusMode("continuous-picture");
+            mIsContinuousPicture = true;
+        }
     }
-    
-    private void post() {
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                checkFocus();
-                post();
-            }
-        }, 1500);
-    }
-    
 
-    private void checkFocus() {
+    public void checkFocus() {
         long time = System.currentTimeMillis();
         
         if (time - mLastFocusTimestamp > mFocusKeepTimeMs && !mIsFocusing) {
