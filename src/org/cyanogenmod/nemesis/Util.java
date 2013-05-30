@@ -35,7 +35,7 @@ public class Util {
     // Screen size holder
     private static Point mScreenSize = new Point();
 
-    private static DateFormat mJpegDateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+    private static DateFormat mJpegDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
 
     /**
      * Returns the orientation of the display

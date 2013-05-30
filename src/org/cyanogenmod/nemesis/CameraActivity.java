@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
 import org.cyanogenmod.nemesis.ui.ShutterButton;
@@ -26,6 +27,7 @@ public class CameraActivity extends Activity {
     private CameraManager mCamManager;
     private SnapshotManager mSnapshotManager;
     private MainSnapshotListener mSnapshotListener;
+    private FocusManager mFocusManager;
     private CameraOrientationEventListener mOrientationListener;
     private GestureDetector mGestureDetector;
     private Handler mHandler;
@@ -127,6 +129,7 @@ public class CameraActivity extends Activity {
         mSnapshotManager = new SnapshotManager(mCamManager, this);
         mSnapshotListener = new MainSnapshotListener();
         mSnapshotManager.addListener(mSnapshotListener);
+        mFocusManager = new FocusManager(mCamManager);
 
         // Add the preview surface to its container
         final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
@@ -139,7 +142,9 @@ public class CameraActivity extends Activity {
 
 
         if (!mCamManager.open(0)) {
-            Log.e(TAG, "Could not open cameras");
+            Log.e(TAG, "Could not open camera HAL");
+            Toast.makeText(this, getResources().getString(R.string.cannot_connect_hal), Toast.LENGTH_LONG).show();
+            return;
         }
 
         Camera.Size sz = Util.getOptimalPreviewSize(this, mCamManager.getParameters().getSupportedPreviewSizes(), 1.33f);

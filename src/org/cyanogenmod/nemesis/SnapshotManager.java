@@ -65,7 +65,6 @@ public class SnapshotManager {
     private List<SnapshotListener> mListeners;
     private Handler mHandler;
     private ContentResolver mContentResolver;
-    private CameraActivity mActivity;
     private ImageSaver mImageSaver;
     private ImageNamer mImageNamer;
     private CameraManager mCameraManager;

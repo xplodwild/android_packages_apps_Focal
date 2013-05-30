@@ -20,6 +20,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
+import android.hardware.Camera.AutoFocusMoveCallback;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -38,6 +40,7 @@ public class CameraManager {
     private Camera mCamera;
     private int mCurrentFacing;
     private Point mTargetSize;
+    private AutoFocusMoveCallback mAutoFocusMoveCallback;
     private Camera.Parameters mParameters;
     private int[] mPreviewFrameBuffer;
     
@@ -85,8 +88,9 @@ public class CameraManager {
 
             if (mTargetSize != null)
                 setPreviewSize(mTargetSize.x, mTargetSize.y);
-            else
-                Log.e(TAG, "mTargetSize is null!");
+            
+            if (mAutoFocusMoveCallback != null)
+                mCamera.setAutoFocusMoveCallback(mAutoFocusMoveCallback);
         }
         catch (Exception e) {
             Log.e(TAG, "Error while opening cameras: " + e.getMessage());
@@ -193,6 +197,28 @@ public class CameraManager {
         } catch (Exception e) {
             // ignore
         }
+    }
+    
+    /**
+     * Trigger the autofocus function of the device
+     * @param cb The AF callback
+     * @return true if we could start the AF, false otherwise
+     */
+    public boolean doAutofocus(AutoFocusCallback cb) {
+        if (mCamera != null) {
+            mCamera.autoFocus(cb);
+            return true;
+        } else {
+            return false;
+        }
+        
+    }
+    
+    public void setAutoFocusMoveCallback(AutoFocusMoveCallback cb) {
+        mAutoFocusMoveCallback = cb;
+        
+        if (mCamera != null)
+            mCamera.setAutoFocusMoveCallback(cb);
     }
     
     /**
