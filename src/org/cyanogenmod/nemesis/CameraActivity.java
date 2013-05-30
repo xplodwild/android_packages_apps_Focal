@@ -93,7 +93,7 @@ public class CameraActivity extends Activity {
                 // We don't have the camera parameters yet, retry later
                 if (params == null) {
                     Log.w(TAG, "No camera params yet, posting again");
-                    mHandler.post(this);
+                    mHandler.postDelayed(this, 100);
                 } else {
                     mSideBar.checkCapabilities(mCamManager, (ViewGroup) findViewById(R.id.widgets_container));
                 }
