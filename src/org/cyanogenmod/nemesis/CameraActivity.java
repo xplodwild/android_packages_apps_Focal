@@ -160,6 +160,7 @@ public class CameraActivity extends Activity {
         layout.setPreviewSize(sz.width, sz.height);
 
         mFocusManager = new FocusManager(mCamManager);
+        mFocusManager.setListener(new MainFocusListener());
         mSnapshotManager = new SnapshotManager(mCamManager, mFocusManager, this);
         mSnapshotListener = new MainSnapshotListener();
         mSnapshotManager.addListener(mSnapshotListener);
@@ -182,6 +183,20 @@ public class CameraActivity extends Activity {
             } else {
                 child.animate().rotation(rotation).setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
             }
+        }
+    }
+
+    private class MainFocusListener implements FocusManager.FocusListener {
+
+        @Override
+        public void onFocusStart(boolean smallAdjust) {
+            mFocusHudRing.animateWorking(smallAdjust ? 200 : 1500);
+        }
+
+        @Override
+        public void onFocusReturns(boolean smallAdjust, boolean success) {
+            // XXX: Have a green and red focus ring to show success or not of the focusing
+            mFocusHudRing.animatePressUp();
         }
     }
 

@@ -177,8 +177,8 @@ public class CameraManager {
         int previewWidth = getParameters().getPreviewSize().width;
         int previewHeight = getParameters().getPreviewSize().height;
         
-        if (mPreviewFrameBuffer == null || mPreviewFrameBuffer.length != (previewWidth*previewHeight*3))
-            mPreviewFrameBuffer = new int[previewWidth*previewHeight];
+        if (mPreviewFrameBuffer == null || mPreviewFrameBuffer.length != (previewWidth*previewHeight+1))
+            mPreviewFrameBuffer = new int[previewWidth*previewHeight+1];
         
         // Convert YUV420SP preview data to RGB
         Log.e(TAG, "Preview is " + previewWidth + "x" + previewHeight);
@@ -266,7 +266,7 @@ public class CameraManager {
         public CameraPreview(Context context) {
             super(context);
 
-            mLastFrameBytes = new byte[2100000];
+            mLastFrameBytes = new byte[2332800]; // size for 1440*1080 preview... XXX: previewWidth*previewHeight*1.5
 
             // Install a SurfaceHolder.Callback so we get notified when the
             // underlying surface is created and destroyed.

@@ -1,6 +1,5 @@
 package org.cyanogenmod.nemesis.ui;
 
-import android.animation.Animator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -63,31 +62,10 @@ public class HudRing extends ImageView implements View.OnTouchListener {
     }
 
     public void animatePressUp() {
-        animate().alpha(0.75f).setDuration(80).start();
+        animate().alpha(0.75f).rotation(0).setDuration(80).start();
     }
 
     public void animateWorking(long duration) {
-        animate().rotationBy(45.0f).setDuration(duration).setInterpolator(new DecelerateInterpolator())
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        animate().rotation(0.0f).alpha(0.75f).setDuration(80).start();
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-                        animate().rotation(0.0f).alpha(0.75f).setDuration(80).start();
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-
-                    }
-                }).start();
+        animate().rotationBy(45.0f).setDuration(duration).setInterpolator(new DecelerateInterpolator()).start();
     }
 }

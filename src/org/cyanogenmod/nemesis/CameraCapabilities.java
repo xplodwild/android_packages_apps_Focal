@@ -4,7 +4,9 @@ import android.content.Context;
 import android.hardware.Camera;
 import android.view.ViewGroup;
 
+import org.cyanogenmod.nemesis.widgets.EffectWidget;
 import org.cyanogenmod.nemesis.widgets.FlashWidget;
+import org.cyanogenmod.nemesis.widgets.SceneModeWidget;
 import org.cyanogenmod.nemesis.widgets.WhiteBalanceWidget;
 import org.cyanogenmod.nemesis.widgets.WidgetBase;
 
@@ -32,6 +34,8 @@ public class CameraCapabilities {
         // will populate the sidebar in the same order as here
         mWidgets.add(new FlashWidget(cam, context));
         mWidgets.add(new WhiteBalanceWidget(cam, context));
+        mWidgets.add(new SceneModeWidget(cam, context));
+        mWidgets.add(new EffectWidget(cam, context));
     }
 
     /**

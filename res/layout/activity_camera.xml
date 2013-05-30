@@ -13,6 +13,19 @@
 
     </org.cyanogenmod.nemesis.ui.PreviewFrameLayout>
 
+    <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/hud_container">
+
+        <org.cyanogenmod.nemesis.ui.FocusHudRing
+                android:id="@+id/hud_ring_focus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+    </FrameLayout>
+
     <org.cyanogenmod.nemesis.ui.SideBar
         android:id="@+id/sidebar_scroller"
         android:layout_width="match_parent"
@@ -48,18 +61,6 @@
 
     </FrameLayout>
 
-    <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/hud_container">
-
-        <org.cyanogenmod.nemesis.ui.FocusHudRing
-                android:id="@+id/hud_ring_focus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-            />
-
-    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/shutter_button_container"
