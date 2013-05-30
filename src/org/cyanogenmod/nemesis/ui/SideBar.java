@@ -17,6 +17,7 @@ public class SideBar extends ScrollView {
     public final static int SLIDE_ANIMATION_DURATION_MS = 300;
     private CameraCapabilities mCapabilities;
     private ViewGroup mToggleContainer;
+    private boolean mIsOpen;
 
     public SideBar(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -38,6 +39,7 @@ public class SideBar extends ScrollView {
      */
     private void initialize() {
         this.setBackgroundColor(getResources().getColor(R.color.widget_background));
+        mIsOpen = true;
     }
 
 
@@ -121,11 +123,20 @@ public class SideBar extends ScrollView {
     }
 
     /**
+     * @return Whether or not the sidebar is open
+     */
+    public boolean isOpen() {
+        return mIsOpen;
+    }
+
+    /**
      * Smoothly close the sidebar
      */
     public void slideClose() {
         this.animate().translationY(this.getHeight())
         .setDuration(SLIDE_ANIMATION_DURATION_MS).start();
+
+        mIsOpen = false;
     }
 
     /**
@@ -133,7 +144,9 @@ public class SideBar extends ScrollView {
      */
     public void slideOpen() {
         this.animate().translationY(0)
-        .setDuration(SLIDE_ANIMATION_DURATION_MS).start();;
+        .setDuration(SLIDE_ANIMATION_DURATION_MS).start();
+
+        mIsOpen = true;
     }
 
 }

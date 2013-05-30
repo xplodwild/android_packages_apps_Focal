@@ -3,6 +3,10 @@ package org.cyanogenmod.nemesis;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -59,6 +63,11 @@ public class CameraActivity extends Activity {
         // takes some time to get first orientation.
         mOrientationListener = new CameraOrientationEventListener(this);
         mOrientationListener.enable();
+
+        // Create sensor listener, to detect shake gestures
+        SensorManager sensorMgr = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorMgr.registerListener(new CameraSensorListener(), sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
 
         mHandler = new Handler();
 
@@ -280,6 +289,54 @@ public class CameraActivity extends Activity {
                 mOrientationCompensation = orientationCompensation;
                 updateInterfaceOrientation();
             }
+        }
+    }
+
+    private class CameraSensorListener implements SensorEventListener {
+        public final static int SHAKE_CLOSE_THRESHOLD = 15;
+        public final static int SHAKE_OPEN_THRESHOLD = -15;
+
+        private float mGravity[] = new float[3];
+        private float mAccel[] = new float[3];
+
+        private long mLastShakeTimestamp = 0;
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            // alpha is calculated as t / (t + dT)
+            // with t, the low-pass filter's time-constant
+            // and dT, the event delivery rate
+            final float alpha = 0.8f;
+
+            mGravity[0] = alpha * mGravity[0] + (1 - alpha) * sensorEvent.values[0];
+            mGravity[1] = alpha * mGravity[1] + (1 - alpha) * sensorEvent.values[1];
+            mGravity[2] = alpha * mGravity[2] + (1 - alpha) * sensorEvent.values[2];
+
+            mAccel[0] = sensorEvent.values[0] - mGravity[0];
+            mAccel[1] = sensorEvent.values[1] - mGravity[1];
+            mAccel[2] = sensorEvent.values[2] - mGravity[2];
+
+            // If we aren't just opening the sidebar
+            if ((System.currentTimeMillis()-mLastShakeTimestamp) < 1000) {
+                Log.e(TAG, "TOO EARLY");
+                return;
+            }
+
+            if (mAccel[0] > SHAKE_CLOSE_THRESHOLD && mSideBar.isOpen()) {
+                Log.e(TAG, "Closing sidebar");
+                mSideBar.slideClose();
+                mLastShakeTimestamp = System.currentTimeMillis();
+            } else if (mAccel[0] < SHAKE_OPEN_THRESHOLD && !mSideBar.isOpen()) {
+                Log.e(TAG, "Opening sidebar");
+                mSideBar.slideOpen();
+                mLastShakeTimestamp = System.currentTimeMillis();
+            }
+
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
         }
     }
 
