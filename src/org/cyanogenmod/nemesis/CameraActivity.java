@@ -47,6 +47,9 @@ public class CameraActivity extends Activity {
 
         setContentView(R.layout.activity_camera);
 
+        getWindow().getDecorView()
+                .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+
         mSideBar = (SideBar) findViewById(R.id.sidebar_scroller);
         mWidgetRenderer = (WidgetRenderer) findViewById(R.id.widgets_container);
 
