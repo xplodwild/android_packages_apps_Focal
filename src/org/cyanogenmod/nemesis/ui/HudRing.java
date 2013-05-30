@@ -1,6 +1,7 @@
 package org.cyanogenmod.nemesis.ui;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,6 +16,7 @@ public class HudRing extends ImageView implements View.OnTouchListener {
     private float mLastY;
     private float mOffsetX;
     private float mOffsetY;
+    private Handler mHandler;
 
     public HudRing(Context context) {
         super(context);
@@ -32,6 +34,7 @@ public class HudRing extends ImageView implements View.OnTouchListener {
     protected void onFinishInflate() {
         super.onFinishInflate();
         setOnTouchListener(this);
+        mHandler = new Handler();
     }
 
     @Override
@@ -66,6 +69,7 @@ public class HudRing extends ImageView implements View.OnTouchListener {
     }
 
     public void animateWorking(long duration) {
+
         animate().rotationBy(45.0f).setDuration(duration).setInterpolator(new DecelerateInterpolator()).start();
     }
 }

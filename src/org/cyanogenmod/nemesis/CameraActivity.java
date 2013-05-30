@@ -70,6 +70,8 @@ public class CameraActivity extends Activity {
         // Setup HUDs
         mFocusHudRing = (FocusHudRing) findViewById(R.id.hud_ring_focus);
         mFocusHudRing.setManagers(mCamManager, mFocusManager);
+        mFocusHudRing.setX(Util.getScreenSize(this).x/2.0f-mFocusHudRing.getWidth()/2.0f);
+        mFocusHudRing.setY(Util.getScreenSize(this).y/2.0f-mFocusHudRing.getHeight()/2.0f);
 
         // Setup shutter button
         ShutterButton shutterButton = (ShutterButton) findViewById(R.id.btn_shutter);
@@ -189,14 +191,30 @@ public class CameraActivity extends Activity {
     private class MainFocusListener implements FocusManager.FocusListener {
 
         @Override
-        public void onFocusStart(boolean smallAdjust) {
-            mFocusHudRing.animateWorking(smallAdjust ? 200 : 1500);
+        public void onFocusStart(final boolean smallAdjust) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mFocusHudRing.animateWorking(smallAdjust ? 200 : 1500);
+                }
+            });
+
         }
 
         @Override
-        public void onFocusReturns(boolean smallAdjust, boolean success) {
-            // XXX: Have a green and red focus ring to show success or not of the focusing
-            mFocusHudRing.animatePressUp();
+        public void onFocusReturns(final boolean smallAdjust, final boolean success) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mFocusHudRing.animatePressUp();
+
+                    if (!smallAdjust) {
+                        mFocusHudRing.setFocusImage(success);
+                    } else {
+                        mFocusHudRing.setFocusImage(true);
+                    }
+                }
+            });
         }
     }
 

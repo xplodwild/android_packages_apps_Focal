@@ -347,7 +347,8 @@ public class CameraManager {
 
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            mCamera.addCallbackBuffer(mLastFrameBytes);
+            if (mCamera != null)
+                mCamera.addCallbackBuffer(mLastFrameBytes);
         }
     }
 }

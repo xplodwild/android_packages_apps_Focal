@@ -33,7 +33,14 @@ public class FocusHudRing extends HudRing {
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        setImageResource(R.drawable.hud_focus_ring);
+        setFocusImage(true);
+    }
+
+    public void setFocusImage(boolean success) {
+        if (success)
+            setImageResource(R.drawable.hud_focus_ring_success);
+        else
+            setImageResource(R.drawable.hud_focus_ring_fail);
     }
 
     public void setManagers(CameraManager camMan, FocusManager focusMan) {
