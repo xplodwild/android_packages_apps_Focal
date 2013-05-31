@@ -1,5 +1,13 @@
 package org.cyanogenmod.nemesis;
 
+import org.cyanogenmod.nemesis.ui.FocusHudRing;
+import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
+import org.cyanogenmod.nemesis.ui.ShutterButton;
+import org.cyanogenmod.nemesis.ui.SideBar;
+import org.cyanogenmod.nemesis.ui.SwitchRingPad;
+import org.cyanogenmod.nemesis.ui.ThumbnailFlinger;
+import org.cyanogenmod.nemesis.ui.WidgetRenderer;
+
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
@@ -18,13 +26,6 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-
-import org.cyanogenmod.nemesis.ui.FocusHudRing;
-import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
-import org.cyanogenmod.nemesis.ui.ShutterButton;
-import org.cyanogenmod.nemesis.ui.SideBar;
-import org.cyanogenmod.nemesis.ui.ThumbnailFlinger;
-import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
 public class CameraActivity extends Activity {
     public final static String TAG = "CameraActivity";
@@ -84,7 +85,8 @@ public class CameraActivity extends Activity {
 
         // Setup shutter button
         ShutterButton shutterButton = (ShutterButton) findViewById(R.id.btn_shutter);
-        shutterButton.setOnClickListener(new ShutterButton.ClickListener(mSnapshotManager));
+        shutterButton.setOnClickListener(new ShutterButton.ClickListener(mSnapshotManager)); // XXX: Move it in here
+        shutterButton.setSlideListener(new MainShutterSlideListener());
 
         // Setup gesture detection
         mGestureDetector = new GestureDetector(this, new GestureListener());
@@ -201,6 +203,29 @@ public class CameraActivity extends Activity {
         v.animate().rotation(rotation).setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
     }
 
+    /**
+     * Listener that is called when shutter button is slided, to open ring pad view
+     */
+    private class MainShutterSlideListener implements ShutterButton.ShutterSlideListener {
+
+        @Override
+        public void onSlideOpen() {
+            SwitchRingPad pad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
+            pad.animateOpen();
+        }
+        
+        @Override
+        public void onSlideClose() {
+            SwitchRingPad pad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
+            pad.animateClose();
+        }
+        
+    }
+    
+    
+    /**
+     * Focus listener to animate the focus HUD ring from FocusManager events
+     */
     private class MainFocusListener implements FocusManager.FocusListener {
 
         @Override
