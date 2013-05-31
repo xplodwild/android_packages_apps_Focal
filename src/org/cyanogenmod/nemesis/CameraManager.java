@@ -142,7 +142,9 @@ public class CameraManager {
     }
 
     private void releaseCamera() {
-        mCamera.release();
+        if (mCamera != null) {
+            mCamera.release();
+        }
         mCamera = null;
         mParameters = null;
         mPreview.notifyCameraChanged();
@@ -214,7 +216,11 @@ public class CameraManager {
      */
     public boolean doAutofocus(AutoFocusCallback cb) {
         if (mCamera != null) {
-            mCamera.autoFocus(cb);
+            try {
+                mCamera.autoFocus(cb);
+            } catch (Exception e) {
+                return false;
+            }
             return true;
         } else {
             return false;
