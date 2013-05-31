@@ -4,6 +4,7 @@ gen/
 bin/
 .classpath
 .project
+.DS_Store
 /.settings/org.eclipse.jdt.core.prefs
 /.settings
 /.idea

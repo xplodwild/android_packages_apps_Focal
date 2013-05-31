@@ -20,7 +20,7 @@ public class SwitchRingPad extends View {
     private Bitmap mPicSphereBitmap;
     private Bitmap mUnusedBitmap;
 
-    private final static int EDGE_PADDING = 32; // XXX: vvvvvvvvvvvvvvvvvv
+    private final static int EDGE_PADDING = 96; // XXX: vvvvvvvvvvvvvvvvvv
     private final static int BUTTON_SIZE = 144; // XXX: DPI INDEPENDANT!!!
     private final static int RING_RADIUS = 400; // XXX: ^^^^^^^^^^^^^^^^^^
 
@@ -67,23 +67,23 @@ public class SwitchRingPad extends View {
         mButtons = new PadButton[SLOT_MAX];
 
         // Camera pad button
-        mCameraBitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_widget_effect_mono)).getBitmap();
+        mCameraBitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.btn_ring_camera_normal)).getBitmap();
         addRingPad(mCameraBitmap, BUTTON_CAMERA, SLOT_LEFT);
 
-        // Video pad button
-        mVideoBitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_widget_effect_negative)).getBitmap();
-        addRingPad(mVideoBitmap, BUTTON_VIDEO, SLOT_MIDLEFT);
-
         // Panorama pad button
-        mPanoBitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_widget_effect_none)).getBitmap();
-        addRingPad(mPanoBitmap, BUTTON_PANO, SLOT_MID);
+        mPanoBitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.btn_ring_pano_normal)).getBitmap();
+        addRingPad(mPanoBitmap, BUTTON_PANO, SLOT_MIDLEFT);
+
+        // Video pad button
+        mVideoBitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.btn_ring_video_normal)).getBitmap();
+        addRingPad(mVideoBitmap, BUTTON_VIDEO, SLOT_MID);
 
         // PictureSphere pad button
-        mPicSphereBitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_widget_effect_posterize)).getBitmap();
+        mPicSphereBitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.btn_ring_picsphere_normal)).getBitmap();
         addRingPad(mPicSphereBitmap, BUTTON_PICSPHERE, SLOT_MIDRIGHT);
 
-        // Unused pad button (filled to test ring only so far)
-        mUnusedBitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_widget_placeholder)).getBitmap();
+        // Switch Cam pad button
+        mUnusedBitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.btn_ring_switchcam_normal)).getBitmap();
         addRingPad(mUnusedBitmap, BUTTON_UNUSED, SLOT_RIGHT);
     }
 
@@ -93,7 +93,7 @@ public class SwitchRingPad extends View {
             mPaint = new Paint();
         }
 
-        Point screenSize = Util.getScreenSize(null);
+        final Point screenSize = Util.getScreenSize(null);
 
         final int width = Math.min(screenSize.x, screenSize.y);
         final int height = Math.max(screenSize.x, screenSize.y);
@@ -101,17 +101,13 @@ public class SwitchRingPad extends View {
         for (int i = 0; i < SLOT_MAX; i++) {
             PadButton button = mButtons[i];
             if (button == null) continue;
+            
+            final float radAngle = (float) ((float) (i * (180.0f/4.0f) + 90.0f) * Math.PI / 180.0f);
 
-            final float x = (float) (height - EDGE_PADDING + RING_RADIUS * Math.cos((i * (180/4) + 90) * Math.PI / 180) - BUTTON_SIZE);
-            final float y = (float) (width/2 - BUTTON_SIZE/2 - RING_RADIUS * Math.sin((i * (180/4) + 90) * Math.PI / 180));
+            final float x = (float) (height - EDGE_PADDING + RING_RADIUS * Math.cos(radAngle) - BUTTON_SIZE);
+            final float y = (float) (width/2 - button.mBitmap.getWidth()/2 - RING_RADIUS * Math.sin(radAngle));
 
-            Log.e("SRP", "At " + x + ", " + y);
-
-            ///if (!isInEditMode()) {
             canvas.drawBitmap(button.mBitmap, x, y, mPaint);
-            //} else {
-            //    canvas.drawCircle(x, y, BUTTON_SIZE, mPaint);
-            //}
         }
     }
 
