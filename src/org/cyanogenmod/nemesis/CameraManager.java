@@ -76,10 +76,10 @@ public class CameraManager {
 
     /**
      * Opens the camera and show its preview in the preview
-     * @param facing
+     * @param cameraId
      * @return true if the operation succeeded, false otherwise
      */
-    public boolean open(int facing) {
+    public boolean open(int cameraId) {
         if (mCamera != null) {
             // Close the previous camera
             releaseCamera();
@@ -87,9 +87,9 @@ public class CameraManager {
 
         // Try to open the camera
         try {
-            mCamera = Camera.open(facing);
+            mCamera = Camera.open(cameraId);
             mCamera.setPreviewCallback(mPreview);
-            mCurrentFacing = facing;
+            mCurrentFacing = cameraId;
             mParameters = mCamera.getParameters();
 
             if (mTargetSize != null)
