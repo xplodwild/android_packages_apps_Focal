@@ -72,7 +72,8 @@ public class WidgetRenderer extends FrameLayout {
     public void widgetMoved(WidgetBase.WidgetContainer widget) {
         // Don't move widget if it was just a small tap
         if (Math.abs(widget.getX() - mWidgetDragStartPoint) < 40.0f) return;
-
+        if (mOpenWidgets.size() == 0) return;
+        
         boolean isFirst = (mOpenWidgets.get(0) == widget);
 
         // Check if we overlap the top of a widget

@@ -66,16 +66,24 @@
         android:id="@+id/shutter_button_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right|center"
-        android:layout_marginRight="-12dp" >
+         >
+        
+        <org.cyanogenmod.nemesis.ui.SwitchRingPad
+            android:id="@+id/switch_ring_pad"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
 
         <org.cyanogenmod.nemesis.ui.ShutterButton
             android:id="@+id/btn_shutter"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginRight="-12dp"
             android:clickable="true"
             android:contentDescription="@string/shutter_button"
             android:src="@drawable/btn_shutter_photo" />
+
     </FrameLayout>
 
 </FrameLayout>

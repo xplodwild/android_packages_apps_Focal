@@ -138,8 +138,8 @@ public class CameraActivity extends Activity {
 
 
     public void updateInterfaceOrientation() {
-        final ViewGroup root = (ViewGroup) findViewById(R.id.shutter_button_container);
-        setViewRotation(root, mOrientationCompensation);
+        final ShutterButton shutter = (ShutterButton) findViewById(R.id.btn_shutter);
+        setViewRotation(shutter, mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
     }
@@ -183,18 +183,22 @@ public class CameraActivity extends Activity {
      * @param vg the root ViewGroup
      * @param rotation the angle to which rotate the views
      */
-    public static void setViewRotation(ViewGroup vg, float rotation) {
+    public static void setViewGroupRotation(ViewGroup vg, float rotation) {
         final int childCount = vg.getChildCount();
 
         for (int i = 0; i < childCount; i++) {
             View child = vg.getChildAt(i);
 
             if (child instanceof ViewGroup) {
-                setViewRotation((ViewGroup) child, rotation);
+                setViewGroupRotation((ViewGroup) child, rotation);
             } else {
-                child.animate().rotation(rotation).setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
+                setViewRotation(child, rotation);
             }
         }
+    }
+    
+    public static void setViewRotation(View v, float rotation) {
+        v.animate().rotation(rotation).setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
     }
 
     private class MainFocusListener implements FocusManager.FocusListener {
