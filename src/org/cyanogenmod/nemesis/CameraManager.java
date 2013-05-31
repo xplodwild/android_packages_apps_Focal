@@ -235,7 +235,6 @@ public class CameraManager {
             List<Camera.Area> focusArea = new ArrayList<Camera.Area>();
             focusArea.add(new Camera.Area(new Rect(x, y, x + FOCUS_WIDTH, y + FOCUS_HEIGHT), 1000));
 
-            Log.e(TAG, "Setting focus point to " + x + ";" + y);
             params.setFocusAreas(focusArea);
 
             try {

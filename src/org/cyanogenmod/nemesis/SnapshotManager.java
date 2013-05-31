@@ -130,7 +130,6 @@ public class SnapshotManager {
     private Runnable mCaptureRunnable = new Runnable() {
         @Override
         public void run() {
-            mFocusManager.checkFocus();
             mCameraManager.takeSnapshot(mShutterCallback, null, mJpegPictureCallback);
         }
     };

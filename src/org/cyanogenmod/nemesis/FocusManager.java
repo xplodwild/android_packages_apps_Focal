@@ -35,7 +35,6 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
     private CameraManager mCamManager;
     private FocusListener mListener;
     private boolean mIsFocusing;
-    private boolean mIsContinuousPicture;
 
 
     public FocusManager(CameraManager cam) {
@@ -47,8 +46,14 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
         Camera.Parameters params = mCamManager.getParameters();
         if (params.getSupportedFocusModes().contains("continuous-picture")) {
             params.setFocusMode("continuous-picture");
-            mIsContinuousPicture = true;
         }
+        
+        // Do a first focus after 1 second
+        mHandler.postDelayed(new Runnable() {
+            public void run() {
+                checkFocus();
+            }
+        }, 1000);
     }
 
     public void setListener(FocusListener listener) {
