@@ -59,7 +59,7 @@ public class ShutterButton extends ImageView {
             }
         }
         
-        if (mListener != null)
+        if (mListener != null && mSlideOpen)
             mListener.onMotionEvent(event);
         
         super.onTouchEvent(event);

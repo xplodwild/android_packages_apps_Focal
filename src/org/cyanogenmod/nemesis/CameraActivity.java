@@ -44,6 +44,7 @@ public class CameraActivity extends Activity {
     private SideBar mSideBar;
     private WidgetRenderer mWidgetRenderer;
     private FocusHudRing mFocusHudRing;
+    private SwitchRingPad mSwitchRingPad;
 
     /**
      * Event: Activity created
@@ -59,6 +60,9 @@ public class CameraActivity extends Activity {
 
         mSideBar = (SideBar) findViewById(R.id.sidebar_scroller);
         mWidgetRenderer = (WidgetRenderer) findViewById(R.id.widgets_container);
+        
+        mSwitchRingPad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
+        mSwitchRingPad.setListener(new MainRingPadListener());
 
         // Create orientation listener. This should be done first because it
         // takes some time to get first orientation.
@@ -123,11 +127,11 @@ public class CameraActivity extends Activity {
 
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         // Pause the camera preview
         mCamManager.pause();
 
-        super.onPause();
+        super.onStop();
     }
 
     @Override
@@ -141,11 +145,10 @@ public class CameraActivity extends Activity {
 
     public void updateInterfaceOrientation() {
         final ShutterButton shutter = (ShutterButton) findViewById(R.id.btn_shutter);
-        final SwitchRingPad pad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
         setViewRotation(shutter, mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
-        pad.notifyOrientationChanged(mOrientationCompensation);
+        mSwitchRingPad.notifyOrientationChanged(mOrientationCompensation);
     }
 
     protected void setupCamera() {
@@ -161,8 +164,7 @@ public class CameraActivity extends Activity {
 
         layout.addView(mCamManager.getPreviewSurface());
 
-
-        if (!mCamManager.open(0)) {
+        if (!mCamManager.open(Camera.CameraInfo.CAMERA_FACING_FRONT)) {
             Log.e(TAG, "Could not open camera HAL");
             Toast.makeText(this, getResources().getString(R.string.cannot_connect_hal), Toast.LENGTH_LONG).show();
             return;
@@ -206,26 +208,41 @@ public class CameraActivity extends Activity {
     }
 
     /**
+     * Listener that is called when a ring pad button is activated (finger release above)
+     */
+    private class MainRingPadListener implements SwitchRingPad.RingPadListener {
+        @Override
+        public void onButtonActivated(int eventId) {
+            switch (eventId) {
+            case SwitchRingPad.BUTTON_SWITCHCAM:
+                if (mCamManager.getCurrentFacing() == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                    mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+                } else {
+                    mCamManager.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+                }
+                break;
+            }
+        }
+    }
+    
+    /**
      * Listener that is called when shutter button is slided, to open ring pad view
      */
     private class MainShutterSlideListener implements ShutterButton.ShutterSlideListener {
 
         @Override
         public void onSlideOpen() {
-            SwitchRingPad pad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
-            pad.animateOpen();
+            mSwitchRingPad.animateOpen();
         }
         
         @Override
         public void onSlideClose() {
-            SwitchRingPad pad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
-            pad.animateClose();
+            mSwitchRingPad.animateClose();
         }
 
         @Override
         public void onMotionEvent(MotionEvent ev) {
-            SwitchRingPad pad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
-            pad.onTouchEvent(ev);
+            mSwitchRingPad.onTouchEvent(ev);
         }
         
     }
@@ -355,16 +372,13 @@ public class CameraActivity extends Activity {
 
             // If we aren't just opening the sidebar
             if ((System.currentTimeMillis()-mLastShakeTimestamp) < 1000) {
-                Log.e(TAG, "TOO EARLY");
                 return;
             }
 
             if (mAccel[0] > SHAKE_CLOSE_THRESHOLD && mSideBar.isOpen()) {
-                Log.e(TAG, "Closing sidebar");
                 mSideBar.slideClose();
                 mLastShakeTimestamp = System.currentTimeMillis();
             } else if (mAccel[0] < SHAKE_OPEN_THRESHOLD && !mSideBar.isOpen()) {
-                Log.e(TAG, "Opening sidebar");
                 mSideBar.slideOpen();
                 mLastShakeTimestamp = System.currentTimeMillis();
             }

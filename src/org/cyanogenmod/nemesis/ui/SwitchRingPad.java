@@ -13,23 +13,25 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
 public class SwitchRingPad extends View implements AnimatorUpdateListener {
+    public interface RingPadListener {
+        public void onButtonActivated(int eventId);
+    }
 
     private final static int EDGE_PADDING = 96; // XXX: vvvvvvvvvvvvvvvvvv
     private final static int BUTTON_SIZE = 144; // XXX: DPI INDEPENDANT!!!
     private final static int RING_RADIUS = 400; // XXX: ^^^^^^^^^^^^^^^^^^
 
-    private final static int BUTTON_CAMERA      = 1;
-    private final static int BUTTON_VIDEO       = 2;
-    private final static int BUTTON_PANO        = 3;
-    private final static int BUTTON_PICSPHERE   = 4;
-    private final static int BUTTON_SWITCHCAM   = 5;
+    public final static int BUTTON_CAMERA      = 1;
+    public final static int BUTTON_VIDEO       = 2;
+    public final static int BUTTON_PANO        = 3;
+    public final static int BUTTON_PICSPHERE   = 4;
+    public final static int BUTTON_SWITCHCAM   = 5;
 
     private final static int SLOT_RIGHT    = 0;
     private final static int SLOT_MIDRIGHT = 1;
@@ -47,12 +49,12 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
     private boolean mIsOpen;
     public float mTargetOrientation;
     public float mCurrentOrientation;
+    private RingPadListener mListener;
 
     private class PadButton {
         public Bitmap mNormalBitmap;
         public Bitmap mHoverBitmap;
         public boolean mIsHovering;
-        public int mSlot;
         public int mEventId;
         public float mLastDrawnX;
         public float mLastDrawnY;
@@ -112,6 +114,10 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         addRingPad(getDrawable(R.drawable.btn_ring_switchcam_normal),
                 getDrawable(R.drawable.btn_ring_switchcam_hover),
                 BUTTON_SWITCHCAM, SLOT_RIGHT);
+    }
+    
+    public void setListener(RingPadListener listener) {
+        mListener = listener;
     }
 
     @Override
@@ -188,7 +194,15 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
             }
         } else if (event.getActionMasked() == MotionEvent.ACTION_UP){
             animateClose();
-            // XXX: Button callback
+            
+            for (int i = 0; i < SLOT_MAX; i++) {
+                PadButton button = mButtons[i];
+                if (button == null) continue;
+             
+                if (button.mIsHovering && mListener != null) {
+                    mListener.onButtonActivated(button.mEventId);
+                }
+            }
             return false;
         }
         
@@ -241,7 +255,6 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         mButtons[slot].mNormalBitmap = iconNormal;
         mButtons[slot].mHoverBitmap = iconHover;
         mButtons[slot].mEventId = eventId;
-        mButtons[slot].mSlot = slot;
     }
 
     @Override

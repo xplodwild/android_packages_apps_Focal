@@ -61,7 +61,8 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
             mButtonsValues.put(button, value);
             addViewToContainer(button);
 
-            if (params.get(mKey).equals(value)) {
+            String currentValue = params.get(mKey);
+            if (currentValue != null && currentValue.equals(value)) {
                 setButtonActivated(button, value);
             }
         } else {

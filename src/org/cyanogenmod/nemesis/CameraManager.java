@@ -72,6 +72,7 @@ public class CameraManager {
 
     public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
+        Log.e("=======", "============ CAMERAMANAGER CREATE");
     }
 
     /**
@@ -118,6 +119,13 @@ public class CameraManager {
     public CameraPreview getPreviewSurface() {
         return mPreview;
     }
+    
+    /**
+     * @return The facing of the current open camera
+     */
+    public int getCurrentFacing() {
+        return mCurrentFacing;
+    }
 
     /**
      * Returns the parameters structure of the current running camera
@@ -143,6 +151,7 @@ public class CameraManager {
 
     private void releaseCamera() {
         if (mCamera != null) {
+            Log.v(TAG, "Releasing camera facing " + mCurrentFacing);
             mCamera.release();
         }
         mCamera = null;
@@ -183,7 +192,6 @@ public class CameraManager {
             mPreviewFrameBuffer = new int[previewWidth*previewHeight+1];
         
         // Convert YUV420SP preview data to RGB
-        Log.e(TAG, "Preview is " + previewWidth + "x" + previewHeight);
         Util.decodeYUV420SP(mPreviewFrameBuffer, data, previewWidth, previewHeight);
         
         // Decode the RGB data to a bitmap
@@ -285,6 +293,8 @@ public class CameraManager {
 
         public void notifyCameraChanged() {
             if (mCamera != null) {
+                setupCamera();
+                
                 try {
                     mCamera.setPreviewDisplay(mHolder);
                     mCamera.startPreview();
@@ -323,7 +333,21 @@ public class CameraManager {
             } catch (Exception e){
                 // ignore: tried to stop a non-existent preview
             }
+            
+            setupCamera();
 
+            // start preview with new settings
+            try {
+                mCamera.setPreviewDisplay(mHolder);
+                mCamera.startPreview();
+
+
+            } catch (Exception e){
+                Log.d(TAG, "Error starting camera preview: " + e.getMessage());
+            }
+        }
+        
+        private void setupCamera() {
             // Set device-specifics here
             try {
                 Camera.Parameters params = mCamera.getParameters();
@@ -332,21 +356,12 @@ public class CameraManager {
                     params.set("camera-mode", 1);
 
                 mCamera.setParameters(params);
+                
+                mCamera.addCallbackBuffer(mLastFrameBytes);
+                mCamera.setPreviewCallbackWithBuffer(this);
             }
             catch (Exception e) {
                 Log.e(TAG, "Could not set device specifics");
-            }
-
-            // start preview with new settings
-            try {
-                mCamera.setPreviewDisplay(mHolder);
-                mCamera.startPreview();
-
-                mCamera.addCallbackBuffer(mLastFrameBytes);
-                mCamera.setPreviewCallbackWithBuffer(this);
-
-            } catch (Exception e){
-                Log.d(TAG, "Error starting camera preview: " + e.getMessage());
             }
         }
 
