@@ -50,6 +50,8 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
     public float mTargetOrientation;
     public float mCurrentOrientation;
     private RingPadListener mListener;
+    private float mHintProgress;
+    private ValueAnimator mHintAnimator;
 
     private class PadButton {
         public Bitmap mNormalBitmap;
@@ -78,11 +80,28 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
     private Bitmap getDrawable(int resId) {
         return ((BitmapDrawable) getResources().getDrawable(resId)).getBitmap();
     }
+    
+    public void animateHint() {
+        mHintAnimator = new ValueAnimator();
+        mHintAnimator.setDuration(1500);
+        mHintAnimator.setFloatValues(0, 1);
+        mHintAnimator.setStartDelay(500);
+        mHintAnimator.addUpdateListener(new AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator arg0) {
+                mHintProgress = (Float) arg0.getAnimatedValue();
+                invalidate();
+            }
+        });
+        mHintAnimator.start();
+    }
 
     private void initialize() {
         mIsOpen = false;
         mPaint = new Paint();
-
+        
+        animateHint();
+        
         mAnimator = new ValueAnimator();
         mAnimator.setDuration(RING_ANIMATION_DURATION_MS);
         mAnimator.setInterpolator(new DecelerateInterpolator());
@@ -122,21 +141,29 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (mOpenProgress == 0)
+        if (mOpenProgress == 0 && mHintProgress == 1)
             return;
 
         if (mPaint == null) {
             mPaint = new Paint();
         }
-
-        final float ringRadius = (float) RING_RADIUS * mOpenProgress;
-
+        
         // Get the size dimensions regardless of orientation
         final Point screenSize = Util.getScreenSize(null);
 
         final int width = Math.min(screenSize.x, screenSize.y);
         final int height = Math.max(screenSize.x, screenSize.y);
 
+        
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(4.0f);
+        mPaint.setARGB((int) (255.0f - 255.0f * mHintProgress), 255, 255, 255);
+        canvas.drawCircle(height - EDGE_PADDING, width/2, mHintProgress * RING_RADIUS, mPaint);
+        canvas.drawCircle(height - EDGE_PADDING, width/2, mHintProgress * RING_RADIUS * 0.66f, mPaint);
+        canvas.drawCircle(height - EDGE_PADDING, width/2, mHintProgress * RING_RADIUS * 0.33f, mPaint);
+
+        final float ringRadius = (float) RING_RADIUS * mOpenProgress;
+       
         // Draw the inner circle (dark)
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(0x88888888);
@@ -194,7 +221,7 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
             }
         } else if (event.getActionMasked() == MotionEvent.ACTION_UP){
             animateClose();
-            
+
             for (int i = 0; i < SLOT_MAX; i++) {
                 PadButton button = mButtons[i];
                 if (button == null) continue;

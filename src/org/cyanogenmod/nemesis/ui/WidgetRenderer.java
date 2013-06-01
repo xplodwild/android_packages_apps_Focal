@@ -1,15 +1,17 @@
 package org.cyanogenmod.nemesis.ui;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.widget.FrameLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.widgets.WidgetBase;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.content.Context;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 
 public class WidgetRenderer extends FrameLayout {
     public final static String TAG = "WidgetRenderer";
@@ -21,6 +23,7 @@ public class WidgetRenderer extends FrameLayout {
     private float mSpacing;
     private int mOrientation;
     private float mWidgetDragStartPoint;
+    private boolean mIsHidden;
 
     public WidgetRenderer(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -73,7 +76,7 @@ public class WidgetRenderer extends FrameLayout {
         // Don't move widget if it was just a small tap
         if (Math.abs(widget.getX() - mWidgetDragStartPoint) < 40.0f) return;
         if (mOpenWidgets.size() == 0) return;
-        
+
         boolean isFirst = (mOpenWidgets.get(0) == widget);
 
         // Check if we overlap the top of a widget
@@ -172,6 +175,34 @@ public class WidgetRenderer extends FrameLayout {
 
     public void notifySidebarSlideOpen() {
         animate().translationY(0).setDuration(SideBar.SLIDE_ANIMATION_DURATION_MS).start();
+    }
+
+    public void hideWidgets() {
+        mIsHidden = true;
+
+        for (int i = 0; i < mOpenWidgets.size(); i++) {
+            WidgetBase.WidgetContainer widget = mOpenWidgets.get(i);
+            widget.animate().translationYBy(widget.getHeight()).setDuration(300).alpha(0)
+            .setInterpolator(new AccelerateInterpolator()).start();
+        }
+    }
+
+    public void restoreWidgets() {
+        mIsHidden = false;
+
+        for (int i = 0; i < mOpenWidgets.size(); i++) {
+            WidgetBase.WidgetContainer widget = mOpenWidgets.get(i);
+            widget.animate().translationYBy(-widget.getHeight()).setDuration(300).alpha(1)
+            .setInterpolator(new DecelerateInterpolator()).start();
+        }
+    }
+
+    public boolean isHidden() {
+        return mIsHidden;
+    }
+
+    public int getWidgetsCount() {
+        return mOpenWidgets.size();
     }
 
 }

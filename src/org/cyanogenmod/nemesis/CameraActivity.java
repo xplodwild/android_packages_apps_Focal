@@ -259,6 +259,11 @@ public class CameraActivity extends Activity {
         public boolean onMotionEvent(MotionEvent ev) {
             return mSwitchRingPad.onTouchEvent(ev);
         }
+
+        @Override
+        public void onShutterButtonPressed() {
+            mSwitchRingPad.animateHint();
+        }
         
     }
     
@@ -449,11 +454,19 @@ public class CameraActivity extends Activity {
 
                 // swipes to open/close the sidebar 
                 if(e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                    mSideBar.slideOpen();
-                    mWidgetRenderer.notifySidebarSlideOpen();
+                    if (mWidgetRenderer.isHidden() && mWidgetRenderer.getWidgetsCount() > 0) {
+                        mWidgetRenderer.restoreWidgets();
+                    } else {
+                        mSideBar.slideOpen();
+                        mWidgetRenderer.notifySidebarSlideOpen();
+                    }
                 }  else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                    mSideBar.slideClose();
-                    mWidgetRenderer.notifySidebarSlideClose();
+                    if (mSideBar.isOpen()) {
+                        mSideBar.slideClose();
+                        mWidgetRenderer.notifySidebarSlideClose();
+                    } else if (!mWidgetRenderer.isHidden() && mWidgetRenderer.getWidgetsCount() > 0) {
+                        mWidgetRenderer.hideWidgets();
+                    }
                 }
             } catch (Exception e) {
                 // nothing
