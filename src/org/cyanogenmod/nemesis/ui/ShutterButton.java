@@ -4,7 +4,6 @@ import org.cyanogenmod.nemesis.SnapshotManager;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,16 +13,19 @@ public class ShutterButton extends ImageView {
     
     /**
      * Interface that notifies the CameraActivity that
-     * the shutter button has been slide (and should show the
-     * pad ring)
+     * the shutter button has been slided (and should show the
+     * pad ring), or that there is a motionevent handled by this
+     * View that should belong to the SwitchRingPad
      */
     public interface ShutterSlideListener {
         public void onSlideOpen();
         public void onSlideClose();
+        public void onMotionEvent(MotionEvent ev);
     }
     
     
     private float mDownX;
+    private float mDownY;
     private ShutterSlideListener mListener;
     
     public ShutterButton(Context context, AttributeSet attrs, int defStyle) {
@@ -42,8 +44,9 @@ public class ShutterButton extends ImageView {
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
             mDownX = event.getRawX();
+            mDownY = event.getRawY();
         } else if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-            if (event.getRawX() - mDownX < -getWidth()/2 && mListener != null) {
+            if ((event.getRawX() - mDownX < -getWidth()/2 || Math.abs(event.getRawY() - mDownY) > getHeight()/2) && mListener != null) {
                 if (!mSlideOpen) {
                     mListener.onSlideOpen();
                     mSlideOpen = true;
@@ -56,7 +59,12 @@ public class ShutterButton extends ImageView {
             }
         }
         
-        return super.onTouchEvent(event);
+        if (mListener != null)
+            mListener.onMotionEvent(event);
+        
+        super.onTouchEvent(event);
+        
+        return true;
     }
     
     public void setSlideListener(ShutterSlideListener listener) {

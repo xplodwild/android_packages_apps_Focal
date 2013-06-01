@@ -219,6 +219,12 @@ public class CameraActivity extends Activity {
             SwitchRingPad pad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
             pad.animateClose();
         }
+
+        @Override
+        public void onMotionEvent(MotionEvent ev) {
+            SwitchRingPad pad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
+            pad.onTouchEvent(ev);
+        }
         
     }
     
