@@ -134,6 +134,7 @@ public class CameraActivity extends Activity {
     public void updateInterfaceOrientation() {
         final ShutterButton shutter = (ShutterButton) findViewById(R.id.btn_shutter);
         setViewRotation(shutter, mOrientationCompensation);
+        mCamManager.setOrientation(mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
         mSwitchRingPad.notifyOrientationChanged(mOrientationCompensation);

@@ -49,6 +49,7 @@ public class CameraManager {
     private AutoFocusMoveCallback mAutoFocusMoveCallback;
     private Camera.Parameters mParameters;
     private int[] mPreviewFrameBuffer;
+    private int mOrientation;
     
     private class AsyncParamRunnable implements Runnable {
         private String mKey;
@@ -72,7 +73,6 @@ public class CameraManager {
 
     public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
-        Log.e("=======", "============ CAMERAMANAGER CREATE");
     }
 
     /**
@@ -207,6 +207,18 @@ public class CameraManager {
                              Camera.PictureCallback jpeg) {
         Log.v(TAG, "takePicture");
         mCamera.takePicture(shutterCallback, raw, jpeg);
+    }
+    
+    /**
+     * Returns the orientation of the device
+     * @return
+     */
+    public int getOrientation() {
+        return mOrientation;
+    }
+    
+    public void setOrientation(int orientation) {
+        mOrientation = orientation;
     }
 
     public void restartPreviewIfNeeded() {

@@ -106,7 +106,7 @@ public class SnapshotManager {
             if (snap.mSave) {
                 // Calculate the width and the height of the jpeg.
                 Camera.Size s = mCameraManager.getParameters().getPictureSize();
-                int orientation = Exif.getOrientation(jpegData);
+                int orientation = Exif.getOrientation(jpegData) - mCameraManager.getOrientation();
                 int width, height;
                 width = s.width;
                 height = s.height;
