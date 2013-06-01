@@ -20,7 +20,7 @@ public class ShutterButton extends ImageView {
     public interface ShutterSlideListener {
         public void onSlideOpen();
         public void onSlideClose();
-        public void onMotionEvent(MotionEvent ev);
+        public boolean onMotionEvent(MotionEvent ev);
     }
     
     
@@ -59,12 +59,11 @@ public class ShutterButton extends ImageView {
             }
         }
         
+        boolean listenerResult = false;
         if (mListener != null && mSlideOpen)
-            mListener.onMotionEvent(event);
+            listenerResult = mListener.onMotionEvent(event);
         
-        super.onTouchEvent(event);
-        
-        return true;
+        return (super.onTouchEvent(event) || listenerResult);
     }
     
     public void setSlideListener(ShutterSlideListener listener) {

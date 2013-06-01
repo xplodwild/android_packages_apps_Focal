@@ -110,29 +110,16 @@ public class CameraActivity extends Activity {
         mCamManager.getPreviewSurface().setOnTouchListener(touchListener);
         mSideBar.setOnTouchListener(touchListener);
 
-        // Populate the sidebar buttons a little later (so we have camera parameters)
-        mHandler.post(new Runnable() {
-            public void run() {
-                Camera.Parameters params = mCamManager.getParameters();
-
-                // We don't have the camera parameters yet, retry later
-                if (params == null) {
-                    Log.w(TAG, "No camera params yet, posting again");
-                    mHandler.postDelayed(this, 100);
-                } else {
-                    mSideBar.checkCapabilities(mCamManager, (ViewGroup) findViewById(R.id.widgets_container));
-                }
-            }
-        });
+        updateCapabilities();
     }
 
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         // Pause the camera preview
         mCamManager.pause();
 
-        super.onStop();
+        super.onPause();
     }
 
     @Override
@@ -150,6 +137,26 @@ public class CameraActivity extends Activity {
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
         mSwitchRingPad.notifyOrientationChanged(mOrientationCompensation);
+    }
+    
+    public void updateCapabilities() {
+        // Populate the sidebar buttons a little later (so we have camera parameters)
+        mHandler.post(new Runnable() {
+            public void run() {
+                Camera.Parameters params = mCamManager.getParameters();
+
+                // We don't have the camera parameters yet, retry later
+                if (params == null) {
+                    mHandler.postDelayed(this, 100);
+                } else {
+                    // Update sidebar
+                    mSideBar.checkCapabilities(mCamManager, (ViewGroup) findViewById(R.id.widgets_container));
+                    
+                    // Update focus ring support
+                    mFocusHudRing.setVisibility(mCamManager.isFocusAreaSupported() ? View.VISIBLE : View.GONE);
+                }
+            }
+        });
     }
 
     protected void setupCamera() {
@@ -226,6 +233,7 @@ public class CameraActivity extends Activity {
                 } else {
                     mCamManager.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
                 }
+                updateCapabilities();
                 break;
             }
         }
@@ -247,8 +255,8 @@ public class CameraActivity extends Activity {
         }
 
         @Override
-        public void onMotionEvent(MotionEvent ev) {
-            mSwitchRingPad.onTouchEvent(ev);
+        public boolean onMotionEvent(MotionEvent ev) {
+            return mSwitchRingPad.onTouchEvent(ev);
         }
         
     }

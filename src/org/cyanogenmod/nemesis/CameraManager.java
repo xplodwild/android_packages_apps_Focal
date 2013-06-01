@@ -235,6 +235,23 @@ public class CameraManager {
         }
         
     }
+    
+    /**
+     * Returns whether or not the current open camera device supports
+     * focus area (focus ring)
+     * @return true if supported
+     */
+    public boolean isFocusAreaSupported() {
+        if (mCamera != null) {
+            try {
+                return (getParameters().getMaxNumFocusAreas() > 0);
+            } catch (Exception e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Defines the main focus point of the camera to the provided x and y values.
