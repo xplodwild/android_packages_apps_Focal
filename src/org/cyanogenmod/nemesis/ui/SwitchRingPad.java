@@ -16,6 +16,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
 public class SwitchRingPad extends View implements AnimatorUpdateListener {
@@ -44,6 +45,8 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
     private ValueAnimator mAnimator;
     private float mOpenProgress;
     private boolean mIsOpen;
+    public float mTargetOrientation;
+    public float mCurrentOrientation;
 
     private class PadButton {
         public Bitmap mNormalBitmap;
@@ -149,11 +152,17 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
 
             final float x = (float) (height - EDGE_PADDING + ringRadius * Math.cos(radAngle) - BUTTON_SIZE);
             final float y = (float) (width/2 - button.mNormalBitmap.getWidth()/2 - ringRadius * Math.sin(radAngle));
-
+            
+            canvas.save();
+            canvas.translate(x + button.mNormalBitmap.getWidth()/2, y + button.mNormalBitmap.getWidth()/2);
+            canvas.rotate(mCurrentOrientation);
+            
             if (button.mIsHovering)
-                canvas.drawBitmap(button.mHoverBitmap, x, y, mPaint);
+                canvas.drawBitmap(button.mHoverBitmap, -button.mNormalBitmap.getWidth()/2, -button.mNormalBitmap.getWidth()/2, mPaint);
             else
-                canvas.drawBitmap(button.mNormalBitmap, x, y, mPaint);
+                canvas.drawBitmap(button.mNormalBitmap, -button.mNormalBitmap.getWidth()/2, -button.mNormalBitmap.getWidth()/2, mPaint);
+            
+            canvas.restore();
             
             button.mLastDrawnX = x;
             button.mLastDrawnY = y;
@@ -186,6 +195,21 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         invalidate();
 
         return super.onTouchEvent(event);
+    }
+    
+    public void notifyOrientationChanged(float orientation) {
+        mTargetOrientation = orientation;
+        ValueAnimator anim = new ValueAnimator();
+        anim.setDuration(200);
+        anim.setFloatValues(mCurrentOrientation, orientation);
+        anim.addUpdateListener(new AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator arg0) {
+                mCurrentOrientation = (Float) arg0.getAnimatedValue();
+            }
+        });
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.start();
     }
 
     public boolean isOpen() {
