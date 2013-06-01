@@ -16,6 +16,12 @@ public class EffectWidget extends SimpleToggleWidget {
         addValue("solarize", R.drawable.ic_widget_effect_solarize);
         addValue("sepia", R.drawable.ic_widget_effect_sepia);
         addValue("posterize", R.drawable.ic_widget_effect_posterize);
+        addValue("whiteboard", R.drawable.ic_widget_effect_whiteboard);
+        addValue("blackboard", R.drawable.ic_widget_effect_blackboard);
+        addValue("aqua", R.drawable.ic_widget_effect_aqua);
+        addValue("emboss", R.drawable.ic_widget_effect_emboss);
+        addValue("sketch", R.drawable.ic_widget_effect_sketch);
+        addValue("neon", R.drawable.ic_widget_effect_neon);
 
     }
 }

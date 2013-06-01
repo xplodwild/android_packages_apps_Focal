@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 public class CameraActivity extends Activity {
@@ -163,8 +164,13 @@ public class CameraActivity extends Activity {
             ((ViewGroup)mCamManager.getPreviewSurface().getParent()).removeView(mCamManager.getPreviewSurface());
 
         layout.addView(mCamManager.getPreviewSurface());
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mCamManager.getPreviewSurface().getLayoutParams();
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        params.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
+        params.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+        mCamManager.getPreviewSurface().setLayoutParams(params);
 
-        if (!mCamManager.open(Camera.CameraInfo.CAMERA_FACING_FRONT)) {
+        if (!mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK)) {
             Log.e(TAG, "Could not open camera HAL");
             Toast.makeText(this, getResources().getString(R.string.cannot_connect_hal), Toast.LENGTH_LONG).show();
             return;
