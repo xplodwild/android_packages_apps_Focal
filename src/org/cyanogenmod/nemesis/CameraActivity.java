@@ -397,9 +397,19 @@ public class CameraActivity extends Activity {
 
             if (mAccel[0] > SHAKE_CLOSE_THRESHOLD && mSideBar.isOpen()) {
                 mSideBar.slideClose();
+                
+                if (mWidgetRenderer.getWidgetsCount() > 0) {
+                    mWidgetRenderer.hideWidgets();
+                }
+                
                 mLastShakeTimestamp = System.currentTimeMillis();
             } else if (mAccel[0] < SHAKE_OPEN_THRESHOLD && !mSideBar.isOpen()) {
                 mSideBar.slideOpen();
+                
+                if (mWidgetRenderer.getWidgetsCount() > 0) {
+                    mWidgetRenderer.restoreWidgets();
+                }
+                
                 mLastShakeTimestamp = System.currentTimeMillis();
             }
 

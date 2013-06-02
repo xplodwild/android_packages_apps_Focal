@@ -325,6 +325,7 @@ public abstract class WidgetBase {
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             boolean handle = false;
+            if (getAlpha() < 1) return false;
 
             mGestureDetector.onTouchEvent(event);
 
@@ -377,8 +378,8 @@ public abstract class WidgetBase {
 
                 @Override
                 public void onAnimationEnd(Animator arg0) {
-                    /*if (!mIsOpen)
-                        WidgetContainer.this.setVisibility(View.GONE);*/
+                    if (!mIsOpen)
+                        WidgetContainer.this.setVisibility(View.GONE);
                 }
 
                 @Override
@@ -392,6 +393,16 @@ public abstract class WidgetBase {
             });
 
 
+        }
+        
+        @Override
+        protected void onMeasure(int widthSpec, int heightSpec) {
+            super.onMeasure(widthSpec, heightSpec);
+            
+            if (!isOpen())
+                setVisibility(View.GONE);
+            else
+                setVisibility(View.VISIBLE);
         }
 
 
@@ -433,7 +444,9 @@ public abstract class WidgetBase {
 
                 if(distance > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                     final SideBar sb = (SideBar) mToggleButton.getParent().getParent();
+                    final WidgetRenderer wr = (WidgetRenderer) mWidget.getParent();
                     sb.toggleWidgetVisibility(WidgetBase.this, true);
+                    wr.widgetClosed(mWidget);
                     mToggleButton.toggleBackground(false);
                 }
             } catch (Exception e) {
