@@ -9,7 +9,6 @@ import org.cyanogenmod.nemesis.widgets.WidgetBase;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
@@ -129,11 +128,10 @@ public class WidgetRenderer extends FrameLayout {
      */
     public void widgetOpened(final WidgetBase.WidgetContainer widget) {
         if (mOpenWidgets.contains(widget)) {
-            Log.e(TAG, "Widget was already rendered!");
+            Log.w(TAG, "Widget was already rendered!");
             return;
         }
 
-        Log.e(TAG, "Widget opened");
         mOpenWidgets.add(widget);
 
         // make sure the widget is properly oriented
