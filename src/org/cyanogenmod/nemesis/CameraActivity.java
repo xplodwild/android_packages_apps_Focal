@@ -22,6 +22,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
@@ -101,7 +102,7 @@ public class CameraActivity extends Activity {
                 if (ev.getAction() == MotionEvent.ACTION_UP) {
                     mSideBar.clampSliding();
                 }
-
+                
                 mGestureDetector.onTouchEvent(ev);
                 return true;
             }
@@ -177,7 +178,7 @@ public class CameraActivity extends Activity {
         params.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
         params.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
         mCamManager.getPreviewSurface().setLayoutParams(params);
-
+        
         if (!mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK)) {
             Log.e(TAG, "Could not open camera HAL");
             Toast.makeText(this, getResources().getString(R.string.cannot_connect_hal), Toast.LENGTH_LONG).show();
@@ -435,6 +436,13 @@ public class CameraActivity extends Activity {
         private static final int SWIPE_THRESHOLD_VELOCITY = 200;
         // allow to drag the side bar up to half of the screen
         private static final int SIDEBAR_THRESHOLD_FACTOR = 2;
+        
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            mFocusHudRing.setPosition(e.getRawX(), e.getRawY());
+            mFocusManager.refocus();
+            return super.onSingleTapConfirmed(e);
+        }
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,

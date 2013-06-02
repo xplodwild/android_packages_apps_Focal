@@ -47,22 +47,39 @@ public class FocusHudRing extends HudRing {
         mCamManager = camMan;
         mFocusManager = focusMan;
     }
+    
+    /**
+     * Centers the focus ring on the x,y coordinates provided
+     * and sets the focus to this position
+     * @param x
+     * @param y
+     */
+    public void setPosition(float x, float y) {
+        setX(x - getWidth()/2.0f);
+        setY(y - getHeight()/2.0f);
+        applyFocusPoint();
+    }
+    
+    
+    private void applyFocusPoint() {
+        float centerPointX = getX() + getWidth()/2.0f;
+        float centerPointY = getY() + getHeight()/2.0f;
+
+        centerPointX *= 1000.0f / ((ViewGroup) getParent()).getWidth();
+        centerPointY *= 1000.0f / ((ViewGroup) getParent()).getHeight();
+
+        centerPointX = (centerPointX - 500.0f) * 2.0f;
+        centerPointY = (centerPointY - 500.0f) * 2.0f;
+
+        mCamManager.setFocusPoint((int) centerPointX, (int) centerPointY);
+    }
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         super.onTouch(view, motionEvent);
 
         if (motionEvent.getActionMasked() == MotionEvent.ACTION_MOVE) {
-            float centerPointX = view.getX() + view.getWidth()/2.0f;
-            float centerPointY = view.getY() + view.getHeight()/2.0f;
-
-            centerPointX *= 1000.0f / ((ViewGroup) getParent()).getWidth();
-            centerPointY *= 1000.0f / ((ViewGroup) getParent()).getHeight();
-
-            centerPointX = (centerPointX - 500.0f) * 2.0f;
-            centerPointY = (centerPointY - 500.0f) * 2.0f;
-
-            mCamManager.setFocusPoint((int) centerPointX, (int) centerPointY);
+            applyFocusPoint();
         }
         else if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
             mFocusManager.refocus();
