@@ -1,16 +1,18 @@
 package org.cyanogenmod.nemesis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.location.Location;
+import android.media.CamcorderProfile;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class manages taking snapshots from Camera
@@ -70,6 +72,7 @@ public class SnapshotManager {
     private CameraManager mCameraManager;
     private FocusManager mFocusManager;
     private Context mContext;
+    private boolean mIsRecording;
 
     private Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
         @Override
@@ -175,6 +178,37 @@ public class SnapshotManager {
             mCurrentShutterQueueIndex = 0;
             new Thread(mCaptureRunnable).start();
         }
+    }
+    
+    /**
+     * Starts recording a video with the current settings
+     */
+    public void startVideo() {
+        Log.e(TAG, "startVideo");
+        mCameraManager.prepareVideoRecording(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES) + "/test.mp4",
+                CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+        
+        mCameraManager.startVideoRecording();
+        mIsRecording = true;
+    }
+    
+    /**
+     * Stops the current recording video, if any
+     */
+    public void stopVideo() {
+        Log.e(TAG, "stopVideo");
+        if (mIsRecording) {
+            mCameraManager.stopVideoRecording();
+            mIsRecording = false;
+        }
+    }
+    
+    /**
+     * Returns whether or not a video is recording
+     */
+    public boolean isRecording() {
+        return mIsRecording;
     }
 
     // Each SaveRequest remembers the data needed to save an image.

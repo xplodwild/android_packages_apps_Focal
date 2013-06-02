@@ -22,7 +22,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
@@ -32,6 +31,13 @@ import android.widget.Toast;
 public class CameraActivity extends Activity {
     public final static String TAG = "CameraActivity";
 
+    public final static int CAMERA_MODE_PHOTO       = 1;
+    public final static int CAMERA_MODE_VIDEO       = 2;
+    public final static int CAMERA_MODE_PANO        = 3;
+    public final static int CAMERA_MODE_PICSPHERE   = 4;
+    
+    private static int mCameraMode = CAMERA_MODE_PHOTO;
+    
     private CameraManager mCamManager;
     private SnapshotManager mSnapshotManager;
     private MainSnapshotListener mSnapshotListener;
@@ -47,6 +53,7 @@ public class CameraActivity extends Activity {
     private WidgetRenderer mWidgetRenderer;
     private FocusHudRing mFocusHudRing;
     private SwitchRingPad mSwitchRingPad;
+    private ShutterButton mShutterButton;
 
     /**
      * Event: Activity created
@@ -90,9 +97,9 @@ public class CameraActivity extends Activity {
         mFocusHudRing.setY(Util.getScreenSize(this).y/2.0f-mFocusHudRing.getHeight()/2.0f);
 
         // Setup shutter button
-        ShutterButton shutterButton = (ShutterButton) findViewById(R.id.btn_shutter);
-        shutterButton.setOnClickListener(new ShutterButton.ClickListener(mSnapshotManager)); // XXX: Move it in here
-        shutterButton.setSlideListener(new MainShutterSlideListener());
+        mShutterButton = (ShutterButton) findViewById(R.id.btn_shutter);
+        mShutterButton.setOnClickListener(new ShutterButton.ClickListener(mSnapshotManager)); // XXX: Move it in here
+        mShutterButton.setSlideListener(new MainShutterSlideListener());
 
         // Setup gesture detection
         mGestureDetector = new GestureDetector(this, new GestureListener());
@@ -131,10 +138,44 @@ public class CameraActivity extends Activity {
         super.onResume();
     }
 
+    /**
+     * Returns the mode of the activity
+     * See CameraActivity.CAMERA_MODE_*
+     * @return int
+     */
+    public static int getCameraMode() {
+        return mCameraMode;
+    }
+    
+    /**
+     * Sets the mode of the activity
+     * See CameraActivity.CAMERA_MODE_*
+     * @param newMode
+     */
+    public void setCameraMode(int newMode) {
+        if (mCameraMode == newMode) return;
+        
+        mCameraMode = newMode;
+        
+        if (newMode == CAMERA_MODE_PHOTO) {
+            mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
+        } else if (newMode == CAMERA_MODE_VIDEO) {
+            mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_video));
+        } else if (newMode == CAMERA_MODE_PICSPHERE) {
+            // PicSphere <3
+        } else if (newMode == CAMERA_MODE_PANO) {
+            
+        }
+        
+        updateCapabilities();
+    }
 
+    /**
+     * Updates the orientation of the whole UI (in place)
+     * based on the calculations given by the orientation listener
+     */
     public void updateInterfaceOrientation() {
-        final ShutterButton shutter = (ShutterButton) findViewById(R.id.btn_shutter);
-        setViewRotation(shutter, mOrientationCompensation);
+        setViewRotation(mShutterButton, mOrientationCompensation);
         mCamManager.setOrientation(mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
@@ -229,6 +270,15 @@ public class CameraActivity extends Activity {
         @Override
         public void onButtonActivated(int eventId) {
             switch (eventId) {
+            case SwitchRingPad.BUTTON_CAMERA:
+                setCameraMode(CAMERA_MODE_PHOTO);
+                break;
+                
+            case SwitchRingPad.BUTTON_VIDEO:
+                setCameraMode(CAMERA_MODE_VIDEO);
+                break;
+            
+            
             case SwitchRingPad.BUTTON_SWITCHCAM:
                 if (mCamManager.getCurrentFacing() == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                     mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK);
@@ -470,7 +520,7 @@ public class CameraActivity extends Activity {
                 if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH)
                     return false;
 
-                // swipes to open/close the sidebar 
+                // swipes to open/close the sidebar and/or hide/restore the widgets 
                 if(e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                     if (mWidgetRenderer.isHidden() && mWidgetRenderer.getWidgetsCount() > 0) {
                         mWidgetRenderer.restoreWidgets();

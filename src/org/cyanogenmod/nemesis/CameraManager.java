@@ -16,6 +16,10 @@
 
 package org.cyanogenmod.nemesis;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -23,13 +27,11 @@ import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.AutoFocusMoveCallback;
+import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class is responsible for interacting with the Camera HAL.
@@ -50,6 +52,7 @@ public class CameraManager {
     private Camera.Parameters mParameters;
     private int[] mPreviewFrameBuffer;
     private int mOrientation;
+    private MediaRecorder mMediaRecorder;
     
     private class AsyncParamRunnable implements Runnable {
         private String mKey;
@@ -73,6 +76,7 @@ public class CameraManager {
 
     public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
+        mMediaRecorder = new MediaRecorder();
     }
 
     /**
@@ -210,6 +214,56 @@ public class CameraManager {
     }
     
     /**
+     * Prepares the MediaRecorder to record a video. This must be called before
+     * startVideoRecording to setup the recording environment.
+     * @param fileName Target file name
+     * @param profile Target profile (quality)
+     */
+    public void prepareVideoRecording(String fileName, CamcorderProfile profile) {
+        // Unlock the camera for use with MediaRecorder
+        mCamera.lock();
+        mCamera.unlock();
+        
+        mMediaRecorder.setCamera(mCamera);
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+        
+
+        /*CamcorderProfile profile = CamcorderProfile
+                .get(CamcorderProfile.QUALITY_HIGH);*/
+        mMediaRecorder.setProfile(profile);
+        mMediaRecorder.setVideoSize(1920, 1088);
+        mMediaRecorder.setOutputFile(fileName);
+        mMediaRecorder.setMaxDuration(0); // infinite
+        mMediaRecorder.setMaxFileSize(0); // infinite
+        
+        mMediaRecorder.setPreviewDisplay(mPreview.getSurfaceHolder().getSurface());
+        
+        try {
+            mMediaRecorder.prepare();
+        } catch (IllegalStateException e) {
+            Log.e(TAG, "Cannot prepare MediaRecorder", e);
+        } catch (IOException e) {
+            Log.e(TAG, "Cannot prepare MediaRecorder", e);
+        }
+        
+        
+    }
+    
+    public void startVideoRecording() {
+        Log.e(TAG, "startVideoRecording");
+        mMediaRecorder.start();
+    }
+    
+    public void stopVideoRecording() {
+        Log.e(TAG, "stopVideoRecording");
+        mMediaRecorder.stop();
+        mCamera.lock();
+        mMediaRecorder.reset();
+        mMediaRecorder.release();
+    }
+    
+    /**
      * Returns the orientation of the device
      * @return
      */
@@ -319,6 +373,10 @@ public class CameraManager {
         public byte[] getLastFrameBytes() {
             return mLastFrameBytes;
         }
+        
+        public SurfaceHolder getSurfaceHolder() {
+            return mHolder;
+        }
 
         public void notifyCameraChanged() {
             if (mCamera != null) {
@@ -396,8 +454,10 @@ public class CameraManager {
 
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            if (mCamera != null)
+            if (mCamera != null &&
+                    CameraActivity.getCameraMode() != CameraActivity.CAMERA_MODE_VIDEO) {
                 mCamera.addCallbackBuffer(mLastFrameBytes);
+            }
         }
     }
 }

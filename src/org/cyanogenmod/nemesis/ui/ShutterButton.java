@@ -1,14 +1,17 @@
 package org.cyanogenmod.nemesis.ui;
 
+import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.SnapshotManager;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
 public class ShutterButton extends ImageView {
+    public final static String TAG = "ShutterButton";
     private boolean mSlideOpen = false;
     
     /**
@@ -62,8 +65,9 @@ public class ShutterButton extends ImageView {
         }
         
         boolean listenerResult = false;
-        if (mListener != null && mSlideOpen)
+        if (mListener != null && mSlideOpen) {
             listenerResult = mListener.onMotionEvent(event);
+        }
         
         return (super.onTouchEvent(event) || listenerResult);
     }
@@ -81,8 +85,17 @@ public class ShutterButton extends ImageView {
 
         @Override
         public void onClick(View v) {
-            // XXX: Check for HDR, exposure, burst shots, timer, ...
-            mSnapshotManager.queueSnapshot(true, 0);
+            if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
+                // XXX: Check for HDR, exposure, burst shots, timer, ...
+                mSnapshotManager.queueSnapshot(true, 0);
+            } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+                Log.e(TAG, "shutter click video");
+                if (!mSnapshotManager.isRecording()) {
+                    mSnapshotManager.startVideo();
+                } else {
+                    mSnapshotManager.stopVideo();
+                }
+            }            
         }
     }
 
