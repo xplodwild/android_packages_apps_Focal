@@ -140,7 +140,7 @@ public class WidgetRenderer extends FrameLayout {
         // position it properly
         widget.forceFinalX(mTotalWidth - WIDGETS_MARGIN);
         widget.setX(mTotalWidth - WIDGETS_MARGIN);
-        mTotalWidth += widget.getWidth() + mSpacing;
+        mTotalWidth += widget.getMeasuredWidth() + mSpacing;
     }
 
     /**

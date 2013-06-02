@@ -105,13 +105,16 @@ public abstract class WidgetBase {
      */
     public void open() {
         WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
+        
+        mWidget.setVisibility(View.VISIBLE);
+        mWidget.invalidate();
+        
+        mIsOpen = true;
+        
         parent.widgetOpened(mWidget);
-
+        
         mWidget.animate().alpha(1.0f).translationXBy(WIDGET_ANIM_TRANSLATE)
         .setDuration(WIDGET_FADE_DURATION_MS).start();
-        mWidget.setVisibility(View.VISIBLE);
-
-        mIsOpen = true;
     }
 
     public void close() {
