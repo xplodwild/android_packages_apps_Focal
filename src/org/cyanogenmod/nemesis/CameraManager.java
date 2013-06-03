@@ -260,7 +260,6 @@ public class CameraManager {
         mMediaRecorder.stop();
         mCamera.lock();
         mMediaRecorder.reset();
-        mMediaRecorder.release();
     }
     
     /**

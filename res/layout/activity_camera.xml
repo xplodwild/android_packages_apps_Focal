@@ -20,10 +20,10 @@
             android:id="@+id/hud_container">
 
         <org.cyanogenmod.nemesis.ui.FocusHudRing
-                android:id="@+id/hud_ring_focus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+            android:id="@+id/hud_ring_focus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal" />
 
     </FrameLayout>
 
@@ -55,6 +55,13 @@
 
     </org.cyanogenmod.nemesis.ui.WidgetRenderer>
 
+    <org.cyanogenmod.nemesis.ui.SavePinger
+        android:id="@+id/save_pinger"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp" />
+
     <FrameLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -80,7 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|center_vertical"
-            android:layout_marginRight="-12dp"
+            android:layout_marginRight="-24dp"
             android:clickable="true"
             android:contentDescription="@string/shutter_button"
             android:src="@drawable/btn_shutter_photo" />

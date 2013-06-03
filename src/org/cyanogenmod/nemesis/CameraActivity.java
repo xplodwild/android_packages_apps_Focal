@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -93,12 +94,10 @@ public class CameraActivity extends Activity {
         // Setup HUDs
         mFocusHudRing = (FocusHudRing) findViewById(R.id.hud_ring_focus);
         mFocusHudRing.setManagers(mCamManager, mFocusManager);
-        mFocusHudRing.setX(Util.getScreenSize(this).x/2.0f-mFocusHudRing.getWidth()/2.0f);
-        mFocusHudRing.setY(Util.getScreenSize(this).y/2.0f-mFocusHudRing.getHeight()/2.0f);
 
         // Setup shutter button
         mShutterButton = (ShutterButton) findViewById(R.id.btn_shutter);
-        mShutterButton.setOnClickListener(new ShutterButton.ClickListener(mSnapshotManager)); // XXX: Move it in here
+        mShutterButton.setOnClickListener(new MainShutterClickListener());
         mShutterButton.setSlideListener(new MainShutterSlideListener());
 
         // Setup gesture detection
@@ -317,6 +316,28 @@ public class CameraActivity extends Activity {
         }
         
     }
+    
+    /**
+     * When the shutter button is pressed
+     */
+    public class MainShutterClickListener implements OnClickListener {
+        @Override
+        public void onClick(View v) {
+            if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
+                // XXX: Check for HDR, exposure, burst shots, timer, ...
+                mSnapshotManager.queueSnapshot(true, 0);
+            } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+                if (!mSnapshotManager.isRecording()) {
+                    mSnapshotManager.startVideo();
+                    mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_stop));
+                } else {
+                    mSnapshotManager.stopVideo();
+                    mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_video));
+                }
+            }            
+        }
+    }
+
     
     
     /**
