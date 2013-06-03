@@ -222,6 +222,10 @@ public class Util {
         return "IMG_" + mJpegDateFormat.format(new Date(dateTaken));
     }
 
+    public static String createVideoName(long dateTaken) {
+        return "VID_" + mJpegDateFormat.format(new Date(dateTaken));
+    }
+
     public static void broadcastNewPicture(Context context, Uri uri) {
         context.sendBroadcast(new Intent(ACTION_NEW_PICTURE, uri));
         // Keep compatibility

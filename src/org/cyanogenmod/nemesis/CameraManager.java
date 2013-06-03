@@ -216,26 +216,27 @@ public class CameraManager {
     /**
      * Prepares the MediaRecorder to record a video. This must be called before
      * startVideoRecording to setup the recording environment.
-     * @param fileName Target file name
+     * @param fileName Target file path
      * @param profile Target profile (quality)
      */
     public void prepareVideoRecording(String fileName, CamcorderProfile profile) {
         // Unlock the camera for use with MediaRecorder
         mCamera.lock();
         mCamera.unlock();
-        
+
+
         mMediaRecorder.setCamera(mCamera);
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         
 
-        /*CamcorderProfile profile = CamcorderProfile
-                .get(CamcorderProfile.QUALITY_HIGH);*/
         mMediaRecorder.setProfile(profile);
-        mMediaRecorder.setVideoSize(1920, 1088);
         mMediaRecorder.setOutputFile(fileName);
+        // Set maximum file size.
+        long maxFileSize = Storage.getStorage().getAvailableSpace() - Storage.LOW_STORAGE_THRESHOLD;
+        mMediaRecorder.setMaxFileSize(maxFileSize);
         mMediaRecorder.setMaxDuration(0); // infinite
-        mMediaRecorder.setMaxFileSize(0); // infinite
+
         
         mMediaRecorder.setPreviewDisplay(mPreview.getSurfaceHolder().getSurface());
         

@@ -1,16 +1,22 @@
 package org.cyanogenmod.nemesis;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.location.Location;
 import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
+import android.os.ParcelFileDescriptor;
+import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.util.Log;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,6 +90,12 @@ public class SnapshotManager {
         public Bitmap mThumbnail;
     }
 
+
+    private Context mContext;
+    private CameraManager mCameraManager;
+    private FocusManager mFocusManager;
+
+    // Photo-related variables
     private List<SnapshotInfo> mSnapshotsQueue;
     private int mCurrentShutterQueueIndex;
     private List<SnapshotListener> mListeners;
@@ -91,10 +103,24 @@ public class SnapshotManager {
     private ContentResolver mContentResolver;
     private ImageSaver mImageSaver;
     private ImageNamer mImageNamer;
-    private CameraManager mCameraManager;
-    private FocusManager mFocusManager;
-    private Context mContext;
+
+    // Video-related variables
+    private long mRecordingStartTime;
     private boolean mIsRecording;
+    private VideoNamer mVideoNamer;
+    private CamcorderProfile mProfile;
+
+    // The video file that the hardware camera is about to record into
+    // (or is recording into.)
+    private String mVideoFilename;
+    private ParcelFileDescriptor mVideoFileDescriptor;
+
+    // The video file that has already been recorded, and that is being
+    // examined by the user.
+    private String mCurrentVideoFilename;
+    private Uri mCurrentVideoUri;
+    private ContentValues mCurrentVideoValues;
+
 
     private Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
         @Override
@@ -168,6 +194,7 @@ public class SnapshotManager {
         mHandler = new Handler();
         mImageSaver = new ImageSaver();
         mImageNamer = new ImageNamer();
+        mVideoNamer = new VideoNamer();
         mContentResolver = ctx.getContentResolver();
     }
 
@@ -207,12 +234,16 @@ public class SnapshotManager {
      */
     public void startVideo() {
         Log.v(TAG, "startVideo");
-        mCameraManager.prepareVideoRecording(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES) + "/test.mp4",
-                CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+        // XXX: Load that from settings
+        mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+
+        // Setup output file
+        generateVideoFilename(mProfile.fileFormat);
+        mCameraManager.prepareVideoRecording(mVideoFilename, mProfile);
         
         mCameraManager.startVideoRecording();
         mIsRecording = true;
+        mRecordingStartTime = SystemClock.uptimeMillis();
 
         for (SnapshotListener listener : mListeners) {
             listener.onVideoRecordingStart();
@@ -226,11 +257,15 @@ public class SnapshotManager {
         Log.v(TAG, "stopVideo");
         if (mIsRecording) {
             mCameraManager.stopVideoRecording();
+            mCurrentVideoFilename = mVideoFilename;
+
             mIsRecording = false;
 
             for (SnapshotListener listener : mListeners) {
                 listener.onVideoRecordingStop();
             }
+
+            addVideoToMediaStore();
         }
     }
     
@@ -239,6 +274,98 @@ public class SnapshotManager {
      */
     public boolean isRecording() {
         return mIsRecording;
+    }
+
+    /**
+     * Add the last recorded video to the MediaStore
+     * @return True if operation succeeded
+     */
+    private boolean addVideoToMediaStore() {
+        boolean fail = false;
+        if (mVideoFileDescriptor == null) {
+            mCurrentVideoValues.put(MediaStore.Video.Media.SIZE,
+                    new File(mCurrentVideoFilename).length());
+            long duration = SystemClock.uptimeMillis() - mRecordingStartTime;
+            if (duration > 0) {
+                mCurrentVideoValues.put(MediaStore.Video.Media.DURATION, duration);
+            } else {
+                Log.w(TAG, "Video duration <= 0 : " + duration);
+            }
+            try {
+                mCurrentVideoUri = mVideoNamer.getUri();
+
+                // Rename the video file to the final name. This avoids other
+                // apps reading incomplete data.  We need to do it after the
+                // above mVideoNamer.getUri() call, so we are certain that the
+                // previous insert to MediaProvider is completed.
+                String finalName = mCurrentVideoValues.getAsString(
+                        MediaStore.Video.Media.DATA);
+                if (new File(mCurrentVideoFilename).renameTo(new File(finalName))) {
+                    mCurrentVideoFilename = finalName;
+                }
+
+                mContentResolver.update(mCurrentVideoUri, mCurrentVideoValues
+                        , null, null);
+                mContext.sendBroadcast(new Intent(Util.ACTION_NEW_VIDEO,
+                        mCurrentVideoUri));
+            } catch (Exception e) {
+                // We failed to insert into the database. This can happen if
+                // the SD card is unmounted.
+                Log.e(TAG, "failed to add video to media store", e);
+                mCurrentVideoUri = null;
+                mCurrentVideoFilename = null;
+                fail = true;
+            } finally {
+                Log.v(TAG, "Current video URI: " + mCurrentVideoUri);
+            }
+        }
+        mCurrentVideoValues = null;
+        return fail;
+    }
+
+    /**
+     * Generates a filename for the next video to record
+     * @param outputFileFormat The file format of the video
+     */
+    private void generateVideoFilename(int outputFileFormat) {
+        long dateTaken = System.currentTimeMillis();
+        String title = Util.createVideoName(dateTaken);
+        // Used when emailing.
+        String filename = title + convertOutputFormatToFileExt(outputFileFormat);
+        String mime = convertOutputFormatToMimeType(outputFileFormat);
+        String path = Storage.getStorage().generateDirectory() + '/' + filename;
+        String tmpPath = path + ".tmp";
+        mCurrentVideoValues = new ContentValues(7);
+        mCurrentVideoValues.put(MediaStore.Video.Media.TITLE, title);
+        mCurrentVideoValues.put(MediaStore.Video.Media.DISPLAY_NAME, filename);
+        mCurrentVideoValues.put(MediaStore.Video.Media.DATE_TAKEN, dateTaken);
+        mCurrentVideoValues.put(MediaStore.Video.Media.MIME_TYPE, mime);
+        mCurrentVideoValues.put(MediaStore.Video.Media.DATA, path);
+        mCurrentVideoValues.put(MediaStore.Video.Media.RESOLUTION,
+                Integer.toString(mProfile.videoFrameWidth) + "x" +
+                        Integer.toString(mProfile.videoFrameHeight));
+        Location loc = null; //mLocationManager.getCurrentLocation();
+        if (loc != null) {
+            mCurrentVideoValues.put(MediaStore.Video.Media.LATITUDE, loc.getLatitude());
+            mCurrentVideoValues.put(MediaStore.Video.Media.LONGITUDE, loc.getLongitude());
+        }
+        mVideoNamer.prepareUri(mContentResolver, mCurrentVideoValues);
+        mVideoFilename = tmpPath;
+        Log.v(TAG, "New video filename: " + mVideoFilename);
+    }
+
+    private String convertOutputFormatToMimeType(int outputFileFormat) {
+        if (outputFileFormat == MediaRecorder.OutputFormat.MPEG_4) {
+            return "video/mp4";
+        }
+        return "video/3gpp";
+    }
+
+    private String convertOutputFormatToFileExt(int outputFileFormat) {
+        if (outputFileFormat == MediaRecorder.OutputFormat.MPEG_4) {
+            return ".mp4";
+        }
+        return ".3gp";
     }
 
     // Each SaveRequest remembers the data needed to save an image.
@@ -466,6 +593,84 @@ public class SnapshotManager {
         private void cleanOldUri() {
             if (mUri == null) return;
             Storage.getStorage().deleteImage(mResolver, mUri);
+            mUri = null;
+        }
+    }
+
+
+    private static class VideoNamer extends Thread {
+        private boolean mRequestPending;
+        private ContentResolver mResolver;
+        private ContentValues mValues;
+        private boolean mStop;
+        private Uri mUri;
+
+        // Runs in main thread
+        public VideoNamer() {
+            start();
+        }
+
+        // Runs in main thread
+        public synchronized void prepareUri(
+                ContentResolver resolver, ContentValues values) {
+            mRequestPending = true;
+            mResolver = resolver;
+            mValues = new ContentValues(values);
+            notifyAll();
+        }
+
+        // Runs in main thread
+        public synchronized Uri getUri() {
+            // wait until the request is done.
+            while (mRequestPending) {
+                try {
+                    wait();
+                } catch (InterruptedException ex) {
+                    // ignore.
+                }
+            }
+            Uri uri = mUri;
+            mUri = null;
+            return uri;
+        }
+
+        // Runs in namer thread
+        @Override
+        public synchronized void run() {
+            while (true) {
+                if (mStop) break;
+                if (!mRequestPending) {
+                    try {
+                        wait();
+                    } catch (InterruptedException ex) {
+                        // ignore.
+                    }
+                    continue;
+                }
+                cleanOldUri();
+                generateUri();
+                mRequestPending = false;
+                notifyAll();
+            }
+            cleanOldUri();
+        }
+
+        // Runs in main thread
+        public synchronized void finish() {
+            mStop = true;
+            notifyAll();
+        }
+
+        // Runs in namer thread
+        private void generateUri() {
+            Uri videoTable = Uri.parse("content://media/external/video/media");
+            mUri = mResolver.insert(videoTable, mValues);
+        }
+
+        // Runs in namer thread
+        private void cleanOldUri() {
+            if (mUri == null) return;
+            mResolver.delete(mUri, null, null);
             mUri = null;
         }
     }
