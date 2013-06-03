@@ -1,18 +1,38 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/camera_app_root"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#333"
-    tools:context=".CameraActivity" >
+             xmlns:tools="http://schemas.android.com/tools"
+             android:id="@+id/camera_app_root"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="#333"
+             tools:context=".CameraActivity" >
 
     <org.cyanogenmod.nemesis.ui.PreviewFrameLayout
-        android:id="@+id/camera_preview_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center">
+            android:id="@+id/camera_preview_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
 
     </org.cyanogenmod.nemesis.ui.PreviewFrameLayout>
+
+    <org.cyanogenmod.nemesis.ui.Notifier
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:background="#88333333"
+            android:focusableInTouchMode="false"
+            android:id="@+id/notifier_container"
+            android:alpha="0"
+            android:layout_gravity="center_vertical|right"
+            android:layout_marginRight="96dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/notifier_text"/>
+    </org.cyanogenmod.nemesis.ui.Notifier>
 
     <LinearLayout
             android:layout_width="wrap_content"
@@ -34,7 +54,6 @@
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/recording_timer_text"
                 android:paddingLeft="8dp"/>
     </LinearLayout>
@@ -45,47 +64,47 @@
             android:id="@+id/hud_container">
 
         <org.cyanogenmod.nemesis.ui.FocusHudRing
-            android:id="@+id/hud_ring_focus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|center_horizontal" />
+                android:id="@+id/hud_ring_focus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|center_horizontal" />
 
     </FrameLayout>
 
     <org.cyanogenmod.nemesis.ui.SideBar
-        android:id="@+id/sidebar_scroller"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginLeft="32dp"
-        android:layout_marginRight="32dp" >
-
-        <LinearLayout
-            android:id="@+id/sidebar_container"
+            android:id="@+id/sidebar_scroller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp" >
+
+        <LinearLayout
+                android:id="@+id/sidebar_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
 
         </LinearLayout>
 
     </org.cyanogenmod.nemesis.ui.SideBar>
 
     <org.cyanogenmod.nemesis.ui.WidgetRenderer
-        android:id="@+id/widgets_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="64dp"
-        android:orientation="horizontal" >
+            android:id="@+id/widgets_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="64dp"
+            android:orientation="horizontal" >
 
     </org.cyanogenmod.nemesis.ui.WidgetRenderer>
 
     <org.cyanogenmod.nemesis.ui.SavePinger
-        android:id="@+id/save_pinger"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp" />
+            android:id="@+id/save_pinger"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp" />
 
     <FrameLayout
             android:layout_width="fill_parent"
@@ -96,26 +115,26 @@
 
 
     <FrameLayout
-        android:id="@+id/shutter_button_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-         >
-        
-        <org.cyanogenmod.nemesis.ui.SwitchRingPad
-            android:id="@+id/switch_ring_pad"
+            android:id="@+id/shutter_button_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            >
+
+        <org.cyanogenmod.nemesis.ui.SwitchRingPad
+                android:id="@+id/switch_ring_pad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
 
         <org.cyanogenmod.nemesis.ui.ShutterButton
-            android:id="@+id/btn_shutter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|center_vertical"
-            android:layout_marginRight="-24dp"
-            android:clickable="true"
-            android:contentDescription="@string/shutter_button"
-            android:src="@drawable/btn_shutter_photo" />
+                android:id="@+id/btn_shutter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:layout_marginRight="-24dp"
+                android:clickable="true"
+                android:contentDescription="@string/shutter_button"
+                android:src="@drawable/btn_shutter_photo" />
 
     </FrameLayout>
 

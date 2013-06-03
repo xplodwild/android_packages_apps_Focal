@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.ui.FocusHudRing;
+import org.cyanogenmod.nemesis.ui.Notifier;
 import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
 import org.cyanogenmod.nemesis.ui.SavePinger;
 import org.cyanogenmod.nemesis.ui.ShutterButton;
@@ -59,6 +60,7 @@ public class CameraActivity extends Activity {
     private ShutterButton mShutterButton;
     private SavePinger mSavePinger;
     private ViewGroup mRecTimerContainer;
+    private Notifier mNotifier;
 
     /**
      * Event: Activity created
@@ -80,6 +82,7 @@ public class CameraActivity extends Activity {
         mSwitchRingPad.setListener(new MainRingPadListener());
 
         mRecTimerContainer = (ViewGroup) findViewById(R.id.recording_timer_container);
+        mNotifier = (Notifier) findViewById(R.id.notifier_container);
 
         // Create orientation listener. This should be done first because it
         // takes some time to get first orientation.
@@ -167,6 +170,7 @@ public class CameraActivity extends Activity {
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
         } else if (newMode == CAMERA_MODE_VIDEO) {
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_video));
+            mNotifier.notify(getString(R.string.double_tap_to_snapshot), 2500);
         } else if (newMode == CAMERA_MODE_PICSPHERE) {
             // PicSphere <3
         } else if (newMode == CAMERA_MODE_PANO) {
@@ -183,6 +187,7 @@ public class CameraActivity extends Activity {
     public void updateInterfaceOrientation() {
         setViewRotation(mShutterButton, mOrientationCompensation);
         setViewRotation(mRecTimerContainer, mOrientationCompensation);
+        setViewRotation(mNotifier, mOrientationCompensation);
         mCamManager.setOrientation(mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
@@ -585,9 +590,21 @@ public class CameraActivity extends Activity {
         
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+            // A single tap equals to touch-to-focus in all modes
             mFocusHudRing.setPosition(e.getRawX(), e.getRawY());
             mFocusManager.refocus();
+
             return super.onSingleTapConfirmed(e);
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            // In VIDEO mode, a double tap focuses
+            if (mCameraMode == CAMERA_MODE_VIDEO) {
+                mSnapshotManager.queueSnapshot(true, 0);
+            }
+
+            return super.onDoubleTap(e);
         }
 
         @Override
