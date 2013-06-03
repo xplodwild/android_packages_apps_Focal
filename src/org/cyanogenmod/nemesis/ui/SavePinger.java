@@ -112,7 +112,8 @@ public class SavePinger extends View {
             
             if (circleValue > 1) circleValue = 1;
             
-            mPaint.setARGB((int) ((255.0f - 255.0f * circleValue) * mFadeProgress * 0.5f), 255, 255, 255);
+            mPaint.setARGB((int) ((255.0f - 255.0f * circleValue) * mFadeProgress * 0.5f),
+                    255, 255, 255);
             canvas.drawCircle(getWidth()/2, getHeight()/2, ringProgress, mPaint);
             
             if (circleValue == 1) {

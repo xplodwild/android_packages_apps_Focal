@@ -10,9 +10,34 @@
         android:id="@+id/camera_preview_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" >
+        android:layout_gravity="center">
 
     </org.cyanogenmod.nemesis.ui.PreviewFrameLayout>
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/recording_timer_container"
+            android:layout_marginTop="18dp"
+            android:layout_marginLeft="18dp"
+            android:padding="4dp"
+            android:background="#88000000"
+            android:visibility="gone">
+
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/recording_pin_image"
+                android:contentDescription="@string/recording"
+                android:src="@drawable/ic_recording_pin"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/recording_timer_text"
+                android:paddingLeft="8dp"/>
+    </LinearLayout>
 
     <FrameLayout
             android:layout_width="fill_parent"

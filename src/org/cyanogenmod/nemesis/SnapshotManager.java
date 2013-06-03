@@ -56,6 +56,16 @@ public class SnapshotManager {
          * The primary purpose of this method is to hide the SavePinger
          */
         public void onImageSavingDone();
+
+        /**
+         * This callback is called when a video starts recording
+         */
+        public void onVideoRecordingStart();
+
+        /**
+         * This callback is called when a video stops recording
+         */
+        public void onVideoRecordingStop();
     }
 
     protected class SnapshotInfo {
@@ -196,23 +206,31 @@ public class SnapshotManager {
      * Starts recording a video with the current settings
      */
     public void startVideo() {
-        Log.e(TAG, "startVideo");
+        Log.v(TAG, "startVideo");
         mCameraManager.prepareVideoRecording(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES) + "/test.mp4",
                 CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
         
         mCameraManager.startVideoRecording();
         mIsRecording = true;
+
+        for (SnapshotListener listener : mListeners) {
+            listener.onVideoRecordingStart();
+        }
     }
     
     /**
      * Stops the current recording video, if any
      */
     public void stopVideo() {
-        Log.e(TAG, "stopVideo");
+        Log.v(TAG, "stopVideo");
         if (mIsRecording) {
             mCameraManager.stopVideoRecording();
             mIsRecording = false;
+
+            for (SnapshotListener listener : mListeners) {
+                listener.onVideoRecordingStop();
+            }
         }
     }
     

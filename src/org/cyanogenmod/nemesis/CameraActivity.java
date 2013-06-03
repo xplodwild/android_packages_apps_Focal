@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.ui.FocusHudRing;
@@ -57,6 +58,7 @@ public class CameraActivity extends Activity {
     private SwitchRingPad mSwitchRingPad;
     private ShutterButton mShutterButton;
     private SavePinger mSavePinger;
+    private ViewGroup mRecTimerContainer;
 
     /**
      * Event: Activity created
@@ -76,6 +78,8 @@ public class CameraActivity extends Activity {
         
         mSwitchRingPad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
         mSwitchRingPad.setListener(new MainRingPadListener());
+
+        mRecTimerContainer = (ViewGroup) findViewById(R.id.recording_timer_container);
 
         // Create orientation listener. This should be done first because it
         // takes some time to get first orientation.
@@ -178,6 +182,7 @@ public class CameraActivity extends Activity {
      */
     public void updateInterfaceOrientation() {
         setViewRotation(mShutterButton, mOrientationCompensation);
+        setViewRotation(mRecTimerContainer, mOrientationCompensation);
         mCamManager.setOrientation(mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
@@ -381,6 +386,25 @@ public class CameraActivity extends Activity {
      * Snapshot listener for when snapshots are taken, in SnapshotManager
      */
     private class MainSnapshotListener implements SnapshotManager.SnapshotListener {
+        private long mRecordingStartTimestamp;
+        private TextView mTimerTv;
+        private boolean mIsRecording;
+
+        private Runnable mUpdateTimer = new Runnable() {
+            @Override
+            public void run() {
+                long recordingDurationMs = System.currentTimeMillis() - mRecordingStartTimestamp;
+                int minutes = (int) Math.floor(recordingDurationMs / 60000.0);
+                int seconds = (int) recordingDurationMs / 1000 - minutes * 60;
+
+                mTimerTv.setText(String.format("%02d:%02d", minutes, seconds));
+
+                // Loop infinitely until recording stops
+                if (mIsRecording) {
+                    mHandler.postDelayed(this, 500);
+                }
+            }
+        };
 
         @Override
         public void onSnapshotShutter(SnapshotManager.SnapshotInfo info) {
@@ -422,6 +446,33 @@ public class CameraActivity extends Activity {
                 @Override
                 public void run() {
                     mSavePinger.stopSaving();
+                }
+            });
+        }
+
+        @Override
+        public void onVideoRecordingStart() {
+            mTimerTv = (TextView) findViewById(R.id.recording_timer_text);
+            mRecordingStartTimestamp = System.currentTimeMillis();
+            mIsRecording = true;
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mHandler.post(mUpdateTimer);
+                    mRecTimerContainer.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        @Override
+        public void onVideoRecordingStop() {
+            mIsRecording = false;
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mRecTimerContainer.setVisibility(View.GONE);
                 }
             });
         }
