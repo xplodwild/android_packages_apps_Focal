@@ -1,8 +1,5 @@
 package org.cyanogenmod.nemesis.ui;
 
-import org.cyanogenmod.nemesis.R;
-import org.cyanogenmod.nemesis.Util;
-
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
@@ -18,14 +15,17 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
+import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.Util;
+
 public class SwitchRingPad extends View implements AnimatorUpdateListener {
     public interface RingPadListener {
         public void onButtonActivated(int eventId);
     }
 
-    private final static int EDGE_PADDING = 96; // XXX: vvvvvvvvvvvvvvvvvv
-    private final static int BUTTON_SIZE = 144; // XXX: DPI INDEPENDANT!!!
-    private final static int RING_RADIUS = 400; // XXX: ^^^^^^^^^^^^^^^^^^
+    private float mEdgePadding;
+    private int mButtonSize;
+    private float mRingRadius;
 
     public final static int BUTTON_CAMERA      = 1;
     public final static int BUTTON_VIDEO       = 2;
@@ -78,7 +78,9 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
     }
 
     private Bitmap getDrawable(int resId) {
-        return ((BitmapDrawable) getResources().getDrawable(resId)).getBitmap();
+        Bitmap bmp = ((BitmapDrawable) getResources().getDrawable(resId)).getBitmap();
+        mButtonSize = bmp.getWidth();
+        return bmp;
     }
     
     public void animateHint() {
@@ -106,6 +108,9 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         mAnimator.setDuration(RING_ANIMATION_DURATION_MS);
         mAnimator.setInterpolator(new DecelerateInterpolator());
         mAnimator.addUpdateListener(this);
+
+        mEdgePadding = getResources().getDimension(R.dimen.ringpad_edge_spacing);
+        mRingRadius = getResources().getDimension(R.dimen.ringpad_radius);
 
         mButtons = new PadButton[SLOT_MAX];
 
@@ -158,22 +163,22 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(4.0f);
         mPaint.setARGB((int) (255.0f - 255.0f * mHintProgress), 255, 255, 255);
-        canvas.drawCircle(height - EDGE_PADDING, width/2, mHintProgress * RING_RADIUS, mPaint);
-        canvas.drawCircle(height - EDGE_PADDING, width/2, mHintProgress * RING_RADIUS * 0.66f, mPaint);
-        canvas.drawCircle(height - EDGE_PADDING, width/2, mHintProgress * RING_RADIUS * 0.33f, mPaint);
+        canvas.drawCircle(height - mEdgePadding, width/2, mHintProgress * mRingRadius, mPaint);
+        canvas.drawCircle(height - mEdgePadding, width/2, mHintProgress * mRingRadius * 0.66f, mPaint);
+        canvas.drawCircle(height - mEdgePadding, width/2, mHintProgress * mRingRadius * 0.33f, mPaint);
 
-        final float ringRadius = (float) RING_RADIUS * mOpenProgress;
+        final float ringRadius = (float) mRingRadius * mOpenProgress;
        
         // Draw the inner circle (dark)
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(0x88888888);
-        canvas.drawCircle(height - EDGE_PADDING, width/2, ringRadius, mPaint);
+        canvas.drawCircle(height - mEdgePadding, width/2, ringRadius, mPaint);
 
         // Draw the outline stroke
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(4.0f);
         mPaint.setColor(0x88DDDDDD);
-        canvas.drawCircle(height - EDGE_PADDING, width/2, ringRadius, mPaint);
+        canvas.drawCircle(height - mEdgePadding, width/2, ringRadius, mPaint);
 
         mPaint.setAlpha((int) (255.0f * mOpenProgress));
         // Draw the actual pad buttons
@@ -183,7 +188,8 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
 
             final float radAngle = (float) ((float) (i * (180.0f/4.0f) + 90.0f) * Math.PI / 180.0f);
 
-            final float x = (float) (height - EDGE_PADDING + ringRadius * Math.cos(radAngle) - BUTTON_SIZE);
+            final float x = (float) (height + ringRadius * Math.cos(radAngle) - mButtonSize);
+            // We remove the button edge
             final float y = (float) (width/2 - button.mNormalBitmap.getWidth()/2 - ringRadius * Math.sin(radAngle));
             
             canvas.save();

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.hardware.Camera.Size;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.Surface;
@@ -227,4 +228,8 @@ public class Util {
         context.sendBroadcast(new Intent("com.android.camera.NEW_PICTURE", uri));
     }
 
+    public static float dpToPx(Context context, float dp) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        return (int)((dp * displayMetrics.density) + 0.5);
+    }
 }

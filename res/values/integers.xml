@@ -11,4 +11,10 @@
     
     <!-- Padding between each open widget -->
     <dimen name="widget_spacing">8dp</dimen>
+
+    <!-- Edge padding of the ring buttons -->
+    <dimen name="ringpad_edge_spacing">32dp</dimen>
+
+    <!-- Radius of the ringpad -->
+    <dimen name="ringpad_radius">140dp</dimen>
 </resources>
