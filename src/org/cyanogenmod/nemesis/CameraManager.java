@@ -16,10 +16,6 @@
 
 package org.cyanogenmod.nemesis;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -32,6 +28,10 @@ import android.media.MediaRecorder;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is responsible for interacting with the Camera HAL.
@@ -453,8 +453,7 @@ public class CameraManager {
 
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            if (mCamera != null &&
-                    CameraActivity.getCameraMode() != CameraActivity.CAMERA_MODE_VIDEO) {
+            if (mCamera != null) {
                 mCamera.addCallbackBuffer(mLastFrameBytes);
             }
         }

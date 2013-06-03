@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/recording_timer_container"
             android:layout_marginTop="18dp"
-            android:layout_marginLeft="18dp"
+            android:layout_marginLeft="32dp"
             android:padding="4dp"
             android:background="#88000000"
             android:visibility="gone">
@@ -101,10 +101,10 @@
 
     <org.cyanogenmod.nemesis.ui.SavePinger
             android:id="@+id/save_pinger"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp" />
 
     <FrameLayout
             android:layout_width="fill_parent"
