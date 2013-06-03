@@ -1,8 +1,5 @@
 package org.cyanogenmod.nemesis;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,6 +10,9 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class manages taking snapshots from Camera
@@ -44,6 +44,18 @@ public class SnapshotManager {
          * @param info A structure containing information about the snapshot
          */
         public void onSnapshotSaved(SnapshotInfo info);
+
+        /**
+         * This callback is called when ImageSaver starts a job of saving an image
+         * The primary purpose of this method is to show the SavePinger
+         */
+        public void onImageSavingStart();
+
+        /**
+         * This callback is called when ImageSaver has done its job of saving an image
+         * The primary purpose of this method is to hide the SavePinger
+         */
+        public void onImageSavingDone();
     }
 
     protected class SnapshotInfo {
@@ -293,11 +305,17 @@ public class SnapshotManager {
                         continue;
                     }
                     r = mQueue.get(0);
+                    for (SnapshotListener listener : mListeners) {
+                        listener.onImageSavingStart();
+                    }
                 }
                 storeImage(r.data, r.uri, r.title, r.loc, r.width, r.height,
                         r.orientation);
                 synchronized (this) {
                     mQueue.remove(0);
+                    for (SnapshotListener listener : mListeners) {
+                        listener.onImageSavingDone();
+                    }
                     notifyAll();  // the main thread may wait in addImage
                 }
             }

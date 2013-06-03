@@ -1,7 +1,5 @@
 package org.cyanogenmod.nemesis.ui;
 
-import org.cyanogenmod.nemesis.R;
-
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
@@ -12,16 +10,19 @@ import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import org.cyanogenmod.nemesis.R;
+
 public class SavePinger extends View {
     public final static String TAG = "SavePinger";
     
     private ValueAnimator mFadeAnimator;
     private ValueAnimator mConstantAnimator;
-    private float mFadeProgress = 1.0f;
+    private float mFadeProgress;
     private Paint mPaint;
     private long mRingTime[] = new long[CIRCLES_COUNT];
     private long mLastTime;
     private Bitmap mSaveIcon;
+    private int mOrientation;
     
     private final static int CIRCLES_COUNT = 3;
     private float mRingRadius;
@@ -43,12 +44,14 @@ public class SavePinger extends View {
     
     private void initialize() {
         mPaint = new Paint();
-        
+
+        // start hidden
+        mFadeProgress = 0.0f;
+
         mSaveIcon = ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_save)).getBitmap();
         
         mFadeAnimator = new ValueAnimator();
         mFadeAnimator.setDuration(1500);
-        mFadeAnimator.setStartDelay(500);
         mFadeAnimator.addUpdateListener(new AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator arg0) {
@@ -78,10 +81,16 @@ public class SavePinger extends View {
 
     public void startSaving() {
         mFadeAnimator.setFloatValues(0, 1);
+        mFadeAnimator.start();
     }
     
     public void stopSaving() {
         mFadeAnimator.setFloatValues(1, 0);
+        mFadeAnimator.start();
+    }
+
+    public void notifyOrientationChanged(int angle) {
+        mOrientation = angle;
     }
     
     @Override
@@ -103,21 +112,25 @@ public class SavePinger extends View {
             
             if (circleValue > 1) circleValue = 1;
             
-            mPaint.setARGB((int) (255.0f - 255.0f * circleValue * mFadeProgress), 255, 255, 255);
+            mPaint.setARGB((int) ((200.0f - 200.0f * circleValue) * mFadeProgress), 255, 255, 255);
             canvas.drawCircle(getWidth()/2, getHeight()/2, ringProgress, mPaint);
             
             if (circleValue == 1) {
                 mRingTime[i] = 0;
             }
         }
-        
-        mPaint.setARGB(255,255,255,255);
+
+        int alpha = (int)(((Math.cos((double) systemTime / 200.0) + 1.0f) / 2.0f) * 255.0f);
         canvas.save();
-        canvas.scale((float) Math.sin(systemTime * 0.2f), (float) Math.sin(systemTime * 0.2f));
-        canvas.drawBitmap(mSaveIcon, getWidth()/2-mSaveIcon.getWidth()/2, getHeight()/2-mSaveIcon.getHeight()/2, mPaint);
-        
+        canvas.translate(getWidth()/2, getHeight()/2);
+        canvas.rotate(mOrientation);
+        mPaint.setARGB((int) (alpha * mFadeProgress), 255, 255, 255);
+        canvas.drawBitmap(mSaveIcon, -mSaveIcon.getWidth()/2, -mSaveIcon.getHeight()/2, mPaint);
+
+        canvas.restore();
+
         mLastTime = systemTime;
-        
+
         invalidate();
     }
 }

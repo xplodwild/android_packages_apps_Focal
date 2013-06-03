@@ -1,13 +1,5 @@
 package org.cyanogenmod.nemesis;
 
-import org.cyanogenmod.nemesis.ui.FocusHudRing;
-import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
-import org.cyanogenmod.nemesis.ui.ShutterButton;
-import org.cyanogenmod.nemesis.ui.SideBar;
-import org.cyanogenmod.nemesis.ui.SwitchRingPad;
-import org.cyanogenmod.nemesis.ui.ThumbnailFlinger;
-import org.cyanogenmod.nemesis.ui.WidgetRenderer;
-
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
@@ -22,12 +14,21 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import org.cyanogenmod.nemesis.ui.FocusHudRing;
+import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
+import org.cyanogenmod.nemesis.ui.SavePinger;
+import org.cyanogenmod.nemesis.ui.ShutterButton;
+import org.cyanogenmod.nemesis.ui.SideBar;
+import org.cyanogenmod.nemesis.ui.SwitchRingPad;
+import org.cyanogenmod.nemesis.ui.ThumbnailFlinger;
+import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
 public class CameraActivity extends Activity {
     public final static String TAG = "CameraActivity";
@@ -55,6 +56,7 @@ public class CameraActivity extends Activity {
     private FocusHudRing mFocusHudRing;
     private SwitchRingPad mSwitchRingPad;
     private ShutterButton mShutterButton;
+    private SavePinger mSavePinger;
 
     /**
      * Event: Activity created
@@ -70,6 +72,7 @@ public class CameraActivity extends Activity {
 
         mSideBar = (SideBar) findViewById(R.id.sidebar_scroller);
         mWidgetRenderer = (WidgetRenderer) findViewById(R.id.widgets_container);
+        mSavePinger = (SavePinger) findViewById(R.id.save_pinger);
         
         mSwitchRingPad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
         mSwitchRingPad.setListener(new MainRingPadListener());
@@ -179,6 +182,7 @@ public class CameraActivity extends Activity {
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
         mSwitchRingPad.notifyOrientationChanged(mOrientationCompensation);
+        mSavePinger.notifyOrientationChanged(mOrientationCompensation);
     }
     
     public void updateCapabilities() {
@@ -400,6 +404,26 @@ public class CameraActivity extends Activity {
         @Override
         public void onSnapshotSaved(SnapshotManager.SnapshotInfo info) {
 
+        }
+
+        @Override
+        public void onImageSavingStart() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSavePinger.startSaving();
+                }
+            });
+        }
+
+        @Override
+        public void onImageSavingDone() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSavePinger.stopSaving();
+                }
+            });
         }
     }
 
