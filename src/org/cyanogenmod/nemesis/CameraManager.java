@@ -341,6 +341,29 @@ public class CameraManager {
             }
         }
     }
+
+    /**
+     * Defines the exposure metering point of the camera to the provided x and y values.
+     * Those values must between -1000 and 1000, where -1000 is the top/left, and 1000 the bottom/right
+     * @param x The X position of the exposure metering point
+     * @param y The Y position of the exposure metering point
+     */
+    public void setExposurePoint(int x, int y) {
+        Camera.Parameters params = getParameters();
+
+        if (params.getMaxNumMeteringAreas() > 0) {
+            List<Camera.Area> exposureArea = new ArrayList<Camera.Area>();
+            exposureArea.add(new Camera.Area(new Rect(x, y, x + FOCUS_WIDTH, y + FOCUS_HEIGHT), 1000));
+
+            params.setMeteringAreas(exposureArea);
+
+            try {
+                mCamera.setParameters(params);
+            } catch (Exception e) {
+                // ignore, we might be setting it too fast since previous attempt
+            }
+        }
+    }
     
     public void setAutoFocusMoveCallback(AutoFocusMoveCallback cb) {
         mAutoFocusMoveCallback = cb;

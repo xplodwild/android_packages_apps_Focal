@@ -64,7 +64,6 @@ public class HudRing extends ImageView implements View.OnTouchListener {
     }
 
     public void animateWorking(long duration) {
-
         animate().rotationBy(45.0f).setDuration(duration).setInterpolator(new DecelerateInterpolator()).start();
     }
 }

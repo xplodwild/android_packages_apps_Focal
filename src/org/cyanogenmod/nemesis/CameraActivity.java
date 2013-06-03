@@ -22,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.cyanogenmod.nemesis.ui.ExposureHudRing;
 import org.cyanogenmod.nemesis.ui.FocusHudRing;
 import org.cyanogenmod.nemesis.ui.Notifier;
 import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
@@ -56,6 +57,7 @@ public class CameraActivity extends Activity {
     private SideBar mSideBar;
     private WidgetRenderer mWidgetRenderer;
     private FocusHudRing mFocusHudRing;
+    private ExposureHudRing mExposureHudRing;
     private SwitchRingPad mSwitchRingPad;
     private ShutterButton mShutterButton;
     private SavePinger mSavePinger;
@@ -104,6 +106,9 @@ public class CameraActivity extends Activity {
         // Setup HUDs
         mFocusHudRing = (FocusHudRing) findViewById(R.id.hud_ring_focus);
         mFocusHudRing.setManagers(mCamManager, mFocusManager);
+
+        mExposureHudRing = (ExposureHudRing) findViewById(R.id.hud_ring_exposure);
+        mExposureHudRing.setManagers(mCamManager);
 
         // Setup shutter button
         mShutterButton = (ShutterButton) findViewById(R.id.btn_shutter);
@@ -223,8 +228,10 @@ public class CameraActivity extends Activity {
         final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
 
         // if we resumed the activity, the preview surface will already be attached
-        if (mCamManager.getPreviewSurface().getParent() != null)
-            ((ViewGroup)mCamManager.getPreviewSurface().getParent()).removeView(mCamManager.getPreviewSurface());
+        if (mCamManager.getPreviewSurface().getParent() != null) {
+            ((ViewGroup)mCamManager.getPreviewSurface().getParent())
+                    .removeView(mCamManager.getPreviewSurface());
+        }
 
         layout.addView(mCamManager.getPreviewSurface());
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mCamManager.getPreviewSurface().getLayoutParams();

@@ -69,6 +69,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|center_horizontal" />
 
+        <org.cyanogenmod.nemesis.ui.ExposureHudRing
+                android:id="@+id/hud_ring_exposure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"/>
+
     </FrameLayout>
 
     <org.cyanogenmod.nemesis.ui.SideBar
