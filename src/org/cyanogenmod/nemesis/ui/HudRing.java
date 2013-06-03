@@ -14,6 +14,9 @@ public class HudRing extends ImageView implements View.OnTouchListener {
     private float mLastX;
     private float mLastY;
 
+    private final static float IDLE_ALPHA = 0.25f;
+    private final static int ANIMATION_DURATION = 120;
+
     public HudRing(Context context) {
         super(context);
     }
@@ -30,6 +33,7 @@ public class HudRing extends ImageView implements View.OnTouchListener {
     protected void onFinishInflate() {
         super.onFinishInflate();
         setOnTouchListener(this);
+        setAlpha(IDLE_ALPHA);
     }
 
     @Override
@@ -56,11 +60,11 @@ public class HudRing extends ImageView implements View.OnTouchListener {
     }
 
     public void animatePressDown() {
-        animate().alpha(1.0f).setDuration(80).start();
+        animate().alpha(1.0f).setDuration(ANIMATION_DURATION).start();
     }
 
     public void animatePressUp() {
-        animate().alpha(0.75f).rotation(0).setDuration(80).start();
+        animate().alpha(IDLE_ALPHA).rotation(0).setDuration(ANIMATION_DURATION).start();
     }
 
     public void animateWorking(long duration) {
