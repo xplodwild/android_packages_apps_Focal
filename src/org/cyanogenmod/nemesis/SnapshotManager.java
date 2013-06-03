@@ -52,16 +52,18 @@ public class SnapshotManager {
         public void onSnapshotSaved(SnapshotInfo info);
 
         /**
-         * This callback is called when ImageSaver starts a job of saving an image
+         * This callback is called when ImageSaver starts a job of saving an image, or
+         * MediaRecorder is storing a video
          * The primary purpose of this method is to show the SavePinger
          */
-        public void onImageSavingStart();
+        public void onMediaSavingStart();
 
         /**
-         * This callback is called when ImageSaver has done its job of saving an image
+         * This callback is called when ImageSaver has done its job of saving an image, or
+         * MediaRecorder is done storing a video
          * The primary purpose of this method is to hide the SavePinger
          */
-        public void onImageSavingDone();
+        public void onMediaSavingDone();
 
         /**
          * This callback is called when a video starts recording
@@ -256,13 +258,30 @@ public class SnapshotManager {
     public void stopVideo() {
         Log.v(TAG, "stopVideo");
         if (mIsRecording) {
-            mCameraManager.stopVideoRecording();
+            // Stop the video in a thread to not stall the UI thread
+            new Thread() {
+                public void run() {
+                    mCameraManager.stopVideoRecording();
+
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (SnapshotListener listener : mListeners) {
+                                listener.onVideoRecordingStop();
+                                listener.onMediaSavingDone();
+                            }
+                        }
+                    });
+                }
+            }.start();
+
             mCurrentVideoFilename = mVideoFilename;
 
             mIsRecording = false;
 
             for (SnapshotListener listener : mListeners) {
                 listener.onVideoRecordingStop();
+                listener.onMediaSavingStart();
             }
 
             addVideoToMediaStore();
@@ -451,7 +470,7 @@ public class SnapshotManager {
                     }
                     r = mQueue.get(0);
                     for (SnapshotListener listener : mListeners) {
-                        listener.onImageSavingStart();
+                        listener.onMediaSavingStart();
                     }
                 }
                 storeImage(r.data, r.uri, r.title, r.loc, r.width, r.height,
@@ -459,7 +478,7 @@ public class SnapshotManager {
                 synchronized (this) {
                     mQueue.remove(0);
                     for (SnapshotListener listener : mListeners) {
-                        listener.onImageSavingDone();
+                        listener.onMediaSavingDone();
                     }
                     notifyAll();  // the main thread may wait in addImage
                 }

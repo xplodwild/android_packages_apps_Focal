@@ -443,7 +443,7 @@ public class CameraActivity extends Activity {
         }
 
         @Override
-        public void onImageSavingStart() {
+        public void onMediaSavingStart() {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -453,7 +453,7 @@ public class CameraActivity extends Activity {
         }
 
         @Override
-        public void onImageSavingDone() {
+        public void onMediaSavingDone() {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
