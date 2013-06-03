@@ -159,13 +159,14 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         final int width = Math.min(screenSize.x, screenSize.y);
         final int height = Math.max(screenSize.x, screenSize.y);
 
-        
+
+        final float buttonOffset = Util.dpToPx(getContext(), 12);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(4.0f);
         mPaint.setARGB((int) (255.0f - 255.0f * mHintProgress), 255, 255, 255);
-        canvas.drawCircle(height - mEdgePadding, width/2, mHintProgress * mRingRadius, mPaint);
-        canvas.drawCircle(height - mEdgePadding, width/2, mHintProgress * mRingRadius * 0.66f, mPaint);
-        canvas.drawCircle(height - mEdgePadding, width/2, mHintProgress * mRingRadius * 0.33f, mPaint);
+        canvas.drawCircle(height - mEdgePadding + buttonOffset, width/2, mHintProgress * mRingRadius, mPaint);
+        canvas.drawCircle(height - mEdgePadding + buttonOffset, width/2, mHintProgress * mRingRadius * 0.66f, mPaint);
+        canvas.drawCircle(height - mEdgePadding + buttonOffset, width/2, mHintProgress * mRingRadius * 0.33f, mPaint);
 
         final float ringRadius = (float) mRingRadius * mOpenProgress;
        
