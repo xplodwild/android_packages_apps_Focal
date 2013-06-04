@@ -183,6 +183,7 @@ public class CameraManager {
 
             mCamera.stopPreview();
             mCamera.setParameters(mParameters);
+            mPreview.notifyPreviewSize(width, height);
             mCamera.startPreview();
         }
     }
