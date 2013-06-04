@@ -196,8 +196,8 @@ public class CameraManager {
         int previewWidth = getParameters().getPreviewSize().width;
         int previewHeight = getParameters().getPreviewSize().height;
 
-        if (mPreviewFrameBuffer == null || mPreviewFrameBuffer.length != (previewWidth * previewHeight + 1))
-            mPreviewFrameBuffer = new int[previewWidth * previewHeight + 1];
+        if (mPreviewFrameBuffer == null || mPreviewFrameBuffer.length != (previewWidth*previewHeight))
+            mPreviewFrameBuffer = new int[previewWidth*previewHeight];
 
         // Convert YUV420SP preview data to RGB
         Util.decodeYUV420SP(mPreviewFrameBuffer, data, previewWidth, previewHeight);
@@ -226,9 +226,7 @@ public class CameraManager {
      */
     public void prepareVideoRecording(String fileName, CamcorderProfile profile) {
         // Unlock the camera for use with MediaRecorder
-        mCamera.lock();
         mCamera.unlock();
-
 
         mMediaRecorder.setCamera(mCamera);
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
@@ -257,12 +255,12 @@ public class CameraManager {
     }
 
     public void startVideoRecording() {
-        Log.e(TAG, "startVideoRecording");
+        Log.v(TAG, "startVideoRecording");
         mMediaRecorder.start();
     }
 
     public void stopVideoRecording() {
-        Log.e(TAG, "stopVideoRecording");
+        Log.v(TAG, "stopVideoRecording");
         mMediaRecorder.stop();
         mCamera.lock();
         mMediaRecorder.reset();
@@ -395,14 +393,15 @@ public class CameraManager {
         public CameraPreview(Context context) {
             super(context);
 
-            mLastFrameBytes = new byte[2332800]; // size for 1440*1080 preview... XXX: previewWidth*previewHeight*1.5
-
             // Install a SurfaceHolder.Callback so we get notified when the
             // underlying surface is created and destroyed.
             mHolder = getHolder();
             mHolder.addCallback(this);
         }
 
+        public void notifyPreviewSize(int width, int height) {
+            mLastFrameBytes = new byte[(int) (width * height * 1.5 + 0.5)];
+        }
         public byte[] getLastFrameBytes() {
             return mLastFrameBytes;
         }
