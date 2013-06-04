@@ -29,7 +29,9 @@ public class PreviewFrameLayout extends RelativeLayout {
 
     public static final String TAG = "CAM_preview";
 
-    /** A callback to be invoked when the preview frame's size changes. */
+    /**
+     * A callback to be invoked when the preview frame's size changes.
+     */
     public interface OnSizeChangedListener {
         public void onSizeChanged(int width, int height);
     }
@@ -74,8 +76,8 @@ public class PreviewFrameLayout extends RelativeLayout {
         int fullWidth = MeasureSpec.getSize(widthSpec);
         int fullHeight = MeasureSpec.getSize(heightSpec);
 
-        float widthRatio = (float) fullWidth/previewWidth;
-        float heightRatio = (float) fullHeight/previewHeight;
+        float widthRatio = (float) fullWidth / previewWidth;
+        float heightRatio = (float) fullHeight / previewHeight;
 
         if (widthRatio > heightRatio) {
             previewWidth *= widthRatio;

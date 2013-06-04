@@ -24,6 +24,7 @@ public class CameraCapabilities {
     /**
      * Default constructor, initializes all the widgets. They will
      * then be sorted by populateSidebar.
+     *
      * @param context The CameraActivity context
      */
     public CameraCapabilities(CameraManager cam, Context context) {
@@ -41,11 +42,12 @@ public class CameraCapabilities {
     /**
      * Populates the sidebar (through sideBarContainer) with the widgets actually
      * compatible with the device.
-     * @param params The Camera parameters returned from the HAL for compatibility check
+     *
+     * @param params           The Camera parameters returned from the HAL for compatibility check
      * @param sideBarContainer The side bar layout that will contain all the toggle buttons
      */
     public void populateSidebar(Camera.Parameters params, ViewGroup sideBarContainer,
-            ViewGroup widgetsContainer) {
+                                ViewGroup widgetsContainer) {
         List<WidgetBase> unsupported = new ArrayList<WidgetBase>();
 
         for (int i = 0; i < mWidgets.size(); i++) {

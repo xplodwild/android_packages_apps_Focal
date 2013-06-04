@@ -4,7 +4,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:background="#333"
-             tools:context=".CameraActivity" >
+             tools:context=".CameraActivity">
 
     <org.cyanogenmod.nemesis.ui.PreviewFrameLayout
             android:id="@+id/camera_preview_container"
@@ -27,6 +27,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp">
+
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -67,7 +68,7 @@
                 android:id="@+id/hud_ring_focus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|center_horizontal" />
+                android:layout_gravity="center_vertical|center_horizontal"/>
 
         <org.cyanogenmod.nemesis.ui.ExposureHudRing
                 android:id="@+id/hud_ring_exposure"
@@ -83,13 +84,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp" >
+            android:layout_marginRight="32dp">
 
         <LinearLayout
                 android:id="@+id/sidebar_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
         </LinearLayout>
 
@@ -101,7 +102,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_marginBottom="64dp"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
     </org.cyanogenmod.nemesis.ui.WidgetRenderer>
 
@@ -110,7 +111,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginLeft="2dp"
-            android:layout_marginTop="2dp" />
+            android:layout_marginTop="2dp"/>
 
     <FrameLayout
             android:layout_width="fill_parent"
@@ -130,7 +131,7 @@
                 android:id="@+id/switch_ring_pad"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"/>
 
         <org.cyanogenmod.nemesis.ui.ShutterButton
                 android:id="@+id/btn_shutter"
@@ -140,7 +141,7 @@
                 android:layout_marginRight="-24dp"
                 android:clickable="true"
                 android:contentDescription="@string/shutter_button"
-                android:src="@drawable/btn_shutter_photo" />
+                android:src="@drawable/btn_shutter_photo"/>
 
     </FrameLayout>
 

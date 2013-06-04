@@ -12,6 +12,7 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
         /**
          * This method is called when the focus operation starts (whether through touch to focus,
          * or via continuous-picture focus mode).
+         *
          * @param smallAdjust If this parameter is set to true, the focus is being done because of
          *                    continuous focus mode and thus only make a small adjustment
          */
@@ -19,10 +20,11 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
 
         /**
          * This method is called when the focus operation ends
+         *
          * @param smallAdjust If this parameter is set to true, the focus is being done because of
          *                    continuous focus mode and made only a small adjustment
-         * @param success If the focus operation was successful. Note that if smallAdjust is true,
-         *                this parameter will always be false.
+         * @param success     If the focus operation was successful. Note that if smallAdjust is true,
+         *                    this parameter will always be false.
          */
         public void onFocusReturns(boolean smallAdjust, boolean success);
     }
@@ -41,13 +43,13 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
         mHandler = new Handler();
         mCamManager = cam;
         mIsFocusing = false;
-        
+
         mCamManager.setAutoFocusMoveCallback(this);
         Camera.Parameters params = mCamManager.getParameters();
         if (params.getSupportedFocusModes().contains("continuous-picture")) {
             params.setFocusMode("continuous-picture");
         }
-        
+
         // Do a first focus after 1 second
         mHandler.postDelayed(new Runnable() {
             public void run() {
@@ -62,11 +64,10 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
 
     public void checkFocus() {
         long time = System.currentTimeMillis();
-        
+
         if (time - mLastFocusTimestamp > mFocusKeepTimeMs && !mIsFocusing) {
             refocus();
-        }
-        else if (time - mLastFocusTimestamp > mFocusKeepTimeMs*2) {
+        } else if (time - mLastFocusTimestamp > mFocusKeepTimeMs * 2) {
             // Force a refocus after 2 times focus failed
             refocus();
         }
@@ -75,6 +76,7 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
     /**
      * Sets the time during which the focus is considered valid
      * before refocusing
+     *
      * @param timeMs Time in miliseconds
      */
     public void setFocusKeepTime(int timeMs) {

@@ -35,7 +35,7 @@ import java.util.List;
 
 /**
  * This class is responsible for interacting with the Camera HAL.
- * It provides easy open/close, helper methods to set parameters or 
+ * It provides easy open/close, helper methods to set parameters or
  * toggle features, etc. in an asynchronous fashion.
  */
 public class CameraManager {
@@ -43,7 +43,7 @@ public class CameraManager {
 
     private final static int FOCUS_WIDTH = 80;
     private final static int FOCUS_HEIGHT = 80;
-    
+
     private CameraPreview mPreview;
     private Camera mCamera;
     private int mCurrentFacing;
@@ -53,16 +53,16 @@ public class CameraManager {
     private int[] mPreviewFrameBuffer;
     private int mOrientation;
     private MediaRecorder mMediaRecorder;
-    
+
     private class AsyncParamRunnable implements Runnable {
         private String mKey;
         private String mValue;
-        
+
         public AsyncParamRunnable(String key, String value) {
             mKey = key;
             mValue = value;
         }
-        
+
         public void run() {
             Log.v(TAG, "Asynchronously setting parameter " + mKey + " to " + mValue);
             Camera.Parameters params = getParameters();
@@ -71,8 +71,10 @@ public class CameraManager {
             // Read them from sensor next time
             mParameters = null;
         }
-    };
-    
+    }
+
+    ;
+
 
     public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
@@ -81,6 +83,7 @@ public class CameraManager {
 
     /**
      * Opens the camera and show its preview in the preview
+     *
      * @param cameraId
      * @return true if the operation succeeded, false otherwise
      */
@@ -99,13 +102,12 @@ public class CameraManager {
 
             if (mTargetSize != null)
                 setPreviewSize(mTargetSize.x, mTargetSize.y);
-            
+
             if (mAutoFocusMoveCallback != null)
                 mCamera.setAutoFocusMoveCallback(mAutoFocusMoveCallback);
 
             // Default focus mode to continuous
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e(TAG, "Error while opening cameras: " + e.getMessage());
             return false;
         }
@@ -118,12 +120,13 @@ public class CameraManager {
 
     /**
      * Returns the preview surface used to display the Camera's preview
+     *
      * @return CameraPreview
      */
     public CameraPreview getPreviewSurface() {
         return mPreview;
     }
-    
+
     /**
      * @return The facing of the current open camera
      */
@@ -133,6 +136,7 @@ public class CameraManager {
 
     /**
      * Returns the parameters structure of the current running camera
+     *
      * @return Camera.Parameters
      */
     public Camera.Parameters getParameters() {
@@ -172,7 +176,7 @@ public class CameraManager {
 
         if (mCamera != null) {
             mParameters.setPreviewSize(width, height);
-            
+
             Log.v(TAG, "Preview size is " + width + "x" + height);
 
             mCamera.stopPreview();
@@ -180,27 +184,27 @@ public class CameraManager {
             mCamera.startPreview();
         }
     }
-    
+
     public void setParameterAsync(String key, String value) {
         AsyncParamRunnable run = new AsyncParamRunnable(key, value);
         new Thread(run).start();
     }
-    
+
     public Bitmap getLastPreviewFrame() {
         // Decode the last frame bytes
         byte[] data = mPreview.getLastFrameBytes();
         int previewWidth = getParameters().getPreviewSize().width;
         int previewHeight = getParameters().getPreviewSize().height;
-        
-        if (mPreviewFrameBuffer == null || mPreviewFrameBuffer.length != (previewWidth*previewHeight+1))
-            mPreviewFrameBuffer = new int[previewWidth*previewHeight+1];
-        
+
+        if (mPreviewFrameBuffer == null || mPreviewFrameBuffer.length != (previewWidth * previewHeight + 1))
+            mPreviewFrameBuffer = new int[previewWidth * previewHeight + 1];
+
         // Convert YUV420SP preview data to RGB
         Util.decodeYUV420SP(mPreviewFrameBuffer, data, previewWidth, previewHeight);
-        
+
         // Decode the RGB data to a bitmap
         Bitmap output = Bitmap.createBitmap(mPreviewFrameBuffer, previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
-        
+
         return output;
     }
 
@@ -212,12 +216,13 @@ public class CameraManager {
         Log.v(TAG, "takePicture");
         mCamera.takePicture(shutterCallback, raw, jpeg);
     }
-    
+
     /**
      * Prepares the MediaRecorder to record a video. This must be called before
      * startVideoRecording to setup the recording environment.
+     *
      * @param fileName Target file path
-     * @param profile Target profile (quality)
+     * @param profile  Target profile (quality)
      */
     public void prepareVideoRecording(String fileName, CamcorderProfile profile) {
         // Unlock the camera for use with MediaRecorder
@@ -228,7 +233,7 @@ public class CameraManager {
         mMediaRecorder.setCamera(mCamera);
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        
+
 
         mMediaRecorder.setProfile(profile);
         mMediaRecorder.setOutputFile(fileName);
@@ -237,9 +242,9 @@ public class CameraManager {
         mMediaRecorder.setMaxFileSize(maxFileSize);
         mMediaRecorder.setMaxDuration(0); // infinite
 
-        
+
         mMediaRecorder.setPreviewDisplay(mPreview.getSurfaceHolder().getSurface());
-        
+
         try {
             mMediaRecorder.prepare();
         } catch (IllegalStateException e) {
@@ -247,30 +252,31 @@ public class CameraManager {
         } catch (IOException e) {
             Log.e(TAG, "Cannot prepare MediaRecorder", e);
         }
-        
-        
+
+
     }
-    
+
     public void startVideoRecording() {
         Log.e(TAG, "startVideoRecording");
         mMediaRecorder.start();
     }
-    
+
     public void stopVideoRecording() {
         Log.e(TAG, "stopVideoRecording");
         mMediaRecorder.stop();
         mCamera.lock();
         mMediaRecorder.reset();
     }
-    
+
     /**
      * Returns the orientation of the device
+     *
      * @return
      */
     public int getOrientation() {
         return mOrientation;
     }
-    
+
     public void setOrientation(int orientation) {
         mOrientation = orientation;
     }
@@ -282,9 +288,10 @@ public class CameraManager {
             // ignore
         }
     }
-    
+
     /**
      * Trigger the autofocus function of the device
+     *
      * @param cb The AF callback
      * @return true if we could start the AF, false otherwise
      */
@@ -299,12 +306,13 @@ public class CameraManager {
         } else {
             return false;
         }
-        
+
     }
-    
+
     /**
      * Returns whether or not the current open camera device supports
      * focus area (focus ring)
+     *
      * @return true if supported
      */
     public boolean isFocusAreaSupported() {
@@ -322,6 +330,7 @@ public class CameraManager {
     /**
      * Defines the main focus point of the camera to the provided x and y values.
      * Those values must between -1000 and 1000, where -1000 is the top/left, and 1000 the bottom/right
+     *
      * @param x The X position of the focus point
      * @param y The Y position of the focus point
      */
@@ -345,6 +354,7 @@ public class CameraManager {
     /**
      * Defines the exposure metering point of the camera to the provided x and y values.
      * Those values must between -1000 and 1000, where -1000 is the top/left, and 1000 the bottom/right
+     *
      * @param x The X position of the exposure metering point
      * @param y The Y position of the exposure metering point
      */
@@ -364,14 +374,14 @@ public class CameraManager {
             }
         }
     }
-    
+
     public void setAutoFocusMoveCallback(AutoFocusMoveCallback cb) {
         mAutoFocusMoveCallback = cb;
-        
+
         if (mCamera != null)
             mCamera.setAutoFocusMoveCallback(cb);
     }
-    
+
     /**
      * The CameraPreview class handles the Camera preview feed
      * and setting the surface holder.
@@ -392,11 +402,11 @@ public class CameraManager {
             mHolder = getHolder();
             mHolder.addCallback(this);
         }
-        
+
         public byte[] getLastFrameBytes() {
             return mLastFrameBytes;
         }
-        
+
         public SurfaceHolder getSurfaceHolder() {
             return mHolder;
         }
@@ -404,7 +414,7 @@ public class CameraManager {
         public void notifyCameraChanged() {
             if (mCamera != null) {
                 setupCamera();
-                
+
                 try {
                     mCamera.setPreviewDisplay(mHolder);
                     mCamera.startPreview();
@@ -432,7 +442,7 @@ public class CameraManager {
         }
 
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-            if (mHolder.getSurface() == null){
+            if (mHolder.getSurface() == null) {
                 // preview surface does not exist
                 return;
             }
@@ -440,10 +450,10 @@ public class CameraManager {
             // stop preview before making changes
             try {
                 mCamera.stopPreview();
-            } catch (Exception e){
+            } catch (Exception e) {
                 // ignore: tried to stop a non-existent preview
             }
-            
+
             setupCamera();
 
             // start preview with new settings
@@ -452,25 +462,24 @@ public class CameraManager {
                 mCamera.startPreview();
 
 
-            } catch (Exception e){
+            } catch (Exception e) {
                 Log.d(TAG, "Error starting camera preview: " + e.getMessage());
             }
         }
-        
+
         private void setupCamera() {
             // Set device-specifics here
             try {
                 Camera.Parameters params = mCamera.getParameters();
-                
+
                 if (getResources().getBoolean(R.bool.config_qualcommZslCameraMode))
                     params.set("camera-mode", 1);
 
                 mCamera.setParameters(params);
-                
+
                 mCamera.addCallbackBuffer(mLastFrameBytes);
                 mCamera.setPreviewCallbackWithBuffer(this);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.e(TAG, "Could not set device specifics");
             }
         }

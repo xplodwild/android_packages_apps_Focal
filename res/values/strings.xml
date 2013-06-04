@@ -3,7 +3,7 @@
 
     <string name="app_name">Nemesis</string>
     <string name="shutter_button">Shutter button</string>
-	<string name="cannot_connect_hal">Unable to connect to camera</string>
+    <string name="cannot_connect_hal">Unable to connect to camera</string>
     <string name="recording">Recording</string>
     <string name="double_tap_to_snapshot">Double-tap to take a picture</string>
 </resources>

@@ -29,24 +29,28 @@ public class SnapshotManager {
     public interface SnapshotListener {
         /**
          * This callback is called when a snapshot is taken (shutter)
+         *
          * @param info A structure containing information about the snapshot taken
          */
         public void onSnapshotShutter(SnapshotInfo info);
 
         /**
          * This callback is called when we have a preview for the snapshot
+         *
          * @param info A structure containing information about the snapshot
          */
         public void onSnapshotPreview(SnapshotInfo info);
 
         /**
          * This callback is called when a snapshot has been processed (vignetting, etc)
+         *
          * @param info A structure containing information about the snapshot
          */
         public void onSnapshotProcessed(SnapshotInfo info);
 
         /**
          * This callback is called when a snapshot has been saved to the internal memory
+         *
          * @param info A structure containing information about the snapshot
          */
         public void onSnapshotSaved(SnapshotInfo info);
@@ -140,7 +144,7 @@ public class SnapshotManager {
             }
 
             // Camera is ready to take another shot, doit
-            if (mSnapshotsQueue.size() > mCurrentShutterQueueIndex+1) {
+            if (mSnapshotsQueue.size() > mCurrentShutterQueueIndex + 1) {
                 mCurrentShutterQueueIndex++;
                 mHandler.post(mCaptureRunnable);
             }
@@ -206,9 +210,10 @@ public class SnapshotManager {
 
     /**
      * Queues a snapshot that will be taken as soon as possible
-     * @param save Whether or not to save the snapshot in gallery
-     *             (for example, software HDR doesn't need all the shots to
-     *             be saved)
+     *
+     * @param save                 Whether or not to save the snapshot in gallery
+     *                             (for example, software HDR doesn't need all the shots to
+     *                             be saved)
      * @param exposureCompensation If the shot has to be taken at a different
      *                             exposure value, otherwise set it to 0
      */
@@ -230,7 +235,7 @@ public class SnapshotManager {
             new Thread(mCaptureRunnable).start();
         }
     }
-    
+
     /**
      * Starts recording a video with the current settings
      */
@@ -242,7 +247,7 @@ public class SnapshotManager {
         // Setup output file
         generateVideoFilename(mProfile.fileFormat);
         mCameraManager.prepareVideoRecording(mVideoFilename, mProfile);
-        
+
         mCameraManager.startVideoRecording();
         mIsRecording = true;
         mRecordingStartTime = SystemClock.uptimeMillis();
@@ -251,7 +256,7 @@ public class SnapshotManager {
             listener.onVideoRecordingStart();
         }
     }
-    
+
     /**
      * Stops the current recording video, if any
      */
@@ -287,7 +292,7 @@ public class SnapshotManager {
             addVideoToMediaStore();
         }
     }
-    
+
     /**
      * Returns whether or not a video is recording
      */
@@ -297,6 +302,7 @@ public class SnapshotManager {
 
     /**
      * Add the last recorded video to the MediaStore
+     *
      * @return True if operation succeeded
      */
     private boolean addVideoToMediaStore() {
@@ -344,6 +350,7 @@ public class SnapshotManager {
 
     /**
      * Generates a filename for the next video to record
+     *
      * @param outputFileFormat The file format of the video
      */
     private void generateVideoFilename(int outputFileFormat) {

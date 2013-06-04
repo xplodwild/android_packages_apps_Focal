@@ -41,10 +41,10 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
      * If the HAL reports a [key]-values array, it will check and filter
      * the values against this array. Otherwise, all the values are added
      * to the list.
-     * 
-     * You might want to check for device-specific values that aren't 
+     * <p/>
+     * You might want to check for device-specific values that aren't
      * reported in -values in the child class before doing addValue
-     * 
+     *
      * @param value The value that the key of this widget can take
      * @param resId The icon that represents it
      */
@@ -54,7 +54,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
         String values = params.get(mKey + "-values");
 
         // If we don't have a -values provided, or if it contains the value, add it.
-        if ((values == null && filterDeviceSpecific(value)) 
+        if ((values == null && filterDeviceSpecific(value))
                 || Arrays.asList(values.split(",")).contains(value)) {
             WidgetBase.WidgetOptionButton button = new WidgetBase.WidgetOptionButton(resId, mContext);
             button.setOnClickListener(this);
@@ -69,12 +69,12 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
             Log.w(TAG, "Device doesn't support " + value + " for setting " + mKey);
         }
     }
-    
+
     /**
      * This method can be overriden by each widgets. If some keys doesn't
      * have a "-values" array, we can filter eventual device-specific incompatibilities
      * in this method.
-     * 
+     *
      * @param value The value tested for support
      * @return true if the value is supported, false if it's not
      */
@@ -97,8 +97,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
                 Log.w(TAG, "... but we don't know the possible values for " + mKey);
             }
             return true;
-        }
-        else {
+        } else {
             Log.d(TAG, "The device doesn't support '" + mKey + "'");
             return false;
         }
@@ -124,7 +123,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
         }
 
         mActiveButton = button;
-        button.setImageBitmap(IconGlower.getSingleton().getGlow(mKey+"="+value,
-                ((BitmapDrawable)button.getDrawable()).getBitmap()));
+        button.setImageBitmap(IconGlower.getSingleton().getGlow(mKey + "=" + value,
+                ((BitmapDrawable) button.getDrawable()).getBitmap()));
     }
 }

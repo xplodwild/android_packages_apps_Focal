@@ -40,9 +40,10 @@ public class Notifier extends LinearLayout {
     /**
      * Shows the provided {@param text} during [@param durationMs} milliseconds with
      * a nice animation.
-     * @note This method must be ran in UI thread!
+     *
      * @param text
      * @param durationMs
+     * @note This method must be ran in UI thread!
      */
     public void notify(String text, long durationMs) {
         mTextView = (TextView) findViewById(R.id.notifier_text);

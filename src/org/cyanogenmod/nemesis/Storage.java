@@ -39,13 +39,14 @@ public class Storage {
     public static final long UNAVAILABLE = -1L;
     public static final long PREPARING = -2L;
     public static final long UNKNOWN_SIZE = -3L;
-    public static final long LOW_STORAGE_THRESHOLD= 50000000;
+    public static final long LOW_STORAGE_THRESHOLD = 50000000;
 
     private String mRoot = Environment.getExternalStorageDirectory().toString();
     private static Storage sStorage;
 
     // Singleton
-    private Storage() {}
+    private Storage() {
+    }
 
     public static Storage getStorage() {
         if (sStorage == null) {
@@ -116,7 +117,7 @@ public class Storage {
         Uri uri = null;
         try {
             uri = resolver.insert(Images.Media.EXTERNAL_CONTENT_URI, values);
-        } catch (Throwable th)  {
+        } catch (Throwable th) {
             // This can happen when the external volume is already mounted, but
             // MediaScanner has not notify MediaProvider to add that volume.
             // The picture is still safe and MediaScanner will find it and
@@ -147,7 +148,7 @@ public class Storage {
         Uri uri = null;
         try {
             uri = resolver.insert(Images.Media.EXTERNAL_CONTENT_URI, values);
-        } catch (Throwable th)  {
+        } catch (Throwable th) {
             // This can happen when the external volume is already mounted, but
             // MediaScanner has not notify MediaProvider to add that volume.
             // The picture is still safe and MediaScanner will find it and

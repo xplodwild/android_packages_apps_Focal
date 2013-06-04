@@ -44,15 +44,13 @@ public class HudRing extends ImageView implements View.OnTouchListener {
            /* mOffsetX = motionEvent.getX() - motionEvent.getRawX();
             mOffsetY = motionEvent.getY() - motionEvent.getRawY();*/
             animatePressDown();
-        }
-        else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+        } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
             setX(getX() + (motionEvent.getRawX() - mLastX));
             setY(getY() + (motionEvent.getRawY() - mLastY));
 
             mLastX = motionEvent.getRawX();
             mLastY = motionEvent.getRawY();
-        }
-        else if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
+        } else if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
             animatePressUp();
         }
 

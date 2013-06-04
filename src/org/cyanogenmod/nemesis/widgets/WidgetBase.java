@@ -21,14 +21,13 @@ import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 /**
  * Base class for settings widget. Each setting widget
  * will extend this class.
- * 
+ * <p/>
  * Remember that we are working in landscape, so the GridLayout
  * column count is the width of the widget when looking landscape,
  * and become the height when looking portrait.
- * 
+ * <p/>
  * What we call the "MaxWidgetWidth" is the number of ROWS in landscape,
  * that looks like COLUMNS in portrait.
- * 
  */
 public abstract class WidgetBase {
     public final static String TAG = "WidgetBase";
@@ -64,10 +63,10 @@ public abstract class WidgetBase {
     /**
      * This method returns whether or not the widget settings are
      * supported by the camera HAL or not.
-     * 
+     * <p/>
      * This method must be overridden by each widget, in order to hide
      * widgets that are not supported by the Camera device.
-     * 
+     *
      * @param params The Camera parameters provided by HAL
      * @return true if the widget is supported by the device
      */
@@ -75,14 +74,15 @@ public abstract class WidgetBase {
 
     /**
      * Add a view to the container widget
+     *
      * @param v The view to add
      */
     public void addViewToContainer(View v) {
         if (mWidget.getRowCount() == mWidgetMaxWidth) {
             // Add a new column instead of a line to fit the max width
-            mWidget.setColumnCount(mWidget.getColumnCount()+1);
+            mWidget.setColumnCount(mWidget.getColumnCount() + 1);
         } else if (mWidget.getRowCount() < mWidgetMaxWidth) {
-            mWidget.setRowCount(mWidget.getRowCount()+1);
+            mWidget.setRowCount(mWidget.getRowCount() + 1);
         }
 
         mWidget.addView(v, 0);
@@ -105,16 +105,16 @@ public abstract class WidgetBase {
      */
     public void open() {
         WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
-        
+
         mWidget.setVisibility(View.VISIBLE);
         mWidget.invalidate();
-        
+
         mIsOpen = true;
-        
+
         parent.widgetOpened(mWidget);
-        
+
         mWidget.animate().alpha(1.0f).translationXBy(WIDGET_ANIM_TRANSLATE)
-        .setDuration(WIDGET_FADE_DURATION_MS).start();
+                .setDuration(WIDGET_FADE_DURATION_MS).start();
     }
 
     public void close() {
@@ -122,7 +122,7 @@ public abstract class WidgetBase {
         parent.widgetClosed(mWidget);
 
         mWidget.animate().alpha(0.0f).translationXBy(-WIDGET_ANIM_TRANSLATE)
-        .setDuration(WIDGET_FADE_DURATION_MS).start();
+                .setDuration(WIDGET_FADE_DURATION_MS).start();
 
         mIsOpen = false;
     }
@@ -134,7 +134,7 @@ public abstract class WidgetBase {
      */
     public class WidgetToggleButton extends ImageView {
         public WidgetToggleButton(Context context, AttributeSet attrs,
-                int defStyle) {
+                                  int defStyle) {
             super(context, attrs, defStyle);
             initialize();
         }
@@ -201,13 +201,14 @@ public abstract class WidgetBase {
          * Returns the number of columns occupied by the widget.
          * A button typically occupies 1 column, but specific widgets
          * like text widget might occupy two columns in some cases.
+         *
          * @return Number of columns
          */
         public int getColSpan();
     }
 
     /**
-     * Represents a standard setting button put inside 
+     * Represents a standard setting button put inside
      * a {@link WidgetContainer}.
      * Note that you're not forced to use exclusively buttons,
      * TextViews can also be added (for Timer for instance)
@@ -217,7 +218,7 @@ public abstract class WidgetBase {
         private int mOriginalResource;
 
         public WidgetOptionButton(int resId, Context context, AttributeSet attrs,
-                int defStyle) {
+                                  int defStyle) {
             super(context, attrs, defStyle);
             initialize(resId);
         }
@@ -282,7 +283,7 @@ public abstract class WidgetBase {
         private float mTargetX = 0.0f;
 
         public WidgetContainer(Context context, AttributeSet attrs,
-                int defStyle) {
+                               int defStyle) {
             super(context, attrs, defStyle);
             initialize();
         }
@@ -299,6 +300,7 @@ public abstract class WidgetBase {
 
         /**
          * Animate the movement on X
+         *
          * @param x
          */
         public void setXSmooth(float x) {
@@ -311,6 +313,7 @@ public abstract class WidgetBase {
 
         /**
          * Returns the final X position, after the animation is done
+         *
          * @return final X position
          */
         public float getFinalX() {
@@ -334,7 +337,7 @@ public abstract class WidgetBase {
 
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
-                mTouchOffset = getX() -  event.getRawX();
+                mTouchOffset = getX() - event.getRawX();
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 parent.widgetPressed(mWidget);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
@@ -397,11 +400,11 @@ public abstract class WidgetBase {
 
 
         }
-        
+
         @Override
         protected void onMeasure(int widthSpec, int heightSpec) {
             super.onMeasure(widthSpec, heightSpec);
-            
+
             if (!isOpen())
                 setVisibility(View.GONE);
             else
@@ -416,7 +419,7 @@ public abstract class WidgetBase {
                 View child = getChildAt(i);
 
                 child.animate().rotation(orientation)
-                .setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
+                        .setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
             }
         }
     }
@@ -445,7 +448,7 @@ public abstract class WidgetBase {
                 if (distance <= 0.1f)
                     distance = e2.getX() - e1.getX();
 
-                if(distance > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                if (distance > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                     final SideBar sb = (SideBar) mToggleButton.getParent().getParent();
                     final WidgetRenderer wr = (WidgetRenderer) mWidget.getParent();
                     sb.toggleWidgetVisibility(WidgetBase.this, true);

@@ -36,13 +36,13 @@ import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 public class CameraActivity extends Activity {
     public final static String TAG = "CameraActivity";
 
-    public final static int CAMERA_MODE_PHOTO       = 1;
-    public final static int CAMERA_MODE_VIDEO       = 2;
-    public final static int CAMERA_MODE_PANO        = 3;
-    public final static int CAMERA_MODE_PICSPHERE   = 4;
-    
+    public final static int CAMERA_MODE_PHOTO = 1;
+    public final static int CAMERA_MODE_VIDEO = 2;
+    public final static int CAMERA_MODE_PANO = 3;
+    public final static int CAMERA_MODE_PICSPHERE = 4;
+
     private static int mCameraMode = CAMERA_MODE_PHOTO;
-    
+
     private CameraManager mCamManager;
     private SnapshotManager mSnapshotManager;
     private MainSnapshotListener mSnapshotListener;
@@ -51,7 +51,8 @@ public class CameraActivity extends Activity {
     private GestureDetector mGestureDetector;
     private Handler mHandler;
 
-    private int mOrientation = OrientationEventListener.ORIENTATION_UNKNOWN;;
+    private int mOrientation = OrientationEventListener.ORIENTATION_UNKNOWN;
+    ;
     private int mOrientationCompensation = 0;
 
     private SideBar mSideBar;
@@ -79,7 +80,7 @@ public class CameraActivity extends Activity {
         mSideBar = (SideBar) findViewById(R.id.sidebar_scroller);
         mWidgetRenderer = (WidgetRenderer) findViewById(R.id.widgets_container);
         mSavePinger = (SavePinger) findViewById(R.id.save_pinger);
-        
+
         mSwitchRingPad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
         mSwitchRingPad.setListener(new MainRingPadListener());
 
@@ -123,7 +124,7 @@ public class CameraActivity extends Activity {
                 if (ev.getAction() == MotionEvent.ACTION_UP) {
                     mSideBar.clampSliding();
                 }
-                
+
                 mGestureDetector.onTouchEvent(ev);
                 return true;
             }
@@ -155,22 +156,24 @@ public class CameraActivity extends Activity {
     /**
      * Returns the mode of the activity
      * See CameraActivity.CAMERA_MODE_*
+     *
      * @return int
      */
     public static int getCameraMode() {
         return mCameraMode;
     }
-    
+
     /**
      * Sets the mode of the activity
      * See CameraActivity.CAMERA_MODE_*
+     *
      * @param newMode
      */
     public void setCameraMode(int newMode) {
         if (mCameraMode == newMode) return;
-        
+
         mCameraMode = newMode;
-        
+
         if (newMode == CAMERA_MODE_PHOTO) {
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
         } else if (newMode == CAMERA_MODE_VIDEO) {
@@ -179,9 +182,9 @@ public class CameraActivity extends Activity {
         } else if (newMode == CAMERA_MODE_PICSPHERE) {
             // PicSphere <3
         } else if (newMode == CAMERA_MODE_PANO) {
-            
+
         }
-        
+
         updateCapabilities();
     }
 
@@ -199,7 +202,7 @@ public class CameraActivity extends Activity {
         mSwitchRingPad.notifyOrientationChanged(mOrientationCompensation);
         mSavePinger.notifyOrientationChanged(mOrientationCompensation);
     }
-    
+
     public void updateCapabilities() {
         // Populate the sidebar buttons a little later (so we have camera parameters)
         mHandler.post(new Runnable() {
@@ -212,7 +215,7 @@ public class CameraActivity extends Activity {
                 } else {
                     // Update sidebar
                     mSideBar.checkCapabilities(mCamManager, (ViewGroup) findViewById(R.id.widgets_container));
-                    
+
                     // Update focus ring support
                     mFocusHudRing.setVisibility(mCamManager.isFocusAreaSupported() ? View.VISIBLE : View.GONE);
                 }
@@ -229,7 +232,7 @@ public class CameraActivity extends Activity {
 
         // if we resumed the activity, the preview surface will already be attached
         if (mCamManager.getPreviewSurface().getParent() != null) {
-            ((ViewGroup)mCamManager.getPreviewSurface().getParent())
+            ((ViewGroup) mCamManager.getPreviewSurface().getParent())
                     .removeView(mCamManager.getPreviewSurface());
         }
 
@@ -239,7 +242,7 @@ public class CameraActivity extends Activity {
         params.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
         params.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
         mCamManager.getPreviewSurface().setLayoutParams(params);
-        
+
         if (!mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK)) {
             Log.e(TAG, "Could not open camera HAL");
             Toast.makeText(this, getResources().getString(R.string.cannot_connect_hal), Toast.LENGTH_LONG).show();
@@ -262,7 +265,8 @@ public class CameraActivity extends Activity {
 
     /**
      * Recursively rotates the Views of ViewGroups
-     * @param vg the root ViewGroup
+     *
+     * @param vg       the root ViewGroup
      * @param rotation the angle to which rotate the views
      */
     public static void setViewGroupRotation(ViewGroup vg, float rotation) {
@@ -278,7 +282,7 @@ public class CameraActivity extends Activity {
             }
         }
     }
-    
+
     public static void setViewRotation(View v, float rotation) {
         v.animate().rotation(rotation).setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
     }
@@ -290,27 +294,27 @@ public class CameraActivity extends Activity {
         @Override
         public void onButtonActivated(int eventId) {
             switch (eventId) {
-            case SwitchRingPad.BUTTON_CAMERA:
-                setCameraMode(CAMERA_MODE_PHOTO);
-                break;
-                
-            case SwitchRingPad.BUTTON_VIDEO:
-                setCameraMode(CAMERA_MODE_VIDEO);
-                break;
-            
-            
-            case SwitchRingPad.BUTTON_SWITCHCAM:
-                if (mCamManager.getCurrentFacing() == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                    mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK);
-                } else {
-                    mCamManager.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-                }
-                updateCapabilities();
-                break;
+                case SwitchRingPad.BUTTON_CAMERA:
+                    setCameraMode(CAMERA_MODE_PHOTO);
+                    break;
+
+                case SwitchRingPad.BUTTON_VIDEO:
+                    setCameraMode(CAMERA_MODE_VIDEO);
+                    break;
+
+
+                case SwitchRingPad.BUTTON_SWITCHCAM:
+                    if (mCamManager.getCurrentFacing() == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                        mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+                    } else {
+                        mCamManager.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+                    }
+                    updateCapabilities();
+                    break;
             }
         }
     }
-    
+
     /**
      * Listener that is called when shutter button is slided, to open ring pad view
      */
@@ -320,7 +324,7 @@ public class CameraActivity extends Activity {
         public void onSlideOpen() {
             mSwitchRingPad.animateOpen();
         }
-        
+
         @Override
         public void onSlideClose() {
             mSwitchRingPad.animateClose();
@@ -335,9 +339,9 @@ public class CameraActivity extends Activity {
         public void onShutterButtonPressed() {
             mSwitchRingPad.animateHint();
         }
-        
+
     }
-    
+
     /**
      * When the shutter button is pressed
      */
@@ -355,12 +359,11 @@ public class CameraActivity extends Activity {
                     mSnapshotManager.stopVideo();
                     mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_video));
                 }
-            }            
+            }
         }
     }
 
-    
-    
+
     /**
      * Focus listener to animate the focus HUD ring from FocusManager events
      */
@@ -494,7 +497,7 @@ public class CameraActivity extends Activity {
      * Handles the orientation changes without turning the actual activity
      */
     private class CameraOrientationEventListener
-    extends OrientationEventListener {
+            extends OrientationEventListener {
         public CameraOrientationEventListener(Context context) {
             super(context);
         }
@@ -550,25 +553,25 @@ public class CameraActivity extends Activity {
             mAccel[2] = sensorEvent.values[2] - mGravity[2];
 
             // If we aren't just opening the sidebar
-            if ((System.currentTimeMillis()-mLastShakeTimestamp) < 1000) {
+            if ((System.currentTimeMillis() - mLastShakeTimestamp) < 1000) {
                 return;
             }
 
             if (mAccel[0] > SHAKE_CLOSE_THRESHOLD && mSideBar.isOpen()) {
                 mSideBar.slideClose();
-                
+
                 if (mWidgetRenderer.getWidgetsCount() > 0) {
                     mWidgetRenderer.hideWidgets();
                 }
-                
+
                 mLastShakeTimestamp = System.currentTimeMillis();
             } else if (mAccel[0] < SHAKE_OPEN_THRESHOLD && !mSideBar.isOpen()) {
                 mSideBar.slideOpen();
-                
+
                 if (mWidgetRenderer.getWidgetsCount() > 0) {
                     mWidgetRenderer.restoreWidgets();
                 }
-                
+
                 mLastShakeTimestamp = System.currentTimeMillis();
             }
 
@@ -583,8 +586,9 @@ public class CameraActivity extends Activity {
     /**
      * Handles the swipe and tap gestures on the lower layer of the screen
      * (ie. the preview surface)
+     *
      * @note Remember that the default orientation of the screen is landscape, thus
-     * 	     the side bar is at the BOTTOM of the screen, and is swiped UP/DOWN. 
+     * the side bar is at the BOTTOM of the screen, and is swiped UP/DOWN.
      */
     public class GestureListener extends GestureDetector.SimpleOnGestureListener {
         //private final static String TAG = "GestureListener";
@@ -594,7 +598,7 @@ public class CameraActivity extends Activity {
         private static final int SWIPE_THRESHOLD_VELOCITY = 200;
         // allow to drag the side bar up to half of the screen
         private static final int SIDEBAR_THRESHOLD_FACTOR = 2;
-        
+
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
             // A single tap equals to touch-to-focus in all modes
@@ -616,12 +620,12 @@ public class CameraActivity extends Activity {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-                float distanceY) {			
+                                float distanceY) {
             // Detect drag of the side bar
             if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH) {
                 // Finger drifted from the path
                 return false;
-            } else if (e1.getRawY() > Util.getScreenSize(CameraActivity.this).y/SIDEBAR_THRESHOLD_FACTOR) {
+            } else if (e1.getRawY() > Util.getScreenSize(CameraActivity.this).y / SIDEBAR_THRESHOLD_FACTOR) {
                 if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE ||
                         e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE) {
                     mSideBar.slide(-distanceY);
@@ -641,14 +645,14 @@ public class CameraActivity extends Activity {
                     return false;
 
                 // swipes to open/close the sidebar and/or hide/restore the widgets 
-                if(e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                     if (mWidgetRenderer.isHidden() && mWidgetRenderer.getWidgetsCount() > 0) {
                         mWidgetRenderer.restoreWidgets();
                     } else {
                         mSideBar.slideOpen();
                         mWidgetRenderer.notifySidebarSlideOpen();
                     }
-                }  else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                     if (mSideBar.isOpen()) {
                         mSideBar.slideClose();
                         mWidgetRenderer.notifySidebarSlideClose();

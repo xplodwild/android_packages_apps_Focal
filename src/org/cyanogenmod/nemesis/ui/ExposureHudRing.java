@@ -36,23 +36,24 @@ public class ExposureHudRing extends HudRing {
     public void setManagers(CameraManager camMan) {
         mCamManager = camMan;
     }
-    
+
     /**
      * Centers the exposure ring on the x,y coordinates provided
      * and sets the focus to this position
+     *
      * @param x
      * @param y
      */
     public void setPosition(float x, float y) {
-        setX(x - getWidth()/2.0f);
-        setY(y - getHeight()/2.0f);
+        setX(x - getWidth() / 2.0f);
+        setY(y - getHeight() / 2.0f);
         applyExposurePoint();
     }
-    
-    
+
+
     private void applyExposurePoint() {
-        float centerPointX = getX() + getWidth()/2.0f;
-        float centerPointY = getY() + getHeight()/2.0f;
+        float centerPointX = getX() + getWidth() / 2.0f;
+        float centerPointY = getY() + getHeight() / 2.0f;
 
         centerPointX *= 1000.0f / ((ViewGroup) getParent()).getWidth();
         centerPointY *= 1000.0f / ((ViewGroup) getParent()).getHeight();

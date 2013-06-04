@@ -1,14 +1,14 @@
 package org.cyanogenmod.nemesis;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.BlurMaskFilter.Blur;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class renders a specific icon in "Glow" mode
@@ -35,8 +35,9 @@ public class IconGlower {
      * provided name is already in the cache, the cached image
      * will be returned. Otherwise, the bitmap will be glowed and
      * cached under the provided name
+     *
      * @param name The name of the bitmap
-     * @param src The bitmap of the icon itself
+     * @param src  The bitmap of the icon itself
      * @return Glowed bitmap
      */
     public Bitmap getGlow(String name, Bitmap src) {

@@ -47,23 +47,24 @@ public class FocusHudRing extends HudRing {
         mCamManager = camMan;
         mFocusManager = focusMan;
     }
-    
+
     /**
      * Centers the focus ring on the x,y coordinates provided
      * and sets the focus to this position
+     *
      * @param x
      * @param y
      */
     public void setPosition(float x, float y) {
-        setX(x - getWidth()/2.0f);
-        setY(y - getHeight()/2.0f);
+        setX(x - getWidth() / 2.0f);
+        setY(y - getHeight() / 2.0f);
         applyFocusPoint();
     }
-    
-    
+
+
     private void applyFocusPoint() {
-        float centerPointX = getX() + getWidth()/2.0f;
-        float centerPointY = getY() + getHeight()/2.0f;
+        float centerPointX = getX() + getWidth() / 2.0f;
+        float centerPointY = getY() + getHeight() / 2.0f;
 
         centerPointX *= 1000.0f / ((ViewGroup) getParent()).getWidth();
         centerPointY *= 1000.0f / ((ViewGroup) getParent()).getHeight();
@@ -80,8 +81,7 @@ public class FocusHudRing extends HudRing {
 
         if (motionEvent.getActionMasked() == MotionEvent.ACTION_MOVE) {
             applyFocusPoint();
-        }
-        else if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
+        } else if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
             mFocusManager.refocus();
         }
 

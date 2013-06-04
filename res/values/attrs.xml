@@ -7,8 +7,8 @@
          necessary to support previous API levels.
     -->
     <declare-styleable name="ButtonBarContainerTheme">
-        <attr name="buttonBarStyle" format="reference" />
-        <attr name="buttonBarButtonStyle" format="reference" />
+        <attr name="buttonBarStyle" format="reference"/>
+        <attr name="buttonBarButtonStyle" format="reference"/>
     </declare-styleable>
 
 </resources>

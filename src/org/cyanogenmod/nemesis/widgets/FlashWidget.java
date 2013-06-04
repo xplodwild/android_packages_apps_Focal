@@ -9,7 +9,7 @@ import org.cyanogenmod.nemesis.R;
  * Flash Widget, manages the flash settings
  */
 public class FlashWidget extends SimpleToggleWidget {
-    
+
     public FlashWidget(CameraManager cam, Context context) {
         super(cam, context, "flash-mode", R.drawable.ic_widget_flash_on);
 

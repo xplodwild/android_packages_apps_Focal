@@ -1,17 +1,17 @@
 package org.cyanogenmod.nemesis.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.cyanogenmod.nemesis.R;
-import org.cyanogenmod.nemesis.widgets.WidgetBase;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+
+import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.widgets.WidgetBase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WidgetRenderer extends FrameLayout {
     public final static String TAG = "WidgetRenderer";
@@ -49,6 +49,7 @@ public class WidgetRenderer extends FrameLayout {
 
     /**
      * Rotate the contents of open widgets
+     *
      * @param orientation
      */
     public void notifyOrientationChanged(int orientation) {
@@ -61,6 +62,7 @@ public class WidgetRenderer extends FrameLayout {
 
     /**
      * Notifies the renderer a widget has been pressed.
+     *
      * @param widget The widget that has been pressed
      */
     public void widgetPressed(WidgetBase.WidgetContainer widget) {
@@ -70,6 +72,7 @@ public class WidgetRenderer extends FrameLayout {
     /**
      * Notifies the renderer a widget has been moved. The renderer
      * will then move the other widgets accordingly if needed.
+     *
      * @param widget The widget that has been moved
      */
     public void widgetMoved(WidgetBase.WidgetContainer widget) {
@@ -85,9 +88,10 @@ public class WidgetRenderer extends FrameLayout {
 
             if (tested == widget) continue;
 
-            if (widget.getX() < tested.getFinalX()+tested.getWidth()) {
+            if (widget.getX() < tested.getFinalX() + tested.getWidth()) {
                 // Don't try to go before the first if we're already it
-                if (isFirst && widget.getX()+widget.getWidth() < tested.getFinalX()-tested.getWidth()/2) break;
+                if (isFirst && widget.getX() + widget.getWidth() < tested.getFinalX() - tested.getWidth() / 2)
+                    break;
 
                 // Move the widget in our list
                 mOpenWidgets.remove(widget);
@@ -102,6 +106,7 @@ public class WidgetRenderer extends FrameLayout {
     /**
      * Reorder the widgets and clamp their position after a widget
      * has been dropped.
+     *
      * @param widget
      */
     public void widgetDropped(WidgetBase.WidgetContainer widget) {
@@ -124,6 +129,7 @@ public class WidgetRenderer extends FrameLayout {
     /**
      * Notifies the renderer a widget has been opened and needs to be
      * positioned.
+     *
      * @param widget Widget opened
      */
     public void widgetOpened(final WidgetBase.WidgetContainer widget) {
@@ -146,6 +152,7 @@ public class WidgetRenderer extends FrameLayout {
     /**
      * Notifies the renderer a widget has been closed and its
      * space can be reclaimed
+     *
      * @param widget Widget closed
      */
     public void widgetClosed(WidgetBase.WidgetContainer widget) {
@@ -183,7 +190,7 @@ public class WidgetRenderer extends FrameLayout {
         for (int i = 0; i < mOpenWidgets.size(); i++) {
             WidgetBase.WidgetContainer widget = mOpenWidgets.get(i);
             widget.animate().translationYBy(widget.getHeight()).setDuration(300).alpha(0)
-            .setInterpolator(new AccelerateInterpolator()).start();
+                    .setInterpolator(new AccelerateInterpolator()).start();
         }
     }
 
@@ -193,7 +200,7 @@ public class WidgetRenderer extends FrameLayout {
         for (int i = 0; i < mOpenWidgets.size(); i++) {
             WidgetBase.WidgetContainer widget = mOpenWidgets.get(i);
             widget.animate().translationYBy(-widget.getHeight()).setDuration(300).alpha(1)
-            .setInterpolator(new DecelerateInterpolator()).start();
+                    .setInterpolator(new DecelerateInterpolator()).start();
         }
     }
 

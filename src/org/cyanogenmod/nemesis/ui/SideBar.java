@@ -61,7 +61,8 @@ public class SideBar extends ScrollView {
 
     /**
      * Toggles the visibility of the widget options (container)
-     * @param widget The widget to toggle
+     *
+     * @param widget  The widget to toggle
      * @param isFling If it should be toggled with the fling-up animation
      */
     public void toggleWidgetVisibility(WidgetBase widget, boolean isFling) {
@@ -80,6 +81,7 @@ public class SideBar extends ScrollView {
 
     /**
      * Notify the bar of the rotation
+     *
      * @param target Target orientation
      */
     public void notifyOrientationChanged(float target) {
@@ -90,13 +92,14 @@ public class SideBar extends ScrollView {
             View child = mToggleContainer.getChildAt(i);
 
             child.animate().rotation(target)
-            .setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
+                    .setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
         }
     }
 
     /**
      * Slides the sidebar off the provided distance, and clamp it at either
      * sides of the screen (out/in)
+     *
      * @param distance The distance to translate the bar
      */
     public void slide(float distance) {
@@ -116,7 +119,7 @@ public class SideBar extends ScrollView {
      * and vice-versa.
      */
     public void clampSliding() {
-        if (this.getTranslationY() > this.getHeight()/2)
+        if (this.getTranslationY() > this.getHeight() / 2)
             slideClose();
         else
             slideOpen();
@@ -134,7 +137,7 @@ public class SideBar extends ScrollView {
      */
     public void slideClose() {
         this.animate().translationY(this.getHeight())
-        .setDuration(SLIDE_ANIMATION_DURATION_MS).start();
+                .setDuration(SLIDE_ANIMATION_DURATION_MS).start();
 
         mIsOpen = false;
     }
@@ -144,7 +147,7 @@ public class SideBar extends ScrollView {
      */
     public void slideOpen() {
         this.animate().translationY(0)
-        .setDuration(SLIDE_ANIMATION_DURATION_MS).start();
+                .setDuration(SLIDE_ANIMATION_DURATION_MS).start();
 
         mIsOpen = true;
     }
