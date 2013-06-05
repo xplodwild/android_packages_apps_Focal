@@ -40,16 +40,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.cyanogenmod.nemesis.ui.ExposureHudRing;
-import org.cyanogenmod.nemesis.ui.FocusHudRing;
-import org.cyanogenmod.nemesis.ui.Notifier;
-import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
-import org.cyanogenmod.nemesis.ui.SavePinger;
-import org.cyanogenmod.nemesis.ui.ShutterButton;
-import org.cyanogenmod.nemesis.ui.SideBar;
-import org.cyanogenmod.nemesis.ui.SwitchRingPad;
-import org.cyanogenmod.nemesis.ui.ThumbnailFlinger;
-import org.cyanogenmod.nemesis.ui.WidgetRenderer;
+import org.cyanogenmod.nemesis.ui.*;
 
 public class CameraActivity extends Activity {
     public final static String TAG = "CameraActivity";
@@ -82,6 +73,7 @@ public class CameraActivity extends Activity {
     private SavePinger mSavePinger;
     private ViewGroup mRecTimerContainer;
     private Notifier mNotifier;
+    private ReviewDrawer mReviewDrawer;
 
     /**
      * Event: Activity created
@@ -104,6 +96,8 @@ public class CameraActivity extends Activity {
 
         mRecTimerContainer = (ViewGroup) findViewById(R.id.recording_timer_container);
         mNotifier = (Notifier) findViewById(R.id.notifier_container);
+
+        mReviewDrawer = (ReviewDrawer) findViewById(R.id.review_drawer);
 
         // Create orientation listener. This should be done first because it
         // takes some time to get first orientation.
@@ -659,23 +653,29 @@ public class CameraActivity extends Activity {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             try {
-                if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH)
-                    return false;
-
-                // swipes to open/close the sidebar and/or hide/restore the widgets 
-                if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                    if (mWidgetRenderer.isHidden() && mWidgetRenderer.getWidgetsCount() > 0) {
-                        mWidgetRenderer.restoreWidgets();
-                    } else {
-                        mSideBar.slideOpen();
-                        mWidgetRenderer.notifySidebarSlideOpen();
+                if (Math.abs(e1.getX() - e2.getX()) < SWIPE_MAX_OFF_PATH) {
+                    // swipes to open/close the sidebar and/or hide/restore the widgets
+                    if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                        if (mWidgetRenderer.isHidden() && mWidgetRenderer.getWidgetsCount() > 0) {
+                            mWidgetRenderer.restoreWidgets();
+                        } else {
+                            mSideBar.slideOpen();
+                            mWidgetRenderer.notifySidebarSlideOpen();
+                        }
+                    } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                        if (mSideBar.isOpen()) {
+                            mSideBar.slideClose();
+                            mWidgetRenderer.notifySidebarSlideClose();
+                        } else if (!mWidgetRenderer.isHidden() && mWidgetRenderer.getWidgetsCount() > 0) {
+                            mWidgetRenderer.hideWidgets();
+                        }
                     }
-                } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                    if (mSideBar.isOpen()) {
-                        mSideBar.slideClose();
-                        mWidgetRenderer.notifySidebarSlideClose();
-                    } else if (!mWidgetRenderer.isHidden() && mWidgetRenderer.getWidgetsCount() > 0) {
-                        mWidgetRenderer.hideWidgets();
+                } else if (Math.abs(e1.getY() - e2.getY()) < SWIPE_MAX_OFF_PATH) {
+                    // swipes up/down to open/close the review drawer
+                    if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                        mReviewDrawer.close();
+                    } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                        mReviewDrawer.open();
                     }
                 }
             } catch (Exception e) {

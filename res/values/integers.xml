@@ -34,4 +34,7 @@
 
     <!-- Radius of the ringpad -->
     <dimen name="ringpad_radius">140dp</dimen>
+
+    <!-- Size of the review drawer thumbnails -->
+    <dimen name="review_drawer_thumb_size">96dp</dimen>
 </resources>
