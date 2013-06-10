@@ -24,7 +24,9 @@ import android.view.ViewGroup;
 
 import org.cyanogenmod.nemesis.widgets.EffectWidget;
 import org.cyanogenmod.nemesis.widgets.FlashWidget;
+import org.cyanogenmod.nemesis.widgets.HdrWidget;
 import org.cyanogenmod.nemesis.widgets.SceneModeWidget;
+import org.cyanogenmod.nemesis.widgets.VideoFrWidget;
 import org.cyanogenmod.nemesis.widgets.WhiteBalanceWidget;
 import org.cyanogenmod.nemesis.widgets.WidgetBase;
 
@@ -55,6 +57,8 @@ public class CameraCapabilities {
         mWidgets.add(new WhiteBalanceWidget(cam, context));
         mWidgets.add(new SceneModeWidget(cam, context));
         mWidgets.add(new EffectWidget(cam, context));
+        mWidgets.add(new HdrWidget(cam, context));
+        mWidgets.add(new VideoFrWidget(cam, context));
     }
 
     /**

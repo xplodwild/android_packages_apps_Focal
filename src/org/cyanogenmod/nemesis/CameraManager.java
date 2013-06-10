@@ -69,7 +69,12 @@ public class CameraManager {
             Log.v(TAG, "Asynchronously setting parameter " + mKey + " to " + mValue);
             Camera.Parameters params = getParameters();
             params.set(mKey, mValue);
-            mCamera.setParameters(params);
+
+            try {
+                mCamera.setParameters(params);
+            } catch (RuntimeException e) {
+                Log.e(TAG, "Could not set parameter " + mKey + " to '" + mValue + "'", e);
+            }
             // Read them from sensor next time
             mParameters = null;
         }

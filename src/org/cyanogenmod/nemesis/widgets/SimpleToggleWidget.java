@@ -46,11 +46,26 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
     private Context mContext;
     private WidgetOptionButton mActiveButton;
 
+    public SimpleToggleWidget(CameraManager cam, Context context, int sidebarIcon) {
+        super(cam, context, sidebarIcon);
+
+        mButtonsValues = new HashMap<WidgetBase.WidgetOptionButton, String>();
+        mContext = context;
+    }
+
     public SimpleToggleWidget(CameraManager cam, Context context, String key, int sidebarIcon) {
         super(cam, context, sidebarIcon);
 
         mButtonsValues = new HashMap<WidgetBase.WidgetOptionButton, String>();
         mContext = context;
+        mKey = key;
+    }
+
+    /**
+     * Defines or redefines the key used for the settings
+     * @param key
+     */
+    protected void setKey(String key) {
         mKey = key;
     }
 
