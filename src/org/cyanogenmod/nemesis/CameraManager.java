@@ -203,12 +203,16 @@ public class CameraManager {
             mPreviewFrameBuffer = new int[previewWidth*previewHeight];
 
         // Convert YUV420SP preview data to RGB
-        Util.decodeYUV420SP(mPreviewFrameBuffer, data, previewWidth, previewHeight);
+        if (data != null) {
+            Util.decodeYUV420SP(mPreviewFrameBuffer, data, previewWidth, previewHeight);
 
-        // Decode the RGB data to a bitmap
-        Bitmap output = Bitmap.createBitmap(mPreviewFrameBuffer, previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
+            // Decode the RGB data to a bitmap
+            Bitmap output = Bitmap.createBitmap(mPreviewFrameBuffer, previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
 
-        return output;
+            return output;
+        } else {
+            return null;
+        }
     }
 
     /**
