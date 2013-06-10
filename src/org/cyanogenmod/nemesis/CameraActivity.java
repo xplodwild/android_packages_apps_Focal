@@ -624,6 +624,8 @@ public class CameraActivity extends Activity {
         // allow to drag the side bar up to half of the screen
         private static final int SIDEBAR_THRESHOLD_FACTOR = 2;
 
+        private boolean mCancelSwipe = false;
+
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
             // A single tap equals to touch-to-focus in all modes
@@ -655,6 +657,7 @@ public class CameraActivity extends Activity {
                         e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE) {
                     mSideBar.slide(-distanceY);
                     mWidgetRenderer.notifySidebarSlideStatus(-distanceY);
+                    mCancelSwipe = true;
                 }
 
                 return true;
@@ -668,18 +671,22 @@ public class CameraActivity extends Activity {
             try {
                 if (Math.abs(e1.getX() - e2.getX()) < SWIPE_MAX_OFF_PATH) {
                     // swipes to open/close the sidebar and/or hide/restore the widgets
-                    if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                    if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
+                            && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                         if (mWidgetRenderer.isHidden() && mWidgetRenderer.getWidgetsCount() > 0) {
                             mWidgetRenderer.restoreWidgets();
                         } else {
                             mSideBar.slideOpen();
                             mWidgetRenderer.notifySidebarSlideOpen();
                         }
-                    } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                    } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
+                            && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                         if (mSideBar.isOpen()) {
                             mSideBar.slideClose();
                             mWidgetRenderer.notifySidebarSlideClose();
-                        } else if (!mWidgetRenderer.isHidden() && mWidgetRenderer.getWidgetsCount() > 0) {
+                        } else if (!mWidgetRenderer.isHidden()
+                                && mWidgetRenderer.getWidgetsCount() > 0
+                                && !mCancelSwipe) {
                             mWidgetRenderer.hideWidgets();
                         }
                     }
@@ -694,6 +701,9 @@ public class CameraActivity extends Activity {
             } catch (Exception e) {
                 // nothing
             }
+
+            mCancelSwipe = false;
+
             return false;
         }
     }
