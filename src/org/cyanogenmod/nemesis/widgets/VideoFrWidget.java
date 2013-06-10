@@ -26,7 +26,7 @@ import org.cyanogenmod.nemesis.R;
 public class VideoFrWidget extends SimpleToggleWidget {
 
     public VideoFrWidget(CameraManager cam, Context context) {
-        super(cam, context, "video-hdr", R.drawable.ic_widget_videofr);
+        super(cam, context, "video-hfr", R.drawable.ic_widget_videofr);
 
         addValue("off", R.drawable.ic_widget_videofr_30);
         addValue("60", R.drawable.ic_widget_videofr_60);
