@@ -350,6 +350,7 @@ public class CameraActivity extends Activity {
         @Override
         public void onShutterButtonPressed() {
             mSwitchRingPad.animateHint();
+            mReviewDrawer.setTemporaryHide(true);
         }
 
     }
@@ -360,6 +361,13 @@ public class CameraActivity extends Activity {
     public class MainShutterClickListener implements OnClickListener {
         @Override
         public void onClick(View v) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mReviewDrawer.setTemporaryHide(false);
+                }
+            }, 500);
+
             if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
                 // XXX: Check for HDR, exposure, burst shots, timer, ...
                 mSnapshotManager.queueSnapshot(true, 0);
@@ -454,7 +462,12 @@ public class CameraActivity extends Activity {
 
         @Override
         public void onSnapshotSaved(SnapshotManager.SnapshotInfo info) {
+            String uriStr = info.mUri.toString();
 
+            int originalImageId = Integer.parseInt(uriStr.substring(uriStr.lastIndexOf("/") + 1, uriStr.length()));
+            Log.e(TAG, "Adding snapshot to gallery: " + originalImageId);
+            mReviewDrawer.addImageToList(originalImageId);
+            mReviewDrawer.setPreviewedImage(originalImageId);
         }
 
         @Override

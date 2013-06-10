@@ -1,6 +1,7 @@
 package org.cyanogenmod.nemesis.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
@@ -32,10 +33,15 @@ public class ReviewDrawer extends LinearLayout {
     private final static String GALLERY_CAMERA_BUCKET = "Camera";
     private int mThumbnailSize;
 
+    private List<Integer> mImages;
+
     private Handler mHandler;
     private ListView mImagesList;
     private ImageView mReviewedImage;
     private ImageListAdapter mImagesListAdapter;
+    private Bitmap mReviewedBitmap;
+    private int mReviewedImageId;
+    private boolean mIsOpen;
 
     public ReviewDrawer(Context context) {
         super(context);
@@ -54,6 +60,7 @@ public class ReviewDrawer extends LinearLayout {
 
     private void initialize() {
         mHandler = new Handler();
+        mImages = new ArrayList<Integer>();
         mThumbnailSize = getContext().getResources().getDimensionPixelSize(R.dimen.review_drawer_thumb_size);
 
         // Default hidden
@@ -79,19 +86,27 @@ public class ReviewDrawer extends LinearLayout {
         mImagesList.setOnItemClickListener(new ImageListClickListener());
 
         mReviewedImage = (ImageView) findViewById(R.id.reviewed_image);
+        mReviewedImage.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openInGallery(mReviewedImageId);
+            }
+        });
 
         // Load pictures from gallery
         updateFromGallery();
     }
 
-    private void updateFromGallery() {
+    public void updateFromGallery() {
+        mImages.clear();
+
         final String[] columns = { MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID };
-        final String orderBy = MediaStore.Images.Media.DATE_TAKEN + " DESC";
+        final String orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
 
         // Select only the images that has been taken from the Camera
         Cursor cursor = getContext().getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
-                new String[] { "Camera" }, orderBy);
+                new String[] { GALLERY_CAMERA_BUCKET }, orderBy);
 
         if (cursor == null) {
             Log.e(TAG, "Null cursor from MediaStore!");
@@ -110,16 +125,28 @@ public class ReviewDrawer extends LinearLayout {
         // Set the default reviewed image to the last image
         cursor.moveToFirst();
         final int firstPictureId = cursor.getInt(imageColumnIndex);
+        setPreviewedImage(firstPictureId);
 
+        //mImagesList.deferNotifyDataSetChanged();
+    }
+
+    /**
+     * Sets the previewed image in the review drawer
+     * @param id The id the of the image
+     */
+    public void setPreviewedImage(final int id) {
         new Thread() {
             public void run() {
-                final Bitmap thumbnail = MediaStore.Images.Thumbnails.getThumbnail(
-                        getContext().getContentResolver(), firstPictureId,
+                if (mReviewedBitmap != null)
+                    mReviewedBitmap.recycle();
+                mReviewedImageId = id;
+                mReviewedBitmap = MediaStore.Images.Thumbnails.getThumbnail(
+                        getContext().getContentResolver(), id,
                         MediaStore.Images.Thumbnails.MINI_KIND, null);
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mReviewedImage.setImageBitmap(thumbnail);
+                        mReviewedImage.setImageBitmap(mReviewedBitmap);
                     }
                 });
             }
@@ -130,10 +157,35 @@ public class ReviewDrawer extends LinearLayout {
         mImagesListAdapter.addImage(id);
     }
 
+    private void openInGallery(int imageId) {
+        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        getContext().startActivity(intent);
+    }
+
+    /**
+     * Sets the review drawer to temporary hide, by reducing alpha to a very low
+     * level
+     * @param enabled To hide or not to hide, that is the question
+     */
+    public void setTemporaryHide(boolean enabled) {
+        float alpha = (enabled ? 0.2f : 1.0f);
+        animate().alpha(alpha).setDuration(200).start();
+    }
+
+    /**
+     * Returns whether or not the review drawer is FULLY open (ie. not in
+     * quick review mode)
+     */
+    public boolean isOpen() {
+        return mIsOpen;
+    }
+
     /**
      * Normally opens the review drawer (animation)
      */
     public void open() {
+        mIsOpen = true;
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new AccelerateInterpolator())
                 .translationX(0.0f).alpha(1.0f).start();
     }
@@ -142,6 +194,7 @@ public class ReviewDrawer extends LinearLayout {
      * Normally closes the review drawer (animation)
      */
     public void close() {
+        mIsOpen = false;
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new DecelerateInterpolator())
                 .translationX(-getMeasuredWidth()).alpha(0.0f).start();
     }
@@ -162,7 +215,9 @@ public class ReviewDrawer extends LinearLayout {
     private class ImageListClickListener implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+            int imageId = mImages.get(i);
+            setPreviewedImage(imageId);
+            mReviewedImageId = imageId;
         }
     }
 
@@ -170,15 +225,18 @@ public class ReviewDrawer extends LinearLayout {
     /**
      * Adapter responsible for showing the images in the list of the review drawer
      */
-    private class ImageListAdapter implements ListAdapter {
-        private List<Integer> mImages;
-
+    private class ImageListAdapter extends BaseAdapter {
         public ImageListAdapter() {
-            mImages = new ArrayList<Integer>();
+
         }
 
         public void addImage(int id) {
-            mImages.add(id);
+            mImages.add(0, id);
+            mHandler.post(new Runnable() {
+                public void run() {
+                    ImageListAdapter.this.notifyDataSetChanged();
+                }
+            });
         }
 
         @Override
@@ -191,18 +249,10 @@ public class ReviewDrawer extends LinearLayout {
             return true;
         }
 
-        @Override
-        public void registerDataSetObserver(DataSetObserver dataSetObserver) {
-
-        }
-
-        @Override
-        public void unregisterDataSetObserver(DataSetObserver dataSetObserver) {
-
-        }
 
         @Override
         public int getCount() {
+            Log.e(TAG, "getCount returning " + mImages.size());
             return mImages.size();
         }
 
@@ -213,12 +263,7 @@ public class ReviewDrawer extends LinearLayout {
 
         @Override
         public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return true;
+            return mImages.get(i);
         }
 
         @Override
@@ -253,10 +298,20 @@ public class ReviewDrawer extends LinearLayout {
                             getContext().getContentResolver(), mImages.get(i),
                             MediaStore.Images.Thumbnails.MICRO_KIND, null);
 
+                    if (thumbnail == null) {
+                        Log.e(TAG, "Thumbnail is null!");
+                        return;
+                    }
+
                     // Thumbnail is ready, apply it to the ImageView in the UI thread and animate it
                     mHandler.post(new Runnable() {
                         public void run() {
-                            finalImageView.setImageBitmap(thumbnail);
+                            // If we shoot really fast, the thumbnail might be recycled
+                            // even before we displayed it, resulting in a crash
+                            if (!thumbnail.isRecycled()) {
+                                finalImageView.setImageBitmap(thumbnail);
+                            }
+
                             finalImageView.animate().alpha(1.0f).setDuration(100).start();
                         }
                     });
@@ -267,19 +322,6 @@ public class ReviewDrawer extends LinearLayout {
             return imageView;
         }
 
-        @Override
-        public int getItemViewType(int i) {
-            return 0;
-        }
 
-        @Override
-        public int getViewTypeCount() {
-            return 1;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return (mImages.size() == 0);
-        }
     }
 }

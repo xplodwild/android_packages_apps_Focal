@@ -168,7 +168,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="left|center_vertical"
             android:id="@+id/review_drawer"
-            android:background="#AA000000"
+            android:background="#CC000000"
             android:layout_marginRight="72dp">
 
         <ListView
@@ -176,6 +176,10 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/list_reviewed_images"
                 android:padding="8dp"
+                android:requiresFadingEdge="vertical"
+                android:fadingEdge="vertical"
+                android:fadingEdgeLength="32dp"
+                android:background="#AA333333"
                 android:layout_weight="2"/>
 
         <ImageView
@@ -183,6 +187,8 @@
                 android:layout_height="match_parent"
                 android:id="@+id/reviewed_image"
                 android:layout_weight="1"
+                android:padding="8dp"
+                android:clickable="true"
                 android:minWidth="400dp"/>
 
         <TextView

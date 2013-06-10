@@ -188,6 +188,8 @@ public class SnapshotManager {
 
                 Uri uri = mImageNamer.getUri();
                 String title = mImageNamer.getTitle();
+                snap.mUri = uri;
+
                 mImageSaver.addImage(jpegData, uri, title, null,
                         width, height, orientation);
             }
