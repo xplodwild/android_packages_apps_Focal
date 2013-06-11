@@ -31,6 +31,21 @@
 
     </org.cyanogenmod.nemesis.ui.PreviewFrameLayout>
 
+    <org.cyanogenmod.nemesis.ui.PreviewFrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            android:layout_gravity="center"
+            android:id="@+id/camera_preview_overlay_container">
+        <ImageView
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_centerInParent="true"
+            android:scaleType="fitXY"
+            android:alpha="0.0"
+            android:id="@+id/camera_preview_overlay"/>
+    </org.cyanogenmod.nemesis.ui.PreviewFrameLayout>
+
     <org.cyanogenmod.nemesis.ui.Notifier
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

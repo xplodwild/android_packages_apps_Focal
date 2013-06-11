@@ -18,34 +18,81 @@
 
 package org.cyanogenmod.nemesis;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.BlurMaskFilter.Blur;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class renders a specific icon in "Glow" mode
+ * This class renders a bitmap with a certain effect
  * and cache it for future use.
  */
-public class IconGlower {
-    private static IconGlower mSingleton;
+public class BitmapFilter {
+    private static BitmapFilter mSingleton;
 
-    private Map<String, Bitmap> mCache;
+    private Map<String, Bitmap> mGlowCache;
+    private RenderScript mRS;
+    private Allocation mBlurInputAllocation;
+    private Allocation mBlurOutputAllocation;
+    private ScriptIntrinsicBlur mBlurScript;
 
-    public static IconGlower getSingleton() {
+    public static BitmapFilter getSingleton() {
         if (mSingleton == null)
-            mSingleton = new IconGlower();
+            mSingleton = new BitmapFilter();
 
         return mSingleton;
     }
 
-    private IconGlower() {
-        mCache = new HashMap<String, Bitmap>();
+    private BitmapFilter() {
+        mGlowCache = new HashMap<String, Bitmap>();
+
+    }
+
+
+    /**
+     * Blurs a bitmap. There's no caching on this one.
+     *
+     * @param src The bitmap to blur
+     * @return A blurred bitmap
+     */
+    public Bitmap getBlur(Context context, Bitmap src, float radius) {
+        if (android.os.Build.VERSION.SDK_INT >= 17) {
+            if (mRS == null) {
+                mRS = RenderScript.create(context);
+            }
+
+            if (mBlurScript == null) {
+                mBlurScript = ScriptIntrinsicBlur.create(mRS, Element.U8_4(mRS));
+            }
+
+            if (mBlurInputAllocation == null) {
+                mBlurInputAllocation = Allocation.createFromBitmap(mRS, src,
+                        Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_GRAPHICS_TEXTURE);
+                mBlurScript.setInput(mBlurInputAllocation);
+            } else {
+                mBlurInputAllocation.copyFrom(src);
+            }
+
+            if (mBlurOutputAllocation == null) {
+                mBlurOutputAllocation = Allocation.createTyped(mRS, mBlurInputAllocation.getType());
+            }
+
+            mBlurScript.setRadius(radius);
+            mBlurScript.forEach(mBlurOutputAllocation);
+            mBlurOutputAllocation.copyTo(src);
+        }
+
+        return src;
     }
 
     /**
@@ -59,8 +106,8 @@ public class IconGlower {
      * @return Glowed bitmap
      */
     public Bitmap getGlow(String name, Bitmap src) {
-        if (mCache.containsKey(name)) {
-            return mCache.get(name);
+        if (mGlowCache.containsKey(name)) {
+            return mGlowCache.get(name);
         } else {
             // An added margin to the initial image
             int margin = 0;
@@ -94,7 +141,7 @@ public class IconGlower {
             //canvas.drawBitmap(src, halfMargin, halfMargin, null);
 
             // cache icon
-            mCache.put(name, bmp);
+            mGlowCache.put(name, bmp);
 
             return bmp;
         }

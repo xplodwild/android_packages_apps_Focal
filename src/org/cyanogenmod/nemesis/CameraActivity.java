@@ -20,6 +20,7 @@ package org.cyanogenmod.nemesis;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -36,11 +37,22 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.cyanogenmod.nemesis.ui.*;
+import org.cyanogenmod.nemesis.ui.ExposureHudRing;
+import org.cyanogenmod.nemesis.ui.FocusHudRing;
+import org.cyanogenmod.nemesis.ui.Notifier;
+import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
+import org.cyanogenmod.nemesis.ui.ReviewDrawer;
+import org.cyanogenmod.nemesis.ui.SavePinger;
+import org.cyanogenmod.nemesis.ui.ShutterButton;
+import org.cyanogenmod.nemesis.ui.SideBar;
+import org.cyanogenmod.nemesis.ui.SwitchRingPad;
+import org.cyanogenmod.nemesis.ui.ThumbnailFlinger;
+import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
 public class CameraActivity extends Activity {
     public final static String TAG = "CameraActivity";
@@ -197,6 +209,7 @@ public class CameraActivity extends Activity {
 
         }
 
+        mCamManager.setCameraMode(mCameraMode);
         updateCapabilities();
     }
 
@@ -272,6 +285,8 @@ public class CameraActivity extends Activity {
         mSnapshotManager = new SnapshotManager(mCamManager, mFocusManager, this);
         mSnapshotListener = new MainSnapshotListener();
         mSnapshotManager.addListener(mSnapshotListener);
+
+        mCamManager.setPreviewPauseListener(new CameraPreviewListener());
     }
 
 
@@ -296,7 +311,57 @@ public class CameraActivity extends Activity {
     }
 
     public static void setViewRotation(View v, float rotation) {
-        v.animate().rotation(rotation).setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
+        v.animate().rotation(rotation).setDuration(200)
+                .setInterpolator(new DecelerateInterpolator()).start();
+    }
+
+    /**
+     * Listener that is called when the preview pauses or resumes
+     */
+    private class CameraPreviewListener implements CameraManager.PreviewPauseListener {
+
+        @Override
+        public void onPreviewPause() {
+            final Bitmap preview = mCamManager.getLastPreviewFrame();
+
+            final PreviewFrameLayout container = (PreviewFrameLayout)
+                    findViewById(R.id.camera_preview_overlay_container);
+
+            final ImageView iv = (ImageView) findViewById(R.id.camera_preview_overlay);
+
+            new Thread() {
+                public void run() {
+                    long time = System.currentTimeMillis();
+                    final Bitmap blurredPreview = BitmapFilter.getSingleton()
+                            .getBlur(CameraActivity.this, preview, 25);
+                    long elapsed = System.currentTimeMillis()-time;
+
+                    Log.v(TAG, "Took " + elapsed + "ms to blur");
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            container.setAspectRatio((float) preview.getWidth() / preview.getHeight());
+                            container.setPreviewSize(preview.getWidth(), preview.getHeight());
+                            iv.setImageBitmap(blurredPreview);
+                            iv.setAlpha(1.0f);
+
+                        }
+                    });
+                }
+            }.start();
+        }
+
+        @Override
+        public void onPreviewResume() {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ImageView iv = (ImageView) findViewById(R.id.camera_preview_overlay);
+                    iv.animate().setDuration(300).alpha(0.0f).start();
+                }
+            }, 100);
+
+        }
     }
 
     /**

@@ -55,6 +55,21 @@ public class CameraManager {
     private int[] mPreviewFrameBuffer;
     private int mOrientation;
     private MediaRecorder mMediaRecorder;
+    private PreviewPauseListener mPreviewPauseListener;
+
+    public interface PreviewPauseListener {
+        /**
+         * This method is called when the preview is about to pause.
+         * This allows the CameraActivity to display an animation when the preview
+         * has to stop.
+         */
+        public void onPreviewPause();
+
+        /**
+         * This method is called when the preview resumes
+         */
+        public void onPreviewResume();
+    }
 
     private class AsyncParamRunnable implements Runnable {
         private String mKey;
@@ -123,6 +138,10 @@ public class CameraManager {
         mPreview.notifyCameraChanged();
 
         return true;
+    }
+
+    public void setPreviewPauseListener(PreviewPauseListener listener) {
+        mPreviewPauseListener = listener;
     }
 
     /**
@@ -227,16 +246,10 @@ public class CameraManager {
         int previewWidth = getParameters().getPreviewSize().width;
         int previewHeight = getParameters().getPreviewSize().height;
 
-        if (mPreviewFrameBuffer == null || mPreviewFrameBuffer.length != (previewWidth*previewHeight))
-            mPreviewFrameBuffer = new int[previewWidth*previewHeight];
-
         // Convert YUV420SP preview data to RGB
         if (data != null) {
-            Util.decodeYUV420SP(mPreviewFrameBuffer, data, previewWidth, previewHeight);
-
-            // Decode the RGB data to a bitmap
-            Bitmap output = Bitmap.createBitmap(mPreviewFrameBuffer, previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
-
+            Bitmap output = Util.decodeYUV420SP(mPreview.getContext(),
+                    data, previewWidth, previewHeight);
             return output;
         } else {
             return null;
@@ -286,12 +299,13 @@ public class CameraManager {
             Log.e(TAG, "Cannot prepare MediaRecorder", e);
         }
 
-
+        mPreview.postCallbackBuffer();
     }
 
     public void startVideoRecording() {
         Log.v(TAG, "startVideoRecording");
         mMediaRecorder.start();
+        mPreview.postCallbackBuffer();
     }
 
     public void stopVideoRecording() {
@@ -299,6 +313,7 @@ public class CameraManager {
         mMediaRecorder.stop();
         mCamera.lock();
         mMediaRecorder.reset();
+        mPreview.postCallbackBuffer();
     }
 
     /**
@@ -320,6 +335,42 @@ public class CameraManager {
         } catch (Exception e) {
             // ignore
         }
+    }
+
+    public void setCameraMode(final int mode) {
+        if (mPreviewPauseListener != null) {
+            mPreviewPauseListener.onPreviewPause();
+        }
+
+        new Thread() {
+            public void run() {
+                // We voluntarily sleep the thread here for the animation being done
+                // in the CameraActivity
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                Camera.Parameters params = getParameters();
+
+                if (mode == CameraActivity.CAMERA_MODE_VIDEO) {
+                    params.setRecordingHint(true);
+                } else {
+                    params.setRecordingHint(false);
+                }
+
+
+                mCamera.stopPreview();
+                mCamera.setParameters(params);
+                mCamera.startPreview();
+                mPreview.postCallbackBuffer();
+
+                if (mPreviewPauseListener != null) {
+                    mPreviewPauseListener.onPreviewResume();
+                }
+            }
+        }.start();
     }
 
     /**
@@ -456,6 +507,7 @@ public class CameraManager {
                 try {
                     mCamera.setPreviewDisplay(mHolder);
                     mCamera.startPreview();
+                    mPreview.postCallbackBuffer();
                 } catch (IOException e) {
                     Log.e(TAG, "Error setting camera preview: " + e.getMessage());
                 }
@@ -470,6 +522,7 @@ public class CameraManager {
             try {
                 mCamera.setPreviewDisplay(holder);
                 mCamera.startPreview();
+                mPreview.postCallbackBuffer();
             } catch (IOException e) {
                 Log.e(TAG, "Error setting camera preview: " + e.getMessage());
             }
@@ -505,6 +558,11 @@ public class CameraManager {
             }
         }
 
+        public void postCallbackBuffer() {
+            mCamera.addCallbackBuffer(mLastFrameBytes);
+            mCamera.setPreviewCallbackWithBuffer(this);
+        }
+
         private void setupCamera() {
             // Set device-specifics here
             try {
@@ -515,8 +573,7 @@ public class CameraManager {
 
                 mCamera.setParameters(params);
 
-                mCamera.addCallbackBuffer(mLastFrameBytes);
-                mCamera.setPreviewCallbackWithBuffer(this);
+                postCallbackBuffer();
             } catch (Exception e) {
                 Log.e(TAG, "Could not set device specifics");
             }
