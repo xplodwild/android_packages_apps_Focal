@@ -27,22 +27,18 @@ import org.cyanogenmod.nemesis.R;
 public class HdrWidget extends SimpleToggleWidget {
 
     public HdrWidget(CameraManager cam, Context context) {
-        super(cam, context, R.drawable.ic_widget_hdr);
+        super(cam, context, "ae-bracket-hdr", R.drawable.ic_widget_hdr);
 
-        // Detect if device uses ae-bracket-hdr (qualcomm) or AOSP's scene-mode=hdr
+        // Reminder: AOSP's HDR mode is scene-mode, so we did put that in scene-mode
+        // Here, it's for qualcomm's ae-bracket-hdr param. We filter out scene-mode hdr
+        // in priority though, for devices like Nexus 4 which reports ae-bracket-hdr, but
+        // doesn't use it.
         Camera.Parameters params = cam.getParameters();
 
-        if (params.get("ae-bracket-hdr") != null && !params.get("ae-bracket-hdr").isEmpty()) {
-            // Use ae-bracket-hdr
-            setKey("ae-bracket-hdr");
+        if (!params.getSupportedSceneModes().contains("hdr")) {
             addValue("Off", R.drawable.ic_widget_hdr_off);
             addValue("HDR", R.drawable.ic_widget_hdr_on);
             addValue("AE-Bracket", R.drawable.ic_widget_hdr_aebracket);
-        } else if (params.getSupportedSceneModes().contains("hdr")) {
-            // Use HDR scene-mode
-            setKey("scene-mode");
-            addValue("auto", R.drawable.ic_widget_hdr_off);
-            addValue("hdr", R.drawable.ic_widget_hdr_on);
         }
     }
 }

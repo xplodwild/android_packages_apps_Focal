@@ -29,6 +29,7 @@ public class SceneModeWidget extends SimpleToggleWidget {
         super(cam, context, "scene-mode", R.drawable.ic_widget_scenemode);
 
         addValue("auto", R.drawable.ic_widget_scenemode_auto);
+        addValue("hdr", R.drawable.ic_widget_scenemode_hdr);
         addValue("portrait", R.drawable.ic_widget_scenemode_portrait);
         addValue("landscape", R.drawable.ic_widget_scenemode_landscape);
         addValue("night", R.drawable.ic_widget_scenemode_night);

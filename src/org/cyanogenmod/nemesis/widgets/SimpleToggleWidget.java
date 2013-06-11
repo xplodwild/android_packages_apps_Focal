@@ -137,6 +137,11 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
             return false;
         }
 
+        if (mButtonsValues.isEmpty() || mButtonsValues.size() == 1) {
+            // There's only one setting, or it's empty, so not worth showing an icon/menu
+            return false;
+        }
+
         if (params.get(mKey) != null) {
             Log.v(TAG, "The device supports '" + mKey + "'");
 
