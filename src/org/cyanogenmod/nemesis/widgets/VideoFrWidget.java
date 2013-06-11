@@ -28,6 +28,9 @@ public class VideoFrWidget extends SimpleToggleWidget {
     public VideoFrWidget(CameraManager cam, Context context) {
         super(cam, context, "video-hfr", R.drawable.ic_widget_videofr);
 
+        // for video only
+        setVideoOnly(true);
+
         addValue("off", R.drawable.ic_widget_videofr_30);
         addValue("60", R.drawable.ic_widget_videofr_60);
         addValue("90", R.drawable.ic_widget_videofr_90);

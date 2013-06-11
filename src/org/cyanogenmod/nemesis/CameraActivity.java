@@ -349,8 +349,14 @@ public class CameraActivity extends Activity {
 
         @Override
         public void onShutterButtonPressed() {
+            // Animate the ring pad
             mSwitchRingPad.animateHint();
+
+            // Make the review drawer super translucent if it is open
             mReviewDrawer.setTemporaryHide(true);
+
+            // Lock automatic settings
+            mCamManager.setLockSetup(true);
         }
 
     }
@@ -444,10 +450,15 @@ public class CameraActivity extends Activity {
         @Override
         public void onSnapshotShutter(SnapshotManager.SnapshotInfo info) {
             FrameLayout layout = (FrameLayout) findViewById(R.id.thumb_flinger_container);
+
+            // Fling the preview
             ThumbnailFlinger flinger = new ThumbnailFlinger(CameraActivity.this);
             layout.addView(flinger);
             flinger.setImageBitmap(info.mThumbnail);
             flinger.doAnimation();
+
+            // Unlock camera auto settings
+            mCamManager.setLockSetup(false);
         }
 
         @Override
@@ -464,8 +475,9 @@ public class CameraActivity extends Activity {
         public void onSnapshotSaved(SnapshotManager.SnapshotInfo info) {
             String uriStr = info.mUri.toString();
 
+            // Add the new image to the gallery and the review drawer
             int originalImageId = Integer.parseInt(uriStr.substring(uriStr.lastIndexOf("/") + 1, uriStr.length()));
-            Log.e(TAG, "Adding snapshot to gallery: " + originalImageId);
+            Log.v(TAG, "Adding snapshot to gallery: " + originalImageId);
             mReviewDrawer.addImageToList(originalImageId);
             mReviewDrawer.setPreviewedImage(originalImageId);
         }

@@ -3,7 +3,6 @@ package org.cyanogenmod.nemesis.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -15,7 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.Util;
 
@@ -95,6 +99,9 @@ public class ReviewDrawer extends LinearLayout {
 
         // Load pictures from gallery
         updateFromGallery();
+
+        // Make sure drawer is initially closed
+        setTranslationX(-9999);
     }
 
     public void updateFromGallery() {

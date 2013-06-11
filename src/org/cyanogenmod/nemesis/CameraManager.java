@@ -198,6 +198,29 @@ public class CameraManager {
         new Thread(run).start();
     }
 
+    /**
+     * Locks the automatic settings of the camera device, like White balance and
+     * exposure.
+     * @param lock true to lock, false to unlock
+     */
+    public void setLockSetup(boolean lock) {
+        Camera.Parameters params = getParameters();
+
+        if (params.isAutoExposureLockSupported()) {
+            params.setAutoExposureLock(lock);
+        }
+
+        if (params.isAutoWhiteBalanceLockSupported()) {
+            params.setAutoWhiteBalanceLock(lock);
+        }
+
+        mCamera.setParameters(params);
+    }
+
+    /**
+     * Returns the last frame of the preview surface
+     * @return Bitmap
+     */
     public Bitmap getLastPreviewFrame() {
         // Decode the last frame bytes
         byte[] data = mPreview.getLastFrameBytes();
@@ -308,6 +331,10 @@ public class CameraManager {
     public boolean doAutofocus(AutoFocusCallback cb) {
         if (mCamera != null) {
             try {
+                // make sure our auto settings aren't locked
+                setLockSetup(false);
+
+                // trigger af
                 mCamera.autoFocus(cb);
             } catch (Exception e) {
                 return false;

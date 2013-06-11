@@ -96,11 +96,13 @@ public abstract class WidgetBase {
      * @param v The view to add
      */
     public void addViewToContainer(View v) {
-        if (mWidget.getRowCount() == mWidgetMaxWidth) {
-            // Add a new column instead of a line to fit the max width
-            mWidget.setColumnCount(mWidget.getColumnCount() + 1);
-        } else if (mWidget.getRowCount() < mWidgetMaxWidth) {
-            mWidget.setRowCount(mWidget.getRowCount() + 1);
+        if (mWidget.getRowCount() * mWidget.getColumnCount() < mWidget.getChildCount()+1) {
+            if (mWidget.getRowCount() == mWidgetMaxWidth) {
+                // Add a new column instead of a line to fit the max width
+                mWidget.setColumnCount(mWidget.getColumnCount() + 1);
+            } else if (mWidget.getRowCount() < mWidgetMaxWidth) {
+                mWidget.setRowCount(mWidget.getRowCount() + 1);
+            }
         }
 
         mWidget.addView(v, 0);
@@ -382,6 +384,7 @@ public abstract class WidgetBase {
 
         private void initialize() {
             this.setBackgroundColor(getResources().getColor(R.color.widget_background));
+            this.setColumnOrderPreserved(true);
 
             // We default the window invisible, so we must respect the status
             // obtained after the "close" animation

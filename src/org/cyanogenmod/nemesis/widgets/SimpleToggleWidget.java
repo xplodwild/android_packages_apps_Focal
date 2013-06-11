@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 
+import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.IconGlower;
 
@@ -41,6 +42,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
     public final static String TAG = "SimpleToggleWidget";
 
     private String mKey;
+    private boolean mVideoOnly;
 
     private Map<WidgetBase.WidgetOptionButton, String> mButtonsValues;
     private Context mContext;
@@ -70,11 +72,19 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
     }
 
     /**
+     * Sets whether or not this setting applies only in video mode
+     * @param videoOnly
+     */
+    protected void setVideoOnly(boolean videoOnly) {
+        mVideoOnly = videoOnly;
+    }
+
+    /**
      * Add a value that can be toggled to the widget
      * If the HAL reports a [key]-values array, it will check and filter
      * the values against this array. Otherwise, all the values are added
      * to the list.
-     * <p/>
+     *
      * You might want to check for device-specific values that aren't
      * reported in -values in the child class before doing addValue
      *
@@ -122,10 +132,22 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
      */
     @Override
     public boolean isSupported(Camera.Parameters params) {
+        if (CameraActivity.getCameraMode() != CameraActivity.CAMERA_MODE_VIDEO && mVideoOnly) {
+            // This setting is only in video mode
+            return false;
+        }
+
         if (params.get(mKey) != null) {
             Log.v(TAG, "The device supports '" + mKey + "'");
-            if (params.get(mKey + "-values") != null) {
-                Log.v(TAG, "... and has these possible values: " + params.get(mKey + "-values"));
+
+            String values = params.get(mKey + "-values");
+            if (values != null) {
+                Log.v(TAG, "... and has these possible values: " + values);
+
+                if (!values.contains(",")) {
+                    // There is only one value, no need to show that button
+                    return false;
+                }
             } else {
                 Log.w(TAG, "... but we don't know the possible values for " + mKey);
             }
