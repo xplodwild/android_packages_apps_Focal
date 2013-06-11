@@ -741,8 +741,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         //private final static String TAG = "GestureListener";
 
         private static final int SWIPE_MIN_DISTANCE = 10;
-        private static final int SWIPE_MAX_OFF_PATH = 250;
-        private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+        private static final int SWIPE_MAX_OFF_PATH = 350;
+        private static final int SWIPE_THRESHOLD_VELOCITY = 800;
         // allow to drag the side bar up to half of the screen
         private static final int SIDEBAR_THRESHOLD_FACTOR = 2;
 
@@ -812,7 +812,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                             mWidgetRenderer.hideWidgets();
                         }
                     }
-                } else if (Math.abs(e1.getY() - e2.getY()) < SWIPE_MAX_OFF_PATH) {
+                }
+
+                if (Math.abs(e1.getY() - e2.getY()) < SWIPE_MAX_OFF_PATH) {
                     // swipes up/down to open/close the review drawer
                     if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                         mReviewDrawer.close();
