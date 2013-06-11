@@ -259,7 +259,6 @@ public class ReviewDrawer extends LinearLayout {
 
         @Override
         public int getCount() {
-            Log.e(TAG, "getCount returning " + mImages.size());
             return mImages.size();
         }
 

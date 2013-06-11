@@ -333,7 +333,7 @@ public class CameraActivity extends Activity {
                 public void run() {
                     long time = System.currentTimeMillis();
                     final Bitmap blurredPreview = BitmapFilter.getSingleton()
-                            .getBlur(CameraActivity.this, preview, 25);
+                            .getBlur(CameraActivity.this, preview, 16);
                     long elapsed = System.currentTimeMillis()-time;
 
                     Log.v(TAG, "Took " + elapsed + "ms to blur");
