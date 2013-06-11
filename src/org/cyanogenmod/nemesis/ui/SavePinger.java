@@ -41,6 +41,7 @@ public class SavePinger extends View {
     private long mLastTime;
     private Bitmap mSaveIcon;
     private int mOrientation;
+    private boolean mPingOnly;
 
     private final static int CIRCLES_COUNT = 3;
     private float mRingRadius;
@@ -97,6 +98,10 @@ public class SavePinger extends View {
         }
     }
 
+    public void setPingOnly(boolean pingOnly) {
+        mPingOnly = pingOnly;
+    }
+
     public void startSaving() {
         mFadeAnimator.setFloatValues(0, 1);
         mFadeAnimator.start();
@@ -139,14 +144,16 @@ public class SavePinger extends View {
             }
         }
 
-        int alpha = (int) (((Math.cos((double) systemTime / 200.0) + 1.0f) / 2.0f) * 255.0f);
-        canvas.save();
-        canvas.translate(getWidth() / 2, getHeight() / 2);
-        canvas.rotate(mOrientation);
-        mPaint.setARGB((int) (alpha * mFadeProgress), 255, 255, 255);
-        canvas.drawBitmap(mSaveIcon, -mSaveIcon.getWidth() / 2, -mSaveIcon.getHeight() / 2, mPaint);
+        if (!mPingOnly) {
+            int alpha = (int) (((Math.cos((double) systemTime / 200.0) + 1.0f) / 2.0f) * 255.0f);
+            canvas.save();
+            canvas.translate(getWidth() / 2, getHeight() / 2);
+            canvas.rotate(mOrientation);
+            mPaint.setARGB((int) (alpha * mFadeProgress), 255, 255, 255);
+            canvas.drawBitmap(mSaveIcon, -mSaveIcon.getWidth() / 2, -mSaveIcon.getHeight() / 2, mPaint);
 
-        canvas.restore();
+            canvas.restore();
+        }
 
         mLastTime = systemTime;
 

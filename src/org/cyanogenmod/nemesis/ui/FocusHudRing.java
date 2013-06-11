@@ -100,7 +100,9 @@ public class FocusHudRing extends HudRing {
         if (motionEvent.getActionMasked() == MotionEvent.ACTION_MOVE) {
             applyFocusPoint();
         } else if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
-            mFocusManager.refocus();
+            if (mFocusManager != null) {
+                mFocusManager.refocus();
+            }
         }
 
         return true;

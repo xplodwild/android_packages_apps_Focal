@@ -105,36 +105,43 @@ public class ReviewDrawer extends LinearLayout {
     }
 
     public void updateFromGallery() {
-        mImages.clear();
+        new Thread() {
+            public void run() {
+                mImages.clear();
 
-        final String[] columns = { MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID };
-        final String orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
+                final String[] columns = { MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID };
+                final String orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
 
-        // Select only the images that has been taken from the Camera
-        Cursor cursor = getContext().getContentResolver().query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
-                new String[] { GALLERY_CAMERA_BUCKET }, orderBy);
+                // Select only the images that has been taken from the Camera
+                final Cursor cursor = getContext().getContentResolver().query(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
+                        new String[] { GALLERY_CAMERA_BUCKET }, orderBy);
 
-        if (cursor == null) {
-            Log.e(TAG, "Null cursor from MediaStore!");
-            return;
-        }
+                if (cursor == null) {
+                    Log.e(TAG, "Null cursor from MediaStore!");
+                    return;
+                }
 
-        int imageColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+                final int imageColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
 
-        for (int i = 0; i < cursor.getCount(); i++) {
-            cursor.moveToPosition(i);
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < cursor.getCount(); i++) {
+                            cursor.moveToPosition(i);
 
-            int id = cursor.getInt(imageColumnIndex);
-            addImageToList(id);
-        }
+                            int id = cursor.getInt(imageColumnIndex);
+                            addImageToList(id);
+                        }
+                    }
+                });
 
-        // Set the default reviewed image to the last image
-        cursor.moveToFirst();
-        final int firstPictureId = cursor.getInt(imageColumnIndex);
-        setPreviewedImage(firstPictureId);
-
-        //mImagesList.deferNotifyDataSetChanged();
+                // Set the default reviewed image to the last image
+                cursor.moveToFirst();
+                final int firstPictureId = cursor.getInt(imageColumnIndex);
+                setPreviewedImage(firstPictureId);
+            }
+        }.start();
     }
 
     /**

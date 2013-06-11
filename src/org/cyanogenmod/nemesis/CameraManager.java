@@ -48,6 +48,7 @@ public class CameraManager {
 
     private CameraPreview mPreview;
     private Camera mCamera;
+    private boolean mCameraReady;
     private int mCurrentFacing;
     private Point mTargetSize;
     private AutoFocusMoveCallback mAutoFocusMoveCallback;
@@ -56,6 +57,7 @@ public class CameraManager {
     private int mOrientation;
     private MediaRecorder mMediaRecorder;
     private PreviewPauseListener mPreviewPauseListener;
+    private CameraReadyListener mCameraReadyListener;
 
     public interface PreviewPauseListener {
         /**
@@ -69,6 +71,20 @@ public class CameraManager {
          * This method is called when the preview resumes
          */
         public void onPreviewResume();
+    }
+
+    public interface CameraReadyListener {
+        /**
+         * Called when a camera has been successfully opened. This allows the
+         * main activity to continue setup operations while the camera
+         * sets up in a different thread.
+         */
+        public void onCameraReady();
+
+        /**
+         * Called when the camera failed to initialize
+         */
+        public void onCameraFailed();
     }
 
     private class AsyncParamRunnable implements Runnable {
@@ -93,14 +109,13 @@ public class CameraManager {
             // Read them from sensor next time
             mParameters = null;
         }
-    }
-
-    ;
+    };
 
 
     public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
         mMediaRecorder = new MediaRecorder();
+        mCameraReady = true;
     }
 
     /**
@@ -109,39 +124,74 @@ public class CameraManager {
      * @param cameraId
      * @return true if the operation succeeded, false otherwise
      */
-    public boolean open(int cameraId) {
+    public boolean open(final int cameraId) {
         if (mCamera != null) {
+            if (mPreviewPauseListener != null) {
+                mPreviewPauseListener.onPreviewPause();
+            }
+
             // Close the previous camera
             releaseCamera();
         }
 
+        mCameraReady = false;
+
         // Try to open the camera
-        try {
-            mCamera = Camera.open(cameraId);
-            mCamera.setPreviewCallback(mPreview);
-            mCurrentFacing = cameraId;
-            mParameters = mCamera.getParameters();
+        new Thread() {
+            public void run() {
+                try {
+                    if (mCamera != null) {
+                        Log.e(TAG, "Previous camera not closed! Not opening");
+                        return;
+                    }
+                    mCamera = Camera.open(cameraId);
+                    mCamera.setPreviewCallback(mPreview);
+                    mCurrentFacing = cameraId;
+                    mParameters = mCamera.getParameters();
 
-            if (mTargetSize != null)
-                setPreviewSize(mTargetSize.x, mTargetSize.y);
+                    if (mTargetSize != null)
+                        setPreviewSize(mTargetSize.x, mTargetSize.y);
 
-            if (mAutoFocusMoveCallback != null)
-                mCamera.setAutoFocusMoveCallback(mAutoFocusMoveCallback);
+                    if (mAutoFocusMoveCallback != null)
+                        mCamera.setAutoFocusMoveCallback(mAutoFocusMoveCallback);
 
-            // Default focus mode to continuous
-        } catch (Exception e) {
-            Log.e(TAG, "Error while opening cameras: " + e.getMessage());
-            return false;
-        }
+                    // Default focus mode to continuous
+                } catch (Exception e) {
+                    Log.e(TAG, "Error while opening cameras: " + e.getMessage());
+                    StackTraceElement[] st = e.getStackTrace();
+                    for (StackTraceElement elemt : st) {
+                        Log.e(TAG, elemt.toString());
+                    }
+                    if (mCameraReadyListener != null) {
+                        mCameraReadyListener.onCameraFailed();
+                    }
+                    return;
+                }
 
-        // Update the preview surface holder with the new opened camera
-        mPreview.notifyCameraChanged();
+                if (mCameraReadyListener != null) {
+                    mCameraReadyListener.onCameraReady();
+                }
+
+                // Update the preview surface holder with the new opened camera
+                mPreview.notifyCameraChanged();
+
+                if (mPreviewPauseListener != null) {
+                    mPreviewPauseListener.onPreviewResume();
+                }
+
+                mCameraReady = true;
+            }
+        }.start();
 
         return true;
     }
 
     public void setPreviewPauseListener(PreviewPauseListener listener) {
         mPreviewPauseListener = listener;
+    }
+
+    public void setCameraReadyListener(CameraReadyListener listener) {
+        mCameraReadyListener = listener;
     }
 
     /**
@@ -184,17 +234,20 @@ public class CameraManager {
     }
 
     private void releaseCamera() {
-        if (mCamera != null) {
+        if (mCamera != null && mCameraReady) {
             Log.v(TAG, "Releasing camera facing " + mCurrentFacing);
             mCamera.release();
+            mCamera = null;
+            mParameters = null;
+            mPreview.notifyCameraChanged();
+            mCameraReady = true;
         }
-        mCamera = null;
-        mParameters = null;
-        mPreview.notifyCameraChanged();
     }
 
     private void reconnectToCamera() {
-        open(mCurrentFacing);
+        if (mCameraReady) {
+            open(mCurrentFacing);
+        }
     }
 
     public void setPreviewSize(int width, int height) {
@@ -243,14 +296,24 @@ public class CameraManager {
     public Bitmap getLastPreviewFrame() {
         // Decode the last frame bytes
         byte[] data = mPreview.getLastFrameBytes();
-        int previewWidth = getParameters().getPreviewSize().width;
-        int previewHeight = getParameters().getPreviewSize().height;
+        Camera.Parameters params = getParameters();
+
+        if (params == null) {
+            return null;
+        }
+
+        Camera.Size previewSize = params.getPreviewSize();
+        if (previewSize == null) {
+            return null;
+        }
+
+        int previewWidth = previewSize.width;
+        int previewHeight = previewSize.height;
 
         // Convert YUV420SP preview data to RGB
         if (data != null) {
-            Bitmap output = Util.decodeYUV420SP(mPreview.getContext(),
+            return Util.decodeYUV420SP(mPreview.getContext(),
                     data, previewWidth, previewHeight);
-            return output;
         } else {
             return null;
         }
@@ -407,6 +470,24 @@ public class CameraManager {
         if (mCamera != null) {
             try {
                 return (getParameters().getMaxNumFocusAreas() > 0);
+            } catch (Exception e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns whether or not the current open camera device supports
+     * exposure metering area (exposure ring)
+     *
+     * @return true if supported
+     */
+    public boolean isExposureAreaSupported() {
+        if (mCamera != null) {
+            try {
+                return (getParameters().getMaxNumMeteringAreas() > 0);
             } catch (Exception e) {
                 return false;
             }

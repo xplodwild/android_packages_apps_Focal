@@ -54,7 +54,7 @@ import org.cyanogenmod.nemesis.ui.SwitchRingPad;
 import org.cyanogenmod.nemesis.ui.ThumbnailFlinger;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
-public class CameraActivity extends Activity {
+public class CameraActivity extends Activity implements CameraManager.CameraReadyListener {
     public final static String TAG = "CameraActivity";
 
     public final static int CAMERA_MODE_PHOTO = 1;
@@ -130,7 +130,6 @@ public class CameraActivity extends Activity {
 
         // Setup HUDs
         mFocusHudRing = (FocusHudRing) findViewById(R.id.hud_ring_focus);
-        mFocusHudRing.setManagers(mCamManager, mFocusManager);
 
         mExposureHudRing = (ExposureHudRing) findViewById(R.id.hud_ring_exposure);
         mExposureHudRing.setManagers(mCamManager);
@@ -156,6 +155,11 @@ public class CameraActivity extends Activity {
 
         mCamManager.getPreviewSurface().setOnTouchListener(touchListener);
         mSideBar.setOnTouchListener(touchListener);
+
+        // Use SavePinger to animate a bit while we open the camera device
+        mSavePinger.setPingOnly(true);
+        mSavePinger.startSaving();
+
 
         updateCapabilities();
     }
@@ -241,8 +245,9 @@ public class CameraActivity extends Activity {
                     // Update sidebar
                     mSideBar.checkCapabilities(mCamManager, (ViewGroup) findViewById(R.id.widgets_container));
 
-                    // Update focus ring support
+                    // Update focus/exposure ring support
                     mFocusHudRing.setVisibility(mCamManager.isFocusAreaSupported() ? View.VISIBLE : View.GONE);
+                    mExposureHudRing.setVisibility(mCamManager.isExposureAreaSupported() ? View.VISIBLE : View.GONE);
                 }
             }
         });
@@ -266,29 +271,63 @@ public class CameraActivity extends Activity {
         params.addRule(RelativeLayout.CENTER_IN_PARENT);
         params.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
         params.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+
         mCamManager.getPreviewSurface().setLayoutParams(params);
-
-        if (!mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK)) {
-            Log.e(TAG, "Could not open camera HAL");
-            Toast.makeText(this, getResources().getString(R.string.cannot_connect_hal), Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        Camera.Size sz = Util.getOptimalPreviewSize(this, mCamManager.getParameters().getSupportedPreviewSizes(), 1.33f);
-        mCamManager.setPreviewSize(sz.width, sz.height);
-
-        layout.setAspectRatio((double) sz.width / sz.height);
-        layout.setPreviewSize(sz.width, sz.height);
-
-        mFocusManager = new FocusManager(mCamManager);
-        mFocusManager.setListener(new MainFocusListener());
-        mSnapshotManager = new SnapshotManager(mCamManager, mFocusManager, this);
-        mSnapshotListener = new MainSnapshotListener();
-        mSnapshotManager.addListener(mSnapshotListener);
-
         mCamManager.setPreviewPauseListener(new CameraPreviewListener());
+        mCamManager.setCameraReadyListener(this);
+
+        mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK);
     }
 
+    @Override
+    public void onCameraReady() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Camera.Size sz = Util.getOptimalPreviewSize(CameraActivity.this, mCamManager.getParameters().getSupportedPreviewSizes(), 1.33f);
+                mCamManager.setPreviewSize(sz.width, sz.height);
+
+                final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
+                layout.setAspectRatio((double) sz.width / sz.height);
+                layout.setPreviewSize(sz.width, sz.height);
+
+                if (mFocusManager == null) {
+                    mFocusManager = new FocusManager(mCamManager);
+                    mFocusManager.setListener(new MainFocusListener());
+                    mFocusHudRing.setManagers(mCamManager, mFocusManager);
+                }
+
+                if (mSnapshotManager == null) {
+                    mSnapshotManager = new SnapshotManager(mCamManager, mFocusManager, CameraActivity.this);
+                    mSnapshotListener = new MainSnapshotListener();
+                    mSnapshotManager.addListener(mSnapshotListener);
+                }
+
+                // Hide sidebar after start
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSideBar.slideClose();
+                    }
+                }, 1500);
+
+
+                mSavePinger.stopSaving();
+            }
+        });
+    }
+
+    public void onCameraFailed() {
+        Log.e(TAG, "Could not open camera HAL");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(CameraActivity.this,
+                        getResources().getString(R.string.cannot_connect_hal),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
     /**
      * Recursively rotates the Views of ViewGroups
@@ -323,6 +362,10 @@ public class CameraActivity extends Activity {
         @Override
         public void onPreviewPause() {
             final Bitmap preview = mCamManager.getLastPreviewFrame();
+
+            if (preview == null) {
+                return;
+            }
 
             final PreviewFrameLayout container = (PreviewFrameLayout)
                     findViewById(R.id.camera_preview_overlay_container);
@@ -552,6 +595,7 @@ public class CameraActivity extends Activity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    mSavePinger.setPingOnly(false);
                     mSavePinger.startSaving();
                 }
             });
