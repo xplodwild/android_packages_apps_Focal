@@ -181,6 +181,15 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         super.onResume();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mReviewDrawer.isOpen()) {
+            mReviewDrawer.close();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     /**
      * Returns the mode of the activity
      * See CameraActivity.CAMERA_MODE_*
