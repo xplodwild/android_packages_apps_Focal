@@ -433,14 +433,18 @@ public abstract class WidgetBase {
         }
 
 
-        public void notifyOrientationChanged(int orientation) {
+        public void notifyOrientationChanged(int orientation, boolean fastforward) {
             int buttonsCount = getChildCount();
 
             for (int i = 0; i < buttonsCount; i++) {
                 View child = getChildAt(i);
 
-                child.animate().rotation(orientation)
-                        .setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
+                if (fastforward) {
+                    child.setRotation(orientation);
+                } else {
+                    child.animate().rotation(orientation)
+                            .setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
+                }
             }
         }
     }

@@ -74,7 +74,7 @@ public class WidgetRenderer extends FrameLayout {
         mOrientation = orientation;
 
         for (int i = 0; i < mOpenWidgets.size(); i++) {
-            mOpenWidgets.get(i).notifyOrientationChanged(orientation);
+            mOpenWidgets.get(i).notifyOrientationChanged(orientation, false);
         }
     }
 
@@ -159,7 +159,7 @@ public class WidgetRenderer extends FrameLayout {
         mOpenWidgets.add(widget);
 
         // make sure the widget is properly oriented
-        widget.notifyOrientationChanged(mOrientation);
+        widget.notifyOrientationChanged(mOrientation, true);
 
         // position it properly
         widget.forceFinalX(mTotalWidth - WIDGETS_MARGIN);

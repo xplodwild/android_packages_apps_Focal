@@ -284,7 +284,19 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Camera.Size sz = Util.getOptimalPreviewSize(CameraActivity.this, mCamManager.getParameters().getSupportedPreviewSizes(), 1.33f);
+                Camera.Parameters params = mCamManager.getParameters();
+
+                if (params == null) {
+                    // Are we too fast? Let's try again.
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            onCameraReady();
+                        }
+                    }, 20);
+                    return;
+                }
+                Camera.Size sz = Util.getOptimalPreviewSize(CameraActivity.this, params.getSupportedPreviewSizes(), 1.33f);
                 mCamManager.setPreviewSize(sz.width, sz.height);
 
                 final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
