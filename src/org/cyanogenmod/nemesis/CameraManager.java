@@ -105,6 +105,9 @@ public class CameraManager {
                 mCamera.setParameters(params);
             } catch (RuntimeException e) {
                 Log.e(TAG, "Could not set parameter " + mKey + " to '" + mValue + "'", e);
+
+                // Reset the camera as it likely crashed if we reached here
+                open(mCurrentFacing);
             }
             // Read them from sensor next time
             mParameters = null;

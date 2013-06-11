@@ -308,6 +308,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     @Override
                     public void run() {
                         mSideBar.slideClose();
+                        mWidgetRenderer.notifySidebarSlideClose();
                     }
                 }, 1500);
 
