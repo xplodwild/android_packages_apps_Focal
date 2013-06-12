@@ -174,9 +174,11 @@ public class ReviewDrawer extends LinearLayout {
     }
 
     private void openInGallery(int imageId) {
-        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        getContext().startActivity(intent);
+        if (imageId > 0) {
+            Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            getContext().startActivity(intent);
+        }
     }
 
     /**
