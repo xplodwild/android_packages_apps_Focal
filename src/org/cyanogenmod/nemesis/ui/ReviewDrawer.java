@@ -42,9 +42,11 @@ public class ReviewDrawer extends LinearLayout {
     private Handler mHandler;
     private ListView mImagesList;
     private ImageView mReviewedImage;
+    private int mReviewedImageOrientation;
     private ImageListAdapter mImagesListAdapter;
     private Bitmap mReviewedBitmap;
     private int mReviewedImageId;
+    private int mCurrentOrientation;
     private boolean mIsOpen;
 
     public ReviewDrawer(Context context) {
@@ -147,6 +149,24 @@ public class ReviewDrawer extends LinearLayout {
     }
 
     /**
+     * Queries the Media service for image orientation
+     * @param id The id of the gallery image
+     * @return The orientation of the image, or 0 if it failed
+     */
+    public int getCameraPhotoOrientation(final int id){
+        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                .appendPath(Integer.toString(id)).build();
+
+        String[] orientationColumn = {MediaStore.Images.Media.ORIENTATION};
+        Cursor cur = getContext().getContentResolver().query(uri, orientationColumn, null, null, null);
+        if (cur != null && cur.moveToFirst()) {
+            return cur.getInt(cur.getColumnIndex(orientationColumn[0]));
+        } else {
+            return 0;
+        }
+    }
+
+    /**
      * Sets the previewed image in the review drawer
      * @param id The id the of the image
      */
@@ -159,10 +179,14 @@ public class ReviewDrawer extends LinearLayout {
                 mReviewedBitmap = MediaStore.Images.Thumbnails.getThumbnail(
                         getContext().getContentResolver(), id,
                         MediaStore.Images.Thumbnails.MINI_KIND, null);
+
+                mReviewedImageOrientation = getCameraPhotoOrientation(id);
+
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         mReviewedImage.setImageBitmap(mReviewedBitmap);
+                        notifyOrientationChanged(mCurrentOrientation);
                     }
                 });
             }
@@ -174,7 +198,9 @@ public class ReviewDrawer extends LinearLayout {
     }
 
     public void notifyOrientationChanged(int orientation) {
-        mReviewedImage.animate().rotation(orientation).setDuration(200).setInterpolator(new DecelerateInterpolator())
+        mCurrentOrientation = orientation;
+        mReviewedImage.animate().rotation(mReviewedImageOrientation + orientation)
+                .setDuration(200).setInterpolator(new DecelerateInterpolator())
                 .start();
     }
 
