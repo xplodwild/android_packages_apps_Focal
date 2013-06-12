@@ -27,6 +27,7 @@ import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.AutoFocusMoveCallback;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -58,6 +59,7 @@ public class CameraManager {
     private MediaRecorder mMediaRecorder;
     private PreviewPauseListener mPreviewPauseListener;
     private CameraReadyListener mCameraReadyListener;
+    private Handler mHandler;
 
     public interface PreviewPauseListener {
         /**
@@ -119,6 +121,7 @@ public class CameraManager {
         mPreview = new CameraPreview(context);
         mMediaRecorder = new MediaRecorder();
         mCameraReady = true;
+        mHandler = new Handler();
     }
 
     /**
@@ -445,14 +448,21 @@ public class CameraManager {
      * @param cb The AF callback
      * @return true if we could start the AF, false otherwise
      */
-    public boolean doAutofocus(AutoFocusCallback cb) {
+    public boolean doAutofocus(final AutoFocusCallback cb) {
         if (mCamera != null) {
             try {
                 // make sure our auto settings aren't locked
                 setLockSetup(false);
 
                 // trigger af
-                mCamera.autoFocus(cb);
+                mCamera.cancelAutoFocus();
+
+                mHandler.post(new Runnable() {
+                    public void run() {
+                        mCamera.autoFocus(cb);
+                    }
+                });
+
             } catch (Exception e) {
                 return false;
             }

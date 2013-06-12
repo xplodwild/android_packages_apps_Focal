@@ -173,6 +173,11 @@ public class ReviewDrawer extends LinearLayout {
         mImagesListAdapter.addImage(id);
     }
 
+    public void notifyOrientationChanged(int orientation) {
+        mReviewedImage.animate().rotation(orientation).setDuration(200).setInterpolator(new DecelerateInterpolator())
+                .start();
+    }
+
     private void openInGallery(int imageId) {
         if (imageId > 0) {
             Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
@@ -215,6 +220,22 @@ public class ReviewDrawer extends LinearLayout {
         mIsOpen = false;
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new DecelerateInterpolator())
                 .translationX(-getMeasuredWidth()).alpha(0.0f).start();
+    }
+
+    public void slide(float distance) {
+        setTranslationX(getTranslationX() + distance);
+
+        if (getAlpha() == 0.0f) {
+            setAlpha(1.0f);
+        }
+    }
+
+    public void clampSliding() {
+        if (getTranslationX() < -getMeasuredWidth()/2) {
+            close();
+        } else {
+            open();
+        }
     }
 
     /**

@@ -64,8 +64,8 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
 
         mCamManager.setAutoFocusMoveCallback(this);
         Camera.Parameters params = mCamManager.getParameters();
-        if (params.getSupportedFocusModes().contains("continuous-picture")) {
-            params.setFocusMode("continuous-picture");
+        if (params.getSupportedFocusModes().contains("auto")) {
+            params.setFocusMode("auto");
         }
 
         // Do a first focus after 1 second
