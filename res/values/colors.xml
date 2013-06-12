@@ -19,5 +19,5 @@
     <color name="widget_background">#88333333</color>
     <color name="widget_toggle_pressed">#BB33B5E5</color>
     <color name="widget_toggle_active">#9033B5E5</color>
-
+    <color name="widget_option_active">#FF0099CC</color>
 </resources>

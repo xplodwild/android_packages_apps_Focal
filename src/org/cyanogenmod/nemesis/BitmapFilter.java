@@ -23,7 +23,8 @@ import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.BlurMaskFilter.Blur;
 import android.graphics.Canvas;
-import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
@@ -105,7 +106,7 @@ public class BitmapFilter {
      * @param src  The bitmap of the icon itself
      * @return Glowed bitmap
      */
-    public Bitmap getGlow(String name, Bitmap src) {
+    public Bitmap getGlow(String name, int glowColor, Bitmap src) {
         if (mGlowCache.containsKey(name)) {
             return mGlowCache.get(name);
         } else {
@@ -115,9 +116,6 @@ public class BitmapFilter {
 
             // the glow radius
             int glowRadius = 4;
-
-            // the glow color
-            int glowColor = Color.rgb(0, 192, 255);
 
             // extract the alpha from the source image
             Bitmap alpha = src.extractAlpha();
@@ -133,7 +131,10 @@ public class BitmapFilter {
             paint.setColor(glowColor);
 
             // outer glow
+            ColorFilter emphasize = new LightingColorFilter(glowColor, 1);
+            paint.setColorFilter(emphasize);
             canvas.drawBitmap(src, halfMargin, halfMargin, paint);
+            paint.setColorFilter(null);
             paint.setMaskFilter(new BlurMaskFilter(glowRadius, Blur.OUTER));
             canvas.drawBitmap(alpha, halfMargin, halfMargin, paint);
 

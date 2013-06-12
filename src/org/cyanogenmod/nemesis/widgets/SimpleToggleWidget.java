@@ -28,6 +28,7 @@ import android.view.View.OnClickListener;
 import org.cyanogenmod.nemesis.BitmapFilter;
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
+import org.cyanogenmod.nemesis.R;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -184,6 +185,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
 
         mActiveButton = button;
         button.setImageBitmap(BitmapFilter.getSingleton().getGlow(mKey + "=" + value,
+                mContext.getResources().getColor(R.color.widget_option_active),
                 ((BitmapDrawable) button.getDrawable()).getBitmap()));
     }
 }

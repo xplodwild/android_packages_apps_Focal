@@ -1,5 +1,6 @@
 package org.cyanogenmod.nemesis.ui;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -235,8 +236,9 @@ public class ReviewDrawer extends LinearLayout {
      */
     public void open() {
         mIsOpen = true;
+        setVisibility(View.VISIBLE);
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new AccelerateInterpolator())
-                .translationX(0.0f).alpha(1.0f).start();
+                .translationX(0.0f).setListener(null).alpha(1.0f).start();
     }
 
     /**
@@ -245,13 +247,34 @@ public class ReviewDrawer extends LinearLayout {
     public void close() {
         mIsOpen = false;
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new DecelerateInterpolator())
-                .translationX(-getMeasuredWidth()).alpha(0.0f).start();
+                .translationX(-getMeasuredWidth()).alpha(0.0f).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        }).start();
     }
 
     public void slide(float distance) {
         setTranslationX(getTranslationX() + distance);
 
         if (getAlpha() == 0.0f) {
+            setVisibility(View.VISIBLE);
             setAlpha(1.0f);
         }
     }

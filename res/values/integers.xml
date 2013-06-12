@@ -23,11 +23,17 @@
     <!-- Size of a widget option button (square) -->
     <dimen name="widget_option_button_size">32dp</dimen>
 
+    <!-- Padding between each icon within a widget -->
+    <dimen name="widget_option_button_padding">4dp</dimen>
+
     <!-- Padding of the widget toggle buttons -->
     <dimen name="widget_toggle_button_padding">8dp</dimen>
 
     <!-- Padding between each open widget -->
     <dimen name="widget_spacing">8dp</dimen>
+
+    <!-- Padding within the widget container window -->
+    <dimen name="widget_container_padding">4dp</dimen>
 
     <!-- Edge padding of the ring buttons -->
     <dimen name="ringpad_edge_spacing">32dp</dimen>

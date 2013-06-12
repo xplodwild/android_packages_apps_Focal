@@ -269,6 +269,7 @@ public abstract class WidgetBase {
                 mTouchOffset = mWidget.getX() - event.getRawX();
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 parent.widgetPressed(mWidget);
+                this.setBackgroundColor(getResources().getColor(R.color.widget_toggle_pressed));
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 mWidget.setX(event.getRawX() + mTouchOffset);
@@ -278,6 +279,7 @@ public abstract class WidgetBase {
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 parent.widgetDropped(mWidget);
+                this.setBackgroundColor(0);
             }
 
             return (super.onTouchEvent(event) || handle);
@@ -286,6 +288,8 @@ public abstract class WidgetBase {
         private void initialize(int resId) {
             this.setImageResource(resId);
             this.setClickable(true);
+            int padding = getResources().getDimensionPixelSize(R.dimen.widget_option_button_padding);
+            this.setPadding(padding, padding, padding, padding);
             mOriginalResource = resId;
         }
 
@@ -393,9 +397,7 @@ public abstract class WidgetBase {
             setVisibility(View.VISIBLE);
 
             // Set padding
-            int padding_in_dp = 8;
-            final float scale = getResources().getDisplayMetrics().density;
-            int pad = (int) (padding_in_dp * scale + 0.5f);
+            int pad = getResources().getDimensionPixelSize(R.dimen.widget_container_padding);
             this.setPadding(pad, pad, pad, pad);
 
             this.animate().setListener(new AnimatorListener() {
