@@ -136,10 +136,12 @@ public class ReviewDrawer extends LinearLayout {
                     }
                 });
 
-                // Set the default reviewed image to the last image
-                cursor.moveToFirst();
-                final int firstPictureId = cursor.getInt(imageColumnIndex);
-                setPreviewedImage(firstPictureId);
+                if (cursor.getCount() > 0) {
+                    // Set the default reviewed image to the last image
+                    cursor.moveToFirst();
+                    final int firstPictureId = cursor.getInt(imageColumnIndex);
+                    setPreviewedImage(firstPictureId);
+                }
             }
         }.start();
     }
