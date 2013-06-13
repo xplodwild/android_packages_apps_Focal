@@ -1,5 +1,8 @@
 package org.cyanogenmod.nemesis.feats;
 
+import android.os.Handler;
+import android.util.Log;
+
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.SnapshotManager;
 import org.cyanogenmod.nemesis.ui.ShutterButton;
@@ -8,12 +11,16 @@ import org.cyanogenmod.nemesis.ui.ShutterButton;
  * Burst capture mode
  */
 public class BurstCapture extends CaptureTransformer {
+    public final static String TAG = "BurstCapture";
+
     private int mBurstCount = -1;
     private int mShotsDone;
     private boolean mBurstInProgress = false;
+    private Handler mHandler;
 
     public BurstCapture(CameraManager camMan, SnapshotManager snapshotMan) {
         super(camMan, snapshotMan);
+        mHandler = new Handler();
     }
 
     /**
@@ -31,11 +38,23 @@ public class BurstCapture extends CaptureTransformer {
     public void startBurstShot() {
         mShotsDone = 0;
         mBurstInProgress = true;
+        Log.e(TAG, "Queued snapshot -- start");
         mSnapManager.queueSnapshot(true, 0);
     }
 
     public void terminateBurstShot() {
         mBurstInProgress = false;
+        Log.e(TAG, "terminate snapshot");
+    }
+
+    private void tryTakeShot() {
+        // XXX: Find a better way to determine if the camera is ready to take a shot
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mSnapManager.queueSnapshot(true, 0);
+            }
+        }, 100);
     }
 
     @Override
@@ -48,13 +67,14 @@ public class BurstCapture extends CaptureTransformer {
     }
 
     @Override
-    public void onSnapshotShutter(SnapshotManager.SnapshotInfo info) {
+    public void onSnapshotShutter(final SnapshotManager.SnapshotInfo info) {
         if (!mBurstInProgress) return;
 
         mShotsDone++;
+        Log.e(TAG, "Done " + mShotsDone + " shots");
 
         if (mShotsDone < mBurstCount || mBurstCount == 0) {
-            mSnapManager.queueSnapshot(true, 0);
+            tryTakeShot();
         }
     }
 
@@ -70,6 +90,7 @@ public class BurstCapture extends CaptureTransformer {
 
     @Override
     public void onSnapshotSaved(SnapshotManager.SnapshotInfo info) {
+
         // XXX: Show it in the quick review drawer
     }
 

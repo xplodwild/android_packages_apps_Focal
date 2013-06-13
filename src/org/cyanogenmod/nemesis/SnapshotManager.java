@@ -225,7 +225,13 @@ public class SnapshotManager {
     }
 
     public void addListener(SnapshotListener listener) {
-        mListeners.add(listener);
+        if (!mListeners.contains(listener)) {
+            mListeners.add(listener);
+        }
+    }
+
+    public void removeListener(SnapshotListener listener) {
+        mListeners.remove(listener);
     }
 
     /**

@@ -54,12 +54,12 @@ public class CameraManager {
     private Point mTargetSize;
     private AutoFocusMoveCallback mAutoFocusMoveCallback;
     private Camera.Parameters mParameters;
-    private int[] mPreviewFrameBuffer;
     private int mOrientation;
     private MediaRecorder mMediaRecorder;
     private PreviewPauseListener mPreviewPauseListener;
     private CameraReadyListener mCameraReadyListener;
     private Handler mHandler;
+    private long mLastPreviewFrameTime;
 
     public interface PreviewPauseListener {
         /**
@@ -323,6 +323,14 @@ public class CameraManager {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Returns the system time of when the last preview frame was received
+     * @return long
+     */
+    public long getLastPreviewFrameTime() {
+        return mLastPreviewFrameTime;
     }
 
     /**
@@ -675,6 +683,7 @@ public class CameraManager {
 
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
+            mLastPreviewFrameTime = System.currentTimeMillis();
             if (mCamera != null) {
                 mCamera.addCallbackBuffer(mLastFrameBytes);
             }

@@ -25,8 +25,8 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ScrollView;
 
+import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraCapabilities;
-import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.widgets.WidgetBase;
 
@@ -65,7 +65,7 @@ public class SideBar extends ScrollView {
      * Check the capabilities of the device, and populate the sidebar
      * with the toggle buttons.
      */
-    public void checkCapabilities(CameraManager cameraManager, ViewGroup widgetsContainer) {
+    public void checkCapabilities(CameraActivity activity, ViewGroup widgetsContainer) {
         mToggleContainer = (ViewGroup) this.getChildAt(0);
 
         if (mCapabilities != null) {
@@ -73,8 +73,8 @@ public class SideBar extends ScrollView {
             mCapabilities = null;
         }
 
-        mCapabilities = new CameraCapabilities(cameraManager, this.getContext());
-        mCapabilities.populateSidebar(cameraManager.getParameters(), mToggleContainer, widgetsContainer);
+        mCapabilities = new CameraCapabilities(activity);
+        mCapabilities.populateSidebar(activity.getCamManager().getParameters(), mToggleContainer, widgetsContainer);
     }
 
     /**

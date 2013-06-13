@@ -162,9 +162,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         // Use SavePinger to animate a bit while we open the camera device
         mSavePinger.setPingOnly(true);
         mSavePinger.startSaving();
-
-
-        updateCapabilities();
     }
 
 
@@ -214,6 +211,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         mCameraMode = newMode;
 
+        // Reset any capture transformer
+        mCaptureTransformer = null;
+
         if (newMode == CAMERA_MODE_PHOTO) {
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
         } else if (newMode == CAMERA_MODE_VIDEO) {
@@ -236,7 +236,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
      * @param transformer The new transformer to apply
      */
     public void setCaptureTransformer(CaptureTransformer transformer) {
+        if (mCaptureTransformer != null) {
+            mSnapshotManager.removeListener(mCaptureTransformer);
+        }
         mCaptureTransformer = transformer;
+
+        if (mCaptureTransformer != null) {
+            mSnapshotManager.addListener(transformer);
+        }
     }
 
     /**
@@ -266,7 +273,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     mHandler.postDelayed(this, 100);
                 } else {
                     // Update sidebar
-                    mSideBar.checkCapabilities(mCamManager, (ViewGroup) findViewById(R.id.widgets_container));
+                    mSideBar.checkCapabilities(CameraActivity.this, (ViewGroup) findViewById(R.id.widgets_container));
 
                     // Update focus/exposure ring support
                     mFocusHudRing.setVisibility(mCamManager.isFocusAreaSupported() ? View.VISIBLE : View.GONE);
@@ -321,6 +328,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     return;
                 }
                 Camera.Size sz = Util.getOptimalPreviewSize(CameraActivity.this, params.getSupportedPreviewSizes(), 1.33f);
+                if (sz == null) {
+                    Log.e(TAG, "No preview size!! Something terribly wrong with camera!");
+                    return;
+                }
                 mCamManager.setPreviewSize(sz.width, sz.height);
 
                 final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
@@ -349,6 +360,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     }
                 }, 1500);
 
+                updateCapabilities();
 
                 mSavePinger.stopSaving();
             }
@@ -528,8 +540,11 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 }
             }, 500);
 
-            if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
-                // XXX: Check for HDR, exposure, burst shots, timer, ...
+            // If we have a capture transformer, apply it, otherwise use the default
+            // behavior.
+            if (mCaptureTransformer != null) {
+                mCaptureTransformer.onShutterButtonClicked(mShutterButton);
+            } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
                 mSnapshotManager.queueSnapshot(true, 0);
             } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
                 if (!mSnapshotManager.isRecording()) {
