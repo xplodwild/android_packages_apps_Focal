@@ -2,6 +2,7 @@ package org.cyanogenmod.nemesis.feats;
 
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.SnapshotManager;
+import org.cyanogenmod.nemesis.ui.ShutterButton;
 
 /**
  * Burst capture mode
@@ -9,6 +10,7 @@ import org.cyanogenmod.nemesis.SnapshotManager;
 public class BurstCapture extends CaptureTransformer {
     private int mBurstCount = -1;
     private int mShotsDone;
+    private boolean mBurstInProgress = false;
 
     public BurstCapture(CameraManager camMan, SnapshotManager snapshotMan) {
         super(camMan, snapshotMan);
@@ -28,16 +30,27 @@ public class BurstCapture extends CaptureTransformer {
      */
     public void startBurstShot() {
         mShotsDone = 0;
+        mBurstInProgress = true;
         mSnapManager.queueSnapshot(true, 0);
     }
 
+    public void terminateBurstShot() {
+        mBurstInProgress = false;
+    }
+
     @Override
-    public void onShutterButtonClicked() {
-        startBurstShot();
+    public void onShutterButtonClicked(ShutterButton button) {
+        if (mBurstInProgress) {
+            terminateBurstShot();
+        } else {
+            startBurstShot();
+        }
     }
 
     @Override
     public void onSnapshotShutter(SnapshotManager.SnapshotInfo info) {
+        if (!mBurstInProgress) return;
+
         mShotsDone++;
 
         if (mShotsDone < mBurstCount || mBurstCount == 0) {

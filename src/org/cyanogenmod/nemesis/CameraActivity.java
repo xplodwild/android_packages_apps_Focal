@@ -42,6 +42,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.cyanogenmod.nemesis.feats.CaptureTransformer;
 import org.cyanogenmod.nemesis.ui.ExposureHudRing;
 import org.cyanogenmod.nemesis.ui.FocusHudRing;
 import org.cyanogenmod.nemesis.ui.Notifier;
@@ -70,6 +71,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private FocusManager mFocusManager;
     private CameraOrientationEventListener mOrientationListener;
     private GestureDetector mGestureDetector;
+    private CaptureTransformer mCaptureTransformer;
     private Handler mHandler;
 
     private int mOrientation = OrientationEventListener.ORIENTATION_UNKNOWN;
@@ -228,6 +230,16 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     }
 
     /**
+     * Sets the active capture transformer. See {@link CaptureTransformer} for
+     * more details on what's a capture transformer.
+     *
+     * @param transformer The new transformer to apply
+     */
+    public void setCaptureTransformer(CaptureTransformer transformer) {
+        mCaptureTransformer = transformer;
+    }
+
+    /**
      * Updates the orientation of the whole UI (in place)
      * based on the calculations given by the orientation listener
      */
@@ -353,6 +365,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                         Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    public CameraManager getCamManager() {
+        return mCamManager;
+    }
+
+    public SnapshotManager getSnapManager() {
+        return mSnapshotManager;
     }
 
     /**

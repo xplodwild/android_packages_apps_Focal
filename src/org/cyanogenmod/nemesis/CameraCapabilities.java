@@ -18,10 +18,10 @@
 
 package org.cyanogenmod.nemesis;
 
-import android.content.Context;
 import android.hardware.Camera;
 import android.view.ViewGroup;
 
+import org.cyanogenmod.nemesis.widgets.BurstModeWidget;
 import org.cyanogenmod.nemesis.widgets.EffectWidget;
 import org.cyanogenmod.nemesis.widgets.FlashWidget;
 import org.cyanogenmod.nemesis.widgets.HdrWidget;
@@ -47,8 +47,9 @@ public class CameraCapabilities {
      *
      * @param context The CameraActivity context
      */
-    public CameraCapabilities(CameraManager cam, Context context) {
+    public CameraCapabilities(CameraActivity context) {
         mWidgets = new ArrayList<WidgetBase>();
+        CameraManager cam = context.getCamManager();
 
         // Populate the list of widgets.
         // Basically, if we add a new widget, we just put it here. They
@@ -56,8 +57,9 @@ public class CameraCapabilities {
         mWidgets.add(new FlashWidget(cam, context));
         mWidgets.add(new WhiteBalanceWidget(cam, context));
         mWidgets.add(new SceneModeWidget(cam, context));
-        mWidgets.add(new EffectWidget(cam, context));
         mWidgets.add(new HdrWidget(cam, context));
+        mWidgets.add(new EffectWidget(cam, context));
+        mWidgets.add(new BurstModeWidget(context));
         mWidgets.add(new VideoFrWidget(cam, context));
     }
 
