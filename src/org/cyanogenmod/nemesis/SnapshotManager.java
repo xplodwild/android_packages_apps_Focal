@@ -98,7 +98,7 @@ public class SnapshotManager {
         public void onVideoRecordingStop();
     }
 
-    protected class SnapshotInfo {
+    public class SnapshotInfo {
         // Whether or not the snapshot has to be saved to internal memory
         public boolean mSave;
 
