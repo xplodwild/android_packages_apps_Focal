@@ -387,6 +387,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         return mSnapshotManager;
     }
 
+    public ReviewDrawer getReviewDrawer() {
+        return mReviewDrawer;
+    }
+
     /**
      * Recursively rotates the Views of ViewGroups
      *

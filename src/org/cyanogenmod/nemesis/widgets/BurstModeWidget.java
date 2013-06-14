@@ -44,7 +44,7 @@ public class BurstModeWidget extends WidgetBase implements View.OnClickListener 
         mBtn15.setOnClickListener(this);
         mBtnInf.setOnClickListener(this);
 
-        mTransformer = new BurstCapture(activity.getCamManager(), activity.getSnapManager());
+        mTransformer = new BurstCapture(activity);
     }
 
     @Override

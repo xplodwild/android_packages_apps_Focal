@@ -107,6 +107,9 @@ public class ReviewDrawer extends LinearLayout {
         setTranslationX(-9999);
     }
 
+    /**
+     * Clears the list of images and reload it from the Gallery (MediaStore)
+     */
     public void updateFromGallery() {
         new Thread() {
             public void run() {
@@ -194,6 +197,10 @@ public class ReviewDrawer extends LinearLayout {
         }.start();
     }
 
+    /**
+     * Add an image at the head of the image ribbon
+     * @param id The id of the image from the MediaStore
+     */
     public void addImageToList(int id) {
         mImagesListAdapter.addImage(id);
     }
@@ -235,10 +242,15 @@ public class ReviewDrawer extends LinearLayout {
      * Normally opens the review drawer (animation)
      */
     public void open() {
+        mReviewedImage.setVisibility(View.VISIBLE);
+        openImpl(1.0f);
+    }
+
+    private void openImpl(float alpha) {
         mIsOpen = true;
         setVisibility(View.VISIBLE);
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new AccelerateInterpolator())
-                .translationX(0.0f).setListener(null).alpha(1.0f).start();
+                .translationX(0.0f).setListener(null).alpha(alpha).start();
     }
 
     /**
@@ -270,8 +282,19 @@ public class ReviewDrawer extends LinearLayout {
         }).start();
     }
 
+    /**
+     * Slide the review drawer of the specified distance on the X axis
+     * @param distance
+     */
     public void slide(float distance) {
-        setTranslationX(getTranslationX() + distance);
+        if (distance > 1) {
+            mReviewedImage.setVisibility(View.VISIBLE);
+        }
+
+        float finalPos = getTranslationX() + distance;
+        if (finalPos > 0) finalPos = 0;
+        
+        setTranslationX(finalPos);
 
         if (getAlpha() == 0.0f) {
             setVisibility(View.VISIBLE);
@@ -283,7 +306,7 @@ public class ReviewDrawer extends LinearLayout {
         if (getTranslationX() < -getMeasuredWidth()/2) {
             close();
         } else {
-            open();
+            openImpl(getAlpha());
         }
     }
 
@@ -291,9 +314,8 @@ public class ReviewDrawer extends LinearLayout {
      * Open the drawer in Quick Review mode
      */
     public void openQuickReview() {
-        float widthPx = Util.dpToPx(getContext(), DRAWER_QUICK_REVIEW_SIZE_DP);
-        animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new AccelerateInterpolator())
-                .translationX(-getMeasuredWidth() + widthPx).alpha(1.0f).start();
+        mReviewedImage.setVisibility(View.GONE);
+        openImpl(0.5f);
     }
 
 

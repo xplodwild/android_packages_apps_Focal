@@ -3,6 +3,7 @@ package org.cyanogenmod.nemesis.feats;
 import android.os.Handler;
 import android.util.Log;
 
+import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.SnapshotManager;
 import org.cyanogenmod.nemesis.ui.ShutterButton;
@@ -17,10 +18,12 @@ public class BurstCapture extends CaptureTransformer {
     private int mShotsDone;
     private boolean mBurstInProgress = false;
     private Handler mHandler;
+    private CameraActivity mActivity;
 
-    public BurstCapture(CameraManager camMan, SnapshotManager snapshotMan) {
-        super(camMan, snapshotMan);
+    public BurstCapture(CameraActivity activity) {
+        super(activity.getCamManager(), activity.getSnapManager());
         mHandler = new Handler();
+        mActivity = activity;
     }
 
     /**
@@ -38,13 +41,14 @@ public class BurstCapture extends CaptureTransformer {
     public void startBurstShot() {
         mShotsDone = 0;
         mBurstInProgress = true;
-        Log.e(TAG, "Queued snapshot -- start");
         mSnapManager.queueSnapshot(true, 0);
+
+        // Open the quick review drawer
+        mActivity.getReviewDrawer().openQuickReview();
     }
 
     public void terminateBurstShot() {
         mBurstInProgress = false;
-        Log.e(TAG, "terminate snapshot");
     }
 
     private void tryTakeShot() {
@@ -71,7 +75,7 @@ public class BurstCapture extends CaptureTransformer {
         if (!mBurstInProgress) return;
 
         mShotsDone++;
-        Log.e(TAG, "Done " + mShotsDone + " shots");
+        Log.v(TAG, "Done " + mShotsDone + " shots");
 
         if (mShotsDone < mBurstCount || mBurstCount == 0) {
             tryTakeShot();
@@ -90,7 +94,6 @@ public class BurstCapture extends CaptureTransformer {
 
     @Override
     public void onSnapshotSaved(SnapshotManager.SnapshotInfo info) {
-
         // XXX: Show it in the quick review drawer
     }
 
