@@ -16,6 +16,7 @@ public class BurstModeWidget extends WidgetBase implements View.OnClickListener 
     private WidgetOptionButton mBtn10;
     private WidgetOptionButton mBtn15;
     private WidgetOptionButton mBtnInf;
+    private WidgetOptionButton mPreviousMode;
     private CameraActivity mCameraActivity;
     private BurstCapture mTransformer;
 
@@ -44,6 +45,8 @@ public class BurstModeWidget extends WidgetBase implements View.OnClickListener 
         mBtn15.setOnClickListener(this);
         mBtnInf.setOnClickListener(this);
 
+        mPreviousMode = mBtnOff;
+
         mTransformer = new BurstCapture(activity);
     }
 
@@ -59,22 +62,34 @@ public class BurstModeWidget extends WidgetBase implements View.OnClickListener 
 
     @Override
     public void onClick(View view) {
+        mPreviousMode.setActivated(false);
+
         if (view == mBtnOff) {
             // Disable the transformer
             mCameraActivity.setCaptureTransformer(null);
+            mBtnOff.setActivated(true);
+            mPreviousMode = mBtnOff;
         } else if (view == mBtn5) {
             mTransformer.setBurstCount(5);
             mCameraActivity.setCaptureTransformer(mTransformer);
+            mBtn5.setActivated(true);
+            mPreviousMode = mBtn5;
         } else if (view == mBtn10) {
             mTransformer.setBurstCount(10);
             mCameraActivity.setCaptureTransformer(mTransformer);
+            mBtn10.setActivated(true);
+            mPreviousMode = mBtn10;
         } else if (view == mBtn15) {
             mTransformer.setBurstCount(15);
             mCameraActivity.setCaptureTransformer(mTransformer);
+            mBtn15.setActivated(true);
+            mPreviousMode = mBtn15;
         } else if (view == mBtnInf) {
             // Infinite burst count
             mTransformer.setBurstCount(0);
             mCameraActivity.setCaptureTransformer(mTransformer);
+            mBtnInf.setActivated(true);
+            mPreviousMode = mBtnInf;
         }
     }
 }

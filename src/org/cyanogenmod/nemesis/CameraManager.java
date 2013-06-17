@@ -334,6 +334,17 @@ public class CameraManager {
     }
 
     /**
+     * Defines a new size for the recorded picture
+     * XXX: Should it update preview size?!
+     * @param sz The new picture size
+     */
+    public void setPictureSize(Camera.Size sz) {
+        Camera.Parameters params = getParameters();
+        params.setPictureSize(sz.width, sz.height);
+        mCamera.setParameters(params);
+    }
+
+    /**
      * Takes a snapshot
      */
     public void takeSnapshot(Camera.ShutterCallback shutterCallback, Camera.PictureCallback raw,

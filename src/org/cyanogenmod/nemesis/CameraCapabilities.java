@@ -21,14 +21,7 @@ package org.cyanogenmod.nemesis;
 import android.hardware.Camera;
 import android.view.ViewGroup;
 
-import org.cyanogenmod.nemesis.widgets.BurstModeWidget;
-import org.cyanogenmod.nemesis.widgets.EffectWidget;
-import org.cyanogenmod.nemesis.widgets.FlashWidget;
-import org.cyanogenmod.nemesis.widgets.HdrWidget;
-import org.cyanogenmod.nemesis.widgets.SceneModeWidget;
-import org.cyanogenmod.nemesis.widgets.VideoFrWidget;
-import org.cyanogenmod.nemesis.widgets.WhiteBalanceWidget;
-import org.cyanogenmod.nemesis.widgets.WidgetBase;
+import org.cyanogenmod.nemesis.widgets.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +54,7 @@ public class CameraCapabilities {
         mWidgets.add(new EffectWidget(cam, context));
         mWidgets.add(new BurstModeWidget(context));
         mWidgets.add(new VideoFrWidget(cam, context));
+        mWidgets.add(new SettingsWidget(cam, context));
     }
 
     /**

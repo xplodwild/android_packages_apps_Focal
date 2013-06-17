@@ -52,8 +52,8 @@ public abstract class WidgetBase {
 
     protected CameraManager mCamManager;
     private GestureDetector mGestureDetector;
-    private WidgetToggleButton mToggleButton;
-    private WidgetContainer mWidget;
+    protected WidgetToggleButton mToggleButton;
+    protected WidgetContainer mWidget;
     private int mWidgetMaxWidth;
     private boolean mIsOpen;
 
@@ -118,6 +118,16 @@ public abstract class WidgetBase {
 
     public boolean isOpen() {
         return mIsOpen;
+    }
+
+    /**
+     * Notifies the WidgetBase that the orientation has changed. WidgetBase doesn't
+     * do anything, but specific widgets might need orientation information (such as
+     * SettingsWidget to rotate the dialog).
+     * @param orientation The screen orientation
+     */
+    public void notifyOrientationChanged(int orientation) {
+
     }
 
     /**
@@ -448,6 +458,8 @@ public abstract class WidgetBase {
                             .setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
                 }
             }
+
+            WidgetBase.this.notifyOrientationChanged(orientation);
         }
     }
 
