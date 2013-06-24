@@ -46,6 +46,7 @@ public class BurstModeWidget extends WidgetBase implements View.OnClickListener 
         mBtnInf.setOnClickListener(this);
 
         mPreviousMode = mBtnOff;
+        mPreviousMode.setActiveDrawable("nemesis-burst-mode=off");
 
         mTransformer = new BurstCapture(activity);
     }
@@ -62,33 +63,33 @@ public class BurstModeWidget extends WidgetBase implements View.OnClickListener 
 
     @Override
     public void onClick(View view) {
-        mPreviousMode.setActivated(false);
+        mPreviousMode.resetImage();
 
         if (view == mBtnOff) {
             // Disable the transformer
             mCameraActivity.setCaptureTransformer(null);
-            mBtnOff.setActivated(true);
+            mBtnOff.setActiveDrawable("nemesis-burst-mode=off");
             mPreviousMode = mBtnOff;
         } else if (view == mBtn5) {
             mTransformer.setBurstCount(5);
             mCameraActivity.setCaptureTransformer(mTransformer);
-            mBtn5.setActivated(true);
+            mBtn5.setActiveDrawable("nemesis-burst-mode=5");
             mPreviousMode = mBtn5;
         } else if (view == mBtn10) {
             mTransformer.setBurstCount(10);
             mCameraActivity.setCaptureTransformer(mTransformer);
-            mBtn10.setActivated(true);
+            mBtn10.setActiveDrawable("nemesis-burst-mode=10");
             mPreviousMode = mBtn10;
         } else if (view == mBtn15) {
             mTransformer.setBurstCount(15);
             mCameraActivity.setCaptureTransformer(mTransformer);
-            mBtn15.setActivated(true);
+            mBtn15.setActiveDrawable("nemesis-burst-mode=15");
             mPreviousMode = mBtn15;
         } else if (view == mBtnInf) {
             // Infinite burst count
             mTransformer.setBurstCount(0);
             mCameraActivity.setCaptureTransformer(mTransformer);
-            mBtnInf.setActivated(true);
+            mBtnInf.setActiveDrawable("nemesis-burst-mode=inf");
             mPreviousMode = mBtnInf;
         }
     }

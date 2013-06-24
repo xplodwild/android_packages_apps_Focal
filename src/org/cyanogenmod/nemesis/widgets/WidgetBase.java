@@ -21,6 +21,7 @@ package org.cyanogenmod.nemesis.widgets;
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -31,6 +32,7 @@ import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 
+import org.cyanogenmod.nemesis.BitmapFilter;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.ui.SideBar;
@@ -293,6 +295,12 @@ public abstract class WidgetBase {
             }
 
             return (super.onTouchEvent(event) || handle);
+        }
+
+        public void setActiveDrawable(String key) {
+            setImageBitmap(BitmapFilter.getSingleton().getGlow(key,
+                    getContext().getResources().getColor(R.color.widget_option_active),
+                    ((BitmapDrawable) getDrawable()).getBitmap()));
         }
 
         private void initialize(int resId) {

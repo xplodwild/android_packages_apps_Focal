@@ -184,8 +184,6 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
         }
 
         mActiveButton = button;
-        button.setImageBitmap(BitmapFilter.getSingleton().getGlow(mKey + "=" + value,
-                mContext.getResources().getColor(R.color.widget_option_active),
-                ((BitmapDrawable) button.getDrawable()).getBitmap()));
+        mActiveButton.setActiveDrawable(mKey + "=" + value);
     }
 }
