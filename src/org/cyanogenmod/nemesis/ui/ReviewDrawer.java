@@ -115,10 +115,8 @@ public class ReviewDrawer extends LinearLayout {
                 Log.e(TAG, "event");
                 if (ev.getActionMasked() == MotionEvent.ACTION_UP) {
                     clampReviewedImageSliding();
-                } else if (ev.getActionMasked() == MotionEvent.ACTION_DOWN ||
-                        ev.getActionMasked() == MotionEvent.ACTION_MOVE) {
-                    mGestureDetector.onTouchEvent(ev);
                 }
+                mGestureDetector.onTouchEvent(ev);
 
                 return true;
             }
