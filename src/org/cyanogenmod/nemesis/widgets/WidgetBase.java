@@ -112,6 +112,39 @@ public abstract class WidgetBase {
         mWidget.addView(v, 0);
     }
 
+    /**
+     * Force the size of the grid container to the specified
+     * row and column count. The views can then be added more precisely
+     * to the container using setViewAt()
+     *
+     * @param row
+     * @param column
+     */
+    public void forceGridSize(int row, int column) {
+        mWidget.setColumnCount(column);
+        mWidget.setRowCount(row);
+    }
+
+    /**
+     * Sets the view v at the specific row/column combo slot.
+     * Pretty much useful only if you used forceGridSize
+     *
+     * @param row
+     * @param column
+     * @param v
+     */
+    public void setViewAt(int row, int column, View v) {
+        // Do some safety checks first
+        if (mWidget.getRowCount() < row+1) {
+            mWidget.setRowCount(row+1);
+        }
+        if (mWidget.getColumnCount() < column+1) {
+            mWidget.setColumnCount(column+1);
+        }
+
+        mWidget.addView(v, row * mWidget.getColumnCount() + column);
+    }
+
     public WidgetToggleButton getToggleButton() {
         return mToggleButton;
     }
@@ -246,9 +279,6 @@ public abstract class WidgetBase {
      * a {@link WidgetContainer}.
      */
     public class WidgetOptionLabel extends TextView implements WidgetOption {
-        private float mTouchOffset = 0.0f;
-        private int mOriginalResource;
-
         public WidgetOptionLabel(Context context, AttributeSet attrs,
                                   int defStyle) {
             super(context, attrs, defStyle);
@@ -275,6 +305,40 @@ public abstract class WidgetBase {
         @Override
         public int getColSpan() {
             // TODO: Return a different colspan if label larger
+            return 1;
+        }
+    }
+
+    /**
+     * Represents a non-clickable imageview put inside
+     * a {@link WidgetContainer}.
+     */
+    public class WidgetOptionImage extends ImageView implements WidgetOption {
+        public WidgetOptionImage(int resId, Context context, AttributeSet attrs,
+                                 int defStyle) {
+            super(context, attrs, defStyle);
+            initialize(resId);
+        }
+
+        public WidgetOptionImage(int resId, Context context, AttributeSet attrs) {
+            super(context, attrs);
+            initialize(resId);
+        }
+
+        public WidgetOptionImage(int resId, Context context) {
+            super(context);
+            initialize(resId);
+        }
+
+        private void initialize(int resId) {
+            setMinimumWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
+            int padding = getResources().getDimensionPixelSize(R.dimen.widget_option_button_padding);
+            setPadding(padding, padding, padding, padding);
+            setImageResource(resId);
+        }
+
+        @Override
+        public int getColSpan() {
             return 1;
         }
     }

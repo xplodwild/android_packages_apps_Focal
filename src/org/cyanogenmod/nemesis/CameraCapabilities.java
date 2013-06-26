@@ -53,9 +53,7 @@ public class CameraCapabilities {
         mWidgets.add(new HdrWidget(cam, context));
         mWidgets.add(new EffectWidget(cam, context));
         mWidgets.add(new SkinToneWidget(cam, context));
-        mWidgets.add(new ContrastWidget(cam, context));
-        mWidgets.add(new SaturationWidget(cam, context));
-        mWidgets.add(new SharpnessWidget(cam, context));
+        mWidgets.add(new EnhancementsWidget(cam, context));
         mWidgets.add(new BurstModeWidget(context));
         mWidgets.add(new VideoFrWidget(cam, context));
         mWidgets.add(new SettingsWidget(cam, context));
