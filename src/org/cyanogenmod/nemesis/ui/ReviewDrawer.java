@@ -11,6 +11,8 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -43,12 +45,16 @@ public class ReviewDrawer extends LinearLayout {
     private Handler mHandler;
     private ListView mImagesList;
     private ImageView mReviewedImage;
+    private ViewGroup mReviewedImageContainer;
     private int mReviewedImageOrientation;
     private ImageListAdapter mImagesListAdapter;
     private Bitmap mReviewedBitmap;
     private int mReviewedImageId;
     private int mCurrentOrientation;
     private boolean mIsOpen;
+    private GestureDetector mGestureDetector;
+
+
 
     public ReviewDrawer(Context context) {
         super(context);
@@ -93,63 +99,86 @@ public class ReviewDrawer extends LinearLayout {
         mImagesList.setOnItemClickListener(new ImageListClickListener());
 
         mReviewedImage = (ImageView) findViewById(R.id.reviewed_image);
-        mReviewedImage.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openInGallery(mReviewedImageId);
-            }
-        });
+        mReviewedImageContainer = (ViewGroup) findViewById(R.id.reviewed_image_container);
 
         // Load pictures from gallery
         updateFromGallery();
 
         // Make sure drawer is initially closed
         setTranslationX(-9999);
+
+        // Setup gesture detection
+        mGestureDetector = new GestureDetector(getContext(), new ReviewedGestureListener());
+        View.OnTouchListener touchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent ev) {
+                Log.e(TAG, "event");
+                if (ev.getActionMasked() == MotionEvent.ACTION_UP) {
+                    clampReviewedImageSliding();
+                } else if (ev.getActionMasked() == MotionEvent.ACTION_DOWN ||
+                        ev.getActionMasked() == MotionEvent.ACTION_MOVE) {
+                    mGestureDetector.onTouchEvent(ev);
+                }
+
+                return true;
+            }
+        };
+
+        mReviewedImageContainer.setOnTouchListener(touchListener);
     }
 
     /**
      * Clears the list of images and reload it from the Gallery (MediaStore)
+     * @note This method is threaded!
      */
     public void updateFromGallery() {
         new Thread() {
             public void run() {
-                mImages.clear();
-
-                final String[] columns = { MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID };
-                final String orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
-
-                // Select only the images that has been taken from the Camera
-                final Cursor cursor = getContext().getContentResolver().query(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
-                        new String[] { GALLERY_CAMERA_BUCKET }, orderBy);
-
-                if (cursor == null) {
-                    Log.e(TAG, "Null cursor from MediaStore!");
-                    return;
-                }
-
-                final int imageColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
-
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (int i = 0; i < cursor.getCount(); i++) {
-                            cursor.moveToPosition(i);
-
-                            int id = cursor.getInt(imageColumnIndex);
-                            addImageToList(id);
-                        }
-                    }
-                });
-
-                if (cursor.getCount() > 0) {
-                    // Set the default reviewed image to the last image
-                    cursor.moveToFirst();
-                    final int firstPictureId = cursor.getInt(imageColumnIndex);
-                    setPreviewedImage(firstPictureId);
-                }
+                updateFromGallerySynchronous();
             }
         }.start();
+    }
+
+    /**
+     * Clears the list of images and reload it from the Gallery (MediaStore)
+     * @note This method is synchronous, see updateFromGallery for the threaded one
+     */
+    public void updateFromGallerySynchronous() {
+        mImages.clear();
+
+        final String[] columns = { MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID };
+        final String orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
+
+        // Select only the images that has been taken from the Camera
+        final Cursor cursor = getContext().getContentResolver().query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
+                new String[] { GALLERY_CAMERA_BUCKET }, orderBy);
+
+        if (cursor == null) {
+            Log.e(TAG, "Null cursor from MediaStore!");
+            return;
+        }
+
+        final int imageColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < cursor.getCount(); i++) {
+                    cursor.moveToPosition(i);
+
+                    int id = cursor.getInt(imageColumnIndex);
+                    addImageToList(id);
+                }
+            }
+        });
+
+        if (cursor.getCount() > 0) {
+            // Set the default reviewed image to the last image
+            cursor.moveToLast();
+            final int firstPictureId = cursor.getInt(imageColumnIndex);
+            setPreviewedImage(firstPictureId);
+        }
     }
 
     /**
@@ -209,6 +238,7 @@ public class ReviewDrawer extends LinearLayout {
         mCurrentOrientation = orientation;
         mReviewedImage.animate().rotation(mReviewedImageOrientation + orientation)
                 .setDuration(200).setInterpolator(new DecelerateInterpolator())
+                .translationY(0.0f).alpha(1.0f)
                 .start();
     }
 
@@ -293,7 +323,7 @@ public class ReviewDrawer extends LinearLayout {
 
         float finalPos = getTranslationX() + distance;
         if (finalPos > 0) finalPos = 0;
-        
+
         setTranslationX(finalPos);
 
         if (getAlpha() == 0.0f) {
@@ -308,6 +338,43 @@ public class ReviewDrawer extends LinearLayout {
         } else {
             openImpl(getAlpha());
         }
+    }
+
+    public void clampReviewedImageSliding() {
+        if (mReviewedImage.getTranslationY() < -mReviewedImage.getHeight()/4) {
+            mReviewedImage.animate().translationY(-mReviewedImage.getHeight()).alpha(0.0f)
+                    .setDuration(300).start();
+            removeReviewedImage();
+        } else if (mReviewedImage.getTranslationY() > mReviewedImage.getHeight()/4) {
+            mReviewedImage.animate().translationY(mReviewedImage.getHeight()).alpha(0.0f)
+                    .setDuration(300).start();
+            removeReviewedImage();
+        } else {
+            mReviewedImage.animate().translationY(0).alpha(1.0f)
+                    .setDuration(300).start();
+        }
+    }
+
+    /**
+     * Removes the currently reviewed image from the
+     * internal memory.
+     */
+    public void removeReviewedImage() {
+        Util.removeFromGallery(getContext().getContentResolver(), mReviewedImageId);
+        updateFromGallery();
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mImages.size() > 0) {
+                    int imageId = mImages.get(0);
+                    setPreviewedImage(imageId);
+                    mReviewedImageId = imageId;
+                    mReviewedImage.animate().translationY(0.0f).alpha(1.0f).setDuration(300).start();
+                }
+            }
+        }, 300);
+        // XXX: Undo popup
     }
 
     /**
@@ -328,6 +395,50 @@ public class ReviewDrawer extends LinearLayout {
             int imageId = mImages.get(i);
             setPreviewedImage(imageId);
             mReviewedImageId = imageId;
+        }
+    }
+
+    /**
+     * Handles the swipe and tap gestures on the reviewed image
+     */
+    public class ReviewedGestureListener extends GestureDetector.SimpleOnGestureListener {
+        private static final int SWIPE_MIN_DISTANCE = 10;
+        private final float DRAG_MIN_DISTANCE = Util.dpToPx(getContext(), 5.0f);
+        private static final int SWIPE_MAX_OFF_PATH = 80;
+        private static final int SWIPE_THRESHOLD_VELOCITY = 800;
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            openInGallery(mReviewedImageId);
+
+            return super.onSingleTapConfirmed(e);
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            return super.onDoubleTap(e);
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+                                float distanceY) {
+            try {
+                float dY = e2.getY() - e1.getY();
+
+                if (Math.abs(e1.getX() - e2.getX()) < SWIPE_MAX_OFF_PATH) {
+                    if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MIN_DISTANCE) {
+                        mReviewedImage.setTranslationY(dY);
+                    }
+                }
+            } catch (Exception e) {
+                // nothing
+            }
+
+            float alpha = 1.0f - Math.abs(mReviewedImage.getTranslationY() / mReviewedImage.getMeasuredHeight());
+            mReviewedImage.setAlpha(alpha);
+
+            mReviewedImage.invalidate();
+            return true;
         }
     }
 

@@ -19,6 +19,7 @@
 package org.cyanogenmod.nemesis;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,6 +27,8 @@ import android.graphics.Point;
 import android.hardware.Camera.Size;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.BaseColumns;
+import android.provider.MediaStore;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
@@ -275,5 +278,10 @@ public class Util {
     public static float dpToPx(Context context, float dp) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return (int) ((dp * displayMetrics.density) + 0.5);
+    }
+
+    public static void removeFromGallery(ContentResolver cr, long id) {
+        cr.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                BaseColumns._ID + "=" + Long.toString(id), null);
     }
 }

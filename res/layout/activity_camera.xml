@@ -38,12 +38,12 @@
             android:layout_gravity="center"
             android:id="@+id/camera_preview_overlay_container">
         <ImageView
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:layout_centerInParent="true"
-            android:scaleType="fitXY"
-            android:alpha="0.0"
-            android:id="@+id/camera_preview_overlay"/>
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_centerInParent="true"
+                android:scaleType="fitXY"
+                android:alpha="0.0"
+                android:id="@+id/camera_preview_overlay"/>
     </org.cyanogenmod.nemesis.ui.PreviewFrameLayout>
 
     <org.cyanogenmod.nemesis.ui.Notifier
@@ -196,15 +196,23 @@
                 android:fadingEdgeLength="32dp"
                 android:background="#AA333333"
                 android:layout_weight="2"/>
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/reviewed_image_container"
+                android:clickable="true">
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/reviewed_image"
+                    android:layout_weight="1"
+                    android:padding="8dp"
+                    android:clickable="false"
+                    android:minWidth="400dp"
+                    android:contentDescription="@string/app_name"/>
+        </LinearLayout>
 
-        <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/reviewed_image"
-                android:layout_weight="1"
-                android:padding="8dp"
-                android:clickable="true"
-                android:minWidth="400dp"/>
 
         <TextView
                 android:layout_width="wrap_content"
@@ -216,5 +224,7 @@
                 />
 
     </org.cyanogenmod.nemesis.ui.ReviewDrawer>
+
+
 
 </FrameLayout>
