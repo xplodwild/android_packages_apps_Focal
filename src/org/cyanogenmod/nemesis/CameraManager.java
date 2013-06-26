@@ -176,6 +176,12 @@ public class CameraManager {
                     mCurrentFacing = cameraId;
                     mParameters = mCamera.getParameters();
 
+                    String params = mCamera.getParameters().flatten();
+                    for (int i = 0; i < params.length(); i += 256) {
+                        Log.e(TAG, params);
+                        params = params.substring(256);
+                    }
+
                     if (mTargetSize != null)
                         setPreviewSize(mTargetSize.x, mTargetSize.y);
 
@@ -588,7 +594,7 @@ public class CameraManager {
     public void setExposurePoint(int x, int y) {
         Camera.Parameters params = getParameters();
 
-        if (params.getMaxNumMeteringAreas() > 0) {
+        if (params != null && params.getMaxNumMeteringAreas() > 0) {
             List<Camera.Area> exposureArea = new ArrayList<Camera.Area>();
             exposureArea.add(new Camera.Area(new Rect(x, y, x + FOCUS_WIDTH, y + FOCUS_HEIGHT), 1000));
 
