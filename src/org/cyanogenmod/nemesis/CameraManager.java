@@ -116,6 +116,27 @@ public class CameraManager {
         }
     };
 
+    private class AsyncParamClassRunnable implements Runnable {
+        private Camera.Parameters mParameters;
+
+        public AsyncParamClassRunnable(Camera.Parameters params) {
+            mParameters = params;
+        }
+
+        public void run() {
+            try {
+                mCamera.setParameters(mParameters);
+            } catch (RuntimeException e) {
+                Log.e(TAG, "Could not set parameters", e);
+
+                // Reset the camera as it likely crashed if we reached here
+                open(mCurrentFacing);
+            }
+            // Read them from sensor next time
+            mParameters = null;
+        }
+    }
+
 
     public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
@@ -273,6 +294,11 @@ public class CameraManager {
 
     public void setParameterAsync(String key, String value) {
         AsyncParamRunnable run = new AsyncParamRunnable(key, value);
+        new Thread(run).start();
+    }
+
+    public void setParametersAsync(Camera.Parameters params) {
+        AsyncParamClassRunnable run = new AsyncParamClassRunnable(params);
         new Thread(run).start();
     }
 

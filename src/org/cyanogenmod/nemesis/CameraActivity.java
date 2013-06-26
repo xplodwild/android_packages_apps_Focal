@@ -32,6 +32,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.OrientationEventListener;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -75,7 +76,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private Handler mHandler;
 
     private int mOrientation = OrientationEventListener.ORIENTATION_UNKNOWN;
-    ;
     private int mOrientationCompensation = 0;
 
     private SideBar mSideBar;
@@ -88,6 +88,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private ViewGroup mRecTimerContainer;
     private Notifier mNotifier;
     private ReviewDrawer mReviewDrawer;
+    private ScaleGestureDetector mZoomGestureDetector;
+    private boolean mHasPinchZoomed;
 
     /**
      * Event: Activity created
@@ -143,6 +145,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         // Setup gesture detection
         mGestureDetector = new GestureDetector(this, new GestureListener());
+        mZoomGestureDetector = new ScaleGestureDetector(this, new ZoomGestureListener());
         View.OnTouchListener touchListener = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent ev) {
@@ -151,7 +154,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     mReviewDrawer.clampSliding();
                 }
 
-                mGestureDetector.onTouchEvent(ev);
+                // Process HUD gestures only if we aren't pinching
+                mHasPinchZoomed = false;
+                mZoomGestureDetector.onTouchEvent(ev);
+
+                if (!mHasPinchZoomed) {
+                    mGestureDetector.onTouchEvent(ev);
+                }
+
                 return true;
             }
         };
@@ -895,6 +905,30 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mCancelSwipe = false;
 
             return false;
+        }
+    }
+
+
+    /**
+     * Handles the pinch-to-zoom gesture
+     */
+    private class ZoomGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            Camera.Parameters params = mCamManager.getParameters();
+
+            if (detector.getScaleFactor() > 1.0f) {
+                params.setZoom(Math.min(params.getZoom()+1, params.getMaxZoom()));
+            } else if (detector.getScaleFactor() < 1.0f) {
+                params.setZoom(Math.max(params.getZoom()-1, 0));
+            } else {
+                return false;
+            }
+
+            mHasPinchZoomed = true;
+            mCamManager.setParametersAsync(params);
+
+            return true;
         }
     }
 
