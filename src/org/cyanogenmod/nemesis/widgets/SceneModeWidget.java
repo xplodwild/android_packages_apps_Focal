@@ -29,13 +29,23 @@ public class SceneModeWidget extends SimpleToggleWidget {
         super(cam, context, "scene-mode", R.drawable.ic_widget_scenemode);
 
         addValue("auto", R.drawable.ic_widget_scenemode_auto);
+        addValue("asd", R.drawable.ic_widget_placeholder); // TODO
         addValue("hdr", R.drawable.ic_widget_scenemode_hdr);
         addValue("portrait", R.drawable.ic_widget_scenemode_portrait);
         addValue("landscape", R.drawable.ic_widget_scenemode_landscape);
         addValue("night", R.drawable.ic_widget_scenemode_night);
         addValue("nightportrait", R.drawable.ic_widget_scenemode_nightportrait);
+        addValue("night-portrait", R.drawable.ic_widget_scenemode_nightportrait);
         addValue("beach", R.drawable.ic_widget_scenemode_beach);
         addValue("snow", R.drawable.ic_widget_scenemode_snow);
+        addValue("theatre", R.drawable.ic_widget_placeholder); // TODO
+        addValue("AR", R.drawable.ic_widget_placeholder); // TODO
+        addValue("sunset", R.drawable.ic_widget_placeholder); // TODO
+        addValue("steadyphoto", R.drawable.ic_widget_placeholder); // TODO
+        addValue("flowers", R.drawable.ic_widget_placeholder); // TODO
+        addValue("fireworks", R.drawable.ic_widget_placeholder); // TODO
+        addValue("candlelight", R.drawable.ic_widget_placeholder); // TODO
+        addValue("backlight", R.drawable.ic_widget_placeholder); // TODO
         addValue("sports", R.drawable.ic_widget_scenemode_sports);
         addValue("party", R.drawable.ic_widget_scenemode_party);
         addValue("barcode", R.drawable.ic_widget_scenemode_barcode);

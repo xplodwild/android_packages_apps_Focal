@@ -19,16 +19,13 @@
 package org.cyanogenmod.nemesis.widgets;
 
 import android.content.Context;
-import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-import org.cyanogenmod.nemesis.BitmapFilter;
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
-import org.cyanogenmod.nemesis.R;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -185,5 +182,14 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
 
         mActiveButton = button;
         mActiveButton.setActiveDrawable(mKey + "=" + value);
+    }
+
+    /**
+     * This method can be overridden by a child class, to do special actions
+     * when a value is set.
+     * @param value The value set to the key
+     */
+    public void onValueSet(String value) {
+
     }
 }

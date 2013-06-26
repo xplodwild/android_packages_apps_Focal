@@ -27,6 +27,7 @@ import org.cyanogenmod.nemesis.R;
  * Flash Widget, manages the flash settings
  */
 public class FlashWidget extends SimpleToggleWidget {
+    private static final String KEY_REDEYE_REDUCTION = "redeye-reduction";
 
     public FlashWidget(CameraManager cam, Context context) {
         super(cam, context, "flash-mode", R.drawable.ic_widget_flash_on);
@@ -34,5 +35,22 @@ public class FlashWidget extends SimpleToggleWidget {
         addValue("auto", R.drawable.ic_widget_flash_auto);
         addValue("on", R.drawable.ic_widget_flash_on);
         addValue("off", R.drawable.ic_widget_flash_off);
+    }
+
+    /**
+     * When the flash is enable, try to enable red-eye reduction (qualcomm)
+     * @param value The value set to the key
+     */
+    @Override
+    public void onValueSet(String value) {
+        if (value.equals("on") || value.equals("auto")) {
+            if (mCamManager.getParameters().get(KEY_REDEYE_REDUCTION) != null) {
+                mCamManager.setParameterAsync(KEY_REDEYE_REDUCTION, "enable");
+            }
+        } else {
+            if (mCamManager.getParameters().get(KEY_REDEYE_REDUCTION) != null) {
+                mCamManager.setParameterAsync(KEY_REDEYE_REDUCTION, "disable");
+            }
+        }
     }
 }
