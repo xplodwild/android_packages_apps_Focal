@@ -25,12 +25,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.cyanogenmod.nemesis.BitmapFilter;
 import org.cyanogenmod.nemesis.CameraManager;
@@ -240,10 +242,48 @@ public abstract class WidgetBase {
     }
 
     /**
+     * Represents a standard label (text view) put inside
+     * a {@link WidgetContainer}.
+     */
+    public class WidgetOptionLabel extends TextView implements WidgetOption {
+        private float mTouchOffset = 0.0f;
+        private int mOriginalResource;
+
+        public WidgetOptionLabel(Context context, AttributeSet attrs,
+                                  int defStyle) {
+            super(context, attrs, defStyle);
+            initialize();
+        }
+
+        public WidgetOptionLabel(Context context, AttributeSet attrs) {
+            super(context, attrs);
+            initialize();
+        }
+
+        public WidgetOptionLabel(Context context) {
+            super(context);
+            initialize();
+        }
+
+        private void initialize() {
+            setWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
+            int padding = getResources().getDimensionPixelSize(R.dimen.widget_option_button_padding);
+            setPadding(padding, padding, padding, padding);
+            setGravity(Gravity.CENTER);
+        }
+
+        @Override
+        public int getColSpan() {
+            // TODO: Return a different colspan if label larger
+            return 1;
+        }
+    }
+
+    /**
      * Represents a standard setting button put inside
      * a {@link WidgetContainer}.
      * Note that you're not forced to use exclusively buttons,
-     * TextViews can also be added (for Timer for instance)
+     * TextViews through WidgetOptionLabel can also be added (for Timer for instance)
      */
     public class WidgetOptionButton extends ImageView implements WidgetOption {
         private float mTouchOffset = 0.0f;
