@@ -71,11 +71,7 @@ public class ExposureCompensationWidget extends WidgetBase {
 
     @Override
     public boolean isSupported(Camera.Parameters params) {
-        if (params.get(KEY_PARAMETER) != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return params.get(KEY_PARAMETER) != null;
     }
 
     public int getExposureValue() {
