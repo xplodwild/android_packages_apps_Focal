@@ -22,6 +22,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.NumberPicker;
@@ -39,18 +40,19 @@ import java.util.List;
  */
 public class SettingsWidget extends WidgetBase implements View.OnClickListener {
     private WidgetOptionButton mResolutionButton;
-    private Context mContext;
+    private CameraActivity mContext;
     private List<String> mResolutionsName;
+    private List<String> mVideoResolutions;
     private List<Camera.Size> mResolutions;
     private AlertDialog mPickerDialog;
     private NumberPicker mNumberPicker;
     private int mInitialOrientation = -1;
     private int mOrientation;
 
-    public SettingsWidget(CameraManager cam, Context context) {
-        super(cam, context, R.drawable.ic_widget_placeholder);
+    public SettingsWidget(CameraActivity context) {
+        super(context.getCamManager(), context, R.drawable.ic_widget_placeholder);
         mContext = context;
-
+        CameraManager cam = context.getCamManager();
 
         // Get the available photo/video size. Unlike AOSP app, we don't
         // store manually each resolution in an XML, but we calculate it directly
@@ -69,6 +71,33 @@ public class SettingsWidget extends WidgetBase implements View.OnClickListener {
                 mResolutionsName.add(df.format(megapixels)+"MP (" + size.width + "x" + size.height + ")");
             }
         } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+            mResolutions = cam.getParameters().getSupportedVideoSizes();
+            //mResolutionsName = new ArrayList<String>();
+
+            //for (Camera.Size size : mResolutions) {
+            //    mResolutionsName.add(size.width + "x" + size.height);
+            //}
+
+            // We support a fixed set of video resolutions (pretty much like AOSP)
+            // because we need to take the CamcorderProfile (media_profiles.xml), which
+            // has a fixed set of values...
+            mResolutionsName = new ArrayList<String>();
+            mVideoResolutions = new ArrayList<String>();
+            for (Camera.Size size : mResolutions) {
+                if (size.width == 1920 && size.height == 1080) {
+                    mResolutionsName.add(mContext.getString(R.string.video_res_1080p));
+                    mVideoResolutions.add("1920x1080");
+                } else if (size.width == 1280 && size.height == 720) {
+                    mResolutionsName.add(mContext.getString(R.string.video_res_720p));
+                    mVideoResolutions.add("1280x720");
+                } else if (size.width == 720 && size.height == 480) {
+                    mResolutionsName.add(mContext.getString(R.string.video_res_480p));
+                    mVideoResolutions.add("720x480");
+                } else if (size.width == 352 && size.height == 288) {
+                    mResolutionsName.add(mContext.getString(R.string.video_res_mms));
+                    mVideoResolutions.add("352x288");
+                }
+            }
 
         }
 
@@ -135,11 +164,25 @@ public class SettingsWidget extends WidgetBase implements View.OnClickListener {
                 public void onClick(DialogInterface dialogInterface, int i) {
                     mInitialOrientation = -1;
 
-                    // Set picture size
-                    mCamManager.setPictureSize(mResolutions.get(mNumberPicker.getValue()));
+                    if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
+                        // Set picture size
+                        mCamManager.setPictureSize(mResolutions.get(mNumberPicker.getValue()));
+                    } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+                        // Set video size
+                        String resolution = mVideoResolutions.get(mNumberPicker.getValue());
+                        if (resolution.equals("1920x1080")) {
+                            // TODO cameraId!!
+                            mContext.getSnapManager().setVideoProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_1080P));
+                        } else if (resolution.equals("1280x720")) {
+                            mContext.getSnapManager().setVideoProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
+                        } else if (resolution.equals("720x480")) {
+                            mContext.getSnapManager().setVideoProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
+                        } else if (resolution.equals("352x288")) {
+                            mContext.getSnapManager().setVideoProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_CIF));
+                        }
+                    }
                 }
             });
-
 
             mPickerDialog = builder.create();
             mPickerDialog.show();

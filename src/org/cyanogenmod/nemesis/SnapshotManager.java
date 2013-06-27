@@ -211,6 +211,13 @@ public class SnapshotManager {
         }
     };
 
+    private Runnable mPreviewCaptureRunnable = new Runnable() {
+        @Override
+        public void run() {
+            // TODO
+        }
+    };
+
     public SnapshotManager(CameraManager man, FocusManager focusMan, Context ctx) {
         mContext = ctx;
         mCameraManager = man;
@@ -222,6 +229,7 @@ public class SnapshotManager {
         mImageNamer = new ImageNamer();
         mVideoNamer = new VideoNamer();
         mContentResolver = ctx.getContentResolver();
+        mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
     }
 
     public void addListener(SnapshotListener listener) {
@@ -244,6 +252,13 @@ public class SnapshotManager {
      *                             exposure value, otherwise set it to 0
      */
     public void queueSnapshot(boolean save, int exposureCompensation) {
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO
+                && mContext.getResources().getBoolean(R.bool.config_usePreviewForVideoSnapshot)) {
+            // We use the preview data for the video snapshot, instead of queueing a normal snapshot
+            new Thread(mPreviewCaptureRunnable).start();
+            return;
+        }
+
         if (mSnapshotsQueue.size() == 2) return; // No more than 2 shots at a time
 
         SnapshotInfo info = new SnapshotInfo();
@@ -262,13 +277,19 @@ public class SnapshotManager {
         }
     }
 
+    public void setVideoProfile(CamcorderProfile profile) {
+        mProfile = profile;
+
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+            mCameraManager.setPreviewSize(profile.videoFrameWidth, profile.videoFrameHeight);
+        }
+    }
+
     /**
      * Starts recording a video with the current settings
      */
     public void startVideo() {
         Log.v(TAG, "startVideo");
-        // XXX: Load that from settings
-        mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
 
         // Setup output file
         generateVideoFilename(mProfile.fileFormat);
@@ -396,7 +417,7 @@ public class SnapshotManager {
         mCurrentVideoValues.put(MediaStore.Video.Media.RESOLUTION,
                 Integer.toString(mProfile.videoFrameWidth) + "x" +
                         Integer.toString(mProfile.videoFrameHeight));
-        Location loc = null; //mLocationManager.getCurrentLocation();
+        Location loc = null; // TODO: mLocationManager.getCurrentLocation();
         if (loc != null) {
             mCurrentVideoValues.put(MediaStore.Video.Media.LATITUDE, loc.getLatitude());
             mCurrentVideoValues.put(MediaStore.Video.Media.LONGITUDE, loc.getLongitude());

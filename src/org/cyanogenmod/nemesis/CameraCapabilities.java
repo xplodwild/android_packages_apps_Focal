@@ -58,7 +58,7 @@ public class CameraCapabilities {
         mWidgets.add(new IsoWidget(cam, context));
         mWidgets.add(new BurstModeWidget(context));
         mWidgets.add(new VideoFrWidget(cam, context));
-        mWidgets.add(new SettingsWidget(cam, context));
+        mWidgets.add(new SettingsWidget(context));
     }
 
     /**

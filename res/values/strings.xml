@@ -23,5 +23,9 @@
     <string name="cannot_connect_hal">Unable to connect to camera</string>
     <string name="recording">Recording</string>
     <string name="double_tap_to_snapshot">Double-tap to take a picture</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
     <string name="OK">OK</string>
 </resources>
