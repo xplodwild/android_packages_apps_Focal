@@ -89,6 +89,7 @@
     <!-- Scene Mode widget values -->
     <string-array name="widget_scenemode_values" translatable="false">
         <item>auto</item>
+        <item>anti-motion-blur</item>
         <item>AR</item>
         <item>asd</item>
         <item>baby</item>
@@ -102,7 +103,9 @@
         <item>document</item>
         <item>fireworks</item>
         <item>flowers</item>
+        <item>handheld-twilight</item>
         <item>hdr</item>
+        <item>high-sensitivity</item>
         <item>landscape</item>
         <item>night</item>
         <item>nightportrait</item>
@@ -111,7 +114,9 @@
         <item>pet</item>
         <item>portrait</item>
         <item>snow</item>
+        <item>soft-skin</item>
         <item>sports</item>
+        <item>spot-light</item>
         <item>steadyphoto</item>
         <item>sunset</item>
         <item>sweep-stitch</item>
@@ -125,6 +130,7 @@
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_scenemode_barcode</item>
         <item>@drawable/ic_widget_scenemode_beach</item>
         <item>@drawable/ic_widget_placeholder</item>
@@ -133,7 +139,9 @@
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_scenemode_hdr</item>
+        <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_scenemode_landscape</item>
         <item>@drawable/ic_widget_scenemode_night</item>
         <item>@drawable/ic_widget_scenemode_nightportrait</item>
@@ -142,7 +150,9 @@
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_scenemode_portrait</item>
         <item>@drawable/ic_widget_scenemode_snow</item>
+        <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_scenemode_sports</item>
+        <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
