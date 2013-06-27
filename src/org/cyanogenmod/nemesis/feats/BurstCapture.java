@@ -52,13 +52,12 @@ public class BurstCapture extends CaptureTransformer {
     }
 
     private void tryTakeShot() {
-        // XXX: Find a better way to determine if the camera is ready to take a shot
-        mHandler.postDelayed(new Runnable() {
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
                 mSnapManager.queueSnapshot(true, 0);
             }
-        }, 100);
+        });
     }
 
     @Override
@@ -72,14 +71,7 @@ public class BurstCapture extends CaptureTransformer {
 
     @Override
     public void onSnapshotShutter(final SnapshotManager.SnapshotInfo info) {
-        if (!mBurstInProgress) return;
 
-        mShotsDone++;
-        Log.v(TAG, "Done " + mShotsDone + " shots");
-
-        if (mShotsDone < mBurstCount || mBurstCount == 0) {
-            tryTakeShot();
-        }
     }
 
     @Override
@@ -95,6 +87,14 @@ public class BurstCapture extends CaptureTransformer {
     @Override
     public void onSnapshotSaved(SnapshotManager.SnapshotInfo info) {
         // XXX: Show it in the quick review drawer
+        if (!mBurstInProgress) return;
+
+        mShotsDone++;
+        Log.v(TAG, "Done " + mShotsDone + " shots");
+
+        if (mShotsDone < mBurstCount || mBurstCount == 0) {
+            tryTakeShot();
+        }
     }
 
     @Override

@@ -226,8 +226,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         if (newMode == CAMERA_MODE_PHOTO) {
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
+            mCamManager.setStabilization(false);
         } else if (newMode == CAMERA_MODE_VIDEO) {
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_video));
+            mCamManager.setStabilization(true);
             mNotifier.notify(getString(R.string.double_tap_to_snapshot), 2500);
         } else if (newMode == CAMERA_MODE_PICSPHERE) {
             // PicSphere <3
@@ -537,8 +539,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
             // Lock automatic settings
             mCamManager.setLockSetup(true);
-        }
 
+            // Turn on stabilization
+            mCamManager.setStabilization(true);
+        }
     }
 
     /**
@@ -642,6 +646,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
             // Unlock camera auto settings
             mCamManager.setLockSetup(false);
+            mCamManager.setStabilization(false);
         }
 
         @Override

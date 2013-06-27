@@ -521,7 +521,6 @@ public class CameraManager {
         } else {
             return false;
         }
-
     }
 
     /**
@@ -613,6 +612,28 @@ public class CameraManager {
 
         if (mCamera != null)
             mCamera.setAutoFocusMoveCallback(cb);
+    }
+
+    /**
+     * Enable the device image stabilization system. Toggle device-specific
+     * stab as well if they exist and are implemented.
+     * @param enabled
+     */
+    public void setStabilization(boolean enabled) {
+        Camera.Parameters params = getParameters();
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
+            if (params.get("sony-is") != null) {
+                // XXX: on-still-hdr
+                params.set("sony-is", enabled ? "on" : "off");
+            }
+
+        } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+            if (params.get("sony-vs") != null) {
+                params.set("sony-vs", enabled ? "on" : "off");
+            } else {
+                params.setVideoStabilization(enabled);
+            }
+        }
     }
 
     /**

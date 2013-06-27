@@ -160,12 +160,6 @@ public class SnapshotManager {
             for (SnapshotListener listener : mListeners) {
                 listener.onSnapshotShutter(snap);
             }
-
-            // Camera is ready to take another shot, doit
-            if (mSnapshotsQueue.size() > mCurrentShutterQueueIndex + 1) {
-                mCurrentShutterQueueIndex++;
-                mHandler.post(mCaptureRunnable);
-            }
         }
     };
 
@@ -196,6 +190,12 @@ public class SnapshotManager {
 
             for (SnapshotListener listener : mListeners) {
                 listener.onSnapshotSaved(snap);
+            }
+
+            // Camera is ready to take another shot, doit
+            if (mSnapshotsQueue.size() > mCurrentShutterQueueIndex + 1) {
+                mCurrentShutterQueueIndex++;
+                mHandler.post(mCaptureRunnable);
             }
 
             // We're done with our shot here!
