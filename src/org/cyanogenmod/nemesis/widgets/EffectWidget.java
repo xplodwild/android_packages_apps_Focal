@@ -28,6 +28,6 @@ public class EffectWidget extends SimpleToggleWidget {
 
     public EffectWidget(CameraManager cam, Context context) {
         super(cam, context, KEY_EFFECT, R.drawable.ic_widget_effect);
-        inflateFromXml(R.array.widget_effects_values, R.array.widget_flash_icons);
+        inflateFromXml(R.array.widget_effects_values, R.array.widget_effects_icons);
     }
 }
