@@ -114,7 +114,9 @@ public class CameraManager {
             // Read them from sensor next time
             mParameters = null;
         }
-    };
+    }
+
+    ;
 
     private class AsyncParamClassRunnable implements Runnable {
         private Camera.Parameters mParameters;
@@ -311,6 +313,7 @@ public class CameraManager {
     /**
      * Locks the automatic settings of the camera device, like White balance and
      * exposure.
+     *
      * @param lock true to lock, false to unlock
      */
     public void setLockSetup(boolean lock) {
@@ -329,6 +332,7 @@ public class CameraManager {
 
     /**
      * Returns the last frame of the preview surface
+     *
      * @return Bitmap
      */
     public Bitmap getLastPreviewFrame() {
@@ -359,6 +363,7 @@ public class CameraManager {
 
     /**
      * Returns the system time of when the last preview frame was received
+     *
      * @return long
      */
     public long getLastPreviewFrameTime() {
@@ -368,6 +373,7 @@ public class CameraManager {
     /**
      * Defines a new size for the recorded picture
      * XXX: Should it update preview size?!
+     *
      * @param sz The new picture size
      */
     public void setPictureSize(Camera.Size sz) {
@@ -637,6 +643,7 @@ public class CameraManager {
         public void notifyPreviewSize(int width, int height) {
             mLastFrameBytes = new byte[(int) (width * height * 1.5 + 0.5)];
         }
+
         public byte[] getLastFrameBytes() {
             return mLastFrameBytes;
         }

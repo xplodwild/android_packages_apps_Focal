@@ -55,7 +55,6 @@ public class ReviewDrawer extends LinearLayout {
     private GestureDetector mGestureDetector;
 
 
-
     public ReviewDrawer(Context context) {
         super(context);
         initialize();
@@ -127,6 +126,7 @@ public class ReviewDrawer extends LinearLayout {
 
     /**
      * Clears the list of images and reload it from the Gallery (MediaStore)
+     *
      * @note This method is threaded!
      */
     public void updateFromGallery() {
@@ -139,18 +139,19 @@ public class ReviewDrawer extends LinearLayout {
 
     /**
      * Clears the list of images and reload it from the Gallery (MediaStore)
+     *
      * @note This method is synchronous, see updateFromGallery for the threaded one
      */
     public void updateFromGallerySynchronous() {
         mImages.clear();
 
-        final String[] columns = { MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID };
+        final String[] columns = {MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID};
         final String orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
 
         // Select only the images that has been taken from the Camera
         final Cursor cursor = getContext().getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
-                new String[] { GALLERY_CAMERA_BUCKET }, orderBy);
+                new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
 
         if (cursor == null) {
             Log.e(TAG, "Null cursor from MediaStore!");
@@ -181,10 +182,11 @@ public class ReviewDrawer extends LinearLayout {
 
     /**
      * Queries the Media service for image orientation
+     *
      * @param id The id of the gallery image
      * @return The orientation of the image, or 0 if it failed
      */
-    public int getCameraPhotoOrientation(final int id){
+    public int getCameraPhotoOrientation(final int id) {
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
                 .appendPath(Integer.toString(id)).build();
 
@@ -199,6 +201,7 @@ public class ReviewDrawer extends LinearLayout {
 
     /**
      * Sets the previewed image in the review drawer
+     *
      * @param id The id the of the image
      */
     public void setPreviewedImage(final int id) {
@@ -226,6 +229,7 @@ public class ReviewDrawer extends LinearLayout {
 
     /**
      * Add an image at the head of the image ribbon
+     *
      * @param id The id of the image from the MediaStore
      */
     public void addImageToList(int id) {
@@ -251,6 +255,7 @@ public class ReviewDrawer extends LinearLayout {
     /**
      * Sets the review drawer to temporary hide, by reducing alpha to a very low
      * level
+     *
      * @param enabled To hide or not to hide, that is the question
      */
     public void setTemporaryHide(boolean enabled) {
@@ -312,6 +317,7 @@ public class ReviewDrawer extends LinearLayout {
 
     /**
      * Slide the review drawer of the specified distance on the X axis
+     *
      * @param distance
      */
     public void slide(float distance) {
@@ -331,7 +337,7 @@ public class ReviewDrawer extends LinearLayout {
     }
 
     public void clampSliding() {
-        if (getTranslationX() < -getMeasuredWidth()/2) {
+        if (getTranslationX() < -getMeasuredWidth() / 2) {
             close();
         } else {
             openImpl(getAlpha());
@@ -339,11 +345,11 @@ public class ReviewDrawer extends LinearLayout {
     }
 
     public void clampReviewedImageSliding() {
-        if (mReviewedImage.getTranslationY() < -mReviewedImage.getHeight()/4) {
+        if (mReviewedImage.getTranslationY() < -mReviewedImage.getHeight() / 4) {
             mReviewedImage.animate().translationY(-mReviewedImage.getHeight()).alpha(0.0f)
                     .setDuration(300).start();
             removeReviewedImage();
-        } else if (mReviewedImage.getTranslationY() > mReviewedImage.getHeight()/4) {
+        } else if (mReviewedImage.getTranslationY() > mReviewedImage.getHeight() / 4) {
             mReviewedImage.animate().translationY(mReviewedImage.getHeight()).alpha(0.0f)
                     .setDuration(300).start();
             removeReviewedImage();
