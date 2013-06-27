@@ -19,6 +19,7 @@
 package org.cyanogenmod.nemesis.widgets;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +27,7 @@ import android.view.View.OnClickListener;
 
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
+import org.cyanogenmod.nemesis.R;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -182,6 +184,21 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
 
         mActiveButton = button;
         mActiveButton.setActiveDrawable(mKey + "=" + value);
+    }
+
+    /**
+     * Inflate the buttons and icons from the provided values and icons
+     * arrays.
+     * @param valuesArray
+     * @param iconsArray
+     */
+    public void inflateFromXml(int valuesArray, int iconsArray) {
+        String[] values = mContext.getResources().getStringArray(valuesArray);
+        TypedArray icons = mContext.getResources().obtainTypedArray(iconsArray);
+
+        for (int i = 0; i < values.length; i++) {
+            addValue(values[i], icons.getResourceId(i, -1));
+        }
     }
 
     /**

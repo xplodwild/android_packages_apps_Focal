@@ -20,6 +20,7 @@ package org.cyanogenmod.nemesis.widgets;
 
 import android.content.Context;
 
+import android.content.res.TypedArray;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 
@@ -28,13 +29,11 @@ import org.cyanogenmod.nemesis.R;
  */
 public class FlashWidget extends SimpleToggleWidget {
     private static final String KEY_REDEYE_REDUCTION = "redeye-reduction";
+    private static final String KEY_FLASH_MODE = "flash-mode";
 
     public FlashWidget(CameraManager cam, Context context) {
-        super(cam, context, "flash-mode", R.drawable.ic_widget_flash_on);
-
-        addValue("auto", R.drawable.ic_widget_flash_auto);
-        addValue("on", R.drawable.ic_widget_flash_on);
-        addValue("off", R.drawable.ic_widget_flash_off);
+        super(cam, context, KEY_FLASH_MODE, R.drawable.ic_widget_flash_on);
+        inflateFromXml(R.array.widget_flash_values, R.array.widget_flash_icons);
     }
 
     /**

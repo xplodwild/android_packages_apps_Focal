@@ -27,15 +27,10 @@ import org.cyanogenmod.nemesis.R;
  * ISO widget, sets ISO sensitivity value
  */
 public class IsoWidget extends SimpleToggleWidget {
-    public IsoWidget(CameraManager cam, Context context) {
-        super(cam, context, "iso", R.drawable.ic_widget_iso);
+    private static final String KEY_ISO = "iso";
 
-        addValue("auto",    R.drawable.ic_widget_iso_auto);
-        addValue("ISO_HJR", R.drawable.ic_widget_iso_hjr);
-        addValue("ISO100",  R.drawable.ic_widget_iso_100);
-        addValue("ISO200",  R.drawable.ic_widget_iso_200);
-        addValue("ISO400",  R.drawable.ic_widget_iso_400);
-        addValue("ISO800",  R.drawable.ic_widget_iso_800);
-        addValue("ISO1600", R.drawable.ic_widget_iso_1600);
+    public IsoWidget(CameraManager cam, Context context) {
+        super(cam, context, KEY_ISO, R.drawable.ic_widget_iso);
+        inflateFromXml(R.array.widget_iso_values, R.array.widget_iso_icons);
     }
 }

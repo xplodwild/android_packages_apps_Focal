@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2013 The CyanogenMod Project
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+
+<resources>
+    <!-- Flash widget values -->
+    <string-array name="widget_flash_values" translatable="false">
+        <item>auto</item>
+        <item>off</item>
+        <item>on</item>
+        <item>red-eye</item>
+    </string-array>
+
+    <array name="widget_flash_icons">
+        <item>@drawable/ic_widget_flash_auto</item>
+        <item>@drawable/ic_widget_flash_off</item>
+        <item>@drawable/ic_widget_flash_on</item>
+        <item>@drawable/ic_widget_placeholder</item>
+    </array>
+
+
+    <!-- Effects widget values -->
+    <string-array name="widget_effects_values" translatable="false">
+        <item>none</item>
+        <item>mono</item>
+        <item>negative</item>
+        <item>solarize</item>
+        <item>sepia</item>
+        <item>posterize</item>
+        <item>blackboard</item>
+        <item>whiteboard</item>
+        <item>aqua</item>
+        <item>emboss</item>
+        <item>sketch</item>
+        <item>neon</item>
+    </string-array>
+
+    <array name="widget_effects_icons">
+        <item>@drawable/ic_widget_effect_none</item>
+        <item>@drawable/ic_widget_effect_mono</item>
+        <item>@drawable/ic_widget_effect_negative</item>
+        <item>@drawable/ic_widget_effect_solarize</item>
+        <item>@drawable/ic_widget_effect_sepia</item>
+        <item>@drawable/ic_widget_effect_posterize</item>
+        <item>@drawable/ic_widget_effect_blackboard</item>
+        <item>@drawable/ic_widget_effect_whiteboard</item>
+        <item>@drawable/ic_widget_effect_aqua</item>
+        <item>@drawable/ic_widget_effect_emboss</item>
+        <item>@drawable/ic_widget_effect_sketch</item>
+        <item>@drawable/ic_widget_effect_neon</item>
+    </array>
+
+    <!-- ISO widget values -->
+    <string-array name="widget_iso_values" translatable="false">
+        <item>auto</item>
+        <item>ISO_HJR</item>
+        <item>ISO100</item>
+        <item>ISO200</item>
+        <item>ISO400</item>
+        <item>ISO800</item>
+        <item>ISO1600</item>
+    </string-array>
+
+    <array name="widget_iso_icons">
+        <item>@drawable/ic_widget_iso_auto</item>
+        <item>@drawable/ic_widget_iso_hjr</item>
+        <item>@drawable/ic_widget_iso_100</item>
+        <item>@drawable/ic_widget_iso_200</item>
+        <item>@drawable/ic_widget_iso_400</item>
+        <item>@drawable/ic_widget_iso_800</item>
+        <item>@drawable/ic_widget_iso_1600</item>
+    </array>
+
+    <!-- Scene Mode widget values -->
+    <string-array name="widget_scenemode_values" translatable="false">
+        <item>auto</item>
+        <item>asd</item>
+        <item>hdr</item>
+        <item>portrait</item>
+        <item>landscape</item>
+        <item>night</item>
+        <item>nightportrait</item>
+        <item>night-portrait</item>
+        <item>beach</item>
+        <item>snow</item>
+        <item>theatre</item>
+        <item>AR</item>
+        <item>sunset</item>
+        <item>steadyphoto</item>
+        <item>flowers</item>
+        <item>fireworks</item>
+        <item>candlelight</item>
+        <item>backlight</item>
+        <item>sports</item>
+        <item>party</item>
+        <item>barcode</item>
+    </string-array>
+
+    <array name="widget_scenemode_icons">
+        <item>@drawable/ic_widget_scenemode_auto</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_hdr</item>
+        <item>@drawable/ic_widget_scenemode_portrait</item>
+        <item>@drawable/ic_widget_scenemode_landscape</item>
+        <item>@drawable/ic_widget_scenemode_night</item>
+        <item>@drawable/ic_widget_scenemode_nightportrait</item>
+        <item>@drawable/ic_widget_scenemode_nightportrait</item>
+        <item>@drawable/ic_widget_scenemode_beach</item>
+        <item>@drawable/ic_widget_scenemode_snow</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_sports</item>
+        <item>@drawable/ic_widget_scenemode_party</item>
+        <item>@drawable/ic_widget_scenemode_barcode</item>
+    </array>
+
+    <string-array name="widget_whitebalance_values" translatable="false">
+        <item>auto</item>
+        <item>cloudy</item>
+        <item>incandescent</item>
+        <item>fluorescent</item>
+        <item>daylight</item>
+        <item>cloudy-daylight</item>
+    </string-array>
+
+    <array name="widget_whitebalance_icons">
+        <item>@drawable/ic_widget_wb_auto</item>
+        <item>@drawable/ic_widget_wb_cloudy</item>
+        <item>@drawable/ic_widget_wb_incandescent</item>
+        <item>@drawable/ic_widget_wb_fluorescent</item>
+        <item>@drawable/ic_widget_wb_daylight</item>
+        <item>@drawable/ic_widget_wb_cloudy_daylight</item>
+    </array>
+</resources>
