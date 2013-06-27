@@ -47,18 +47,22 @@ public class CameraCapabilities {
         // Populate the list of widgets.
         // Basically, if we add a new widget, we just put it here. They
         // will populate the sidebar in the same order as here
-        mWidgets.add(new FlashWidget(cam, context));
-        mWidgets.add(new WhiteBalanceWidget(cam, context));
-        mWidgets.add(new SceneModeWidget(cam, context));
-        mWidgets.add(new HdrWidget(cam, context));
-        mWidgets.add(new EffectWidget(cam, context));
-        mWidgets.add(new ExposureCompensationWidget(cam, context));
-        mWidgets.add(new SkinToneWidget(cam, context));
-        mWidgets.add(new EnhancementsWidget(cam, context));
-        mWidgets.add(new IsoWidget(cam, context));
-        mWidgets.add(new BurstModeWidget(context));
-        mWidgets.add(new VideoFrWidget(cam, context));
-        mWidgets.add(new SettingsWidget(cam, context));
+        try {
+            mWidgets.add(new FlashWidget(cam, context));
+            mWidgets.add(new WhiteBalanceWidget(cam, context));
+            mWidgets.add(new SceneModeWidget(cam, context));
+            mWidgets.add(new HdrWidget(cam, context));
+            mWidgets.add(new EffectWidget(cam, context));
+            mWidgets.add(new ExposureCompensationWidget(cam, context));
+            mWidgets.add(new SkinToneWidget(cam, context));
+            mWidgets.add(new EnhancementsWidget(cam, context));
+            mWidgets.add(new IsoWidget(cam, context));
+            mWidgets.add(new BurstModeWidget(context));
+            mWidgets.add(new VideoFrWidget(cam, context));
+            mWidgets.add(new SettingsWidget(cam, context));
+         } catch (Exception e) {
+                // We'll deal with this in populateSidebar(), by removing unsupported widgets
+         }
     }
 
     /**
