@@ -89,50 +89,64 @@
     <!-- Scene Mode widget values -->
     <string-array name="widget_scenemode_values" translatable="false">
         <item>auto</item>
+        <item>AR</item>
         <item>asd</item>
+        <item>baby</item>
+        <item>backlight</item>
+        <item>backlight-portrait</item>
+        <item>barcode</item>
+        <item>beach</item>
+        <item>candlelight</item>
+        <item>dark</item>
+        <item>dish</item>
+        <item>document</item>
+        <item>fireworks</item>
+        <item>flowers</item>
         <item>hdr</item>
-        <item>portrait</item>
         <item>landscape</item>
         <item>night</item>
         <item>nightportrait</item>
         <item>night-portrait</item>
-        <item>beach</item>
-        <item>snow</item>
-        <item>theatre</item>
-        <item>AR</item>
-        <item>sunset</item>
-        <item>steadyphoto</item>
-        <item>flowers</item>
-        <item>fireworks</item>
-        <item>candlelight</item>
-        <item>backlight</item>
-        <item>sports</item>
         <item>party</item>
-        <item>barcode</item>
+        <item>pet</item>
+        <item>portrait</item>
+        <item>snow</item>
+        <item>sports</item>
+        <item>steadyphoto</item>
+        <item>sunset</item>
+        <item>sweep-stitch</item>
+        <item>theatre</item>
     </string-array>
 
     <array name="widget_scenemode_icons">
         <item>@drawable/ic_widget_scenemode_auto</item>
         <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_barcode</item>
+        <item>@drawable/ic_widget_scenemode_beach</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_scenemode_hdr</item>
-        <item>@drawable/ic_widget_scenemode_portrait</item>
         <item>@drawable/ic_widget_scenemode_landscape</item>
         <item>@drawable/ic_widget_scenemode_night</item>
         <item>@drawable/ic_widget_scenemode_nightportrait</item>
         <item>@drawable/ic_widget_scenemode_nightportrait</item>
-        <item>@drawable/ic_widget_scenemode_beach</item>
-        <item>@drawable/ic_widget_scenemode_snow</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_scenemode_sports</item>
         <item>@drawable/ic_widget_scenemode_party</item>
-        <item>@drawable/ic_widget_scenemode_barcode</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_portrait</item>
+        <item>@drawable/ic_widget_scenemode_snow</item>
+        <item>@drawable/ic_widget_scenemode_sports</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
     </array>
 
     <string-array name="widget_whitebalance_values" translatable="false">
