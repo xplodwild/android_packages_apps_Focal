@@ -81,7 +81,14 @@ public class SkinToneWidget extends WidgetBase {
     }
 
     public int getToneValue() {
-        return Integer.parseInt(mCamManager.getParameters().get(KEY_PARAMETER));
+        Camera.Parameters params = mCamManager.getParameters();
+        String value = params.get(KEY_PARAMETER);
+
+        if (value != null) {
+            return Integer.parseInt(value);
+        } else {
+            return 0;
+        }
     }
 
     public void setToneValue(int value) {

@@ -78,8 +78,6 @@ public class EnhancementsWidget extends WidgetBase {
         super(cam, context, R.drawable.ic_widget_contrast);
 
         // Add views in the widget
-        //forceGridSize(3, 3);
-
         mMinusButton = new WidgetOptionButton[ROW_COUNT];
         mPlusButton = new WidgetOptionButton[ROW_COUNT];
         mValueLabel = new WidgetOptionLabel[ROW_COUNT];
@@ -131,7 +129,14 @@ public class EnhancementsWidget extends WidgetBase {
     }
 
     public int getValue(String key) {
-        return Integer.parseInt(mCamManager.getParameters().get(key));
+        Camera.Parameters params = mCamManager.getParameters();
+        String value = params.get(key);
+
+        if (value != null) {
+            return Integer.parseInt(value);
+        } else {
+            return 0;
+        }
     }
 
     public void setValue(String key, int value) {
