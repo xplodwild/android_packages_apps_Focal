@@ -180,6 +180,14 @@ public class WidgetRenderer extends FrameLayout {
         reorderWidgets(null);
     }
 
+    /**
+     * Close all the widgets currently opened
+     */
+    public void closeAllWidgets() {
+        for (int i = 0; i < mOpenWidgets.size(); i++) {
+            mOpenWidgets.get(i).getWidgetBase().close();
+        }
+    }
 
     public void notifySidebarSlideStatus(float distance) {
         float finalY = getTranslationY() + distance;

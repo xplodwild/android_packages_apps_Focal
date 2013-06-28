@@ -285,6 +285,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 if (params == null) {
                     mHandler.postDelayed(this, 100);
                 } else {
+                    // Close all widgets
+                    mWidgetRenderer.closeAllWidgets();
+
                     // Update sidebar
                     mSideBar.checkCapabilities(CameraActivity.this, (ViewGroup) findViewById(R.id.widgets_container));
 
