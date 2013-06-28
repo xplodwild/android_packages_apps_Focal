@@ -90,6 +90,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private ReviewDrawer mReviewDrawer;
     private ScaleGestureDetector mZoomGestureDetector;
     private boolean mHasPinchZoomed;
+    private boolean mCancelSideBarClose;
 
     /**
      * Event: Activity created
@@ -295,6 +296,19 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         });
     }
 
+    public boolean isExposureRingVisible() {
+        return (mExposureHudRing.getVisibility() == View.VISIBLE);
+    }
+
+    public void setExposureRingVisible(boolean visible) {
+        mExposureHudRing.setVisibility(visible ? View.VISIBLE : View.GONE);
+
+        // Internally reset the position of the exposure ring, while still
+        // leaving it at its position so that if the user toggles it back
+        // on, it will appear at its previous location
+        mCamManager.setExposurePoint(0, 0);
+    }
+
     protected void setupCamera() {
         // Setup the Camera hardware and preview surface
         mCamManager = new CameraManager(this);
@@ -364,11 +378,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 }
 
                 // Hide sidebar after start
+                mCancelSideBarClose = false;
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mSideBar.slideClose();
-                        mWidgetRenderer.notifySidebarSlideClose();
+                        if (!mCancelSideBarClose) {
+                            mSideBar.slideClose();
+                            mWidgetRenderer.notifySidebarSlideClose();
+                        }
                     }
                 }, 1500);
 
@@ -864,6 +881,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                         mSideBar.slide(-distanceY);
                         mWidgetRenderer.notifySidebarSlideStatus(-distanceY);
                         mCancelSwipe = true;
+                        mCancelSideBarClose = true;
                     }
 
                     return true;
@@ -887,12 +905,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                         } else {
                             mSideBar.slideOpen();
                             mWidgetRenderer.notifySidebarSlideOpen();
+                            mCancelSideBarClose = true;
                         }
                     } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
                             && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                         if (mSideBar.isOpen()) {
                             mSideBar.slideClose();
                             mWidgetRenderer.notifySidebarSlideClose();
+                            mCancelSideBarClose = true;
                         } else if (!mWidgetRenderer.isHidden()
                                 && mWidgetRenderer.getWidgetsCount() > 0
                                 && !mCancelSwipe) {
