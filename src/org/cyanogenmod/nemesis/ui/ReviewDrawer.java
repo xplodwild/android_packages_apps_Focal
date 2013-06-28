@@ -236,7 +236,6 @@ public class ReviewDrawer extends LinearLayout {
         mCurrentOrientation = orientation;
         mReviewedImage.animate().rotation(mReviewedImageOrientation + orientation)
                 .setDuration(200).setInterpolator(new DecelerateInterpolator())
-                .translationY(0.0f).alpha(1.0f)
                 .start();
     }
 
