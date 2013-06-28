@@ -22,4 +22,8 @@
 
     <!-- Whether or not to enable camera-mode=1 for ZSL on Qcom devices -->
     <bool name="config_qualcommZslCameraMode">true</bool>
+
+    <!-- Whether or not to use preview data to take snapshots while in the video mode.
+     This enables snapshot during videos on older devices. -->
+    <bool name="config_usePreviewForVideoSnapshot">false</bool>
 </resources>

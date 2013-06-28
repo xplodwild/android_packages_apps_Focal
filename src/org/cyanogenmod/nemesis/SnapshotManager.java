@@ -34,6 +34,7 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -214,7 +215,38 @@ public class SnapshotManager {
     private Runnable mPreviewCaptureRunnable = new Runnable() {
         @Override
         public void run() {
-            // TODO
+            Camera.Size s = mCameraManager.getParameters().getPreviewSize();
+            mImageNamer.prepareUri(mContentResolver, System.currentTimeMillis(), s.width, s.height, 0);
+
+            SnapshotInfo info = new SnapshotInfo();
+            info.mSave = true;
+            info.mExposureCompensation = 0;
+            info.mThumbnail = mCameraManager.getLastPreviewFrame();
+
+            for (SnapshotListener listener : mListeners) {
+                listener.onSnapshotShutter(info);
+            }
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            info.mThumbnail.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+            byte[] jpegData = baos.toByteArray();
+
+            // Calculate the width and the height of the jpeg.
+            int orientation = Exif.getOrientation(jpegData) - mCameraManager.getOrientation();
+            int width, height;
+            width = s.width;
+            height = s.height;
+
+            Uri uri = mImageNamer.getUri();
+            String title = mImageNamer.getTitle();
+            info.mUri = uri;
+
+            mImageSaver.addImage(jpegData, uri, title, null,
+                    width, height, orientation);
+
+            for (SnapshotListener listener : mListeners) {
+                listener.onSnapshotSaved(info);
+            }
         }
     };
 

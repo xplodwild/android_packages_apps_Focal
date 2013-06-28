@@ -635,14 +635,20 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         };
 
         @Override
-        public void onSnapshotShutter(SnapshotManager.SnapshotInfo info) {
-            FrameLayout layout = (FrameLayout) findViewById(R.id.thumb_flinger_container);
+        public void onSnapshotShutter(final SnapshotManager.SnapshotInfo info) {
+            final FrameLayout layout = (FrameLayout) findViewById(R.id.thumb_flinger_container);
 
             // Fling the preview
-            ThumbnailFlinger flinger = new ThumbnailFlinger(CameraActivity.this);
-            layout.addView(flinger);
-            flinger.setImageBitmap(info.mThumbnail);
-            flinger.doAnimation();
+            final ThumbnailFlinger flinger = new ThumbnailFlinger(CameraActivity.this);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    layout.addView(flinger);
+                    flinger.setImageBitmap(info.mThumbnail);
+                    flinger.doAnimation();
+                }
+            });
+
 
             // Unlock camera auto settings
             mCamManager.setLockSetup(false);
