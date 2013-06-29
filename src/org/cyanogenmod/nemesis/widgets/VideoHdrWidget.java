@@ -20,6 +20,7 @@ package org.cyanogenmod.nemesis.widgets;
 
 import android.content.Context;
 import android.hardware.Camera;
+
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 

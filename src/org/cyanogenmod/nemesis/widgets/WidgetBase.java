@@ -100,7 +100,7 @@ public abstract class WidgetBase {
      * @param v The view to add
      */
     public void addViewToContainer(View v) {
-        if (mWidget.getRowCount() * mWidget.getColumnCount() < mWidget.getChildCount()+1) {
+        if (mWidget.getRowCount() * mWidget.getColumnCount() < mWidget.getChildCount() + 1) {
             if (mWidget.getRowCount() == mWidgetMaxWidth) {
                 // Add a new column instead of a line to fit the max width
                 mWidget.setColumnCount(mWidget.getColumnCount() + 1);
@@ -135,11 +135,11 @@ public abstract class WidgetBase {
      */
     public void setViewAt(int row, int column, View v) {
         // Do some safety checks first
-        if (mWidget.getRowCount() < row+1) {
-            mWidget.setRowCount(row+1);
+        if (mWidget.getRowCount() < row + 1) {
+            mWidget.setRowCount(row + 1);
         }
-        if (mWidget.getColumnCount() < column+1) {
-            mWidget.setColumnCount(column+1);
+        if (mWidget.getColumnCount() < column + 1) {
+            mWidget.setColumnCount(column + 1);
         }
 
         mWidget.addView(v, row * mWidget.getColumnCount() + column);
@@ -161,6 +161,7 @@ public abstract class WidgetBase {
      * Notifies the WidgetBase that the orientation has changed. WidgetBase doesn't
      * do anything, but specific widgets might need orientation information (such as
      * SettingsWidget to rotate the dialog).
+     *
      * @param orientation The screen orientation
      */
     public void notifyOrientationChanged(int orientation) {
@@ -280,7 +281,7 @@ public abstract class WidgetBase {
      */
     public class WidgetOptionLabel extends TextView implements WidgetOption {
         public WidgetOptionLabel(Context context, AttributeSet attrs,
-                                  int defStyle) {
+                                 int defStyle) {
             super(context, attrs, defStyle);
             initialize();
         }

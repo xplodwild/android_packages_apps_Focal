@@ -37,6 +37,7 @@
             android:visibility="visible"
             android:layout_gravity="center"
             android:id="@+id/camera_preview_overlay_container">
+
         <ImageView
                 android:layout_height="match_parent"
                 android:layout_width="wrap_content"
@@ -196,12 +197,14 @@
                 android:fadingEdgeLength="32dp"
                 android:background="#AA333333"
                 android:layout_weight="2"/>
+
         <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:id="@+id/reviewed_image_container"
                 android:clickable="true">
+
             <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -224,7 +227,6 @@
                 />
 
     </org.cyanogenmod.nemesis.ui.ReviewDrawer>
-
 
 
 </FrameLayout>

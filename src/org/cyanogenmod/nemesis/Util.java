@@ -202,7 +202,7 @@ public class Util {
         Bitmap bmp = null;
 
         if (Build.VERSION.SDK_INT >= 17) {
-            final RenderScript rs = RenderScript.create( context );
+            final RenderScript rs = RenderScript.create(context);
             final ScriptIntrinsicYuvToRGB script = ScriptIntrinsicYuvToRGB.create(rs, Element.RGBA_8888(rs));
             Type.Builder tb = new Type.Builder(rs, Element.RGBA_8888(rs));
             tb.setX(width);

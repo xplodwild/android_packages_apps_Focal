@@ -471,7 +471,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     long time = System.currentTimeMillis();
                     final Bitmap blurredPreview = BitmapFilter.getSingleton()
                             .getBlur(CameraActivity.this, preview, 16);
-                    long elapsed = System.currentTimeMillis()-time;
+                    long elapsed = System.currentTimeMillis() - time;
 
                     Log.v(TAG, "Took " + elapsed + "ms to blur");
 
@@ -952,9 +952,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             Camera.Parameters params = mCamManager.getParameters();
 
             if (detector.getScaleFactor() > 1.0f) {
-                params.setZoom(Math.min(params.getZoom()+1, params.getMaxZoom()));
+                params.setZoom(Math.min(params.getZoom() + 1, params.getMaxZoom()));
             } else if (detector.getScaleFactor() < 1.0f) {
-                params.setZoom(Math.max(params.getZoom()-1, 0));
+                params.setZoom(Math.max(params.getZoom() - 1, 0));
             } else {
                 return false;
             }

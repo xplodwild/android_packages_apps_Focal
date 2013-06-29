@@ -20,7 +20,6 @@ package org.cyanogenmod.nemesis.widgets;
 
 import android.content.Context;
 
-import android.content.res.TypedArray;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 
@@ -38,6 +37,7 @@ public class FlashWidget extends SimpleToggleWidget {
 
     /**
      * When the flash is enable, try to enable red-eye reduction (qualcomm)
+     *
      * @param value The value set to the key
      */
     @Override

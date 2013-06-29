@@ -27,7 +27,6 @@ import android.view.View.OnClickListener;
 
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
-import org.cyanogenmod.nemesis.R;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -65,6 +64,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
 
     /**
      * Defines or redefines the key used for the settings
+     *
      * @param key
      */
     protected void setKey(String key) {
@@ -73,6 +73,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
 
     /**
      * Sets whether or not this setting applies only in video mode
+     *
      * @param videoOnly
      */
     protected void setVideoOnly(boolean videoOnly) {
@@ -84,7 +85,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
      * If the HAL reports a [key]-values array, it will check and filter
      * the values against this array. Otherwise, all the values are added
      * to the list.
-     *
+     * <p/>
      * You might want to check for device-specific values that aren't
      * reported in -values in the child class before doing addValue
      *
@@ -189,6 +190,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
     /**
      * Inflate the buttons and icons from the provided values and icons
      * arrays.
+     *
      * @param valuesArray
      * @param iconsArray
      */
@@ -204,6 +206,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
     /**
      * This method can be overridden by a child class, to do special actions
      * when a value is set.
+     *
      * @param value The value set to the key
      */
     public void onValueSet(String value) {

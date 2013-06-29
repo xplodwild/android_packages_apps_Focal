@@ -138,14 +138,14 @@ public class SettingsWidget extends WidgetBase {
             mResolutions = cam.getParameters().getSupportedPictureSizes();
             mResolutionsName = new ArrayList<String>();
 
-            DecimalFormat df = new DecimalFormat( ) ;
+            DecimalFormat df = new DecimalFormat();
             df.setMaximumFractionDigits(1);
             df.setMinimumFractionDigits(0);
             df.setDecimalSeparatorAlwaysShown(false);
 
             for (Camera.Size size : mResolutions) {
                 float megapixels = size.width * size.height / 1000000.0f;
-                mResolutionsName.add(df.format(megapixels)+"MP (" + size.width + "x" + size.height + ")");
+                mResolutionsName.add(df.format(megapixels) + "MP (" + size.width + "x" + size.height + ")");
             }
         } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
             mResolutions = cam.getParameters().getSupportedVideoSizes();
@@ -206,11 +206,10 @@ public class SettingsWidget extends WidgetBase {
             else
                 finalRot += mInitialOrientation;
 
-            ((ViewGroup)mNumberPicker.getParent().getParent().getParent().getParent())
+            ((ViewGroup) mNumberPicker.getParent().getParent().getParent().getParent())
                     .animate().rotation(orientation - mInitialOrientation).setDuration(300).start();
 
         }
     }
-
 
 }

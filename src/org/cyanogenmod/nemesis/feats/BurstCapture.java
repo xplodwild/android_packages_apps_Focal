@@ -4,7 +4,6 @@ import android.os.Handler;
 import android.util.Log;
 
 import org.cyanogenmod.nemesis.CameraActivity;
-import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.SnapshotManager;
 import org.cyanogenmod.nemesis.ui.ShutterButton;
 
@@ -29,6 +28,7 @@ public class BurstCapture extends CaptureTransformer {
     /**
      * Set the number of shots to take, or 0 for an infinite shooting
      * (that will need to be stopped using terminateBurstShot)
+     *
      * @param count The number of shots
      */
     public void setBurstCount(int count) {

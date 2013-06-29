@@ -36,14 +36,14 @@ public class EnhancementsWidget extends WidgetBase {
     private static final String KEY_SATURATION_PARAMETER = "saturation";
     private static final String KEY_MAX_SATURATION_PARAMETER = "max-saturation";
 
-    private static final int ROW_CONTRAST   = 0;
-    private static final int ROW_SHARPNESS  = 1;
+    private static final int ROW_CONTRAST = 0;
+    private static final int ROW_SHARPNESS = 1;
     private static final int ROW_SATURATION = 2;
-    private static final int ROW_COUNT      = 3;
+    private static final int ROW_COUNT = 3;
 
     private WidgetOptionButton[] mMinusButton;
     private WidgetOptionButton[] mPlusButton;
-    private WidgetOptionLabel[]  mValueLabel;
+    private WidgetOptionLabel[] mValueLabel;
 
 
     private class MinusClickListener implements View.OnClickListener {
