@@ -122,9 +122,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mOrientationListener.enable();
 
         // Create sensor listener, to detect shake gestures
-        SensorManager sensorMgr = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensorMgr.registerListener(new CameraSensorListener(), sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL);
+        //SensorManager sensorMgr = (SensorManager) getSystemService(SENSOR_SERVICE);
+        //sensorMgr.registerListener(new CameraSensorListener(), sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+        //        SensorManager.SENSOR_DELAY_NORMAL);
 
         mHandler = new Handler();
 
@@ -233,7 +233,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mCamManager.setStabilization(true);
             mNotifier.notify(getString(R.string.double_tap_to_snapshot), 2500);
         } else if (newMode == CAMERA_MODE_PICSPHERE) {
-            // PicSphere <3
+            mSideBar.slideClose();
+            mWidgetRenderer.closeAllWidgets();
         } else if (newMode == CAMERA_MODE_PANO) {
 
         }
