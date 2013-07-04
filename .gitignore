@@ -10,3 +10,6 @@ bin/
 /.idea
 /out
 /Nemesis.iml
+/jni
+/libs
+/obj

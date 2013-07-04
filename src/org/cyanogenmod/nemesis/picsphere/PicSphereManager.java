@@ -1,7 +1,13 @@
 package org.cyanogenmod.nemesis.picsphere;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.util.Log;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,12 +19,14 @@ import java.util.List;
  * Can you feel the awesomeness?
  */
 public class PicSphereManager {
+    public final static String TAG = "PicSphereManager";
     private List<PicSphere> mPicSpheres;
     private Context mContext;
 
     public PicSphereManager(Context context) {
         mContext = context;
         mPicSpheres = new ArrayList<PicSphere>();
+        copyBinaries();
     }
 
     /**
@@ -45,5 +53,56 @@ public class PicSphereManager {
                 sphere.render();
             }
         }.start();
+    }
+
+
+    /**
+     * Copy the required binaries and libraries to the data folder
+     * @return
+     */
+    private boolean copyBinaries() {
+        try {
+            String files[] = {
+                "autooptimiser", "autopano", "celeste", "enblend", "enfuse", "nona", "pano_modify",
+                    "ptclean", "tiffinfo",
+                    "libexiv2.so", "libglib-2.0.so", "libgmodule-2.0.so", "libgobject-2.0.so",
+                    "libgthread-2.0.so", "libjpeg.so", "libpano13.so", "libtiff.so", "libtiffdecoder.so",
+                    "libvigraimpex.so"
+            };
+
+            final AssetManager am = mContext.getAssets();
+
+            for (String file : files) {
+                InputStream is = am.open("picsphere/" + file);
+
+                // Create the output file
+                File dir = mContext.getFilesDir();
+                File outFile = new File(dir, file);
+
+                if (outFile.exists())
+                    outFile.delete();
+
+                OutputStream os = new FileOutputStream(outFile);
+
+                // Copy the file
+                byte[] buffer = new byte[1024];
+                int read;
+                while ((read = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, read);
+                }
+
+                if (!outFile.getName().endsWith(".so") && !outFile.setExecutable(true)) {
+                    return false;
+                }
+
+                os.flush();
+                os.close();
+                is.close();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error copying libraries and binaries", e);
+            return false;
+        }
+        return true;
     }
 }

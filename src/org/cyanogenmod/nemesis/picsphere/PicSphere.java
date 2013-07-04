@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class PicSphere {
     public final static String TAG = "PicSphere";
+    private String mPathPrefix;
     private List<Uri> mPictures;
     private Context mContext;
     private File mTempPath;
@@ -60,6 +61,7 @@ public class PicSphere {
         // Prepare a temporary directory
         Log.d(TAG, "Preparing temp dir for PicSphere rendering...");
         File appFilesDir = mContext.getFilesDir();
+        mPathPrefix = appFilesDir.getAbsolutePath() + "/";
         String tempPathStr = appFilesDir.getAbsolutePath() + "/" + System.currentTimeMillis();
         mTempPath = new File(tempPathStr);
         mTempPath.mkdir();
@@ -81,7 +83,7 @@ public class PicSphere {
 
     private void run(String command) throws IOException {
         Runtime rt = Runtime.getRuntime();
-        Process proc = rt.exec(command);
+        Process proc = rt.exec(mPathPrefix + command);
         mProcStdOut = new BufferedReader(new
                 InputStreamReader(proc.getInputStream()));
         mProcStdErr = new BufferedReader(new
