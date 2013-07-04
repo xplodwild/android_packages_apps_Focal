@@ -1,9 +1,7 @@
 package org.cyanogenmod.nemesis.picsphere;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.net.Uri;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -28,9 +26,23 @@ public class PicSphere {
     private BufferedReader mProcStdErr;
     private String mProjectFile;
 
+    private Thread mOutputLogger = new Thread() {
+        public void run() {
+            while (true) {
+                try {
+                    Thread.sleep(10);
+                    consumeProcLogs();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
+
     protected PicSphere(Context context) {
         mPictures = new ArrayList<Uri>();
         mContext = context;
+        mOutputLogger.start();
     }
 
     /**
@@ -46,6 +58,7 @@ public class PicSphere {
      */
     protected void render() {
         // Prepare a temporary directory
+        Log.d(TAG, "Preparing temp dir for PicSphere rendering...");
         File appFilesDir = mContext.getFilesDir();
         String tempPathStr = appFilesDir.getAbsolutePath() + "/" + System.currentTimeMillis();
         mTempPath = new File(tempPathStr);
@@ -56,15 +69,19 @@ public class PicSphere {
         // Process our images
         try {
             doAutopano();
+            doPtclean();
+            doAutoOptimiser();
+            doPanoModify();
+            doNona();
+            doEnblend();
         } catch (IOException ex) {
             Log.e(TAG, "Unable to process: ", ex);
         }
     }
 
-    private void run(String command, String parameters) throws IOException {
+    private void run(String command) throws IOException {
         Runtime rt = Runtime.getRuntime();
-        String[] commands = {command,parameters};
-        Process proc = rt.exec(commands);
+        Process proc = rt.exec(command);
         mProcStdOut = new BufferedReader(new
                 InputStreamReader(proc.getInputStream()));
         mProcStdErr = new BufferedReader(new
@@ -74,12 +91,16 @@ public class PicSphere {
     private void consumeProcLogs() {
         String line;
         try {
-            while ((line = mProcStdErr.readLine()) != null) {
-                Log.e(TAG, line);
+            if (mProcStdErr != null) {
+                while ((line = mProcStdErr.readLine()) != null) {
+                    Log.e(TAG, line);
+                }
             }
 
-            while ((line = mProcStdOut.readLine()) != null) {
-                Log.i(TAG, line);
+            if (mProcStdOut != null) {
+                while ((line = mProcStdOut.readLine()) != null) {
+                    Log.i(TAG, line);
+                }
             }
         } catch (IOException e) {
             Log.e(TAG, "Error while consuming proc logs", e);
@@ -95,15 +116,17 @@ public class PicSphere {
      * @throws IOException
      */
     private boolean doAutopano() throws IOException {
+        Log.d(TAG, "Autopano...");
         String filesStr = "";
         for (Uri picture : mPictures) {
             filesStr += " " + picture.getPath();
         }
 
         // TODO: Load the horizontal view angle from the camera
-        run("autopano", "--projection 0,50 -o " + mProjectFile + " " + filesStr);
+        run("autopano --projection 0,50 " + mProjectFile + " " + filesStr);
         consumeProcLogs();
 
+        Log.d(TAG, "Autopano... done");
         return true;
     }
 
@@ -119,9 +142,11 @@ public class PicSphere {
      * @throws IOException
      */
     private boolean doPtclean() throws IOException {
-        run("ptclean", "-v --output " + mProjectFile + " " + mProjectFile);
+        Log.d(TAG, "Ptclean...");
+        run("ptclean --output " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
+        Log.d(TAG, "Ptclean... done");
         return true;
     }
 
@@ -134,9 +159,11 @@ public class PicSphere {
      * @throws IOException
      */
     private boolean doAutoOptimiser() throws IOException {
-        run("autooptimiser", "-a -l -s -m -o " + mProjectFile + " " + mProjectFile);
+        Log.d(TAG, "AutoOptimiser...");
+        run("autooptimiser -a -l -s -m -o " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
+        Log.d(TAG, "AutoOptimiser... done");
         return true;
     }
 
@@ -147,9 +174,11 @@ public class PicSphere {
      * @throws IOException
      */
     private boolean doPanoModify() throws IOException {
-        run("pano_modify", "-o " + mProjectFile + " --center --straighten --canvas=AUTO --crop=AUTO " + mProjectFile);
+        Log.d(TAG, "PanoModify...");
+        run("pano_modify -o " + mProjectFile + " --center --straighten --canvas=AUTO --crop=AUTO " + mProjectFile);
         consumeProcLogs();
 
+        Log.d(TAG, "PanoModify... done");
         return true;
     }
 
@@ -161,9 +190,11 @@ public class PicSphere {
      * @throws IOException
      */
     private boolean doNona() throws IOException {
-        run("nona", "-o " + mTempPath + "/project -m TIFF_m " + mProjectFile);
+        Log.d(TAG, "Nona...");
+        run("nona -o " + mTempPath + "/project -m TIFF_m " + mProjectFile);
         consumeProcLogs();
 
+        Log.d(TAG, "Nona... done");
         return true;
     }
 
@@ -175,9 +206,19 @@ public class PicSphere {
      * @throws IOException
      */
     private boolean doEnblend() throws IOException {
-        run("enblend", "-o /sdcard/final.tif " + mTempPath + "/*.tif");
+        Log.d(TAG, "Enblend...");
+
+        // Build the list of output files. The convention set up by Nona is projectXXXX.tif,
+        // so we basically build that list out of the number of shots we fed to autopano
+        String files = "";
+        for (int i = 0; i < mPictures.size(); i++) {
+            files += " " + mTempPath + "/" + String.format("project%04d.tif", i);
+        }
+
+        run("enblend -o /sdcard/final.tif " + files);
         consumeProcLogs();
 
+        Log.d(TAG, "Enblend... done");
         return true;
     }
 }

@@ -2,6 +2,7 @@ package org.cyanogenmod.nemesis.picsphere;
 
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,6 +18,7 @@ public class PicSphereManager {
 
     public PicSphereManager(Context context) {
         mContext = context;
+        mPicSpheres = new ArrayList<PicSphere>();
     }
 
     /**

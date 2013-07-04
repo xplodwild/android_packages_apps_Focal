@@ -25,7 +25,7 @@ import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -44,6 +44,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
+import org.cyanogenmod.nemesis.picsphere.PicSphere;
+import org.cyanogenmod.nemesis.picsphere.PicSphereManager;
 import org.cyanogenmod.nemesis.ui.ExposureHudRing;
 import org.cyanogenmod.nemesis.ui.FocusHudRing;
 import org.cyanogenmod.nemesis.ui.Notifier;
@@ -55,6 +57,8 @@ import org.cyanogenmod.nemesis.ui.SideBar;
 import org.cyanogenmod.nemesis.ui.SwitchRingPad;
 import org.cyanogenmod.nemesis.ui.ThumbnailFlinger;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
+
+import java.io.File;
 
 public class CameraActivity extends Activity implements CameraManager.CameraReadyListener {
     public final static String TAG = "CameraActivity";
@@ -70,6 +74,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private SnapshotManager mSnapshotManager;
     private MainSnapshotListener mSnapshotListener;
     private FocusManager mFocusManager;
+    private PicSphereManager mPicSphereManager;
     private CameraOrientationEventListener mOrientationListener;
     private GestureDetector mGestureDetector;
     private CaptureTransformer mCaptureTransformer;
@@ -517,6 +522,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     setCameraMode(CAMERA_MODE_VIDEO);
                     break;
 
+                case SwitchRingPad.BUTTON_PICSPHERE:
+                    setCameraMode(CAMERA_MODE_PICSPHERE);
+                    break;
 
                 case SwitchRingPad.BUTTON_SWITCHCAM:
                     if (mCamManager.getCurrentFacing() == Camera.CameraInfo.CAMERA_FACING_FRONT) {
@@ -593,6 +601,16 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     mSnapshotManager.stopVideo();
                     mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_video));
                 }
+            } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
+                if (mPicSphereManager == null) {
+                    mPicSphereManager = new PicSphereManager(CameraActivity.this);
+                }
+
+                PicSphere sphere = mPicSphereManager.createPicSphere();
+                sphere.addPicture(Uri.fromFile(new File("/sdcard/pano/IMG_20130703_220141.jpg")));
+                sphere.addPicture(Uri.fromFile(new File("/sdcard/pano/IMG_20130703_220144.jpg")));
+                sphere.addPicture(Uri.fromFile(new File("/sdcard/pano/IMG_20130703_220148.jpg")));
+                mPicSphereManager.startRendering(sphere);
             }
         }
     }
