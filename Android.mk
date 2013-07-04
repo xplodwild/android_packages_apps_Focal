@@ -8,4 +8,4 @@ LOCAL_PACKAGE_NAME := Nemesis
 
 include $(BUILD_PACKAGE)
 
--include external/Nemesis/Android.mk
+-include $(call all-makefiles-under, $(ANDROID_BUILD_TOP)/external/Nemesis)
