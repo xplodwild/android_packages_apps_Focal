@@ -23,12 +23,14 @@
         <item>auto</item>
         <item>off</item>
         <item>on</item>
+        <item>torch</item>
         <item>red-eye</item>
     </string-array>
 
     <array name="widget_flash_icons">
         <item>@drawable/ic_widget_flash_auto</item>
         <item>@drawable/ic_widget_flash_off</item>
+        <item>@drawable/ic_widget_flash_on</item>
         <item>@drawable/ic_widget_flash_on</item>
         <item>@drawable/ic_widget_placeholder</item>
     </array>
