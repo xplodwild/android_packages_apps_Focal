@@ -22,6 +22,7 @@ public class PicSphereManager {
     public final static String TAG = "PicSphereManager";
     private List<PicSphere> mPicSpheres;
     private Context mContext;
+    private Capture3DRenderer mCapture3DRenderer;
 
     public PicSphereManager(Context context) {
         mContext = context;
@@ -37,6 +38,17 @@ public class PicSphereManager {
         PicSphere sphere = new PicSphere(mContext);
         mPicSpheres.add(sphere);
         return sphere;
+    }
+
+    /**
+     * Returns the 3D renderer context for PicSphere capture mode
+     */
+    public Capture3DRenderer getRenderer() {
+        if (mCapture3DRenderer != null) {
+            mCapture3DRenderer = new Capture3DRenderer(mContext);
+        }
+
+        return mCapture3DRenderer;
     }
 
     /**

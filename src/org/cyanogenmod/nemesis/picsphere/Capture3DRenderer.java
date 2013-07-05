@@ -367,6 +367,13 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
         mSnapshots.add(snap);
     }
 
+    /**
+     * Clear sphere's snapshots
+     */
+    public void clearSnapshots() {
+        mSnapshots.clear();
+    }
+
     /*
 	 * (non-Javadoc)
 	 *

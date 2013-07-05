@@ -25,4 +25,10 @@ public abstract class CaptureTransformer implements SnapshotManager.SnapshotList
      */
     public abstract void onShutterButtonClicked(ShutterButton button);
 
+    /**
+     * Triggers a secondary action when the shutter button is long-pressed
+     * (optional)
+     */
+    public void onShutterButtonLongPressed(ShutterButton button) { }
+
 }

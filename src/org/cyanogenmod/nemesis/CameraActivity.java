@@ -50,6 +50,7 @@ import android.widget.Toast;
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
 import org.cyanogenmod.nemesis.picsphere.Capture3DRenderer;
 import org.cyanogenmod.nemesis.picsphere.PicSphere;
+import org.cyanogenmod.nemesis.picsphere.PicSphereCaptureTransformer;
 import org.cyanogenmod.nemesis.picsphere.PicSphereManager;
 import org.cyanogenmod.nemesis.ui.ExposureHudRing;
 import org.cyanogenmod.nemesis.ui.FocusHudRing;
@@ -152,7 +153,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         // Setup shutter button
         mShutterButton = (ShutterButton) findViewById(R.id.btn_shutter);
-        mShutterButton.setOnClickListener(new MainShutterClickListener());
+        MainShutterClickListener shutterClickListener = new MainShutterClickListener();
+        mShutterButton.setOnClickListener(shutterClickListener);
+        mShutterButton.setOnLongClickListener(shutterClickListener);
         mShutterButton.setSlideListener(new MainShutterSlideListener());
 
         // Setup gesture detection
@@ -455,16 +458,24 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mWidgetRenderer.closeAllWidgets();
 
         // Setup the 3D rendering
-        Capture3DRenderer renderer = new Capture3DRenderer(this);
+        if (mPicSphereManager == null) {
+            mPicSphereManager = new PicSphereManager(CameraActivity.this);
+        }
         mCamManager.getPreviewSurface().setVisibility(View.GONE);
         mPicSphere3DView = new GLSurfaceView(this);
-        mPicSphere3DView.setRenderer(renderer);
+        mPicSphere3DView.setRenderer(mPicSphereManager.getRenderer());
         ((ViewGroup) findViewById(R.id.camera_preview_container)).addView(mPicSphere3DView);
 
         // Setup the gyroscope
         SensorManager sensorMgr = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensorMgr.registerListener(renderer, sensorMgr.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
-                SensorManager.SENSOR_DELAY_GAME);
+        sensorMgr.registerListener(mPicSphereManager.getRenderer(),
+                sensorMgr.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_GAME);
+
+        // Setup the capture transformer
+        setCaptureTransformer(new PicSphereCaptureTransformer(mPicSphereManager, mCamManager, mSnapshotManager));
+
+        // Notify how to finish a sphere
+        mNotifier.notify(getString(R.string.ps_long_press_to_stop), 4000);
     }
 
     public void resetPicSphere() {
@@ -621,7 +632,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     /**
      * When the shutter button is pressed
      */
-    public class MainShutterClickListener implements OnClickListener {
+    public class MainShutterClickListener implements OnClickListener, View.OnLongClickListener {
         @Override
         public void onClick(View v) {
             mHandler.postDelayed(new Runnable() {
@@ -645,17 +656,15 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     mSnapshotManager.stopVideo();
                     mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_video));
                 }
-            } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
-                if (mPicSphereManager == null) {
-                    mPicSphereManager = new PicSphereManager(CameraActivity.this);
-                }
-
-                PicSphere sphere = mPicSphereManager.createPicSphere();
-                sphere.addPicture(Uri.fromFile(new File("/sdcard/pano/IMG_20130703_220141.jpg")));
-                sphere.addPicture(Uri.fromFile(new File("/sdcard/pano/IMG_20130703_220144.jpg")));
-                sphere.addPicture(Uri.fromFile(new File("/sdcard/pano/IMG_20130703_220148.jpg")));
-                mPicSphereManager.startRendering(sphere);
             }
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if (mCaptureTransformer != null) {
+                mCaptureTransformer.onShutterButtonLongPressed(mShutterButton);
+            }
+            return true;
         }
     }
 
