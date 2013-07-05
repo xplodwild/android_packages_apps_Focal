@@ -19,13 +19,17 @@
 package org.cyanogenmod.nemesis;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.ConfigurationInfo;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -44,6 +48,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
+import org.cyanogenmod.nemesis.picsphere.Capture3DRenderer;
 import org.cyanogenmod.nemesis.picsphere.PicSphere;
 import org.cyanogenmod.nemesis.picsphere.PicSphereManager;
 import org.cyanogenmod.nemesis.ui.ExposureHudRing;
@@ -94,6 +99,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private Notifier mNotifier;
     private ReviewDrawer mReviewDrawer;
     private ScaleGestureDetector mZoomGestureDetector;
+    private GLSurfaceView mPicSphere3DView;
     private boolean mHasPinchZoomed;
     private boolean mCancelSideBarClose;
 
@@ -225,6 +231,11 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     public void setCameraMode(int newMode) {
         if (mCameraMode == newMode) return;
 
+        // Reset PicSphere 3D renderer if we were in PS mode
+        if (mCameraMode == CAMERA_MODE_PICSPHERE) {
+            resetPicSphere();
+        }
+
         mCameraMode = newMode;
 
         // Reset any capture transformer
@@ -238,8 +249,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mCamManager.setStabilization(true);
             mNotifier.notify(getString(R.string.double_tap_to_snapshot), 2500);
         } else if (newMode == CAMERA_MODE_PICSPHERE) {
-            mSideBar.slideClose();
-            mWidgetRenderer.closeAllWidgets();
+            initializePicSphere();
         } else if (newMode == CAMERA_MODE_PANO) {
 
         }
@@ -427,6 +437,40 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
     public ReviewDrawer getReviewDrawer() {
         return mReviewDrawer;
+    }
+
+    public void initializePicSphere() {
+        // Check if device has a gyroscope and GLES2 support
+        // XXX: Should we make a fallback for super super old devices?
+        final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+        final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
+
+        if (!supportsEs2) {
+            mNotifier.notify(getString(R.string.no_gles20_support), 4000);
+            return;
+        }
+        // Close widgets and slide sidebar to make room and focus on the sphere
+        mSideBar.slideClose();
+        mWidgetRenderer.closeAllWidgets();
+
+        // Setup the 3D rendering
+        Capture3DRenderer renderer = new Capture3DRenderer(this);
+        mCamManager.getPreviewSurface().setVisibility(View.GONE);
+        mPicSphere3DView = new GLSurfaceView(this);
+        mPicSphere3DView.setRenderer(renderer);
+        ((ViewGroup) findViewById(R.id.camera_preview_container)).addView(mPicSphere3DView);
+
+        // Setup the gyroscope
+        SensorManager sensorMgr = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorMgr.registerListener(renderer, sensorMgr.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
+                SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    public void resetPicSphere() {
+        ((ViewGroup) findViewById(R.id.camera_preview_container)).removeView(mPicSphere3DView);
+        mPicSphere3DView = null;
+        mCamManager.getPreviewSurface().setVisibility(View.VISIBLE);
     }
 
     /**
