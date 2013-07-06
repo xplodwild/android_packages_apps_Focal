@@ -114,7 +114,8 @@ public class PicSphere {
 
     private void run(String command) throws IOException {
         Runtime rt = Runtime.getRuntime();
-        Process proc = rt.exec(mPathPrefix + command);
+        Process proc = rt.exec(command, new String[]{"PATH="+mPathPrefix+":/system/bin",
+                "LD_LIBRARY_PATH="+mPathPrefix+":/system/lib"});
         mProcStdOut = new BufferedReader(new
                 InputStreamReader(proc.getInputStream()));
         mProcStdErr = new BufferedReader(new
