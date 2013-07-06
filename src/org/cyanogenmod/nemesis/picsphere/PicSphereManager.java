@@ -45,7 +45,9 @@ public class PicSphereManager {
     public PicSphereManager(Context context) {
         mContext = context;
         mPicSpheres = new ArrayList<PicSphere>();
-        copyBinaries();
+        new Thread() {
+            public void run() { copyBinaries(); }
+        }.start();
     }
 
     /**
@@ -62,7 +64,7 @@ public class PicSphereManager {
      * Returns the 3D renderer context for PicSphere capture mode
      */
     public Capture3DRenderer getRenderer() {
-        if (mCapture3DRenderer != null) {
+        if (mCapture3DRenderer == null) {
             mCapture3DRenderer = new Capture3DRenderer(mContext);
         }
 

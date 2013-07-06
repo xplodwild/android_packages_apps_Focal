@@ -110,7 +110,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_camera);
 
         getWindow().getDecorView()
@@ -201,7 +200,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     @Override
     protected void onResume() {
         // Restore the camera preview
-        mCamManager.resume();
+        if (mCamManager != null) {
+            mCamManager.resume();
+        }
 
         super.onResume();
     }
@@ -461,8 +462,11 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         if (mPicSphereManager == null) {
             mPicSphereManager = new PicSphereManager(CameraActivity.this);
         }
-        mCamManager.getPreviewSurface().setVisibility(View.GONE);
+        //mCamManager.getPreviewSurface().setVisibility(View.INVISIBLE);
+        mCamManager.getPreviewSurface().setScaleX(0.3f);
+        mCamManager.getPreviewSurface().setScaleY(0.3f);
         mPicSphere3DView = new GLSurfaceView(this);
+        mPicSphere3DView.setEGLContextClientVersion(2);
         mPicSphere3DView.setRenderer(mPicSphereManager.getRenderer());
         ((ViewGroup) findViewById(R.id.camera_preview_container)).addView(mPicSphere3DView);
 

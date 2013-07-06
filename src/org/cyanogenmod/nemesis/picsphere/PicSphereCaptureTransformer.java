@@ -18,6 +18,8 @@
 
 package org.cyanogenmod.nemesis.picsphere;
 
+import android.util.Log;
+
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SnapshotManager;
@@ -29,6 +31,7 @@ import org.cyanogenmod.nemesis.ui.ShutterButton;
  * created by PicSphereManager
  */
 public class PicSphereCaptureTransformer extends CaptureTransformer {
+    public final static String TAG = "PicSphereCaptureTransformer";
     private PicSphereManager mPicSphereManager;
     private PicSphere mPicSphere;
 
@@ -43,6 +46,8 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
             // Initialize a new sphere
             mPicSphere = mPicSphereManager.createPicSphere();
         }
+
+        mSnapManager.queueSnapshot(true, 0);
     }
 
     @Override
@@ -71,7 +76,11 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
 
     @Override
     public void onSnapshotSaved(SnapshotManager.SnapshotInfo info) {
-        mPicSphere.addPicture(info.mUri);
+        if (mPicSphere != null) {
+            mPicSphere.addPicture(info.mUri);
+        } else {
+            Log.e(TAG, "No current PicSphere");
+        }
     }
 
     @Override

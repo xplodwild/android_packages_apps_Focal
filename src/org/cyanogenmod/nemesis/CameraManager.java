@@ -465,7 +465,8 @@ public class CameraManager {
 
     public void setCameraMode(final int mode) {
         if (mPreviewPauseListener != null) {
-            mPreviewPauseListener.onPreviewPause();
+           // mPreviewPauseListener.onPreviewPause();
+            return;
         }
 
         new Thread() {
@@ -489,7 +490,11 @@ public class CameraManager {
 
                 mCamera.stopPreview();
                 mCamera.setParameters(params);
-                mCamera.startPreview();
+                try {
+                    mCamera.startPreview();
+                } catch (RuntimeException e) {
+                    Log.e(TAG, "Unable to start preview", e);
+                }
                 mPreview.postCallbackBuffer();
 
                 if (mPreviewPauseListener != null) {

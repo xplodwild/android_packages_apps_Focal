@@ -29,8 +29,11 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
+
+import org.cyanogenmod.nemesis.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -51,42 +54,122 @@ import javax.microedition.khronos.opengles.GL10;
 public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventListener {
     public final static String TAG = "Capture3DRenderer";
 
-    private float[] mModelMatrix = new float[16];
-    private float[] mViewMatrix = new float[16];
-    private float[] mProjectionMatrix = new float[16];
-    private float[] mMVPMatrix = new float[16];
-
-    private final FloatBuffer mRectangleVertices;
-    private final FloatBuffer mRectangleTexCoords;
-
-    private int mProgramHandle;
-    private int mMVPMatrixHandle;
-    private int mPositionHandle;
-    private int mTexCoordHandle;
-    private int mTextureUniformHandle;
-
-    private final int mBytesPerFloat = 4;
-    private final int mStrideBytes = 7 * mBytesPerFloat;
-    private final int mPositionOffset = 0;
-    private final int mPositionDataSize = 3;
-    private final int mTextureCoordinateDataSize = 2;
-
     private List<Snapshot> mSnapshots;
     private Context mContext;
+    private Handler mHandler;
     private float mGyroscopeX;
     private float mGyroscopeY;
     private float mGyroscopeZ;
+    private float[] mViewMatrix = new float[16];
+    private float[] mProjectionMatrix = new float[16];
+
+
+    private FloatBuffer mVertexBuffer;
+    private FloatBuffer mTexCoordBuffer;
+    // x, y,
+    private final float mVertexData[] =
+            {-0.5f,  -0.5f,
+                    -0.5f, 0.5f,
+                    0.5f, 0.5f,
+                    0.5f, -0.5f};
+    // u,v
+    private final float mTexCoordData[] =   {0.0f, 0.0f,
+            0.0f, 1.0f,
+            1.0f, 1.0f,
+            1.0f, 0.0f};
+
+    private int mProgram;
+    private int mVertexShader;
+    private int mFragmentShader;
+    private Bitmap mBitmapToLoad;
+    private int mTextureData;
+    private int mPositionHandler;
+    private int mTexCoordHandler;
+    private int mTextureHandler;
+    private int mMVPMatrixHandler;
+    private float[] mModelMatrix = new float[16];
+    private float[] mMVPMatrix = new float[16];
+
 
     /**
      * Stores the information about each snapshot displayed in the sphere
      */
     private class Snapshot {
-        public Vector<Float> mAngle;
-        public int mTextureDataHandle;
+        private Vector<Float> mAngle;
+
 
         public Snapshot() {
-            mAngle = new Vector<Float>(3);
-            mTextureDataHandle = 0;
+            mAngle = new Vector<Float>();
+            mAngle.add(0.0f);
+            mAngle.add(0.0f);
+            mAngle.add(0.0f);
+
+        }
+
+        public void setTexture(Bitmap tex) {
+            mBitmapToLoad = tex;
+        }
+
+        private void loadTexture() {
+            // Load the snapshot bitmap as a texture to bind to our GLES20 program
+            int texture[] = new int[1];
+
+            GLES20.glGenTextures(1, texture, 0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture[0]);
+
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mBitmapToLoad, 0);
+            //tex.recycle();
+
+            if(texture[0] == 0){
+                // Displays error
+            }
+
+            mTextureData = texture[0];
+            mBitmapToLoad = null;
+        }
+
+        public void draw(){
+            if (mBitmapToLoad != null) {
+                loadTexture();
+            }
+
+            Matrix.setIdentityM(mModelMatrix, 0);
+            Matrix.translateM(mModelMatrix, 0, -1.5f, 1.5f, -1.0f);
+            //Matrix.rotateM(mModelMatrix, 0, 45, 1.0f, 0.0f, 0.0f);
+
+            GLES20.glUseProgram(mProgram);
+            mVertexBuffer.position(0);
+            mTexCoordBuffer.position(0);
+
+
+            GLES20.glEnableVertexAttribArray(mTexCoordHandler);
+            GLES20.glEnableVertexAttribArray(mPositionHandler);
+
+            GLES20.glVertexAttribPointer(mPositionHandler, 2, GLES20.GL_FLOAT, false, 8, mVertexBuffer);
+            GLES20.glVertexAttribPointer(mTexCoordHandler, 2, GLES20.GL_FLOAT, false, 8, mTexCoordBuffer);
+
+            // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
+            // (which currently contains model * view).
+            Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+
+            // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
+            // (which now contains model * view * projection).
+            Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+
+            // Pass in the combined matrix.
+            GLES20.glUniformMatrix4fv(mMVPMatrixHandler, 1, false, mMVPMatrix, 0);
+
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureData);
+
+            GLES20.glUniform1i(mTextureHandler, 0);
+
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 4);
         }
     }
 
@@ -96,36 +179,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
     public Capture3DRenderer(Context context) {
         mSnapshots = new ArrayList<Snapshot>();
         mContext = context;
-
-        // Initialize the shape of planes (front-facing plane)
-        final float[] rectangleVertexData = {
-                -1.0f,  1.0f, 0.0f,
-                -1.0f, -1.0f, 0.0f,
-                 1.0f,  1.0f, 0.0f,
-                -1.0f, -1.0f, 0.0f,
-                 1.0f, -1.0f, 0.0f,
-                 1.0f,  1.0f, 0.0f,
-                };
-
-        final float[] rectangleTexCoords = {
-                // Front face
-                0.0f, 0.0f,
-                0.0f, 1.0f,
-                1.0f, 0.0f,
-                0.0f, 1.0f,
-                1.0f, 1.0f,
-                1.0f, 0.0f
-        };
-
-        // Initialize the buffers.
-        mRectangleVertices = ByteBuffer.allocateDirect(rectangleVertexData.length * mBytesPerFloat)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-
-        mRectangleVertices.put(rectangleVertexData).position(0);
-
-        mRectangleTexCoords = ByteBuffer.allocateDirect(rectangleTexCoords.length * mBytesPerFloat)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mRectangleTexCoords.put(rectangleTexCoords).position(0);
+        mHandler = new Handler();
     }
 
     @Override
@@ -134,26 +188,31 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
 
         // Enable depth testing
-        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+        //GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
-        // The below glEnable() call is a holdover from OpenGL ES 1, and is not needed in OpenGL ES 2.
-        // Enable texture mapping
-        // GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+        setCameraDirection(0, 0, -5);
+        ByteBuffer bb_data = ByteBuffer.allocateDirect(mVertexData.length * 4);
+        bb_data.order(ByteOrder.nativeOrder());
+        ByteBuffer bb_texture = ByteBuffer.allocateDirect(mTexCoordData.length * 4);
+        bb_texture.order(ByteOrder.nativeOrder());
 
-        // Make the camera look at some random direction while we wait for gyro
-        setCameraDirection(0.0f, 0.0f, -5.0f);
+        mVertexBuffer = bb_data.asFloatBuffer();
+        mVertexBuffer.put(mVertexData);
+        mVertexBuffer.position(0);
+        mTexCoordBuffer = bb_texture.asFloatBuffer();
+        mTexCoordBuffer.put(mTexCoordData);
+        mTexCoordBuffer.position(0);
 
         // Simple GLSL vertex/fragment, as GLES2 doesn't have the classical fixed pipeline
         final String vertexShader =
-                "uniform mat4 u_MVPMatrix;      \n"
+                "uniform mat4 u_MVPMatrix; \n"
                         + "attribute vec4 a_Position;     \n"
                         + "attribute vec2 a_TexCoordinate;\n"
                         + "varying vec2 v_TexCoordinate;  \n"
                         + "void main()                    \n"
                         + "{                              \n"
                         + "   v_TexCoordinate = a_TexCoordinate;\n"
-                        + "   gl_Position = u_MVPMatrix   \n"
-                        + "               * a_Position;   \n"
+                        + "   gl_Position = u_MVPMatrix * a_Position;   \n"
                         + "}                              \n";
 
         final String fragmentShader =
@@ -165,98 +224,26 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
                         + "   gl_FragColor = texture2D(u_Texture, v_TexCoordinate);\n"
                         + "}                              \n";
 
-        // Load in the vertex shader.
-        int vertexShaderHandle = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
+        mVertexShader = compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
+        mFragmentShader = compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader);
 
-        if (vertexShaderHandle != 0) {
-            // Pass in the shader source.
-            GLES20.glShaderSource(vertexShaderHandle, vertexShader);
+        mProgram = GLES20.glCreateProgram();
+        GLES20.glAttachShader(mProgram, mFragmentShader);
+        GLES20.glAttachShader(mProgram, mVertexShader);
+        GLES20.glLinkProgram(mProgram);
 
-            // Compile the shader.
-            GLES20.glCompileShader(vertexShaderHandle);
+        int[] linkStatus = new int[1];
+        GLES20.glGetProgramiv(mProgram, GLES20.GL_LINK_STATUS, linkStatus, 0);
 
-            // Get the compilation status.
-            final int[] compileStatus = new int[1];
-            GLES20.glGetShaderiv(vertexShaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
-
-            // If the compilation failed, delete the shader.
-            if (compileStatus[0] == 0) {
-                GLES20.glDeleteShader(vertexShaderHandle);
-                vertexShaderHandle = 0;
-            }
+        if (linkStatus[0] == 0) {
+            throw new RuntimeException("Error linking shaders");
         }
+        mPositionHandler     = GLES20.glGetAttribLocation(mProgram, "a_Position");
+        mTexCoordHandler     = GLES20.glGetAttribLocation(mProgram, "a_TexCoordinate");
+        mMVPMatrixHandler    = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
+        mTextureHandler      = GLES20.glGetUniformLocation(mProgram, "u_Texture");
 
-        if (vertexShaderHandle == 0) {
-            throw new RuntimeException("Error creating vertex shader.");
-        }
-
-        // Load in the fragment shader shader.
-        int fragmentShaderHandle = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-
-        if (fragmentShaderHandle != 0) {
-            // Pass in the shader source.
-            GLES20.glShaderSource(fragmentShaderHandle, fragmentShader);
-
-            // Compile the shader.
-            GLES20.glCompileShader(fragmentShaderHandle);
-
-            // Get the compilation status.
-            final int[] compileStatus = new int[1];
-            GLES20.glGetShaderiv(fragmentShaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
-
-            // If the compilation failed, delete the shader.
-            if (compileStatus[0] == 0) {
-                GLES20.glDeleteShader(fragmentShaderHandle);
-                fragmentShaderHandle = 0;
-            }
-        }
-
-        if (fragmentShaderHandle == 0) {
-            throw new RuntimeException("Error creating fragment shader.");
-        }
-
-        // Create a program object and store the handle to it.
-        int programHandle = GLES20.glCreateProgram();
-
-        if (programHandle != 0) {
-            // Bind the vertex shader to the program.
-            GLES20.glAttachShader(programHandle, vertexShaderHandle);
-
-            // Bind the fragment shader to the program.
-            GLES20.glAttachShader(programHandle, fragmentShaderHandle);
-
-            // Bind attributes
-            GLES20.glBindAttribLocation(programHandle, 0, "a_Position");
-            GLES20.glBindAttribLocation(programHandle, 1, "a_TexCoordinate");
-
-            // Link the two shaders together into a program.
-            GLES20.glLinkProgram(programHandle);
-
-            // Get the link status.
-            final int[] linkStatus = new int[1];
-            GLES20.glGetProgramiv(programHandle, GLES20.GL_LINK_STATUS, linkStatus, 0);
-
-            // If the link failed, delete the program.
-            if (linkStatus[0] == 0) {
-                GLES20.glDeleteProgram(programHandle);
-                programHandle = 0;
-            }
-        }
-
-        if (programHandle == 0) {
-            throw new RuntimeException("Error creating program.");
-        }
-
-        mProgramHandle = programHandle;
-
-        // Set program handles. These will later be used to pass in values to the program.
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "u_MVPMatrix");
-        mPositionHandle = GLES20.glGetAttribLocation(programHandle, "a_Position");
-        mTexCoordHandle = GLES20.glGetAttribLocation(programHandle, "a_TexCoordinate");
-        mTextureUniformHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_Texture");
-
-        // Tell OpenGL to use this program when rendering.
-        GLES20.glUseProgram(programHandle);
+        //addSnapshot(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.btn_ring_camera_hover));
     }
 
     @Override
@@ -271,69 +258,26 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
         final float right = ratio;
         final float bottom = -1.0f;
         final float top = 1.0f;
-        final float near = 1.0f;
-        final float far = 10.0f;
+        final float near = 0.1f;
+        final float far = 100.0f;
 
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
     }
 
     @Override
     public void onDrawFrame(GL10 glUnused) {
-        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         for (Snapshot snap : mSnapshots) {
-            // Set the texture of this snapshot
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, snap.mTextureDataHandle);
-            GLES20.glUniform1i(mTextureUniformHandle, 0);
-
-            // Draw the rectangle facing straight on.
-            Matrix.setIdentityM(mModelMatrix, 0);
-            Matrix.rotateM(mModelMatrix, 0, snap.mAngle.get(0), 1.0f, 0.0f, 0.0f);
-            Matrix.rotateM(mModelMatrix, 0, snap.mAngle.get(1), 0.0f, 1.0f, 0.0f);
-            Matrix.rotateM(mModelMatrix, 0, snap.mAngle.get(2), 0.0f, 0.0f, 1.0f);
-            Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, 5.0f);
-            drawTriangle(mRectangleVertices);
+            snap.draw();
         }
     }
 
-    /**
-     * Draws a triangle from the given vertex data.
-     *
-     * @param aTriangleBuffer The buffer containing the vertex data.
-     */
-    private void drawTriangle(final FloatBuffer aTriangleBuffer) {
-        // Pass in the position information
-        aTriangleBuffer.position(mPositionOffset);
-        GLES20.glVertexAttribPointer(mPositionHandle, mPositionDataSize, GLES20.GL_FLOAT, false,
-                mStrideBytes, aTriangleBuffer);
-
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
-
-        // Pass in the texture coordinate information
-        mRectangleTexCoords.position(0);
-        GLES20.glVertexAttribPointer(mTexCoordHandle, mTextureCoordinateDataSize, GLES20.GL_FLOAT, false,
-                0, mRectangleTexCoords);
-
-        GLES20.glEnableVertexAttribArray(mTexCoordHandle);
-
-        // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
-        // (which currently contains model * view).
-        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
-
-        // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
-        // (which now contains model * view * projection).
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
-
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
-    }
-
-    public void setCameraDirection(final float x, final float y, final float z) {
-        // Position the camera at the center of our sphere
+    public void setCameraDirection(float lookX, float lookY, float lookZ) {
+        // Position the eye in front of the origin.
         final float eyeX = 0.0f;
         final float eyeY = 0.0f;
-        final float eyeZ = 0.0f;
+        final float eyeZ = -0.7f;
 
         // Set our up vector. This is where our head would be pointing were we holding the camera.
         final float upX = 0.0f;
@@ -343,45 +287,63 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
         // Set the view matrix. This matrix can be said to represent the camera position.
         // NOTE: In OpenGL 1, a ModelView matrix is used, which is a combination of a model and
         // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
-        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, x, y, z, upX, upY, upZ);
+        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+    }
+
+    /**
+     * Helper function to compile a shader.
+     *
+     * @param shaderType The shader type.
+     * @param shaderSource The shader source code.
+     * @return An OpenGL handle to the shader.
+     */
+    public static int compileShader(final int shaderType, final String shaderSource)
+    {
+        int shaderHandle = GLES20.glCreateShader(shaderType);
+
+        if (shaderHandle != 0) {
+            // Pass in the shader source.
+            GLES20.glShaderSource(shaderHandle, shaderSource);
+
+            // Compile the shader.
+            GLES20.glCompileShader(shaderHandle);
+
+            // Get the compilation status.
+            final int[] compileStatus = new int[1];
+            GLES20.glGetShaderiv(shaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
+
+            // If the compilation failed, delete the shader.
+            if (compileStatus[0] == 0)
+            {
+                Log.e(TAG, "Error compiling shader: " + GLES20.glGetShaderInfoLog(shaderHandle));
+                GLES20.glDeleteShader(shaderHandle);
+                shaderHandle = 0;
+            }
+        }
+
+        if (shaderHandle == 0) {
+            throw new RuntimeException("Error creating shader.");
+        }
+
+        return shaderHandle;
     }
 
     /**
      * Adds a snapshot to the sphere
      */
-    public void addSnapshot(Bitmap image) {
+    public void addSnapshot(final Bitmap image) {
         Snapshot snap = new Snapshot();
-        snap.mAngle.set(0, mGyroscopeX);
-        snap.mAngle.set(1, mGyroscopeY);
-        snap.mAngle.set(2, mGyroscopeZ);
+        //snap.mAngle.set(0, mGyroscopeX);
+        //snap.mAngle.set(1, mGyroscopeY);
+        //snap.mAngle.set(2, mGyroscopeZ);
 
-        // Load the snapshot bitmap as a texture to bind to our GLES20 program
-        final int[] textureHandle = new int[1];
-
-        GLES20.glGenTextures(1, textureHandle, 0);
-
-        if (textureHandle[0] != 0) {
-            // Bind to the texture in OpenGL
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
-
-            // Set filtering
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
-
-            // Load the bitmap into the bound texture.
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
-
-            // Recycle the bitmap, since its data has been loaded into OpenGL.
-            // TODO: Do we still need it?
-            // bitmap.recycle();
+        snap.setTexture(image);
+        Log.e(TAG, "Created snapshot");
+        if (image == null) {
+            Log.e(TAG, "Bitmap is null");
+        } else {
+            Log.e(TAG, "Bitmap is not null");
         }
-
-        if (textureHandle[0] == 0) {
-            throw new RuntimeException("Error loading texture.");
-        }
-
-        snap.mTextureDataHandle = textureHandle[0];
-
         mSnapshots.add(snap);
     }
 
@@ -431,7 +393,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
             mGyroscopeY = event.values[1];
             mGyroscopeZ = event.values[2];
 
-            setCameraDirection(mGyroscopeX, mGyroscopeY, mGyroscopeZ);
+            //setCameraDirection(mGyroscopeX, mGyroscopeY, mGyroscopeZ);
         }
     }
 }
