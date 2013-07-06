@@ -470,10 +470,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mPicSphere3DView.setRenderer(mPicSphereManager.getRenderer());
         ((ViewGroup) findViewById(R.id.camera_preview_container)).addView(mPicSphere3DView);
 
-        // Setup the gyroscope
-        SensorManager sensorMgr = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensorMgr.registerListener(mPicSphereManager.getRenderer(),
-                sensorMgr.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_GAME);
 
         // Setup the capture transformer
         setCaptureTransformer(new PicSphereCaptureTransformer(mPicSphereManager, mCamManager, mSnapshotManager));

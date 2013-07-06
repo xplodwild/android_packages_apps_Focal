@@ -20,20 +20,12 @@ package org.cyanogenmod.nemesis.picsphere;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.util.Log;
-
-import org.cyanogenmod.nemesis.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -51,10 +43,11 @@ import javax.microedition.khronos.opengles.GL10;
  *
  * TODO: Fallback for non-GLES2 devices?
  */
-public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventListener {
+public class Capture3DRenderer implements GLSurfaceView.Renderer {
     public final static String TAG = "Capture3DRenderer";
 
     private List<Snapshot> mSnapshots;
+    private SensorFusion mSensorFusion;
     private Context mContext;
     private Handler mHandler;
     private float mGyroscopeX;
@@ -68,10 +61,10 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
     private FloatBuffer mTexCoordBuffer;
     // x, y,
     private final float mVertexData[] =
-            {-0.5f,  -0.5f,
-                    -0.5f, 0.5f,
-                    0.5f, 0.5f,
-                    0.5f, -0.5f};
+            {-50f,  -50f,
+                    -50f, 50f,
+                    50f, 50f,
+                    50f, -50f};
     // u,v
     private final float mTexCoordData[] =   {0.0f, 0.0f,
             0.0f, 1.0f,
@@ -81,8 +74,6 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
     private int mProgram;
     private int mVertexShader;
     private int mFragmentShader;
-    private Bitmap mBitmapToLoad;
-    private int mTextureData;
     private int mPositionHandler;
     private int mTexCoordHandler;
     private int mTextureHandler;
@@ -96,7 +87,8 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
      */
     private class Snapshot {
         private Vector<Float> mAngle;
-
+        private int mTextureData;
+        private Bitmap mBitmapToLoad;
 
         public Snapshot() {
             mAngle = new Vector<Float>();
@@ -138,9 +130,13 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
                 loadTexture();
             }
 
+            float rX = mAngle.get(0);
+            float rY = mAngle.get(1);
+            //float rZ = mAngle.get(2);
+
             Matrix.setIdentityM(mModelMatrix, 0);
-            Matrix.translateM(mModelMatrix, 0, -1.5f, 1.5f, -1.0f);
-            //Matrix.rotateM(mModelMatrix, 0, 45, 1.0f, 0.0f, 0.0f);
+            Matrix.rotateM(mModelMatrix, 0, (float) Math.sqrt(rX * rX + rY * rY), rX, rY, 0.0f);
+            Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, -100);
 
             GLES20.glUseProgram(mProgram);
             mVertexBuffer.position(0);
@@ -180,6 +176,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
         mSnapshots = new ArrayList<Snapshot>();
         mContext = context;
         mHandler = new Handler();
+        mSensorFusion = new SensorFusion(context);
     }
 
     @Override
@@ -242,8 +239,6 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
         mTexCoordHandler     = GLES20.glGetAttribLocation(mProgram, "a_TexCoordinate");
         mMVPMatrixHandler    = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
         mTextureHandler      = GLES20.glGetUniformLocation(mProgram, "u_Texture");
-
-        //addSnapshot(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.btn_ring_camera_hover));
     }
 
     @Override
@@ -259,7 +254,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
         final float bottom = -1.0f;
         final float top = 1.0f;
         final float near = 0.1f;
-        final float far = 100.0f;
+        final float far = 1000.0f;
 
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
     }
@@ -267,6 +262,9 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
     @Override
     public void onDrawFrame(GL10 glUnused) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+        float[] orientation = mSensorFusion.getFusedOrientation();
+        setCameraOrientation(orientation[0], orientation[1], orientation[2]);
 
         for (Snapshot snap : mSnapshots) {
             snap.draw();
@@ -277,7 +275,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
         // Position the eye in front of the origin.
         final float eyeX = 0.0f;
         final float eyeY = 0.0f;
-        final float eyeZ = -0.7f;
+        final float eyeZ = 1f;
 
         // Set our up vector. This is where our head would be pointing were we holding the camera.
         final float upX = 0.0f;
@@ -288,6 +286,33 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
         // NOTE: In OpenGL 1, a ModelView matrix is used, which is a combination of a model and
         // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
         Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+    }
+
+    public void setCameraOrientation(float rX, float rY, float rZ) {
+        // Position the eye in front of the origin.
+        final float eyeX = 0.0f;
+        final float eyeY = 0.0f;
+        final float eyeZ = 0.0f;
+
+        // Set our up vector. This is where our head would be pointing were we holding the camera.
+        final float upX = 0.0f;
+        final float upY = 1.0f;
+        final float upZ = 0.0f;
+
+
+        // Set the view matrix. This matrix can be said to represent the camera position.
+        // NOTE: In OpenGL 1, a ModelView matrix is used, which is a combination of a model and
+        // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
+        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, 0, 0, -1, upX, upY, upZ);
+
+        // Convert to degrees
+        rZ = 0; //(float) (rZ * 180.0f/Math.PI);
+        rY = (float) (rY * 180.0f/Math.PI);
+
+        Matrix.rotateM(mViewMatrix, 0, (float) Math.sqrt(rZ * rZ + rY * rY), rZ, rY, 0);
+        //Matrix.rotateM(mViewMatrix, 0, 270.0f, 0, 1.0f, 0);
+        //Matrix.rotateM(mViewMatrix, 0, rY, 0, 1.0f, 0);
+        //Matrix.rotateM(mViewMatrix, 0, rZ, 0, 0, 1.0f);
     }
 
     /**
@@ -333,9 +358,10 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
      */
     public void addSnapshot(final Bitmap image) {
         Snapshot snap = new Snapshot();
-        //snap.mAngle.set(0, mGyroscopeX);
-        //snap.mAngle.set(1, mGyroscopeY);
-        //snap.mAngle.set(2, mGyroscopeZ);
+        float[] orientation = mSensorFusion.getFusedOrientation();
+        //snap.mAngle.set(0, orientation[2]);
+        snap.mAngle.set(1, (float) (orientation[1] * 180.0f / Math.PI));
+        //snap.mAngle.set(2, orientation[0]);
 
         snap.setTexture(image);
         Log.e(TAG, "Created snapshot");
@@ -352,48 +378,5 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer, SensorEventLis
      */
     public void clearSnapshots() {
         mSnapshots.clear();
-    }
-
-    /*
-	 * (non-Javadoc)
-	 *
-	 * @see android.hardware.SensorEventListener#onAccuracyChanged(android.hardware.Sensor, int)
-	 */
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        if (sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            String accuracyStr;
-            if (SensorManager.SENSOR_STATUS_ACCURACY_HIGH == accuracy) {
-                accuracyStr = "SENSOR_STATUS_ACCURACY_HIGH";
-            } else if (SensorManager.SENSOR_STATUS_ACCURACY_LOW == accuracy) {
-                accuracyStr = "SENSOR_STATUS_ACCURACY_LOW";
-            } else if (SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM == accuracy) {
-                accuracyStr = "SENSOR_STATUS_ACCURACY_MEDIUM";
-            } else {
-                accuracyStr = "SENSOR_STATUS_UNRELIABLE";
-            }
-
-            // TODO: Remove me
-            Log.d(TAG, "Sensor's values (" + mGyroscopeX + "," + mGyroscopeY + "," + mGyroscopeZ + ") and accuracy : "
-                    + accuracyStr);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.hardware.SensorEventListener#onSensorChanged(android.hardware.SensorEvent)
-     */
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        // update only when your are in the right case:
-        if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            // the angular speed around each axis
-            mGyroscopeX = event.values[0];
-            mGyroscopeY = event.values[1];
-            mGyroscopeZ = event.values[2];
-
-            //setCameraDirection(mGyroscopeX, mGyroscopeY, mGyroscopeZ);
-        }
     }
 }
