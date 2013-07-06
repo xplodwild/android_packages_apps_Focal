@@ -65,7 +65,7 @@ public class SensorFusion implements SensorEventListener {
     private boolean initState = true;
 
     public static final int TIME_CONSTANT = 30;
-    public static final float FILTER_COEFFICIENT = 0.98f;
+    public static final float FILTER_COEFFICIENT = 0.68f;
 
     public SensorFusion(Context context) {
         gyroOrientation[0] = 0.0f;
@@ -139,12 +139,19 @@ public class SensorFusion implements SensorEventListener {
     }
 
     public float[] getFusedOrientation() {
-        return accMagOrientation;
+        float[] rotMat = getRotationMatrixFromOrientation(fusedOrientation);
+        SensorManager.remapCoordinateSystem(rotMat, SensorManager.AXIS_X,
+                SensorManager.AXIS_Z, rotMat);
+        float[] fusedRemappedOrientation = new float[fusedOrientation.length];
+        SensorManager.getOrientation(rotMat, fusedRemappedOrientation);
+
+        return fusedRemappedOrientation;
     }
 
     // calculates orientation angles from accelerometer and magnetometer output
     public void calculateAccMagOrientation() {
         if(SensorManager.getRotationMatrix(rotationMatrix, null, accel, magnet)) {
+
             SensorManager.getOrientation(rotationMatrix, accMagOrientation);
         }
     }

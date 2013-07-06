@@ -47,25 +47,22 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     public final static String TAG = "Capture3DRenderer";
 
     private List<Snapshot> mSnapshots;
-    private List<Snapshot> mSnapshotsIntegration;
+    private boolean mListBusy;
     private SensorFusion mSensorFusion;
-    private Context mContext;
-    private Handler mHandler;
-    private float mGyroscopeX;
-    private float mGyroscopeY;
-    private float mGyroscopeZ;
+    private Quaternion mCameraQuat;
     private float[] mViewMatrix = new float[16];
     private float[] mProjectionMatrix = new float[16];
 
 
     private FloatBuffer mVertexBuffer;
     private FloatBuffer mTexCoordBuffer;
+    private final static float mScale = 150f;
     // x, y,
     private final float mVertexData[] =
-            {-50f,  -50f,
-                    -50f, 50f,
-                    50f, 50f,
-                    50f, -50f};
+            {-mScale,  -mScale,
+                    -mScale, mScale,
+                    mScale, mScale,
+                    mScale, -mScale};
     // u,v
     private final float mTexCoordData[] =   {0.0f, 0.0f,
             0.0f, 1.0f,
@@ -87,16 +84,12 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
      * Stores the information about each snapshot displayed in the sphere
      */
     private class Snapshot {
-        private Vector<Float> mAngle;
+        private Quaternion mAngle;
         private int mTextureData;
         private Bitmap mBitmapToLoad;
 
         public Snapshot() {
-            mAngle = new Vector<Float>();
-            mAngle.add(0.0f);
-            mAngle.add(0.0f);
-            mAngle.add(0.0f);
-
+            mAngle = new Quaternion();
         }
 
         public void setTexture(Bitmap tex) {
@@ -131,13 +124,8 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
                 loadTexture();
             }
 
-            float rX = mAngle.get(0);
-            float rY = mAngle.get(1);
-            //float rZ = mAngle.get(2);
-
-            Matrix.setIdentityM(mModelMatrix, 0);
-            Matrix.rotateM(mModelMatrix, 0, (float) Math.sqrt(rX * rX + rY * rY), rX, rY, 0.0f);
-            Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, -160);
+            mModelMatrix = mAngle.getMatrix();
+            Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, -400);
 
             GLES20.glUseProgram(mProgram);
             mVertexBuffer.position(0);
@@ -175,10 +163,9 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
      */
     public Capture3DRenderer(Context context) {
         mSnapshots = new ArrayList<Snapshot>();
-        mSnapshotsIntegration = new ArrayList<Snapshot>();
-        mContext = context;
-        mHandler = new Handler();
+        mListBusy = false;
         mSensorFusion = new SensorFusion(context);
+        mCameraQuat = new Quaternion();
     }
 
     @Override
@@ -248,17 +235,17 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         // Set the OpenGL viewport to the same size as the surface.
         GLES20.glViewport(0, 0, width, height);
 
-        float fov = 60; // degrees, try also 45, or different number if you like
+        float fov = 60;
 
         // Create a new perspective projection matrix. The height will stay the same
         // while the width will vary as per aspect ratio.
         final float ratio = (float) width / height;
         final float near = 0.1f;
         final float far = 500.0f;
-        final float top = (float) Math.tan(fov * Math.PI / 360.0f) * near;
-        final float bottom = -top;
-        final float left = ratio * bottom;
-        final float right = ratio * top;
+        final float bottom = (float) Math.tan(fov * Math.PI / 360.0f) * near;
+        final float top = -bottom;
+        final float left = ratio * top;
+        final float right = ratio * bottom;
 
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
     }
@@ -270,9 +257,12 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         float[] orientation = mSensorFusion.getFusedOrientation();
         setCameraOrientation(orientation[0], orientation[1], orientation[2]);
 
+        while (mListBusy) { }
+        mListBusy = true;
         for (Snapshot snap : mSnapshots) {
             snap.draw();
         }
+        mListBusy = false;
     }
 
     public void setCameraDirection(float lookX, float lookY, float lookZ) {
@@ -303,20 +293,28 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         final float upY = 1.0f;
         final float upZ = 0.0f;
 
+        // Convert to degrees
+        rX = (float) (rX * 180.0f/Math.PI);
+        rY = (float) (rY * 180.0f/Math.PI);
+        rZ = (float) (rZ * 180.0f/Math.PI);
 
+       // Log.e(TAG, "rY = " + rY);
+
+        mCameraQuat.fromEuler(rY, 0.0f, rX);
+        mViewMatrix = mCameraQuat.getConjugate().getMatrix();
+
+        /*
         // Set the view matrix. This matrix can be said to represent the camera position.
         // NOTE: In OpenGL 1, a ModelView matrix is used, which is a combination of a model and
         // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
         Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, 0, 0, -1, upX, upY, upZ);
 
-        // Convert to degrees
-        rZ = (float) (rZ * 180.0f/Math.PI);
-        rY = (float) (rY * 180.0f/Math.PI);
 
         Matrix.rotateM(mViewMatrix, 0, (float) Math.sqrt(rZ * rZ + rY * rY), rZ, rY, 0);
         //Matrix.rotateM(mViewMatrix, 0, 270.0f, 0, 1.0f, 0);
         //Matrix.rotateM(mViewMatrix, 0, rY, 0, 1.0f, 0);
         //Matrix.rotateM(mViewMatrix, 0, rZ, 0, 0, 1.0f);
+        */
     }
 
     /**
@@ -326,8 +324,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
      * @param shaderSource The shader source code.
      * @return An OpenGL handle to the shader.
      */
-    public static int compileShader(final int shaderType, final String shaderSource)
-    {
+    public static int compileShader(final int shaderType, final String shaderSource) {
         int shaderHandle = GLES20.glCreateShader(shaderType);
 
         if (shaderHandle != 0) {
@@ -342,8 +339,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
             GLES20.glGetShaderiv(shaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
 
             // If the compilation failed, delete the shader.
-            if (compileStatus[0] == 0)
-            {
+            if (compileStatus[0] == 0) {
                 Log.e(TAG, "Error compiling shader: " + GLES20.glGetShaderInfoLog(shaderHandle));
                 GLES20.glDeleteShader(shaderHandle);
                 shaderHandle = 0;
@@ -362,10 +358,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
      */
     public synchronized void addSnapshot(final Bitmap image) {
         Snapshot snap = new Snapshot();
-        float[] orientation = mSensorFusion.getFusedOrientation();
-        snap.mAngle.set(0, (float) (orientation[2] * -180.0f / Math.PI));
-        snap.mAngle.set(1, (float) (orientation[1] * -180.0f / Math.PI));
-        //snap.mAngle.set(2, orientation[0]);
+        snap.mAngle = new Quaternion(mCameraQuat);
 
         snap.setTexture(image);
         Log.e(TAG, "Created snapshot");
@@ -374,7 +367,11 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         } else {
             Log.e(TAG, "Bitmap is not null");
         }
+
+        while (mListBusy) { }
+        mListBusy = true;
         mSnapshots.add(snap);
+        mListBusy = false;
     }
 
     /**

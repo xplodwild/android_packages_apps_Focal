@@ -319,6 +319,12 @@ public class CameraManager {
     public void setLockSetup(boolean lock) {
         Camera.Parameters params = getParameters();
 
+        if (params == null) {
+            // Params might be null if we pressed or swipe the shutter button
+            // while the camera is not ready
+            return;
+        }
+
         if (params.isAutoExposureLockSupported()) {
             params.setAutoExposureLock(lock);
         }
