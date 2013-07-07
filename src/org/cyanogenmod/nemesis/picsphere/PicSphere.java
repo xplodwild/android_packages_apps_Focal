@@ -28,6 +28,7 @@ import org.cyanogenmod.nemesis.SnapshotManager;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
@@ -267,6 +268,9 @@ public class PicSphere {
         run("enblend --compression=jpeg -o " + jpegPath + " " + files);
         consumeProcLogs();
 
+        // Apply PhotoSphere EXIF tags on the final jpeg
+        doExiv2();
+
         // Save it to gallery
         // XXX: This needs opening the output byte array... Isn't there any way to update
         // gallery data without having to reload/save the JPEG file? Because we have it already,
@@ -292,6 +296,19 @@ public class PicSphere {
         return true;
     }
 
+    private boolean doExiv2() throws IOException {
+        Log.d(TAG, "Exiv2 tagging...");
+
+        String[] xmp = generatePhotoSphereXMP(2000, 2000, mPictures.size());
+        for (String line : xmp) {
+            run("exiv2 -m\"" + line + "\" " + mTempPath+"final.jpg");
+        }
+        consumeProcLogs();
+
+        Log.d(TAG, "Exiv2... done");
+        return true;
+    }
+
     /**
      * Generate PhotoSphere XMP data file for use with exiv2 tool
      * https://developers.google.com/photo-sphere/metadata/
@@ -300,24 +317,18 @@ public class PicSphere {
      * @param height The height of the panorama
      * @return Exiv2 config file string
      */
-    public static String generatePhotoSphereXMP(int width, int height, int sourceImageCount) {
-        return "# Exiv2 Google Photo Sphere command file\n" +
-                "# -------------------------\n" +
-                "#\n" +
-                "# $ exiv2 -m photo-sphere.txt file ...\n" +
-                " \n" +
-                "reg GPano http://ns.google.com/photos/1.0/panorama/\n" +
-                " \n" +
-                "set Xmp.GPano.UsePanoramaViewer             XmpText     True\n" +
-                "set Xmp.GPano.CaptureSoftware               XmpText     CyanogenMod-Nemesis\n" +
-                "set Xmp.GPano.StitchingSoftware             XmpText     CyanogenMod-Nemesis+Hugin\n" +
-                "set Xmp.GPano.SourcePhotosCount             XmpText     "+sourceImageCount+"\n" +
-                "set Xmp.GPano.ProjectionType                XmpText     equirectangular \n" +
-                "set Xmp.GPano.CroppedAreaImageWidthPixels   XmpText     "+width+"\n" +
-                "set Xmp.GPano.CroppedAreaImageHeightPixels  XmpText     "+height+"\n" +
-                "set Xmp.GPano.FullPanoWidthPixels           XmpText     "+width+"\n" +
-                "set Xmp.GPano.FullPanoHeightPixels          XmpText     "+height+"\n" +
-                "set Xmp.GPano.CroppedAreaLeftPixels         XmpText     0\n" +
-                "set Xmp.GPano.CroppedAreaTopPixels          XmpText     0";
+    public static String[] generatePhotoSphereXMP(int width, int height, int sourceImageCount) {
+        return new String[]{
+                "set Xmp.GPano.UsePanoramaViewer             XmpText     True",
+                "set Xmp.GPano.CaptureSoftware               XmpText     CyanogenMod-Nemesis",
+                "set Xmp.GPano.StitchingSoftware             XmpText     CyanogenMod-Nemesis+Hugin",
+                "set Xmp.GPano.SourcePhotosCount             XmpText     "+sourceImageCount,
+                "set Xmp.GPano.ProjectionType                XmpText     equirectangular",
+                "set Xmp.GPano.CroppedAreaImageWidthPixels   XmpText     "+width,
+                "set Xmp.GPano.CroppedAreaImageHeightPixels  XmpText     "+height,
+                "set Xmp.GPano.FullPanoWidthPixels           XmpText     "+width,
+                "set Xmp.GPano.FullPanoHeightPixels          XmpText     "+height,
+                "set Xmp.GPano.CroppedAreaLeftPixels         XmpText     0",
+                "set Xmp.GPano.CroppedAreaTopPixels          XmpText     0"};
     }
 }
