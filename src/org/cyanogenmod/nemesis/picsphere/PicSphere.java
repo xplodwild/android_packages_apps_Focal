@@ -291,4 +291,33 @@ public class PicSphere {
         Log.d(TAG, "Enblend... done");
         return true;
     }
+
+    /**
+     * Generate PhotoSphere XMP data file for use with exiv2 tool
+     * https://developers.google.com/photo-sphere/metadata/
+     *
+     * @param width The width of the panorama
+     * @param height The height of the panorama
+     * @return Exiv2 config file string
+     */
+    public static String generatePhotoSphereXMP(int width, int height, int sourceImageCount) {
+        return "# Exiv2 Google Photo Sphere command file\n" +
+                "# -------------------------\n" +
+                "#\n" +
+                "# $ exiv2 -m photo-sphere.txt file ...\n" +
+                " \n" +
+                "reg GPano http://ns.google.com/photos/1.0/panorama/\n" +
+                " \n" +
+                "set Xmp.GPano.UsePanoramaViewer             XmpText     True\n" +
+                "set Xmp.GPano.CaptureSoftware               XmpText     CyanogenMod-Nemesis\n" +
+                "set Xmp.GPano.StitchingSoftware             XmpText     CyanogenMod-Nemesis+Hugin\n" +
+                "set Xmp.GPano.SourcePhotosCount             XmpText     "+sourceImageCount+"\n" +
+                "set Xmp.GPano.ProjectionType                XmpText     equirectangular \n" +
+                "set Xmp.GPano.CroppedAreaImageWidthPixels   XmpText     "+width+"\n" +
+                "set Xmp.GPano.CroppedAreaImageHeightPixels  XmpText     "+height+"\n" +
+                "set Xmp.GPano.FullPanoWidthPixels           XmpText     "+width+"\n" +
+                "set Xmp.GPano.FullPanoHeightPixels          XmpText     "+height+"\n" +
+                "set Xmp.GPano.CroppedAreaLeftPixels         XmpText     0\n" +
+                "set Xmp.GPano.CroppedAreaTopPixels          XmpText     0";
+    }
 }

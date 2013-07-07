@@ -113,7 +113,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
             //tex.recycle();
 
             if(texture[0] == 0){
-                // Displays error
+                Log.e(TAG, "Unable to attribute texture to quad");
             }
 
             mTextureData = texture[0];
@@ -174,10 +174,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         // Set the background clear color to gray.
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
 
-        // Enable depth testing
-        //GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-
-        setCameraDirection(0, 0, -5);
+        // Initialize plane vertex data and texcoords data
         ByteBuffer bb_data = ByteBuffer.allocateDirect(mVertexData.length * 4);
         bb_data.order(ByteOrder.nativeOrder());
         ByteBuffer bb_texture = ByteBuffer.allocateDirect(mTexCoordData.length * 4);
@@ -214,6 +211,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         mVertexShader = compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
         mFragmentShader = compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader);
 
+        // create the program and bind the shader attributes
         mProgram = GLES20.glCreateProgram();
         GLES20.glAttachShader(mProgram, mFragmentShader);
         GLES20.glAttachShader(mProgram, mVertexShader);
@@ -236,7 +234,8 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         // Set the OpenGL viewport to the same size as the surface.
         GLES20.glViewport(0, 0, width, height);
 
-        float fov = 60;
+        // We use  here a field of view of 60, which is mostly find for a camera app representation
+        final float fov = 60.0f;
 
         // Create a new perspective projection matrix. The height will stay the same
         // while the width will vary as per aspect ratio.
@@ -265,56 +264,14 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         mListBusy.unlock();
     }
 
-    public void setCameraDirection(float lookX, float lookY, float lookZ) {
-        // Position the eye in front of the origin.
-        final float eyeX = 0.0f;
-        final float eyeY = 0.0f;
-        final float eyeZ = 1f;
-
-        // Set our up vector. This is where our head would be pointing were we holding the camera.
-        final float upX = 0.0f;
-        final float upY = 1.0f;
-        final float upZ = 0.0f;
-
-        // Set the view matrix. This matrix can be said to represent the camera position.
-        // NOTE: In OpenGL 1, a ModelView matrix is used, which is a combination of a model and
-        // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
-        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
-    }
-
     public void setCameraOrientation(float rX, float rY, float rZ) {
-        // Position the eye in front of the origin.
-        final float eyeX = 0.0f;
-        final float eyeY = 0.0f;
-        final float eyeZ = 0.0f;
-
-        // Set our up vector. This is where our head would be pointing were we holding the camera.
-        final float upX = 0.0f;
-        final float upY = 1.0f;
-        final float upZ = 0.0f;
-
-        // Convert to degrees
+        // Convert angles to degrees
         rX = (float) (rX * 180.0f/Math.PI);
         rY = (float) (rY * 180.0f/Math.PI);
-        rZ = (float) (rZ * 180.0f/Math.PI);
 
-       // Log.e(TAG, "rY = " + rY);
-
+        // Update quaternion from euler angles out of orientation and set it as view matrix
         mCameraQuat.fromEuler(rY, 0.0f, rX);
         mViewMatrix = mCameraQuat.getConjugate().getMatrix();
-
-        /*
-        // Set the view matrix. This matrix can be said to represent the camera position.
-        // NOTE: In OpenGL 1, a ModelView matrix is used, which is a combination of a model and
-        // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
-        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, 0, 0, -1, upX, upY, upZ);
-
-
-        Matrix.rotateM(mViewMatrix, 0, (float) Math.sqrt(rZ * rZ + rY * rY), rZ, rY, 0);
-        //Matrix.rotateM(mViewMatrix, 0, 270.0f, 0, 1.0f, 0);
-        //Matrix.rotateM(mViewMatrix, 0, rY, 0, 1.0f, 0);
-        //Matrix.rotateM(mViewMatrix, 0, rZ, 0, 0, 1.0f);
-        */
     }
 
     /**
@@ -356,17 +313,11 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     /**
      * Adds a snapshot to the sphere
      */
-    public synchronized void addSnapshot(final Bitmap image) {
+    public void addSnapshot(final Bitmap image) {
         Snapshot snap = new Snapshot();
         snap.mAngle = new Quaternion(mCameraQuat);
 
         snap.setTexture(image);
-        Log.e(TAG, "Created snapshot");
-        if (image == null) {
-            Log.e(TAG, "Bitmap is null");
-        } else {
-            Log.e(TAG, "Bitmap is not null");
-        }
 
         mListBusy.lock();
         mSnapshots.add(snap);
@@ -377,6 +328,8 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
      * Clear sphere's snapshots
      */
     public void clearSnapshots() {
+        mListBusy.lock();
         mSnapshots.clear();
+        mListBusy.unlock();
     }
 }
