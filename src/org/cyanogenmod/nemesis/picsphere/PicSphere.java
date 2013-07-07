@@ -187,7 +187,7 @@ public class PicSphere {
      */
     private boolean doPtclean() throws IOException {
         Log.d(TAG, "Ptclean...");
-        //run("ptclean -o " + mProjectFile + " " + mProjectFile);
+        run("ptclean -o " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "Ptclean... done");
