@@ -28,7 +28,8 @@ import android.media.SoundPool;
  * hardcoded values to play them quickly.
  */
 public class SoundManager {
-    public final static int SOUND_FOCUS_START = 1;
+    public final static int SOUND_SHUTTER = 0;
+    public final static int SOUND_NOTIFICATION = 1;
     public final static int SOUND_FOCUS_END = 2;
     public final static int SOUND_FOCUS_FAIL = 3;
     public final static int SOUND_PROCESS_DONE = 4;
@@ -56,7 +57,8 @@ public class SoundManager {
     }
 
     public void preload(Context ctx) {
-        mSoundsFD[SOUND_FOCUS_START] = mSoundPool.load(ctx, R.raw.snd_focus_start, 2);
+        mSoundsFD[SOUND_SHUTTER] = mSoundPool.load(ctx, R.raw.snd_capture, 1);
+        mSoundsFD[SOUND_NOTIFICATION] = mSoundPool.load(ctx, R.raw.snd_notification, 2);
         mSoundsFD[SOUND_FOCUS_END] = mSoundPool.load(ctx, R.raw.snd_focus_end, 3);
         mSoundsFD[SOUND_FOCUS_FAIL] = mSoundPool.load(ctx, R.raw.snd_focus_fail, 4);
         mSoundsFD[SOUND_PROCESS_DONE] = mSoundPool.load(ctx, R.raw.snd_processing_done, 5);

@@ -174,6 +174,7 @@ public class CameraManager {
                         return;
                     }
                     mCamera = Camera.open(cameraId);
+                    mCamera.enableShutterSound(false);
                     mCamera.setPreviewCallback(mPreview);
                     mCurrentFacing = cameraId;
                     mParameters = mCamera.getParameters();
@@ -394,6 +395,7 @@ public class CameraManager {
     public void takeSnapshot(Camera.ShutterCallback shutterCallback, Camera.PictureCallback raw,
                              Camera.PictureCallback jpeg) {
         Log.v(TAG, "takePicture");
+        SoundManager.getSingleton().play(SoundManager.SOUND_SHUTTER);
         mCamera.takePicture(shutterCallback, raw, jpeg);
     }
 

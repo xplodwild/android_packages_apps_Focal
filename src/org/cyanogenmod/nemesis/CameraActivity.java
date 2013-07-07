@@ -686,6 +686,11 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         @Override
         public void onFocusReturns(final boolean smallAdjust, final boolean success) {
+            if (success) {
+                SoundManager.getSingleton().play(SoundManager.SOUND_FOCUS_END);
+            } else {
+                SoundManager.getSingleton().play(SoundManager.SOUND_FOCUS_FAIL);
+            }
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
