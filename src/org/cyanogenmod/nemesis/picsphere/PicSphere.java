@@ -24,8 +24,11 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import org.apache.sanselan.Sanselan;
+import org.apache.sanselan.common.byteSources.ByteSourceFile;
 import org.cyanogenmod.nemesis.SnapshotManager;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -143,6 +146,16 @@ public class PicSphere {
     private void run(String command) throws IOException {
         Runtime rt = Runtime.getRuntime();
         Process proc = rt.exec(command, new String[]{"PATH="+mPathPrefix+":/system/bin",
+                "LD_LIBRARY_PATH="+mPathPrefix+":/system/lib"});
+        mProcStdOut = new BufferedReader(new
+                InputStreamReader(proc.getInputStream()));
+        mProcStdErr = new BufferedReader(new
+                InputStreamReader(proc.getErrorStream()));
+    }
+
+    private void run(String[] commandWithArgs) throws IOException {
+        Runtime rt = Runtime.getRuntime();
+        Process proc = rt.exec(commandWithArgs, new String[]{"PATH="+mPathPrefix+":/system/bin",
                 "LD_LIBRARY_PATH="+mPathPrefix+":/system/lib"});
         mProcStdOut = new BufferedReader(new
                 InputStreamReader(proc.getInputStream()));
@@ -298,7 +311,10 @@ public class PicSphere {
         consumeProcLogs();
 
         // Apply PhotoSphere EXIF tags on the final jpeg
-        doExiv2();
+        if (doExifTagging()) {
+            jpegPath = mTempPath + "/final.tagged.jpg";
+        }
+
 
         // Save it to gallery
         // XXX: This needs opening the output byte array... Isn't there any way to update
@@ -325,14 +341,21 @@ public class PicSphere {
         return true;
     }
 
-    private boolean doExiv2() throws IOException {
+    private boolean doExifTagging() throws IOException {
         Log.d(TAG, "Exiv2 tagging...");
 
-        String[] xmp = generatePhotoSphereXMP(2000, 2000, mPictures.size());
-        for (String line : xmp) {
-            run("exiv2bin -m\"" + line + "\" " + mTempPath+"/final.jpg");
+        try {
+            File file = new File(mTempPath + "/final.jpg");
+            File newFile = new File(mTempPath + "/final.tagged.jpg");
+            org.apache.sanselan.formats.jpeg.xmp.JpegXmpRewriter xmpWriter =
+                    new org.apache.sanselan.formats.jpeg.xmp.JpegXmpRewriter();
+            xmpWriter.updateXmpXml(new ByteSourceFile(file),
+                    new BufferedOutputStream(new FileOutputStream(newFile)),
+                    generatePhotoSphereXMP(2000, 2000, mPictures.size()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-        consumeProcLogs();
 
         Log.d(TAG, "Exiv2... done");
         return true;
@@ -346,18 +369,24 @@ public class PicSphere {
      * @param height The height of the panorama
      * @return Exiv2 config file string
      */
-    public static String[] generatePhotoSphereXMP(int width, int height, int sourceImageCount) {
-        return new String[]{
-                "set Xmp.GPano.UsePanoramaViewer             XmpText     True",
-                "set Xmp.GPano.CaptureSoftware               XmpText     CyanogenMod-Nemesis",
-                "set Xmp.GPano.StitchingSoftware             XmpText     CyanogenMod-Nemesis+Hugin",
-                "set Xmp.GPano.SourcePhotosCount             XmpText     "+sourceImageCount,
-                "set Xmp.GPano.ProjectionType                XmpText     equirectangular",
-                "set Xmp.GPano.CroppedAreaImageWidthPixels   XmpText     "+width,
-                "set Xmp.GPano.CroppedAreaImageHeightPixels  XmpText     "+height,
-                "set Xmp.GPano.FullPanoWidthPixels           XmpText     "+width,
-                "set Xmp.GPano.FullPanoHeightPixels          XmpText     "+height,
-                "set Xmp.GPano.CroppedAreaLeftPixels         XmpText     0",
-                "set Xmp.GPano.CroppedAreaTopPixels          XmpText     0"};
+    public static String generatePhotoSphereXMP(int width, int height, int sourceImageCount) {
+        return "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.1.0-jc003\">\n" +
+                "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
+                "    <rdf:Description rdf:about=\"\"\n" +
+                "        xmlns:GPano=\"http://ns.google.com/photos/1.0/panorama/\"\n" +
+                "      GPano:UsePanoramaViewer=\"True\"\n" +
+                "      GPano:ProjectionType=\"equirectangular\"\n" +
+                //"      GPano:PoseHeadingDegrees=\"122.0\"\n" +
+                "      GPano:CroppedAreaLeftPixels=\"0\"\n" +
+                "      GPano:FullPanoWidthPixels=\""+width+"\"\n" +
+                //"      GPano:FirstPhotoDate=\"2012-11-22T23:15:59.773Z\"\n" +
+                "      GPano:CroppedAreaImageHeightPixels=\""+height+"\"\n" +
+                "      GPano:FullPanoHeightPixels=\""+height+"\"\n" +
+                "      GPano:SourcePhotosCount=\""+sourceImageCount+"\"\n" +
+                "      GPano:CroppedAreaImageWidthPixels=\""+width+"\"\n" +
+                //"      GPano:LastPhotoDate=\"2012-11-22T23:16:41.177Z\"\n" +
+                "      GPano:CroppedAreaTopPixels=\"0\"\n" +
+                "  </rdf:RDF>\n" +
+                "</x:xmpmeta>";
     }
 }

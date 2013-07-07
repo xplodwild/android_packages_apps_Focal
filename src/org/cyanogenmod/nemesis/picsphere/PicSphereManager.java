@@ -100,7 +100,7 @@ public class PicSphereManager {
         try {
             String files[] = {
                 "autooptimiser", "autopano", "celeste", "enblend", "enfuse", "nona", "pano_modify",
-                    "ptclean", "tiffinfo",
+                    "ptclean", "tiffinfo", "exiv2bin",
                     "libexiv2.so", "libglib-2.0.so", "libgmodule-2.0.so", "libgobject-2.0.so",
                     "libgthread-2.0.so", "libjpeg.so", "libpano13.so", "libtiff.so", "libtiffdecoder.so",
                     "libvigraimpex.so"
