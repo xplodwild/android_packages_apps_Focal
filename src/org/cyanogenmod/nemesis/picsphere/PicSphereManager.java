@@ -22,6 +22,8 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
+import org.cyanogenmod.nemesis.SnapshotManager;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -40,10 +42,12 @@ public class PicSphereManager {
     public final static String TAG = "PicSphereManager";
     private List<PicSphere> mPicSpheres;
     private Context mContext;
+    private SnapshotManager mSnapManager;
     private Capture3DRenderer mCapture3DRenderer;
 
-    public PicSphereManager(Context context) {
+    public PicSphereManager(Context context, SnapshotManager snapMan) {
         mContext = context;
+        mSnapManager = snapMan;
         mPicSpheres = new ArrayList<PicSphere>();
         new Thread() {
             public void run() { copyBinaries(); }
@@ -55,7 +59,7 @@ public class PicSphereManager {
      * @return A PicSphere that is empty
      */
     public PicSphere createPicSphere() {
-        PicSphere sphere = new PicSphere(mContext);
+        PicSphere sphere = new PicSphere(mContext, mSnapManager);
         mPicSpheres.add(sphere);
         return sphere;
     }

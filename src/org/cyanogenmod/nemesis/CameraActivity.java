@@ -460,7 +460,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         // Setup the 3D rendering
         if (mPicSphereManager == null) {
-            mPicSphereManager = new PicSphereManager(CameraActivity.this);
+            mPicSphereManager = new PicSphereManager(CameraActivity.this, mSnapshotManager);
         }
         //mCamManager.getPreviewSurface().setVisibility(View.INVISIBLE);
         mCamManager.getPreviewSurface().setScaleX(0.3f);

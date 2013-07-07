@@ -24,10 +24,13 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import org.cyanogenmod.nemesis.SnapshotManager;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +49,9 @@ public class PicSphere {
     private BufferedReader mProcStdOut;
     private BufferedReader mProcStdErr;
     private String mProjectFile;
+    private SnapshotManager mSnapManager;
+    private Uri mOutputUri;
+    private String mOutputTitle;
 
     private Thread mOutputLogger = new Thread() {
         public void run() {
@@ -60,9 +66,10 @@ public class PicSphere {
         }
     };
 
-    protected PicSphere(Context context) {
+    protected PicSphere(Context context, SnapshotManager snapMan) {
         mPictures = new ArrayList<Uri>();
         mContext = context;
+        mSnapManager = snapMan;
         mOutputLogger.start();
     }
 
@@ -98,6 +105,9 @@ public class PicSphere {
         mTempPath.mkdir();
         mProjectFile = mTempPath + "/project.pto";
 
+        mSnapManager.prepareNamerUri(100,100);
+        mOutputUri = mSnapManager.getNamerUri();
+        mOutputTitle = mSnapManager.getNamerTitle();
 
         // Process our images
         try {
@@ -177,7 +187,7 @@ public class PicSphere {
      */
     private boolean doPtclean() throws IOException {
         Log.d(TAG, "Ptclean...");
-        run("ptclean --output " + mProjectFile + " " + mProjectFile);
+        //run("ptclean -o " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "Ptclean... done");
@@ -246,11 +256,37 @@ public class PicSphere {
         // so we basically build that list out of the number of shots we fed to autopano
         String files = "";
         for (int i = 0; i < mPictures.size(); i++) {
-            files += " " + mTempPath + "/" + String.format("project%04d.tif", i);
+            // Check if file exists, otherwise enblend will fail
+            String filePath = mTempPath + "/" + String.format("project%04d.tif", i);
+            if (new File(filePath).exists()) {
+                files += " " + filePath;
+            }
         }
 
-        run("enblend -o /sdcard/final.tif " + files);
+        String jpegPath = mTempPath + "/final.jpg";
+        run("enblend --compression=jpeg -o " + jpegPath + " " + files);
         consumeProcLogs();
+
+        // Save it to gallery
+        // XXX: This needs opening the output byte array... Isn't there any way to update
+        // gallery data without having to reload/save the JPEG file? Because we have it already,
+        // we could just move it.
+        byte[] jpegData;
+        RandomAccessFile f = new RandomAccessFile(jpegPath, "r");
+        try {
+            // Get and check length
+            long longlength = f.length();
+            int length = (int) longlength;
+            if (length != longlength)
+                throw new IOException("File size >= 2 GB");
+            // Read file and return data
+            jpegData = new byte[length];
+            f.readFully(jpegData);
+        } finally {
+            f.close();
+        }
+
+        mSnapManager.saveImage(mOutputUri, mOutputTitle, 100, 100, 0, jpegData);
 
         Log.d(TAG, "Enblend... done");
         return true;

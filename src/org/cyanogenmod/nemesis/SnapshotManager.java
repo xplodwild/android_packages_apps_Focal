@@ -274,6 +274,24 @@ public class SnapshotManager {
         mListeners.remove(listener);
     }
 
+    public void prepareNamerUri(int width, int height) {
+        mImageNamer.prepareUri(mContentResolver, System.currentTimeMillis(), width, height, 0);
+    }
+
+    public Uri getNamerUri() {
+        return mImageNamer.getUri();
+    }
+
+    public String getNamerTitle() {
+        return mImageNamer.getTitle();
+    }
+
+    public void saveImage(Uri uri, String title, int width, int height,
+                          int orientation, byte[] jpegData) {
+        mImageSaver.addImage(jpegData, uri, title, null,
+                width, height, orientation);
+    }
+
     /**
      * Queues a snapshot that will be taken as soon as possible
      *
@@ -307,6 +325,14 @@ public class SnapshotManager {
             mCurrentShutterQueueIndex = 0;
             new Thread(mCaptureRunnable).start();
         }
+    }
+
+    public ImageNamer getImageNamer() {
+        return mImageNamer;
+    }
+
+    public ImageSaver getImageSaver() {
+        return mImageSaver;
     }
 
     public void setVideoProfile(CamcorderProfile profile) {
