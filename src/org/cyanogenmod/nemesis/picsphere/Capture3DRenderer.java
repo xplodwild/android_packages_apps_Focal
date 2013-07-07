@@ -33,6 +33,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -47,7 +48,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     public final static String TAG = "Capture3DRenderer";
 
     private List<Snapshot> mSnapshots;
-    private boolean mListBusy;
+    private ReentrantLock mListBusy;
     private SensorFusion mSensorFusion;
     private Quaternion mCameraQuat;
     private float[] mViewMatrix = new float[16];
@@ -163,7 +164,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
      */
     public Capture3DRenderer(Context context) {
         mSnapshots = new ArrayList<Snapshot>();
-        mListBusy = false;
+        mListBusy = new ReentrantLock();
         mSensorFusion = new SensorFusion(context);
         mCameraQuat = new Quaternion();
     }
@@ -257,12 +258,11 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         float[] orientation = mSensorFusion.getFusedOrientation();
         setCameraOrientation(orientation[0], orientation[1], orientation[2]);
 
-        while (mListBusy) { }
-        mListBusy = true;
+        mListBusy.lock();
         for (Snapshot snap : mSnapshots) {
             snap.draw();
         }
-        mListBusy = false;
+        mListBusy.unlock();
     }
 
     public void setCameraDirection(float lookX, float lookY, float lookZ) {
@@ -368,10 +368,9 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
             Log.e(TAG, "Bitmap is not null");
         }
 
-        while (mListBusy) { }
-        mListBusy = true;
+        mListBusy.lock();
         mSnapshots.add(snap);
-        mListBusy = false;
+        mListBusy.unlock();
     }
 
     /**
