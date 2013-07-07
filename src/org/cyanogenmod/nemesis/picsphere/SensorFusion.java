@@ -65,7 +65,7 @@ public class SensorFusion implements SensorEventListener {
     private boolean initState = true;
 
     public static final int TIME_CONSTANT = 30;
-    public static final float FILTER_COEFFICIENT = 0.68f;
+    public static final float FILTER_COEFFICIENT = 0.78f;
 
     public SensorFusion(Context context) {
         gyroOrientation[0] = 0.0f;
@@ -140,8 +140,8 @@ public class SensorFusion implements SensorEventListener {
 
     public float[] getFusedOrientation() {
         float[] rotMat = getRotationMatrixFromOrientation(fusedOrientation);
-        SensorManager.remapCoordinateSystem(rotMat, SensorManager.AXIS_X,
-                SensorManager.AXIS_Z, rotMat);
+        SensorManager.remapCoordinateSystem(rotMat, SensorManager.AXIS_Y,
+                SensorManager.AXIS_MINUS_Z, rotMat);
         float[] fusedRemappedOrientation = new float[fusedOrientation.length];
         SensorManager.getOrientation(rotMat, fusedRemappedOrientation);
 

@@ -18,6 +18,16 @@
 -->
 
 <resources>
+    <!-- Voice shutter trigger commands -->
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whisky</item>
+        <item>whiskey</item>
+        <item>cheese</item>
+        <item>ok cid, take a picture</item>
+    </string-array>
+
     <!-- Flash widget values -->
     <string-array name="widget_flash_values" translatable="false">
         <item>auto</item>
@@ -27,12 +37,13 @@
         <item>red-eye</item>
     </string-array>
 
+
     <array name="widget_flash_icons">
         <item>@drawable/ic_widget_flash_auto</item>
         <item>@drawable/ic_widget_flash_off</item>
         <item>@drawable/ic_widget_flash_on</item>
         <item>@drawable/ic_widget_flash_on</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_flash_redeye</item>
     </array>
 
 
@@ -131,25 +142,25 @@
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_backlight</item>
+        <item>@drawable/ic_widget_scenemode_backlightportrait</item>
         <item>@drawable/ic_widget_scenemode_barcode</item>
         <item>@drawable/ic_widget_scenemode_beach</item>
         <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_dark</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_scenemode_hdr</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_highsensitivity</item>
         <item>@drawable/ic_widget_scenemode_landscape</item>
         <item>@drawable/ic_widget_scenemode_night</item>
         <item>@drawable/ic_widget_scenemode_nightportrait</item>
         <item>@drawable/ic_widget_scenemode_nightportrait</item>
         <item>@drawable/ic_widget_scenemode_party</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_pet</item>
         <item>@drawable/ic_widget_scenemode_portrait</item>
         <item>@drawable/ic_widget_scenemode_snow</item>
         <item>@drawable/ic_widget_placeholder</item>
@@ -161,6 +172,7 @@
         <item>@drawable/ic_widget_placeholder</item>
     </array>
 
+    <!-- White balance widget values -->
     <string-array name="widget_whitebalance_values" translatable="false">
         <item>auto</item>
         <item>cloudy</item>

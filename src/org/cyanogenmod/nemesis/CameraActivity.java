@@ -27,8 +27,6 @@ import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,8 +46,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
-import org.cyanogenmod.nemesis.picsphere.Capture3DRenderer;
-import org.cyanogenmod.nemesis.picsphere.PicSphere;
 import org.cyanogenmod.nemesis.picsphere.PicSphereCaptureTransformer;
 import org.cyanogenmod.nemesis.picsphere.PicSphereManager;
 import org.cyanogenmod.nemesis.ui.ExposureHudRing;
@@ -63,8 +59,6 @@ import org.cyanogenmod.nemesis.ui.SideBar;
 import org.cyanogenmod.nemesis.ui.SwitchRingPad;
 import org.cyanogenmod.nemesis.ui.ThumbnailFlinger;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
-
-import java.io.File;
 
 public class CameraActivity extends Activity implements CameraManager.CameraReadyListener {
     public final static String TAG = "CameraActivity";
@@ -259,6 +253,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         }
 
         mCamManager.setCameraMode(mCameraMode);
+
         updateCapabilities();
     }
 
@@ -462,9 +457,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         if (mPicSphereManager == null) {
             mPicSphereManager = new PicSphereManager(CameraActivity.this, mSnapshotManager);
         }
-        //mCamManager.getPreviewSurface().setVisibility(View.INVISIBLE);
+
         mCamManager.getPreviewSurface().setScaleX(0.3f);
         mCamManager.getPreviewSurface().setScaleY(0.3f);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mCamManager.getPreviewSurface().getLayoutParams();
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        params.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
+        params.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+
         mPicSphere3DView = new GLSurfaceView(this);
         mPicSphere3DView.setEGLContextClientVersion(2);
         mPicSphere3DView.setRenderer(mPicSphereManager.getRenderer());
@@ -481,7 +481,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     public void resetPicSphere() {
         ((ViewGroup) findViewById(R.id.camera_preview_container)).removeView(mPicSphere3DView);
         mPicSphere3DView = null;
-        mCamManager.getPreviewSurface().setVisibility(View.VISIBLE);
     }
 
     /**

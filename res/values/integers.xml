@@ -33,7 +33,7 @@
     <dimen name="widget_spacing">8dp</dimen>
 
     <!-- Padding within the widget container window -->
-    <dimen name="widget_container_padding">4dp</dimen>
+    <dimen name="widget_container_padding">1dp</dimen>
 
     <!-- Edge padding of the ring buttons -->
     <dimen name="ringpad_edge_spacing">32dp</dimen>

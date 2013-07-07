@@ -18,25 +18,26 @@ package org.apache.sanselan;
 
 //import java.awt.Dimension;
 //import java.awt.image.BufferedImage;
+import org.apache.sanselan.common.BinaryFileParser;
+import org.apache.sanselan.common.IImageMetadata;
+import org.apache.sanselan.common.byteSources.ByteSource;
+import org.apache.sanselan.common.byteSources.ByteSourceArray;
+import org.apache.sanselan.common.byteSources.ByteSourceFile;
+import org.apache.sanselan.formats.jpeg.JpegImageParser;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 
-import org.apache.sanselan.common.BinaryFileParser;
-import org.apache.sanselan.common.IImageMetadata;
-import org.apache.sanselan.common.byteSources.ByteSource;
-import org.apache.sanselan.common.byteSources.ByteSourceArray;
-import org.apache.sanselan.common.byteSources.ByteSourceFile;
 //import org.apache.sanselan.formats.bmp.BmpImageParser;
 //import org.apache.sanselan.formats.gif.GifImageParser;
 //import org.apache.sanselan.formats.ico.IcoImageParser;
-import org.apache.sanselan.formats.jpeg.JpegImageParser;
-import org.apache.sanselan.formats.png.PngImageParser;
+//import org.apache.sanselan.formats.png.PngImageParser;
 //import org.apache.sanselan.formats.pnm.PNMImageParser;
 //import org.apache.sanselan.formats.psd.PsdImageParser;
-import org.apache.sanselan.formats.tiff.TiffImageParser;
+//import org.apache.sanselan.formats.tiff.TiffImageParser;
 
 public abstract class ImageParser extends BinaryFileParser implements
 		SanselanConstants
@@ -44,8 +45,7 @@ public abstract class ImageParser extends BinaryFileParser implements
 
 	public static final ImageParser[] getAllImageParsers()
 	{
-		ImageParser result[] = { new JpegImageParser(), new TiffImageParser(),
-				new PngImageParser() 
+		ImageParser result[] = { new JpegImageParser()
 //				new BmpImageParser(),
 //				new GifImageParser(), new PsdImageParser(),
 //				new PNMImageParser(), new IcoImageParser(),

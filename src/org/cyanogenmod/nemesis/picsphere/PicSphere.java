@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import org.apache.sanselan.Sanselan;
 import org.apache.sanselan.common.byteSources.ByteSourceFile;
 import org.cyanogenmod.nemesis.SnapshotManager;
 
@@ -226,7 +225,7 @@ public class PicSphere {
     private boolean doPtclean() throws IOException {
         Log.d(TAG, "Ptclean...");
         notifyStep(STEP_PTCLEAN);
-        run("ptclean -o " + mProjectFile + " " + mProjectFile);
+        //run("ptclean -o " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "Ptclean... done");

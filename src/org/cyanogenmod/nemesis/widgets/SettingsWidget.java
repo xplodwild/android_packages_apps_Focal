@@ -19,7 +19,6 @@
 package org.cyanogenmod.nemesis.widgets;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
@@ -127,7 +126,7 @@ public class SettingsWidget extends WidgetBase {
     };
 
     public SettingsWidget(CameraActivity context) {
-        super(context.getCamManager(), context, R.drawable.ic_widget_placeholder);
+        super(context.getCamManager(), context, R.drawable.ic_widget_settings);
         mContext = context;
         CameraManager cam = context.getCamManager();
 
