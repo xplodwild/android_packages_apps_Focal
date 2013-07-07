@@ -53,6 +53,13 @@ public class PicSphere {
     private SnapshotManager mSnapManager;
     private Uri mOutputUri;
     private String mOutputTitle;
+    private ProgressListener mProgressListener;
+    public final static int STEP_AUTOPANO = 1;
+    public final static int STEP_PTCLEAN = 2;
+    public final static int STEP_AUTOOPTIMISER = 3;
+    public final static int STEP_PANOMODIFY = 4;
+    public final static int STEP_NONA = 5;
+    public final static int STEP_ENBLEND = 6;
 
     private Thread mOutputLogger = new Thread() {
         public void run() {
@@ -67,11 +74,21 @@ public class PicSphere {
         }
     };
 
+    public interface ProgressListener {
+        public void onRenderStart(PicSphere sphere);
+        public void onStepChange(PicSphere sphere, int newStep);
+        public void onRenderDone(PicSphere sphere);
+    }
+
     protected PicSphere(Context context, SnapshotManager snapMan) {
         mPictures = new ArrayList<Uri>();
         mContext = context;
         mSnapManager = snapMan;
         mOutputLogger.start();
+    }
+
+    public void setProgressListener(ProgressListener listener) {
+        mProgressListener = listener;
     }
 
     private String getRealPathFromURI(Uri contentURI) {
@@ -133,6 +150,12 @@ public class PicSphere {
                 InputStreamReader(proc.getErrorStream()));
     }
 
+    private void notifyStep(int step) {
+        if (mProgressListener != null) {
+            mProgressListener.onStepChange(this, step);
+        }
+    }
+
     private void consumeProcLogs() {
         String line;
         try {
@@ -162,6 +185,7 @@ public class PicSphere {
      */
     private boolean doAutopano() throws IOException {
         Log.d(TAG, "Autopano...");
+        notifyStep(STEP_AUTOPANO);
         String filesStr = "";
         for (Uri picture : mPictures) {
             filesStr += " " + picture.getPath();
@@ -188,6 +212,7 @@ public class PicSphere {
      */
     private boolean doPtclean() throws IOException {
         Log.d(TAG, "Ptclean...");
+        notifyStep(STEP_PTCLEAN);
         run("ptclean -o " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
@@ -205,6 +230,7 @@ public class PicSphere {
      */
     private boolean doAutoOptimiser() throws IOException {
         Log.d(TAG, "AutoOptimiser...");
+        notifyStep(STEP_AUTOOPTIMISER);
         run("autooptimiser -a -l -s -m -o " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
@@ -220,6 +246,7 @@ public class PicSphere {
      */
     private boolean doPanoModify() throws IOException {
         Log.d(TAG, "PanoModify...");
+        notifyStep(STEP_PANOMODIFY);
         run("pano_modify -o " + mProjectFile + " --center --straighten --canvas=AUTO --crop=AUTO " + mProjectFile);
         consumeProcLogs();
 
@@ -236,6 +263,7 @@ public class PicSphere {
      */
     private boolean doNona() throws IOException {
         Log.d(TAG, "Nona...");
+        notifyStep(STEP_NONA);
         run("nona -o " + mTempPath + "/project -m TIFF_m " + mProjectFile);
         consumeProcLogs();
 
@@ -252,6 +280,7 @@ public class PicSphere {
      */
     private boolean doEnblend() throws IOException {
         Log.d(TAG, "Enblend...");
+        notifyStep(STEP_ENBLEND);
 
         // Build the list of output files. The convention set up by Nona is projectXXXX.tif,
         // so we basically build that list out of the number of shots we fed to autopano
@@ -301,7 +330,7 @@ public class PicSphere {
 
         String[] xmp = generatePhotoSphereXMP(2000, 2000, mPictures.size());
         for (String line : xmp) {
-            run("exiv2 -m\"" + line + "\" " + mTempPath+"final.jpg");
+            run("exiv2bin -m\"" + line + "\" " + mTempPath+"/final.jpg");
         }
         consumeProcLogs();
 
