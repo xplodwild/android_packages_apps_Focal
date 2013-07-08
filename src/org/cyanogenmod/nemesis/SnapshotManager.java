@@ -121,6 +121,7 @@ public class SnapshotManager {
     private FocusManager mFocusManager;
 
     // Photo-related variables
+    private boolean mWaitExposureSettle;
     private List<SnapshotInfo> mSnapshotsQueue;
     private int mCurrentShutterQueueIndex;
     private List<SnapshotListener> mListeners;
@@ -208,6 +209,13 @@ public class SnapshotManager {
     private Runnable mCaptureRunnable = new Runnable() {
         @Override
         public void run() {
+            if (mWaitExposureSettle) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             mCameraManager.takeSnapshot(mShutterCallback, null, mJpegPictureCallback);
         }
     };
@@ -317,7 +325,7 @@ public class SnapshotManager {
         info.mThumbnail = mCameraManager.getLastPreviewFrame();
         if (mCameraManager.getParameters().getExposureCompensation() != exposureCompensation) {
             mCameraManager.getParameters().setExposureCompensation(exposureCompensation);
-
+            mWaitExposureSettle = true;
         }
         mSnapshotsQueue.add(info);
 
