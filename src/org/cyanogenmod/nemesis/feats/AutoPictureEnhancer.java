@@ -18,7 +18,6 @@
 
 package org.cyanogenmod.nemesis.feats;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.media.effect.Effect;
 import android.media.effect.EffectContext;
@@ -33,7 +32,7 @@ import javax.microedition.khronos.opengles.GL10;
 /**
  * Automatic photo enhancement
  */
-public class AutoPictureEnhancer extends Activity implements GLSurfaceView.Renderer {
+public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
     private int[] mTextures = new int[2];
     private EffectContext mEffectContext;
     private Effect mAutoFixEffect;

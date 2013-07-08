@@ -133,6 +133,8 @@ public class SnapshotManager {
     private ContentResolver mContentResolver;
     private ImageSaver mImageSaver;
     private ImageNamer mImageNamer;
+    private PixelBuffer mOffscreenGL;
+    private AutoPictureEnhancer mAutoPicEnhancer;
 
     // Video-related variables
     private long mRecordingStartTime;
@@ -193,13 +195,16 @@ public class SnapshotManager {
                 // if
                 new Thread() {
                     public void run() {
-                        PixelBuffer pb = new PixelBuffer(s.width, s.height);
-                        AutoPictureEnhancer enhancer = new AutoPictureEnhancer();
-                        pb.setRenderer(enhancer);
-                        enhancer.setTexture(BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length));
+                        // XXX: PixelBuffer has to be created every time because the GL context
+                        // can only be used from its original thread. It's not very intense, but
+                        // ideally we would be re-using the same thread every time.
+                        mOffscreenGL = new PixelBuffer(s.width, s.height);
+                        mAutoPicEnhancer = new AutoPictureEnhancer();
+                        mOffscreenGL.setRenderer(mAutoPicEnhancer);
+                        mAutoPicEnhancer.setTexture(BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length));
 
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        pb.getBitmap().compress(Bitmap.CompressFormat.JPEG, 90, baos);
+                        mOffscreenGL.getBitmap().compress(Bitmap.CompressFormat.JPEG, 90, baos);
 
                         // If the orientation is somehow negative, avoid the Gallery crashing dumbly
                         // (see com/android/gallery3d/ui/PhotoView.java line 758 (setTileViewPosition))
@@ -210,13 +215,14 @@ public class SnapshotManager {
 
                         mImageSaver.addImage(baos.toByteArray(), uri, title, null,
                                 width, height, orientation);
+
+                        for (SnapshotListener listener : mListeners) {
+                            listener.onSnapshotSaved(snap);
+                        }
                     }
                 }.start();
+                // else just imagesaver
                 // endif
-            }
-
-            for (SnapshotListener listener : mListeners) {
-                listener.onSnapshotSaved(snap);
             }
 
             // Camera is ready to take another shot, doit
