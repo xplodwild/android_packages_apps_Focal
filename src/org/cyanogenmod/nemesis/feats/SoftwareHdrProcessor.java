@@ -25,6 +25,21 @@ public class SoftwareHdrProcessor {
     private Uri mOutputUri;
     private String mOutputTitle;
     private Context mContext;
+    private BufferedReader mProcStdOut;
+    private BufferedReader mProcStdErr;
+
+    private Thread mOutputLogger = new Thread() {
+        public void run() {
+            while (true) {
+                try {
+                    Thread.sleep(10);
+                    consumeProcLogs();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
 
     public SoftwareHdrProcessor(Context context, SnapshotManager snapMan) {
         mSnapManager = snapMan;
@@ -39,9 +54,21 @@ public class SoftwareHdrProcessor {
         Runtime rt = Runtime.getRuntime();
         Process proc = rt.exec(command, new String[]{"PATH="+mPathPrefix+":/system/bin",
                 "LD_LIBRARY_PATH="+mPathPrefix+":/system/lib"});
+        mProcStdOut = new BufferedReader(new
+                InputStreamReader(proc.getInputStream()));
+        mProcStdErr = new BufferedReader(new
+                InputStreamReader(proc.getErrorStream()));
+
+        try {
+            proc.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void render() {
+        mOutputLogger.start();
+
         // Prepare a temporary directory
         Log.d(TAG, "Preparing temp dir for PicSphere rendering...");
         File appFilesDir = mContext.getFilesDir();
@@ -51,11 +78,11 @@ public class SoftwareHdrProcessor {
         mTempPath.mkdir();
 
         mSnapManager.prepareNamerUri(100,100);
-        mOutputUri = mSnapManager.getNamerUri();
-        mOutputTitle = mSnapManager.getNamerTitle();
+
 
         // Process our images
         try {
+            doAlignImageStack();
             doEnfuse();
 
             // Save it to gallery
@@ -77,21 +104,63 @@ public class SoftwareHdrProcessor {
                 f.close();
             }
 
+            mOutputUri = mSnapManager.getNamerUri();
+            mOutputTitle = mSnapManager.getNamerTitle();
             mSnapManager.saveImage(mOutputUri, mOutputTitle, 100, 100, 0, jpegData);
         } catch (IOException ex) {
             Log.e(TAG, "Unable to process: ", ex);
         }
     }
 
-    private boolean doEnfuse() throws IOException {
-        Log.d(TAG, "Enfuse...");
+    private void consumeProcLogs() {
+        String line;
+        try {
+            if (mProcStdOut != null && mProcStdOut.ready()) {
+                while ((line = mProcStdOut.readLine()) != null) {
+                    Log.i(TAG, line);
+                }
+            }
+
+            if (mProcStdErr != null && mProcStdErr.ready()) {
+                while ((line = mProcStdErr.readLine()) != null) {
+                    Log.e(TAG, line);
+                }
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Error while consuming proc logs", e);
+        }
+    }
+
+    private boolean doAlignImageStack() throws IOException {
+        Log.d(TAG, "Align Image Stack...");
 
         String filesStr = "";
         for (Uri picture : mPictures) {
             filesStr += " " + picture.getPath();
         }
 
-        run("enfuse -o "+mTempPath+"/final.jpg --compression=jpeg " + filesStr);
+        run("align_image_stack -v -v -v -a project " + filesStr);
+        consumeProcLogs();
+
+        Log.d(TAG, "Align Image Stack... done");
+        return true;
+    }
+
+    private boolean doEnfuse() throws IOException {
+        Log.d(TAG, "Enfuse...");
+
+        // Build the list of output files. The convention set up by AlignImageStack is projectXXXX.tif,
+        // so we basically build that list out of the number of shots we fed to align_image_stack
+        String files = "";
+        for (int i = 0; i < mPictures.size(); i++) {
+            // Check if file exists, otherwise enfuse will fail
+            String filePath = mTempPath + "/" + String.format("project%04d.tif", i);
+            if (new File(filePath).exists()) {
+                files += " " + filePath;
+            }
+        }
+        run("enfuse -o "+mTempPath+"/final.jpg --compression=jpeg " + files);
+        consumeProcLogs();
 
         Log.d(TAG, "Enfuse... done");
         return true;
