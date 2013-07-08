@@ -180,10 +180,10 @@ public class CameraManager {
                     mParameters = mCamera.getParameters();
 
                     String params = mCamera.getParameters().flatten();
-                    int step = params.length() > 256 ? 256 : params.length();
-                    for (int i = 0; i < params.length(); i += 256) {
+                    final int step = params.length() > 256 ? 256 : params.length();
+                    for (int i = 0; i < params.length(); i += step) {
                         Log.e(TAG, params);
-                        params = params.substring(256);
+                        params = params.substring(step);
                     }
 
                     if (mTargetSize != null)
