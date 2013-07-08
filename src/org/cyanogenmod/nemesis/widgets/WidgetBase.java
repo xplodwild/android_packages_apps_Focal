@@ -515,7 +515,11 @@ public abstract class WidgetBase {
                 parent.widgetDropped(mWidget);
             }
 
-            return (super.onTouchEvent(event) || handle);
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                return handle;
+            } else {
+                return (super.onTouchEvent(event) || handle);
+            }
         }
 
         @Override
