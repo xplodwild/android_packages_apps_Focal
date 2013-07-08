@@ -134,6 +134,7 @@ public class TimerModeWidget extends WidgetBase implements View.OnClickListener 
             mTransformer.setTimer(TimerCapture.VOICE_TIMER_VALUE);
             mCameraActivity.setCaptureTransformer(mTransformer);
             mBtnVoice.setActiveDrawable(DRAWABLE_TAG+"=voice");
+            mIsEnabled = true;
         }
     }
 

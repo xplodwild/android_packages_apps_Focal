@@ -18,17 +18,13 @@
 
 package org.cyanogenmod.nemesis.widgets;
 
-import android.content.Context;
 import android.hardware.Camera;
 import android.view.View;
 
 import org.cyanogenmod.nemesis.BuildConfig;
 import org.cyanogenmod.nemesis.CameraActivity;
-import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.feats.SoftwareHdrCapture;
-
-import java.util.Arrays;
 
 /**
  * Software HDR widget
@@ -91,7 +87,7 @@ public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListene
             mContext.setCaptureTransformer(mTransformer);
         } else if (view == mBtnOff) {
             mPreviousMode.resetImage();
-            mBtnOn.setActiveDrawable(DRAWABLE_TAG+"=off");
+            mBtnOff.setActiveDrawable(DRAWABLE_TAG+"=off");
             mPreviousMode = mBtnOff;
             mContext.setCaptureTransformer(null);
         }
