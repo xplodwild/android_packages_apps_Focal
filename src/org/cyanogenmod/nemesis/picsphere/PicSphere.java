@@ -19,9 +19,7 @@
 package org.cyanogenmod.nemesis.picsphere;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import org.apache.sanselan.common.byteSources.ByteSourceFile;
@@ -150,6 +148,12 @@ public class PicSphere {
                 InputStreamReader(proc.getInputStream()));
         mProcStdErr = new BufferedReader(new
                 InputStreamReader(proc.getErrorStream()));
+
+        try {
+            proc.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void notifyStep(int step) {
@@ -161,15 +165,15 @@ public class PicSphere {
     private void consumeProcLogs() {
         String line;
         try {
-            if (mProcStdErr != null) {
-                while ((line = mProcStdErr.readLine()) != null) {
-                    Log.e(TAG, line);
+            if (mProcStdOut != null && mProcStdOut.ready()) {
+                while ((line = mProcStdOut.readLine()) != null) {
+                    Log.i(TAG, line);
                 }
             }
 
-            if (mProcStdOut != null) {
-                while ((line = mProcStdOut.readLine()) != null) {
-                    Log.i(TAG, line);
+            if (mProcStdErr != null && mProcStdErr.ready()) {
+                while ((line = mProcStdErr.readLine()) != null) {
+                    Log.e(TAG, line);
                 }
             }
         } catch (IOException e) {
