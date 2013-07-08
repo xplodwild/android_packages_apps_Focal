@@ -139,6 +139,13 @@
 
     </org.cyanogenmod.nemesis.ui.WidgetRenderer>
 
+    <org.cyanogenmod.nemesis.ui.CircleTimerView
+            android:id="@+id/timer_view"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"/>
+
     <org.cyanogenmod.nemesis.ui.SavePinger
             android:id="@+id/save_pinger"
             android:layout_width="48dp"

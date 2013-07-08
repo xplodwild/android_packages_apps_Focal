@@ -48,6 +48,7 @@ import android.widget.Toast;
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
 import org.cyanogenmod.nemesis.picsphere.PicSphereCaptureTransformer;
 import org.cyanogenmod.nemesis.picsphere.PicSphereManager;
+import org.cyanogenmod.nemesis.ui.CircleTimerView;
 import org.cyanogenmod.nemesis.ui.ExposureHudRing;
 import org.cyanogenmod.nemesis.ui.FocusHudRing;
 import org.cyanogenmod.nemesis.ui.Notifier;
@@ -90,6 +91,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private SwitchRingPad mSwitchRingPad;
     private ShutterButton mShutterButton;
     private SavePinger mSavePinger;
+    private CircleTimerView mTimerView;
     private ViewGroup mRecTimerContainer;
     private Notifier mNotifier;
     private ReviewDrawer mReviewDrawer;
@@ -112,6 +114,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mSideBar = (SideBar) findViewById(R.id.sidebar_scroller);
         mWidgetRenderer = (WidgetRenderer) findViewById(R.id.widgets_container);
         mSavePinger = (SavePinger) findViewById(R.id.save_pinger);
+        mTimerView = (CircleTimerView) findViewById(R.id.timer_view);
 
         mSwitchRingPad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
         mSwitchRingPad.setListener(new MainRingPadListener());
@@ -325,6 +328,16 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         // leaving it at its position so that if the user toggles it back
         // on, it will appear at its previous location
         mCamManager.setExposurePoint(0, 0);
+    }
+
+    public void startTimerCountdown(int timeMs) {
+        mTimerView.animate().alpha(1.0f).setDuration(300).start();
+        mTimerView.setIntervalTime(timeMs);
+        mTimerView.startIntervalAnimation();
+    }
+
+    public void hideTimerCountdown() {
+        mTimerView.animate().alpha(0.0f).setDuration(300).start();
     }
 
     protected void setupCamera() {

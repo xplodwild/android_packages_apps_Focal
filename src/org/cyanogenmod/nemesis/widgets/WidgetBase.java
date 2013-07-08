@@ -301,6 +301,23 @@ public abstract class WidgetBase {
             int padding = getResources().getDimensionPixelSize(R.dimen.widget_option_button_padding);
             setPadding(padding, padding, padding, padding);
             setGravity(Gravity.CENTER);
+
+            setTextSize(getResources().getDimension(R.dimen.widget_option_label_font_size));
+        }
+
+        @Override
+        public void onFinishInflate() {
+            super.onFinishInflate();
+            GridLayout.LayoutParams params = (GridLayout.LayoutParams) this.getLayoutParams();
+            params.setGravity(Gravity.CENTER);
+        }
+
+        public void setSmall(boolean small) {
+            if (small) {
+                setTextSize(getResources().getDimension(R.dimen.widget_option_label_font_size_small));
+            } else {
+                setTextSize(getResources().getDimension(R.dimen.widget_option_label_font_size));
+            }
         }
 
         @Override

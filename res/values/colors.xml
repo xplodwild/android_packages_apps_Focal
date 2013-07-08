@@ -20,4 +20,6 @@
     <color name="widget_toggle_pressed">#BB33B5E5</color>
     <color name="widget_toggle_active">#9033B5E5</color>
     <color name="widget_option_active">#FF0099CC</color>
+    <color name="clock_red">#FF4444</color>
+    <color name="clock_white">#FFFFFF</color>
 </resources>
