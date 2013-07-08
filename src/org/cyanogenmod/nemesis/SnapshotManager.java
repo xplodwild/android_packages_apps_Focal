@@ -315,7 +315,10 @@ public class SnapshotManager {
         info.mSave = save;
         info.mExposureCompensation = exposureCompensation;
         info.mThumbnail = mCameraManager.getLastPreviewFrame();
+        if (mCameraManager.getParameters().getExposureCompensation() != exposureCompensation) {
+            mCameraManager.getParameters().setExposureCompensation(exposureCompensation);
 
+        }
         mSnapshotsQueue.add(info);
 
         if (mSnapshotsQueue.size() == 1) {

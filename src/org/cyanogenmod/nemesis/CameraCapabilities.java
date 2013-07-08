@@ -51,6 +51,7 @@ public class CameraCapabilities {
         mWidgets.add(new WhiteBalanceWidget(cam, context));
         mWidgets.add(new SceneModeWidget(cam, context));
         mWidgets.add(new HdrWidget(cam, context));
+        mWidgets.add(new SoftwareHdrWidget(context));
         mWidgets.add(new EffectWidget(cam, context));
         mWidgets.add(new ExposureCompensationWidget(cam, context));
         mWidgets.add(new SkinToneWidget(cam, context));

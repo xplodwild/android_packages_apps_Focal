@@ -26,6 +26,7 @@ import android.util.Log;
 
 import org.apache.sanselan.common.byteSources.ByteSourceFile;
 import org.cyanogenmod.nemesis.SnapshotManager;
+import org.cyanogenmod.nemesis.Util;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -93,23 +94,12 @@ public class PicSphere {
         mProgressListener = listener;
     }
 
-    private String getRealPathFromURI(Uri contentURI) {
-        Cursor cursor = mContext.getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            return contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
-        }
-    }
-
     /**
      * Adds a picture to the sphere
      * @param pic The URI of the picture
      */
     public void addPicture(Uri pic) {
-        mPictures.add(Uri.fromFile(new File(getRealPathFromURI(pic))));
+        mPictures.add(Uri.fromFile(new File(Util.getRealPathFromURI(mContext, pic))));
     }
 
     /**

@@ -178,7 +178,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         };
 
         mCamManager.getPreviewSurface().setOnTouchListener(touchListener);
-        mSideBar.setOnTouchListener(touchListener);
 
         // Use SavePinger to animate a bit while we open the camera device
         mSavePinger.setPingOnly(true);
@@ -965,6 +964,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                                 float distanceY) {
+            if (e1 == null || e2 == null) return false;
+
             // Detect drag of the side bar or review drawer
             if (Math.abs(e1.getX() - e2.getX()) < SWIPE_MAX_OFF_PATH) {
                 if (e1.getRawY() > Util.getScreenSize(CameraActivity.this).y / SIDEBAR_THRESHOLD_FACTOR) {

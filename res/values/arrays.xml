@@ -18,6 +18,13 @@
 -->
 
 <resources>
+    <!-- Hardware HDR settings keys. If any of these key is present, the software HDR widget is
+         hidden. If you need to force-disable software HDR, see config.xml -->
+    <string-array name="hardware_hdr_keys">
+        <item>ae-bracket-hdr</item>
+    </string-array>
+
+
     <!-- Voice shutter trigger commands -->
     <string-array name="transformer_timer_voice_words">
         <item>cid</item>

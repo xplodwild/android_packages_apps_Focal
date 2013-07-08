@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.hardware.Camera.Size;
@@ -283,5 +284,16 @@ public class Util {
     public static void removeFromGallery(ContentResolver cr, long id) {
         cr.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 BaseColumns._ID + "=" + Long.toString(id), null);
+    }
+
+    public static String getRealPathFromURI(Context context, Uri contentURI) {
+        Cursor cursor = context.getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
     }
 }

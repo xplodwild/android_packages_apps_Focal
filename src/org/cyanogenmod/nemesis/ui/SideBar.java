@@ -23,6 +23,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.HorizontalScrollView;
 import android.widget.ScrollView;
 
 import org.cyanogenmod.nemesis.CameraActivity;
@@ -30,7 +31,7 @@ import org.cyanogenmod.nemesis.CameraCapabilities;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.widgets.WidgetBase;
 
-public class SideBar extends ScrollView {
+public class SideBar extends HorizontalScrollView {
     public final static String TAG = "SideBar";
     public final static int SLIDE_ANIMATION_DURATION_MS = 300;
     private CameraCapabilities mCapabilities;
@@ -57,6 +58,7 @@ public class SideBar extends ScrollView {
      */
     private void initialize() {
         this.setBackgroundColor(getResources().getColor(R.color.widget_background));
+        setHorizontalScrollBarEnabled(true);
         mIsOpen = true;
     }
 

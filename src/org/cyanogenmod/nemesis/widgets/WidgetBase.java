@@ -201,6 +201,9 @@ public abstract class WidgetBase {
      * side bar.
      */
     public class WidgetToggleButton extends ImageView {
+        private float mDownX;
+        private float mDownY;
+
         public WidgetToggleButton(Context context, AttributeSet attrs,
                                   int defStyle) {
             super(context, attrs, defStyle);
@@ -242,13 +245,19 @@ public abstract class WidgetBase {
             // Handle the background color on touch
             if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
                 this.setBackgroundColor(getResources().getColor(R.color.widget_toggle_pressed));
+                mDownX = event.getX();
+                mDownY = event.getY();
             } else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
                 // State is not updated yet, but after ACTION_UP is received the button
                 // will likely be clicked and its state will change.
                 toggleBackground(!mIsOpen);
+            } else if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+                if (Math.abs(event.getX() - mDownX) > 1.0f || Math.abs(event.getY() - mDownY) > 1) {
+                    toggleBackground(false);
+                }
             }
 
-            return defaultResult;
+            return true;
         }
 
         private class ToggleClickListener implements OnClickListener {
