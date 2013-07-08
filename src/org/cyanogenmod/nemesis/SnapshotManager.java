@@ -23,6 +23,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.location.Location;
 import android.media.CamcorderProfile;
@@ -33,6 +34,9 @@ import android.os.ParcelFileDescriptor;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
+
+import org.cyanogenmod.nemesis.feats.AutoPictureEnhancer;
+import org.cyanogenmod.nemesis.feats.PixelBuffer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -167,7 +171,7 @@ public class SnapshotManager {
 
     private Camera.PictureCallback mJpegPictureCallback = new Camera.PictureCallback() {
         @Override
-        public void onPictureTaken(byte[] jpegData, Camera camera) {
+        public void onPictureTaken(final byte[] jpegData, Camera camera) {
             Log.v(TAG, "onPicture: Got JPEG data");
             mCameraManager.restartPreviewIfNeeded();
 
@@ -176,18 +180,39 @@ public class SnapshotManager {
             // Store the jpeg on internal memory if needed
             if (snap.mSave) {
                 // Calculate the width and the height of the jpeg.
-                Camera.Size s = mCameraManager.getParameters().getPictureSize();
-                int orientation = Exif.getOrientation(jpegData) - mCameraManager.getOrientation();
-                int width, height;
-                width = s.width;
-                height = s.height;
+                final Camera.Size s = mCameraManager.getParameters().getPictureSize();
+                final int orientation = Exif.getOrientation(jpegData) - mCameraManager.getOrientation();
+                final int width = s.width,
+                        height = s.height;
 
-                Uri uri = mImageNamer.getUri();
-                String title = mImageNamer.getTitle();
+                final Uri uri = mImageNamer.getUri();
+                final String title = mImageNamer.getTitle();
                 snap.mUri = uri;
 
-                mImageSaver.addImage(jpegData, uri, title, null,
-                        width, height, orientation);
+                // TODO: Toggle Automatic Picture Enhancement
+                // if
+                new Thread() {
+                    public void run() {
+                        PixelBuffer pb = new PixelBuffer(s.width, s.height);
+                        AutoPictureEnhancer enhancer = new AutoPictureEnhancer();
+                        pb.setRenderer(enhancer);
+                        enhancer.setTexture(BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length));
+
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        pb.getBitmap().compress(Bitmap.CompressFormat.JPEG, 90, baos);
+
+                        // If the orientation is somehow negative, avoid the Gallery crashing dumbly
+                        // (see com/android/gallery3d/ui/PhotoView.java line 758 (setTileViewPosition))
+                        int correctedOrientation = orientation;
+                        while (correctedOrientation < 0) {
+                            correctedOrientation += 360;
+                        }
+
+                        mImageSaver.addImage(baos.toByteArray(), uri, title, null,
+                                width, height, orientation);
+                    }
+                }.start();
+                // endif
             }
 
             for (SnapshotListener listener : mListeners) {
