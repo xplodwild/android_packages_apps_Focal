@@ -37,6 +37,7 @@ import android.widget.TextView;
 import org.cyanogenmod.nemesis.BitmapFilter;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.SettingsStorage;
 import org.cyanogenmod.nemesis.ui.SideBar;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
@@ -155,6 +156,29 @@ public abstract class WidgetBase {
 
     public boolean isOpen() {
         return mIsOpen;
+    }
+
+    /**
+     * Restores the value of this widget from the database to the Camera's preferences
+     */
+    public String restoreValueFromStorage(String key) {
+        Camera.Parameters params = mCamManager.getParameters();
+
+        String currentValue = params.get(key);
+        if (currentValue != null) {
+            String storageValue = SettingsStorage.getCameraSetting(mWidget.getContext(),
+                    mCamManager.getCurrentFacing(), key, currentValue);
+            mCamManager.setParameterAsync(key, storageValue);
+
+            return storageValue;
+        }
+
+        return currentValue;
+    }
+
+    public String getCameraValue(String key) {
+        Camera.Parameters params = mCamManager.getParameters();
+        return params.get(key);
     }
 
     /**

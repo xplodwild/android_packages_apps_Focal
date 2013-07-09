@@ -24,6 +24,7 @@ import android.view.View;
 
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.SettingsStorage;
 
 /**
  * Skin Tone Enhancement widget (Qualcomm)
@@ -64,11 +65,13 @@ public class SkinToneWidget extends WidgetBase {
 
         mMinusButton.setOnClickListener(new MinusClickListener());
         mPlusButton.setOnClickListener(new PlusClickListener());
-        mValueLabel.setText(Integer.toString(getToneValue()));
 
         addViewToContainer(mMinusButton);
         addViewToContainer(mValueLabel);
         addViewToContainer(mPlusButton);
+
+        restoreValueFromStorage(KEY_PARAMETER);
+        mValueLabel.setText(Integer.toString(getToneValue()));
     }
 
     @Override
@@ -88,7 +91,11 @@ public class SkinToneWidget extends WidgetBase {
     }
 
     public void setToneValue(int value) {
-        mCamManager.setParameterAsync(KEY_PARAMETER, Integer.toString(value));
-        mValueLabel.setText(Integer.toString(value));
+        String valueStr = Integer.toString(value);
+
+        mCamManager.setParameterAsync(KEY_PARAMETER, valueStr);
+        SettingsStorage.storeCameraSetting(mWidget.getContext(), mCamManager.getCurrentFacing(),
+                KEY_PARAMETER, valueStr);
+        mValueLabel.setText(valueStr);
     }
 }

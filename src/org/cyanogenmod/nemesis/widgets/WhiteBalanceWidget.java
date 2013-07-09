@@ -32,5 +32,6 @@ public class WhiteBalanceWidget extends SimpleToggleWidget {
     public WhiteBalanceWidget(CameraManager cam, Context context) {
         super(cam, context, KEY_WHITEBALANCE, R.drawable.ic_widget_wb_auto);
         inflateFromXml(R.array.widget_whitebalance_values, R.array.widget_whitebalance_icons);
+        restoreValueFromStorage(KEY_WHITEBALANCE);
     }
 }

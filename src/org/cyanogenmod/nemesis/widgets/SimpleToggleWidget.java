@@ -27,10 +27,12 @@ import android.view.View.OnClickListener;
 
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
+import org.cyanogenmod.nemesis.SettingsStorage;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Base for simple widgets simply changing a parameter
@@ -115,7 +117,41 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
     }
 
     /**
-     * This method can be overriden by each widgets. If some keys doesn't
+     * Updates the currently selected button based on the current Camera parameters
+     */
+    public void updateSelectedButton() {
+        String value = getCameraValue(mKey);
+        updateSelectedButton(value);
+    }
+
+    public void updateSelectedButton(String value) {
+        Set<WidgetOptionButton> buttons = mButtonsValues.keySet();
+        for (WidgetOptionButton btn : buttons) {
+            if (mButtonsValues.get(btn).equals(value)) {
+                Log.e(TAG, "Set button activated for value " + value);
+                setButtonActivated(btn, value);
+                return;
+            }
+        }
+
+        setButtonActivated(null, value);
+    }
+
+    /**
+     * Restore the camera parameter from the stored settings, and update the selected
+     * button (method of WidgetBase overridden in SimpleToggleWidget)
+     * @param key
+     */
+    @Override
+    public String restoreValueFromStorage(String key) {
+        String value = super.restoreValueFromStorage(key);
+        updateSelectedButton(value);
+
+        return value;
+    }
+
+    /**
+     * This method can be overridden by each widgets. If some keys doesn't
      * have a "-values" array, we can filter eventual device-specific incompatibilities
      * in this method.
      *
@@ -172,6 +208,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
 
         if (value != null) {
             mCamManager.setParameterAsync(mKey, value);
+            SettingsStorage.storeCameraSetting(mContext, mCamManager.getCurrentFacing(), mKey, value);
             setButtonActivated(button, value);
         } else {
             Log.e(TAG, "Unknown value for this button!");
@@ -184,7 +221,9 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
         }
 
         mActiveButton = button;
-        mActiveButton.setActiveDrawable(mKey + "=" + value);
+        if (button != null) {
+            mActiveButton.setActiveDrawable(mKey + "=" + value);
+        }
     }
 
     /**

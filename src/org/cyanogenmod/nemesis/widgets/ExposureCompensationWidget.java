@@ -24,6 +24,7 @@ import android.view.View;
 
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.SettingsStorage;
 
 /**
  * Exposure compensation setup widget
@@ -62,11 +63,12 @@ public class ExposureCompensationWidget extends WidgetBase {
 
         mMinusButton.setOnClickListener(new MinusClickListener());
         mPlusButton.setOnClickListener(new PlusClickListener());
-        mValueLabel.setText(Integer.toString(getExposureValue()));
 
         addViewToContainer(mMinusButton);
         addViewToContainer(mValueLabel);
         addViewToContainer(mPlusButton);
+
+        mValueLabel.setText(restoreValueFromStorage(KEY_PARAMETER));
     }
 
     @Override
@@ -87,7 +89,11 @@ public class ExposureCompensationWidget extends WidgetBase {
     }
 
     public void setExposureValue(int value) {
-        mCamManager.setParameterAsync(KEY_PARAMETER, Integer.toString(value));
-        mValueLabel.setText(Integer.toString(value));
+        String valueStr = Integer.toString(value);
+
+        mCamManager.setParameterAsync(KEY_PARAMETER, valueStr);
+        SettingsStorage.storeCameraSetting(mWidget.getContext(), mCamManager.getCurrentFacing(),
+                KEY_PARAMETER, valueStr);
+        mValueLabel.setText(valueStr);
     }
 }

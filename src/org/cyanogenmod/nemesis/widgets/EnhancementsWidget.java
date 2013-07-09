@@ -24,6 +24,7 @@ import android.view.View;
 
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.SettingsStorage;
 
 /**
  * Contrast/sharpness/saturation setting widget (Qualcomm)
@@ -112,9 +113,10 @@ public class EnhancementsWidget extends WidgetBase {
         mPlusButton[ROW_SATURATION].setOnClickListener(new PlusClickListener(KEY_SATURATION_PARAMETER,
                 KEY_MAX_SATURATION_PARAMETER));
 
-        mValueLabel[ROW_CONTRAST].setText(Integer.toString(getValue(KEY_CONTRAST_PARAMETER)));
-        mValueLabel[ROW_SHARPNESS].setText(Integer.toString(getValue(KEY_SHARPNESS_PARAMETER)));
-        mValueLabel[ROW_SATURATION].setText(Integer.toString(getValue(KEY_SATURATION_PARAMETER)));
+
+        mValueLabel[ROW_CONTRAST].setText(restoreValueFromStorage(KEY_CONTRAST_PARAMETER));
+        mValueLabel[ROW_SHARPNESS].setText(restoreValueFromStorage(KEY_SHARPNESS_PARAMETER));
+        mValueLabel[ROW_SATURATION].setText(restoreValueFromStorage(KEY_SATURATION_PARAMETER));
     }
 
     @Override
@@ -140,14 +142,21 @@ public class EnhancementsWidget extends WidgetBase {
     }
 
     public void setValue(String key, int value) {
-        mCamManager.setParameterAsync(key, Integer.toString(value));
+        String valueStr = Integer.toString(value);
+        mCamManager.setParameterAsync(key, valueStr);
 
         if (key.equals(KEY_CONTRAST_PARAMETER)) {
-            mValueLabel[ROW_CONTRAST].setText(Integer.toString(value));
+            mValueLabel[ROW_CONTRAST].setText(valueStr);
+            SettingsStorage.storeCameraSetting(getWidget().getContext(), mCamManager.getCurrentFacing(),
+                    KEY_CONTRAST_PARAMETER, valueStr);
         } else if (key.equals(KEY_SHARPNESS_PARAMETER)) {
-            mValueLabel[ROW_SHARPNESS].setText(Integer.toString(value));
+            mValueLabel[ROW_SHARPNESS].setText(valueStr);
+            SettingsStorage.storeCameraSetting(getWidget().getContext(), mCamManager.getCurrentFacing(),
+                    KEY_SHARPNESS_PARAMETER, valueStr);
         } else if (key.equals(KEY_SATURATION_PARAMETER)) {
-            mValueLabel[ROW_SATURATION].setText(Integer.toString(value));
+            mValueLabel[ROW_SATURATION].setText(valueStr);
+            SettingsStorage.storeCameraSetting(getWidget().getContext(), mCamManager.getCurrentFacing(),
+                    KEY_SATURATION_PARAMETER, valueStr);
         }
     }
 }

@@ -25,6 +25,7 @@ import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 
 public class HdrWidget extends SimpleToggleWidget {
+    private final static String KEY_PARAMETER = "ae-bracket-hdr";
 
     public HdrWidget(CameraManager cam, Context context) {
         super(cam, context, "ae-bracket-hdr", R.drawable.ic_widget_hdr);
@@ -39,6 +40,8 @@ public class HdrWidget extends SimpleToggleWidget {
             addValue("Off", R.drawable.ic_widget_hdr_off);
             addValue("HDR", R.drawable.ic_widget_hdr_on);
             addValue("AE-Bracket", R.drawable.ic_widget_hdr_aebracket);
+
+            restoreValueFromStorage(KEY_PARAMETER);
         }
     }
 }

@@ -33,6 +33,7 @@ public class FlashWidget extends SimpleToggleWidget {
     public FlashWidget(CameraManager cam, Context context) {
         super(cam, context, KEY_FLASH_MODE, R.drawable.ic_widget_flash_on);
         inflateFromXml(R.array.widget_flash_values, R.array.widget_flash_icons);
+        restoreValueFromStorage(KEY_FLASH_MODE);
     }
 
     /**
