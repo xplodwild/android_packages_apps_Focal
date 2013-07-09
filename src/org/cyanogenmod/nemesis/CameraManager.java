@@ -186,7 +186,7 @@ public class CameraManager {
                     String params = mCamera.getParameters().flatten();
                     final int step = params.length() > 256 ? 256 : params.length();
                     for (int i = 0; i < params.length(); i += step) {
-                        Log.e(TAG, params);
+                        Log.d(TAG, params);
                         params = params.substring(step);
                     }
 
