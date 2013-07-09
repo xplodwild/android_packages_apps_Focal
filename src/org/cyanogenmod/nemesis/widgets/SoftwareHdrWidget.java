@@ -61,6 +61,11 @@ public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListene
 
     @Override
     public boolean isSupported(Camera.Parameters params) {
+        // Software HDR only in photo mode!
+        if (CameraActivity.getCameraMode() != CameraActivity.CAMERA_MODE_PHOTO) {
+            return false;
+        }
+
         // When debugging, show software HDR anyway
         if (BuildConfig.DEBUG) {
             return true;
