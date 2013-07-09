@@ -21,7 +21,6 @@ package org.cyanogenmod.nemesis.widgets;
 import android.hardware.Camera;
 import android.view.View;
 
-import org.cyanogenmod.nemesis.BuildConfig;
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.feats.SoftwareHdrCapture;
