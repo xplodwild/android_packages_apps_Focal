@@ -769,8 +769,13 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         }
 
         @Override
-        public void onSnapshotProcessed(SnapshotManager.SnapshotInfo info) {
-
+        public void onSnapshotProcessing(SnapshotManager.SnapshotInfo info) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    mSavePinger.setPingOnly(true);
+                    mSavePinger.startSaving();
+                }
+            });
         }
 
         @Override

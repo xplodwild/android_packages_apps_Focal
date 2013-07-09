@@ -65,11 +65,11 @@ public class SnapshotManager {
         public void onSnapshotPreview(SnapshotInfo info);
 
         /**
-         * This callback is called when a snapshot has been processed (vignetting, etc)
+         * This callback is called when a snapshot is being processed (auto color enhancement, etc)
          *
          * @param info A structure containing information about the snapshot
          */
-        public void onSnapshotProcessed(SnapshotInfo info);
+        public void onSnapshotProcessing(SnapshotInfo info);
 
         /**
          * This callback is called when a snapshot has been saved to the internal memory
@@ -195,6 +195,10 @@ public class SnapshotManager {
                 // if
                 new Thread() {
                     public void run() {
+                        for (SnapshotListener listener : mListeners) {
+                            listener.onSnapshotProcessing(snap);
+                        }
+
                         // XXX: PixelBuffer has to be created every time because the GL context
                         // can only be used from its original thread. It's not very intense, but
                         // ideally we would be re-using the same thread every time.

@@ -70,7 +70,7 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
     }
 
     @Override
-    public void onSnapshotProcessed(SnapshotManager.SnapshotInfo info) {
+    public void onSnapshotProcessing(SnapshotManager.SnapshotInfo info) {
 
     }
 

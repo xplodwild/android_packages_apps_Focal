@@ -169,7 +169,7 @@ public class TimerCapture extends CaptureTransformer implements RecognitionListe
     }
 
     @Override
-    public void onSnapshotProcessed(SnapshotManager.SnapshotInfo info) {
+    public void onSnapshotProcessing(SnapshotManager.SnapshotInfo info) {
 
     }
 
