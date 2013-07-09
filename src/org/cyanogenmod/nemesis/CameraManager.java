@@ -181,7 +181,7 @@ public class CameraManager {
 
                     // Default to the biggest preview size
                     List<Camera.Size> sizes = mParameters.getSupportedPictureSizes();
-                    mParameters.setPictureSize(sizes.get(0).width, sizes.get(1).height);
+                    mParameters.setPictureSize(sizes.get(0).width, sizes.get(0).height);
 
                     String params = mCamera.getParameters().flatten();
                     final int step = params.length() > 256 ? 256 : params.length();
