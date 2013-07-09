@@ -218,7 +218,7 @@ public class SnapshotManager {
                         }
 
                         mImageSaver.addImage(baos.toByteArray(), uri, title, null,
-                                width, height, orientation);
+                                width, height, correctedOrientation);
 
                         for (SnapshotListener listener : mListeners) {
                             listener.onSnapshotSaved(snap);
