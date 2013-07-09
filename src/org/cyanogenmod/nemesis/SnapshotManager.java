@@ -193,11 +193,8 @@ public class SnapshotManager {
 
                 // TODO: Toggle Automatic Picture Enhancement
                 // if
-                /*
-
                 new Thread() {
                     public void run() {
-                    */
                         for (SnapshotListener listener : mListeners) {
                             listener.onSnapshotProcessing(snap);
                         }
@@ -205,8 +202,8 @@ public class SnapshotManager {
                         // XXX: PixelBuffer has to be created every time because the GL context
                         // can only be used from its original thread. It's not very intense, but
                         // ideally we would be re-using the same thread every time.
-                        mOffscreenGL = new PixelBuffer(s.width, s.height);
-                        mAutoPicEnhancer = new AutoPictureEnhancer();
+                        mOffscreenGL = new PixelBuffer(mContext, s.width, s.height);
+                        mAutoPicEnhancer = new AutoPictureEnhancer(mContext);
                         mOffscreenGL.setRenderer(mAutoPicEnhancer);
                         mAutoPicEnhancer.setTexture(BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length));
 
@@ -226,9 +223,8 @@ public class SnapshotManager {
                         for (SnapshotListener listener : mListeners) {
                             listener.onSnapshotSaved(snap);
                         }
-                /*
                     }
-                }.start();*/
+                }.start();
                 // else just imagesaver
                 // endif
             }

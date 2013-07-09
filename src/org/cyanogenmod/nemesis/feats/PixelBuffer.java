@@ -18,9 +18,13 @@
 
 package org.cyanogenmod.nemesis.feats;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
+
+import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.Util;
 
 import java.nio.IntBuffer;
 
@@ -40,9 +44,7 @@ import static javax.microedition.khronos.egl.EGL10.EGL_HEIGHT;
 import static javax.microedition.khronos.egl.EGL10.EGL_LARGEST_PBUFFER;
 import static javax.microedition.khronos.egl.EGL10.EGL_NONE;
 import static javax.microedition.khronos.egl.EGL10.EGL_NO_CONTEXT;
-import static javax.microedition.khronos.egl.EGL10.EGL_PBUFFER_BIT;
 import static javax.microedition.khronos.egl.EGL10.EGL_RED_SIZE;
-import static javax.microedition.khronos.egl.EGL10.EGL_RENDERABLE_TYPE;
 import static javax.microedition.khronos.egl.EGL10.EGL_STENCIL_SIZE;
 import static javax.microedition.khronos.egl.EGL10.EGL_SUCCESS;
 import static javax.microedition.khronos.egl.EGL10.EGL_WIDTH;
@@ -57,9 +59,11 @@ public class PixelBuffer {
     final static boolean LIST_CONFIGS = false;
     final static private int EGL_OPENGL_ES2_BIT = 4;
     final static private int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
+    final static private int EGL_BIND_TO_TEXTURE_RGB = 0x3039;
     final static private int EGL_BIND_TO_TEXTURE_RGBA = 0x303A;
     final static private int EGL_TEXTURE_FORMAT = 0x3080;
     final static private int EGL_TEXTURE_TARGET = 0x3081;
+    final static private int EGL_TEXTURE_RGB = 0x305D;
     final static private int EGL_TEXTURE_RGBA = 0x305E;
     final static private int EGL_TEXTURE_2D = 0x305F;
 
@@ -74,24 +78,40 @@ public class PixelBuffer {
     EGLContext mEGLContext;
     EGLSurface mEGLSurface;
     GL10 mGL;
+    Context mContext;
 
     String mThreadOwner;
 
-    public PixelBuffer(int width, int height) {
+    public PixelBuffer(Context context, int width, int height) {
         mWidth = width;
         mHeight = height;
+        mContext = context;
 
-        int[] version = new int[]{
-            2, 2
-        };
-        int[] attribList = new int[] {
-                EGL_WIDTH, mWidth,
-                EGL_HEIGHT, mWidth,
-                EGL_LARGEST_PBUFFER, 1,
-                //EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGBA,
-                //EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
-                EGL_NONE
-        };
+        int[] version = new int[2];
+        int[] attribList = null;
+
+        if (context.getResources().getBoolean(R.bool.config_deviceSupportsNonPoTTextures)) {
+            // The device supports non-PoT textures, so use the real image size
+            attribList = new int[] {
+                    EGL_WIDTH, mWidth,
+                    EGL_HEIGHT, mHeight,
+                    EGL_LARGEST_PBUFFER, 1,
+                    EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGBA,
+                    EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
+                    EGL_NONE
+            };
+        } else {
+            // The device requires a PoT texture, use the maximal size
+            final int maxSize = mContext.getResources().getInteger(R.integer.config_maxPoTTextureSize);
+            attribList = new int[] {
+                    EGL_WIDTH, Math.min(maxSize, Util.getUpperPoT(mWidth)),
+                    EGL_HEIGHT, Math.min(maxSize, Util.getUpperPoT(mHeight)),
+                    EGL_LARGEST_PBUFFER, 1,
+                    EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGBA,
+                    EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
+                    EGL_NONE
+            };
+        }
 
         // No error checking performed, minimum required code to elucidate logic
         mEGL = (EGL10) EGLContext.getEGL();
@@ -152,9 +172,9 @@ public class PixelBuffer {
                 EGL_GREEN_SIZE, 8,
                 EGL_BLUE_SIZE, 8,
                 EGL_ALPHA_SIZE, 8,
-                //EGL_BIND_TO_TEXTURE_RGBA, 1,
-                //EGL10.EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
-                //EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                EGL_BIND_TO_TEXTURE_RGBA, 1,
+                EGL10.EGL_SURFACE_TYPE, EGL10.EGL_PBUFFER_BIT,
+                EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
                 EGL_NONE
         };
 
@@ -205,18 +225,32 @@ public class PixelBuffer {
     }
 
     private void convertToBitmap() {
-        IntBuffer ib = IntBuffer.allocate(mWidth*mHeight);
-        IntBuffer ibt = IntBuffer.allocate(mWidth*mHeight);
-        mGL.glReadPixels(0, 0, mWidth, mHeight, GL_RGBA, GL_UNSIGNED_BYTE, ib);
+        boolean isScaled = !mContext.getResources().getBoolean(R.bool.config_deviceSupportsNonPoTTextures);
+        final int maxSize = mContext.getResources().getInteger(R.integer.config_maxPoTTextureSize);
+
+        int scaledWidth = isScaled ? Math.min(maxSize, Util.getUpperPoT(mWidth)) : mWidth;
+        int scaledHeight = isScaled ? Math.min(maxSize, Util.getUpperPoT(mHeight)) : mHeight;
+
+        IntBuffer ib = IntBuffer.allocate(scaledWidth*scaledHeight);
+        IntBuffer ibt = IntBuffer.allocate(scaledWidth*scaledHeight);
+        mGL.glReadPixels(0, 0, scaledWidth, scaledHeight, GL_RGBA, GL_UNSIGNED_BYTE, ib);
 
         // Convert upside down mirror-reversed image to right-side up normal image.
-        for (int i = 0; i < mHeight; i++) {
-            for (int j = 0; j < mWidth; j++) {
-                ibt.put((mHeight-i-1)*mWidth + j, ib.get(i*mWidth + j));
+        for (int i = 0; i < scaledHeight; i++) {
+            for (int j = 0; j < scaledWidth; j++) {
+                ibt.put((scaledHeight-i-1)*scaledWidth + j, ib.get(i*scaledWidth + j));
             }
         }
 
-        mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+        mBitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
         mBitmap.copyPixelsFromBuffer(ibt);
+
+        if (isScaled) {
+            // Image was converted to a power of two texture, scale it back
+            Log.v(TAG, "Image was scaled, scaling back to " + mWidth + "x" + mHeight);
+            Bitmap scaled = Bitmap.createScaledBitmap(mBitmap, mWidth, mHeight, true);
+            mBitmap.recycle();
+            mBitmap = scaled;
+        }
     }
 }

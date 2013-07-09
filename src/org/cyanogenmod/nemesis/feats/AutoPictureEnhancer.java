@@ -18,6 +18,7 @@
 
 package org.cyanogenmod.nemesis.feats;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.effect.Effect;
 import android.media.effect.EffectContext;
@@ -25,6 +26,10 @@ import android.media.effect.EffectFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
+import android.util.Log;
+
+import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.Util;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -33,6 +38,8 @@ import javax.microedition.khronos.opengles.GL10;
  * Automatic photo enhancement
  */
 public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
+    public final static String TAG = "AutoPictureEnhancer";
+
     private int[] mTextures = new int[2];
     private EffectContext mEffectContext;
     private Effect mAutoFixEffect;
@@ -42,27 +49,55 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
     private int mImageHeight;
     private Bitmap mBitmapToLoad;
     private boolean mInitialized = false;
+    private Context mContext;
 
-    public AutoPictureEnhancer() {
-
+    public AutoPictureEnhancer(Context context) {
+        mContext = context;
     }
 
     public void setTexture(Bitmap bitmap) {
         mBitmapToLoad = bitmap;
     }
 
+    public static Bitmap scale(Bitmap bmp, int w, int h) {
+        Bitmap b = null;
+        if (bmp != null) {
+            Log.v(TAG, "Scaling bitmap from " + bmp.getWidth() + "x" + bmp.getHeight() + " to " + w + "x" + h);
+
+            // We're going to need some memory
+            System.gc();
+            Runtime.getRuntime().gc();
+
+            // Scale it!
+            b=Bitmap.createScaledBitmap(bmp, w, h, true);
+        }
+        return b;
+    }
+
     private void loadTextureImpl(Bitmap bitmap) {
         // Generate textures
-        GLES20.glGenTextures(2, mTextures, 0);
+        GLES20.glGenTextures(1, mTextures, 0);
 
         // Load input bitmap
-        mImageWidth = bitmap.getWidth();
-        mImageHeight = bitmap.getHeight();
+        if (!mContext.getResources().getBoolean(R.bool.config_deviceSupportsNonPoTTextures)) {
+            final int maxSize = mContext.getResources().getInteger(R.integer.config_maxPoTTextureSize);
+
+            mImageWidth = Math.min(maxSize, Util.getUpperPoT(bitmap.getWidth()));
+            mImageHeight = Math.min(maxSize, Util.getUpperPoT(bitmap.getHeight()));
+        } else {
+            mImageWidth = bitmap.getWidth();
+            mImageHeight = bitmap.getHeight();
+        }
+
         mTexRenderer.updateTextureSize(mImageWidth, mImageHeight);
 
         // Upload to texture
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextures[0]);
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+        if (mImageWidth != bitmap.getWidth() || mImageHeight != bitmap.getHeight()) {
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, scale(bitmap, mImageWidth, mImageHeight), 0);
+        } else {
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+        }
 
         // Set texture parameters
         GLToolbox.initTexParams();
@@ -85,18 +120,18 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
     }
 
     private void applyEffects() {
-        mMinMaxEffect.apply(mTextures[0], mImageWidth, mImageHeight, mTextures[1]);
-        mAutoFixEffect.apply(mTextures[1], mImageWidth, mImageHeight, mTextures[1]);
+        mMinMaxEffect.apply(mTextures[0], mImageWidth, mImageHeight, mTextures[0]);
+        mAutoFixEffect.apply(mTextures[0], mImageWidth, mImageHeight, mTextures[0]);
     }
 
     private void renderResult() {
-        mTexRenderer.renderTexture(mTextures[1]);
+        mTexRenderer.renderTexture(mTextures[0]);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
         if (!mInitialized) {
-            //Only need to do this once
+            // Only need to do this once
             mEffectContext = EffectContext.createWithCurrentGlContext();
             mTexRenderer.init();
             mInitialized = true;
@@ -105,6 +140,8 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
         if (mBitmapToLoad != null) {
             loadTextureImpl(mBitmapToLoad);
             mBitmapToLoad = null;
+        } else {
+            Log.e(TAG, "Bitmap to load is null");
         }
 
         // Render the effect
@@ -116,7 +153,11 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         if (mTexRenderer != null) {
-            mTexRenderer.updateViewSize(width, height);
+            if (!mContext.getResources().getBoolean(R.bool.config_deviceSupportsNonPoTTextures)) {
+                mTexRenderer.updateViewSize(width, width);
+            } else {
+                mTexRenderer.updateViewSize(width, height);
+            }
         }
     }
 

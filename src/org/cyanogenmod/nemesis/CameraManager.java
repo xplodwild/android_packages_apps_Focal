@@ -260,8 +260,14 @@ public class CameraManager {
         if (mCamera == null)
             return null;
 
-        if (mParameters == null)
-            mParameters = mCamera.getParameters();
+        if (mParameters == null) {
+            try {
+                mParameters = mCamera.getParameters();
+            } catch (RuntimeException e) {
+                Log.e(TAG, "Error while getting parameters: ", e);
+                return null;
+            }
+        }
 
         return mParameters;
     }

@@ -26,4 +26,12 @@
     <!-- Whether or not to use preview data to take snapshots while in the video mode.
      This enables snapshot during videos on older devices. -->
     <bool name="config_usePreviewForVideoSnapshot">false</bool>
+
+    <!-- Whether or not the device supports non-Power of Two textures (basically,
+    if AutoPictureEnhancer crashes) -->
+    <bool name="config_deviceSupportsNonPoTTextures">true</bool>
+
+    <!-- If deviceSupportsNonPoTTextures is false, this size is the maximal size
+    the texture can take (aka. the largest possible GL texture size) -->
+    <integer name="config_maxPoTTextureSize">4096</integer>
 </resources>
