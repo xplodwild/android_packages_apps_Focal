@@ -35,9 +35,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.cyanogenmod.nemesis.BitmapFilter;
+import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SettingsStorage;
+import org.cyanogenmod.nemesis.ui.Notifier;
 import org.cyanogenmod.nemesis.ui.SideBar;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
@@ -400,9 +402,10 @@ public abstract class WidgetBase {
      * Note that you're not forced to use exclusively buttons,
      * TextViews through WidgetOptionLabel can also be added (for Timer for instance)
      */
-    public class WidgetOptionButton extends ImageView implements WidgetOption {
+    public class WidgetOptionButton extends ImageView implements WidgetOption, View.OnLongClickListener {
         private float mTouchOffset = 0.0f;
         private int mOriginalResource;
+        private String mHintText;
 
         public WidgetOptionButton(int resId, Context context, AttributeSet attrs,
                                   int defStyle) {
@@ -423,6 +426,10 @@ public abstract class WidgetBase {
 
         public void resetImage() {
             setImageResource(mOriginalResource);
+        }
+
+        public void setHintText(String hint) {
+            mHintText = hint;
         }
 
         @Override
@@ -452,6 +459,8 @@ public abstract class WidgetBase {
             return (super.onTouchEvent(event) || handle);
         }
 
+
+
         public void setActiveDrawable(String key) {
             setImageBitmap(BitmapFilter.getSingleton().getGlow(key,
                     getContext().getResources().getColor(R.color.widget_option_active),
@@ -464,11 +473,22 @@ public abstract class WidgetBase {
             int padding = getResources().getDimensionPixelSize(R.dimen.widget_option_button_padding);
             this.setPadding(padding, padding, padding, padding);
             mOriginalResource = resId;
+            setOnLongClickListener(this);
         }
 
         @Override
         public int getColSpan() {
             return 1;
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if (mHintText != null && mHintText.length() > 0) {
+                CameraActivity.notify(mHintText, 2000);
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 

@@ -52,6 +52,12 @@ public class BurstModeWidget extends WidgetBase implements View.OnClickListener 
         mBtn15 = new WidgetOptionButton(R.drawable.ic_widget_burst_15, activity);
         mBtnInf = new WidgetOptionButton(R.drawable.ic_widget_burst_inf, activity);
 
+        mBtn5.setHintText(String.format(activity.getString(R.string.widget_burstmode_count_shots), 5));
+        mBtn10.setHintText(String.format(activity.getString(R.string.widget_burstmode_count_shots), 10));
+        mBtn15.setHintText(String.format(activity.getString(R.string.widget_burstmode_count_shots), 15));
+        mBtnOff.setHintText(activity.getString(R.string.widget_burstmode_off));
+        mBtnInf.setHintText(activity.getString(R.string.widget_burstmode_infinite));
+
         addViewToContainer(mBtnOff);
         addViewToContainer(mBtn5);
         addViewToContainer(mBtn10);

@@ -193,8 +193,11 @@ public class SnapshotManager {
 
                 // TODO: Toggle Automatic Picture Enhancement
                 // if
+                /*
+
                 new Thread() {
                     public void run() {
+                    */
                         for (SnapshotListener listener : mListeners) {
                             listener.onSnapshotProcessing(snap);
                         }
@@ -223,8 +226,9 @@ public class SnapshotManager {
                         for (SnapshotListener listener : mListeners) {
                             listener.onSnapshotSaved(snap);
                         }
+                /*
                     }
-                }.start();
+                }.start();*/
                 // else just imagesaver
                 // endif
             }

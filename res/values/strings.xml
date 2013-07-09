@@ -31,6 +31,12 @@
     <string name="no_gles20_support">Your device doesn\'t support GLES2</string>
     <string name="no_gyroscope">Your device doesn\'t have a gyroscope</string>
     <string name="ps_long_press_to_stop">Long-press the shutter button to finish your sphere.</string>
+
+    <string name="widget_burstmode_count_shots">Burst %d shots</string>
+    <string name="widget_burstmode_off">Disable burst mode</string>
+    <string name="widget_burstmode_infinite">Infinite burst</string>
+
+
 </resources>
 
 

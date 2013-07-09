@@ -93,7 +93,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private SavePinger mSavePinger;
     private CircleTimerView mTimerView;
     private ViewGroup mRecTimerContainer;
-    private Notifier mNotifier;
+    private static Notifier mNotifier;
     private ReviewDrawer mReviewDrawer;
     private ScaleGestureDetector mZoomGestureDetector;
     private GLSurfaceView mPicSphere3DView;
@@ -220,6 +220,15 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
      */
     public static int getCameraMode() {
         return mCameraMode;
+    }
+
+    /**
+     * Notify, like a toast, but orientation aware
+     * @param text
+     * @param lengthMs
+     */
+    public static void notify(String text, int lengthMs) {
+        mNotifier.notify(text, lengthMs);
     }
 
     /**

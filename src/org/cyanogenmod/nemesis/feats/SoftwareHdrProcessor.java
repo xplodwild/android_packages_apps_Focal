@@ -139,7 +139,7 @@ public class SoftwareHdrProcessor {
             filesStr += " " + picture.getPath();
         }
 
-        run("align_image_stack -v -v -v -a project " + filesStr);
+        run("align_image_stack -v -v -v -a "+mTempPath+"/project " + filesStr);
         consumeProcLogs();
 
         Log.d(TAG, "Align Image Stack... done");

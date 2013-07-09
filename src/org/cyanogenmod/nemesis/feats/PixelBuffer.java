@@ -37,10 +37,14 @@ import static javax.microedition.khronos.egl.EGL10.EGL_DEFAULT_DISPLAY;
 import static javax.microedition.khronos.egl.EGL10.EGL_DEPTH_SIZE;
 import static javax.microedition.khronos.egl.EGL10.EGL_GREEN_SIZE;
 import static javax.microedition.khronos.egl.EGL10.EGL_HEIGHT;
+import static javax.microedition.khronos.egl.EGL10.EGL_LARGEST_PBUFFER;
 import static javax.microedition.khronos.egl.EGL10.EGL_NONE;
 import static javax.microedition.khronos.egl.EGL10.EGL_NO_CONTEXT;
+import static javax.microedition.khronos.egl.EGL10.EGL_PBUFFER_BIT;
 import static javax.microedition.khronos.egl.EGL10.EGL_RED_SIZE;
+import static javax.microedition.khronos.egl.EGL10.EGL_RENDERABLE_TYPE;
 import static javax.microedition.khronos.egl.EGL10.EGL_STENCIL_SIZE;
+import static javax.microedition.khronos.egl.EGL10.EGL_SUCCESS;
 import static javax.microedition.khronos.egl.EGL10.EGL_WIDTH;
 import static javax.microedition.khronos.opengles.GL10.GL_RGBA;
 import static javax.microedition.khronos.opengles.GL10.GL_UNSIGNED_BYTE;
@@ -51,7 +55,13 @@ import static javax.microedition.khronos.opengles.GL10.GL_UNSIGNED_BYTE;
 public class PixelBuffer {
     final static String TAG = "PixelBuffer";
     final static boolean LIST_CONFIGS = false;
+    final static private int EGL_OPENGL_ES2_BIT = 4;
     final static private int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
+    final static private int EGL_BIND_TO_TEXTURE_RGBA = 0x303A;
+    final static private int EGL_TEXTURE_FORMAT = 0x3080;
+    final static private int EGL_TEXTURE_TARGET = 0x3081;
+    final static private int EGL_TEXTURE_RGBA = 0x305E;
+    final static private int EGL_TEXTURE_2D = 0x305F;
 
     GLSurfaceView.Renderer mRenderer; // borrow this interface
     int mWidth, mHeight;
@@ -71,10 +81,15 @@ public class PixelBuffer {
         mWidth = width;
         mHeight = height;
 
-        int[] version = new int[2];
+        int[] version = new int[]{
+            2, 2
+        };
         int[] attribList = new int[] {
                 EGL_WIDTH, mWidth,
-                EGL_HEIGHT, mHeight,
+                EGL_HEIGHT, mWidth,
+                EGL_LARGEST_PBUFFER, 1,
+                //EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGBA,
+                //EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
                 EGL_NONE
         };
 
@@ -137,6 +152,9 @@ public class PixelBuffer {
                 EGL_GREEN_SIZE, 8,
                 EGL_BLUE_SIZE, 8,
                 EGL_ALPHA_SIZE, 8,
+                //EGL_BIND_TO_TEXTURE_RGBA, 1,
+                //EGL10.EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+                //EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
                 EGL_NONE
         };
 
@@ -147,6 +165,11 @@ public class PixelBuffer {
         int configSize = numConfig[0];
         mEGLConfigs = new EGLConfig[configSize];
         mEGL.eglChooseConfig(mEGLDisplay, attribList, mEGLConfigs, configSize, numConfig);
+
+        int error = mEGL.eglGetError();
+        if (error != EGL_SUCCESS) {
+            Log.e(TAG, "eglChooseConfig: " + error);
+        }
 
         if (LIST_CONFIGS) {
             listConfig();

@@ -123,7 +123,13 @@ public class SoftwareHdrCapture extends CaptureTransformer {
             // Process
             SoftwareHdrProcessor processor = new SoftwareHdrProcessor(mActivity, mSnapManager);
             processor.setPictures(mPictures);
-            processor.render();
+            try {
+                processor.render();
+            } catch (Exception e) {
+                // TODO: Unable to render, keep files
+            } finally {
+                // TODO: Delete source files
+            }
         }
     }
 
