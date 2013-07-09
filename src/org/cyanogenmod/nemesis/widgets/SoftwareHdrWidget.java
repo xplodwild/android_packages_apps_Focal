@@ -66,11 +66,6 @@ public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListene
             return false;
         }
 
-        // When debugging, show software HDR anyway
-        if (BuildConfig.DEBUG) {
-            return true;
-        }
-
         // We hide the software HDR widget if either we have scene-mode=hdr, or any of the
         // hdr setting key defined
         String[] keys = mContext.getResources().getStringArray(R.array.hardware_hdr_keys);
