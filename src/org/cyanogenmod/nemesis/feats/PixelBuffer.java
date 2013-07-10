@@ -95,7 +95,6 @@ public class PixelBuffer {
             attribList = new int[] {
                     EGL_WIDTH, mWidth,
                     EGL_HEIGHT, mHeight,
-                    EGL_LARGEST_PBUFFER, 1,
                     EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGBA,
                     EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
                     EGL_NONE
