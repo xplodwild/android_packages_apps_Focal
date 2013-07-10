@@ -503,6 +503,13 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         ViewGroup picsphereContainer = ((ViewGroup) findViewById(R.id.picsphere_renderer_container));
         picsphereContainer.removeView(mPicSphere3DView);
         picsphereContainer.setVisibility(View.GONE);
+
+        ViewGroup camContainer = (ViewGroup) findViewById(R.id.camera_preview_container);
+        FrameLayout.LayoutParams root = (FrameLayout.LayoutParams) camContainer.getLayoutParams();
+        root.width = FrameLayout.LayoutParams.MATCH_PARENT;
+        root.height = FrameLayout.LayoutParams.MATCH_PARENT;
+        camContainer.setLayoutParams(root);
+
         mPicSphere3DView = null;
     }
 

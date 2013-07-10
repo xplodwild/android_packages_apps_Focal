@@ -18,6 +18,7 @@
 
 package org.cyanogenmod.nemesis.widgets;
 
+import android.content.res.Resources;
 import android.hardware.Camera;
 import android.view.View;
 
@@ -52,11 +53,13 @@ public class BurstModeWidget extends WidgetBase implements View.OnClickListener 
         mBtn15 = new WidgetOptionButton(R.drawable.ic_widget_burst_15, activity);
         mBtnInf = new WidgetOptionButton(R.drawable.ic_widget_burst_inf, activity);
 
-        mBtn5.setHintText(String.format(activity.getString(R.string.widget_burstmode_count_shots), 5));
-        mBtn10.setHintText(String.format(activity.getString(R.string.widget_burstmode_count_shots), 10));
-        mBtn15.setHintText(String.format(activity.getString(R.string.widget_burstmode_count_shots), 15));
-        mBtnOff.setHintText(activity.getString(R.string.widget_burstmode_off));
-        mBtnInf.setHintText(activity.getString(R.string.widget_burstmode_infinite));
+        getToggleButton().setHintText(R.string.widget_burstmode);
+        final Resources res = getWidget().getResources();
+        mBtn5.setHintText(String.format(res.getString(R.string.widget_burstmode_count_shots), 5));
+        mBtn10.setHintText(String.format(res.getString(R.string.widget_burstmode_count_shots), 10));
+        mBtn15.setHintText(String.format(res.getString(R.string.widget_burstmode_count_shots), 15));
+        mBtnOff.setHintText(R.string.widget_burstmode_off);
+        mBtnInf.setHintText(R.string.widget_burstmode_infinite);
 
         addViewToContainer(mBtnOff);
         addViewToContainer(mBtn5);

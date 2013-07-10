@@ -39,7 +39,6 @@ import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SettingsStorage;
-import org.cyanogenmod.nemesis.ui.Notifier;
 import org.cyanogenmod.nemesis.ui.SideBar;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
@@ -229,6 +228,8 @@ public abstract class WidgetBase {
     public class WidgetToggleButton extends ImageView {
         private float mDownX;
         private float mDownY;
+        private boolean mCancelOpenOnDown;
+        private String mHintText;
 
         public WidgetToggleButton(Context context, AttributeSet attrs,
                                   int defStyle) {
@@ -253,6 +254,15 @@ public abstract class WidgetBase {
             this.setPadding(pad, pad, pad, pad);
 
             this.setOnClickListener(new ToggleClickListener());
+            this.setOnLongClickListener(new LongClickListener());
+        }
+
+        public void setHintText(String text) {
+            mHintText = text;
+        }
+
+        public void setHintText(int resId) {
+            mHintText = getResources().getString(resId);
         }
 
         public void toggleBackground(boolean active) {
@@ -266,11 +276,18 @@ public abstract class WidgetBase {
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             // to dispatch click / long click event, we do it first
-            boolean defaultResult = super.onTouchEvent(event);
+            boolean defaultResult;
+            if (event.getActionMasked() == MotionEvent.ACTION_UP && mCancelOpenOnDown) {
+                toggleBackground(false);
+                defaultResult = false;
+            } else {
+                defaultResult = super.onTouchEvent(event);
+            }
 
             // Handle the background color on touch
             if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
                 this.setBackgroundColor(getResources().getColor(R.color.widget_toggle_pressed));
+                mCancelOpenOnDown = false;
                 mDownX = event.getX();
                 mDownY = event.getY();
             } else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
@@ -284,6 +301,17 @@ public abstract class WidgetBase {
             }
 
             return true;
+        }
+
+        private class LongClickListener implements OnLongClickListener {
+            @Override
+            public boolean onLongClick(View view) {
+                mCancelOpenOnDown = true;
+                if (mHintText != null && !mHintText.isEmpty()) {
+                    CameraActivity.notify(mHintText, 2000);
+                }
+                return true;
+            }
         }
 
         private class ToggleClickListener implements OnClickListener {
@@ -430,6 +458,10 @@ public abstract class WidgetBase {
 
         public void setHintText(String hint) {
             mHintText = hint;
+        }
+
+        public void setHintText(int resId) {
+            mHintText = getResources().getString(resId);
         }
 
         @Override

@@ -35,6 +35,12 @@ import org.cyanogenmod.nemesis.R;
 public class Notifier extends LinearLayout {
     private TextView mTextView;
     private Handler mHandler;
+    private Runnable mFadeOutRunnable = new Runnable() {
+        @Override
+        public void run() {
+            fadeOut();
+        }
+    };
 
     public Notifier(Context context) {
         super(context);
@@ -64,16 +70,13 @@ public class Notifier extends LinearLayout {
      * @note This method must be ran in UI thread!
      */
     public void notify(String text, long durationMs) {
+        mHandler.removeCallbacks(mFadeOutRunnable);
         mTextView = (TextView) findViewById(R.id.notifier_text);
         mTextView.setText(text);
+        setAlpha(0.0f);
 
         fadeIn();
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                fadeOut();
-            }
-        }, durationMs);
+        mHandler.postDelayed(mFadeOutRunnable, durationMs);
     }
 
     private void fadeIn() {
