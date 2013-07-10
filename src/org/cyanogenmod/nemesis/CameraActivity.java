@@ -263,9 +263,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         }
 
-        mCamManager.setCameraMode(mCameraMode);
-
         updateCapabilities();
+        mCamManager.setCameraMode(mCameraMode);
     }
 
     /**
@@ -550,21 +549,24 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             new Thread() {
                 public void run() {
                     long time = System.currentTimeMillis();
-                    final Bitmap blurredPreview = BitmapFilter.getSingleton()
-                            .getBlur(CameraActivity.this, preview, 16);
-                    long elapsed = System.currentTimeMillis() - time;
+                    try {
+                        final Bitmap blurredPreview = BitmapFilter.getSingleton()
+                                .getBlur(CameraActivity.this, preview, 16);
+                        long elapsed = System.currentTimeMillis() - time;
 
-                    Log.v(TAG, "Took " + elapsed + "ms to blur");
+                        Log.v(TAG, "Took " + elapsed + "ms to blur");
 
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            container.setAspectRatio((float) preview.getWidth() / preview.getHeight());
-                            container.setPreviewSize(preview.getWidth(), preview.getHeight());
-                            iv.setImageBitmap(blurredPreview);
-                            iv.setAlpha(1.0f);
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                container.setAspectRatio((float) preview.getWidth() / preview.getHeight());
+                                container.setPreviewSize(preview.getWidth(), preview.getHeight());
+                                iv.setImageBitmap(blurredPreview);
+                                iv.setAlpha(1.0f);
 
-                        }
-                    });
+                                findViewById(R.id.camera_preview_container).setAlpha(0.0f);
+                            }
+                        });
+                    } catch (Exception e) { }
                 }
             }.start();
         }
@@ -574,6 +576,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    findViewById(R.id.camera_preview_container).setAlpha(1.0f);
                     ImageView iv = (ImageView) findViewById(R.id.camera_preview_overlay);
                     iv.animate().setDuration(300).alpha(0.0f).start();
                 }

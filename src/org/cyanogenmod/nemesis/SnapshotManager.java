@@ -405,7 +405,7 @@ public class SnapshotManager {
         return mImageSaver;
     }
 
-    public void setVideoProfile(CamcorderProfile profile) {
+    public void setVideoProfile(final CamcorderProfile profile) {
         mProfile = profile;
 
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {

@@ -132,10 +132,10 @@ public class SettingsWidget extends WidgetBase {
         mContext = context;
         CameraManager cam = context.getCamManager();
 
-        // Get the available photo/video size. Unlike AOSP app, we don't
-        // store manually each resolution in an XML, but we calculate it directly
-        // from the width and height of the picture size.
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
+            // Get the available photo size. Unlike AOSP app, we don't
+            // store manually each resolution in an XML, but we calculate it directly
+            // from the width and height of the picture size.
             mResolutions = cam.getParameters().getSupportedPictureSizes();
             mResolutionsName = new ArrayList<String>();
 
@@ -176,11 +176,6 @@ public class SettingsWidget extends WidgetBase {
                     mVideoResolutions.add("352x288");
                 }
             }
-
-            // Restore video size if we have any
-            String resolution = SettingsStorage.getCameraSetting(context, mCamManager.getCurrentFacing(),
-                    "video-size", mVideoResolutions.get(0));
-            applyVideoResolution(resolution);
         }
 
 

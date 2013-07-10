@@ -60,6 +60,7 @@ public class CameraManager {
     private CameraReadyListener mCameraReadyListener;
     private Handler mHandler;
     private long mLastPreviewFrameTime;
+    private boolean mIsModeSwitching;
 
     public interface PreviewPauseListener {
         /**
@@ -145,6 +146,7 @@ public class CameraManager {
         mMediaRecorder = new MediaRecorder();
         mCameraReady = true;
         mHandler = new Handler();
+        mIsModeSwitching = false;
     }
 
     /**
@@ -297,14 +299,22 @@ public class CameraManager {
         mTargetSize = new Point(width, height);
 
         if (mCamera != null) {
-            mParameters.setPreviewSize(width, height);
+            Camera.Parameters params = getParameters();
+            params.setPreviewSize(width, height);
 
             Log.v(TAG, "Preview size is " + width + "x" + height);
 
-            mCamera.stopPreview();
-            mCamera.setParameters(mParameters);
-            mPreview.notifyPreviewSize(width, height);
-            mCamera.startPreview();
+            if (!mIsModeSwitching) {
+                try {
+                    mCamera.stopPreview();
+                    mParameters = params;
+                    mCamera.setParameters(mParameters);
+                    mPreview.notifyPreviewSize(width, height);
+                    mCamera.startPreview();
+                } catch (RuntimeException ex) {
+                    Log.e(TAG, "Unable to set Preview Size", ex);
+                }
+            }
         }
     }
 
@@ -341,7 +351,11 @@ public class CameraManager {
             params.setAutoWhiteBalanceLock(lock);
         }
 
-        mCamera.setParameters(params);
+        try {
+            mCamera.setParameters(params);
+        } catch (RuntimeException e) {
+
+        }
     }
 
     /**
@@ -493,9 +507,9 @@ public class CameraManager {
     }
 
     public void setCameraMode(final int mode) {
+        Log.e(TAG, "SET CAMERA MODE");
         if (mPreviewPauseListener != null) {
-           // mPreviewPauseListener.onPreviewPause();
-            return;
+            mPreviewPauseListener.onPreviewPause();
         }
 
         new Thread() {
@@ -503,7 +517,7 @@ public class CameraManager {
                 // We voluntarily sleep the thread here for the animation being done
                 // in the CameraActivity
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -511,20 +525,24 @@ public class CameraManager {
                 Camera.Parameters params = getParameters();
 
                 if (mode == CameraActivity.CAMERA_MODE_VIDEO) {
+                    Log.e(TAG, "Switching to recording hint");
                     params.setRecordingHint(true);
                 } else {
                     params.setRecordingHint(false);
                 }
 
-
+                mIsModeSwitching = true;
                 mCamera.stopPreview();
+                params.setPreviewSize(mTargetSize.x, mTargetSize.y);
                 mCamera.setParameters(params);
                 try {
                     mCamera.startPreview();
+                    mPreview.notifyPreviewSize(mTargetSize.x, mTargetSize.y);
                 } catch (RuntimeException e) {
                     Log.e(TAG, "Unable to start preview", e);
                 }
                 mPreview.postCallbackBuffer();
+                mIsModeSwitching = false;
 
                 if (mPreviewPauseListener != null) {
                     mPreviewPauseListener.onPreviewResume();
