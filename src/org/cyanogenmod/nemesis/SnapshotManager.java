@@ -117,12 +117,16 @@ public class SnapshotManager {
 
         // A bitmap containing a thumbnail of the image
         public Bitmap mThumbnail;
+
+        // Whether or not to bypass image processing (even if user enabled it)
+        public boolean mBypassProcessing;
     }
 
 
     private Context mContext;
     private CameraManager mCameraManager;
     private FocusManager mFocusManager;
+    private boolean mBypassProcessing;
 
     // Photo-related variables
     private boolean mWaitExposureSettle;
@@ -183,7 +187,7 @@ public class SnapshotManager {
             if (snap.mSave) {
                 // Calculate the width and the height of the jpeg.
                 final Camera.Size s = mCameraManager.getParameters().getPictureSize();
-                final int orientation = Exif.getOrientation(jpegData) - mCameraManager.getOrientation();
+                int orientation = Exif.getOrientation(jpegData) - mCameraManager.getOrientation();
                 final int width = s.width,
                         height = s.height;
 
@@ -191,42 +195,49 @@ public class SnapshotManager {
                 final String title = mImageNamer.getTitle();
                 snap.mUri = uri;
 
+                // If the orientation is somehow negative, avoid the Gallery crashing dumbly
+                // (see com/android/gallery3d/ui/PhotoView.java line 758 (setTileViewPosition))
+                while (orientation < 0) {
+                    orientation += 360;
+                }
+                final int correctedOrientation = orientation;
+
+
                 // TODO: Toggle Automatic Picture Enhancement
-                // if
-                new Thread() {
-                    public void run() {
-                        for (SnapshotListener listener : mListeners) {
-                            listener.onSnapshotProcessing(snap);
+                if (!snap.mBypassProcessing) {
+                    new Thread() {
+                        public void run() {
+                            for (SnapshotListener listener : mListeners) {
+                                listener.onSnapshotProcessing(snap);
+                            }
+
+                            // XXX: PixelBuffer has to be created every time because the GL context
+                            // can only be used from its original thread. It's not very intense, but
+                            // ideally we would be re-using the same thread every time.
+                            mOffscreenGL = new PixelBuffer(mContext, s.width, s.height);
+                            mAutoPicEnhancer = new AutoPictureEnhancer(mContext);
+                            mOffscreenGL.setRenderer(mAutoPicEnhancer);
+                            mAutoPicEnhancer.setTexture(BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length));
+
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            mOffscreenGL.getBitmap().compress(Bitmap.CompressFormat.JPEG, 90, baos);
+
+                            mImageSaver.addImage(baos.toByteArray(), uri, title, null,
+                                    width, height, correctedOrientation);
+
+                            for (SnapshotListener listener : mListeners) {
+                                listener.onSnapshotSaved(snap);
+                            }
                         }
+                    }.start();
+                } else {
+                    mImageSaver.addImage(jpegData, uri, title, null,
+                            width, height, correctedOrientation);
 
-                        // XXX: PixelBuffer has to be created every time because the GL context
-                        // can only be used from its original thread. It's not very intense, but
-                        // ideally we would be re-using the same thread every time.
-                        mOffscreenGL = new PixelBuffer(mContext, s.width, s.height);
-                        mAutoPicEnhancer = new AutoPictureEnhancer(mContext);
-                        mOffscreenGL.setRenderer(mAutoPicEnhancer);
-                        mAutoPicEnhancer.setTexture(BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length));
-
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        mOffscreenGL.getBitmap().compress(Bitmap.CompressFormat.JPEG, 90, baos);
-
-                        // If the orientation is somehow negative, avoid the Gallery crashing dumbly
-                        // (see com/android/gallery3d/ui/PhotoView.java line 758 (setTileViewPosition))
-                        int correctedOrientation = orientation;
-                        while (correctedOrientation < 0) {
-                            correctedOrientation += 360;
-                        }
-
-                        mImageSaver.addImage(baos.toByteArray(), uri, title, null,
-                                width, height, correctedOrientation);
-
-                        for (SnapshotListener listener : mListeners) {
-                            listener.onSnapshotSaved(snap);
-                        }
+                    for (SnapshotListener listener : mListeners) {
+                        listener.onSnapshotSaved(snap);
                     }
-                }.start();
-                // else just imagesaver
-                // endif
+                }
             }
 
             // Camera is ready to take another shot, doit
@@ -317,6 +328,15 @@ public class SnapshotManager {
         mListeners.remove(listener);
     }
 
+    /**
+     * Sets whether or not to bypass image processing (for burst shot or hdr for instance)
+     * This value is reset after each snapshot queued!
+     * @param bypass
+     */
+    public void setBypassProcessing(boolean bypass) {
+        mBypassProcessing = bypass;
+    }
+
     public void prepareNamerUri(int width, int height) {
         mImageNamer.prepareUri(mContentResolver, System.currentTimeMillis(), width, height, 0);
     }
@@ -358,11 +378,15 @@ public class SnapshotManager {
         info.mSave = save;
         info.mExposureCompensation = exposureCompensation;
         info.mThumbnail = mCameraManager.getLastPreviewFrame();
+        info.mBypassProcessing = mBypassProcessing;
         if (mCameraManager.getParameters().getExposureCompensation() != exposureCompensation) {
             mCameraManager.getParameters().setExposureCompensation(exposureCompensation);
             mWaitExposureSettle = true;
         }
         mSnapshotsQueue.add(info);
+
+        // Reset bypass in any case
+        mBypassProcessing = false;
 
         if (mSnapshotsQueue.size() == 1) {
             // We had no other snapshot queued so far, so start things up

@@ -80,6 +80,7 @@ public class SoftwareHdrCapture extends CaptureTransformer {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
+                mSnapManager.setBypassProcessing(true);
                 mSnapManager.queueSnapshot(true, getShotExposure(mShotsDone));
             }
         });

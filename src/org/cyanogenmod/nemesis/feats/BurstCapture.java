@@ -73,6 +73,7 @@ public class BurstCapture extends CaptureTransformer {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
+                mSnapManager.setBypassProcessing(true);
                 mSnapManager.queueSnapshot(true, 0);
             }
         });
