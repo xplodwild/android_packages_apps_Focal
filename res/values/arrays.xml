@@ -145,7 +145,7 @@
 
     <array name="widget_scenemode_icons">
         <item>@drawable/ic_widget_scenemode_auto</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_antimotionblur</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
         <item>@drawable/ic_widget_placeholder</item>
