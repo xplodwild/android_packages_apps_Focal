@@ -19,6 +19,7 @@
 package org.cyanogenmod.nemesis.ui;
 
 import android.animation.Animator;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -122,7 +123,7 @@ public class ReviewDrawer extends LinearLayout {
         updateFromGallery();
 
         // Make sure drawer is initially closed
-        setTranslationX(-9999);
+        setTranslationX(-99999);
 
         // Setup gesture detection
         mGestureDetector = new GestureDetector(getContext(), new ReviewedGestureListener());
@@ -167,6 +168,11 @@ public class ReviewDrawer extends LinearLayout {
         final String orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
 
         // Select only the images that has been taken from the Camera
+        ContentResolver cr = getContext().getContentResolver();
+        if (cr == null) {
+            Log.e(TAG, "No content resolver!");
+            return;
+        }
         final Cursor cursor = getContext().getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
                 new String[]{GALLERY_CAMERA_BUCKET}, orderBy);

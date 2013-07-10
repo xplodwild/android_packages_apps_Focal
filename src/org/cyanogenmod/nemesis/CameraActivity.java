@@ -478,17 +478,18 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mPicSphereManager = new PicSphereManager(CameraActivity.this, mSnapshotManager);
         }
 
-        mCamManager.getPreviewSurface().setScaleX(0.3f);
-        mCamManager.getPreviewSurface().setScaleY(0.3f);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mCamManager.getPreviewSurface().getLayoutParams();
-        params.addRule(RelativeLayout.CENTER_IN_PARENT);
-        params.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
-        params.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+        ViewGroup camContainer = (ViewGroup) findViewById(R.id.camera_preview_container);
+        FrameLayout.LayoutParams root = (FrameLayout.LayoutParams) camContainer.getLayoutParams();
+        root.width = 320;
+        root.height = 240;
+        camContainer.setLayoutParams(root);
 
         mPicSphere3DView = new GLSurfaceView(this);
         mPicSphere3DView.setEGLContextClientVersion(2);
         mPicSphere3DView.setRenderer(mPicSphereManager.getRenderer());
-        ((ViewGroup) findViewById(R.id.camera_preview_container)).addView(mPicSphere3DView);
+        ViewGroup picsphereContainer = ((ViewGroup) findViewById(R.id.picsphere_renderer_container));
+        picsphereContainer.addView(mPicSphere3DView);
+        picsphereContainer.setVisibility(View.VISIBLE);
 
 
         // Setup the capture transformer
@@ -499,7 +500,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     }
 
     public void resetPicSphere() {
-        ((ViewGroup) findViewById(R.id.camera_preview_container)).removeView(mPicSphere3DView);
+        ViewGroup picsphereContainer = ((ViewGroup) findViewById(R.id.picsphere_renderer_container));
+        picsphereContainer.removeView(mPicSphere3DView);
+        picsphereContainer.setVisibility(View.GONE);
         mPicSphere3DView = null;
     }
 

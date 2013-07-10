@@ -117,6 +117,26 @@ public class PicSphere {
         mOutputUri = mSnapManager.getNamerUri();
         mOutputTitle = mSnapManager.getNamerTitle();
 
+        // Wait till all images are saved and accessible
+        boolean allSaved = false;
+        while (!allSaved) {
+            allSaved = true;
+            for (Uri pic : mPictures) {
+                File file = new File(pic.getPath());
+                if (!file.exists() || !file.canRead()) {
+                    allSaved = false;
+
+                    // Wait a bit until we retry
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    continue;
+                }
+            }
+        }
+
         // Process our images
         try {
             doAutopano();
@@ -131,6 +151,7 @@ public class PicSphere {
     }
 
     private void run(String command) throws IOException {
+        Log.e(TAG, "Running: " + command);
         Runtime rt = Runtime.getRuntime();
         Process proc = rt.exec(command, new String[]{"PATH="+mPathPrefix+":/system/bin",
                 "LD_LIBRARY_PATH="+mPathPrefix+":/system/lib"});
@@ -138,6 +159,12 @@ public class PicSphere {
                 InputStreamReader(proc.getInputStream()));
         mProcStdErr = new BufferedReader(new
                 InputStreamReader(proc.getErrorStream()));
+
+        try {
+            proc.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void run(String[] commandWithArgs) throws IOException {
