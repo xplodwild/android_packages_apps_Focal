@@ -29,6 +29,7 @@ import android.widget.NumberPicker;
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.SettingsStorage;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import java.util.List;
  */
 public class SettingsWidget extends WidgetBase {
     private static final String DRAWABLE_KEY_EXPO_RING = "_Nemesis_ExposureRing=true";
+    private static final String KEY_SHOW_EXPOSURE_RING = "ShowExposureRing";
     private WidgetOptionButton mResolutionButton;
     private WidgetOptionButton mToggleExposureRing;
     private CameraActivity mContext;
@@ -59,69 +61,69 @@ public class SettingsWidget extends WidgetBase {
             } else {
                 mToggleExposureRing.resetImage();
             }
+
+            SettingsStorage.storeAppSetting(mContext, KEY_SHOW_EXPOSURE_RING,
+                    mContext.isExposureRingVisible() ? "1" : "0");
         }
     };
 
     private View.OnClickListener mResolutionClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            if (view == mResolutionButton) {
-                mInitialOrientation = -1;
+            mInitialOrientation = -1;
 
-                mNumberPicker = new NumberPicker(mContext);
-                String[] names = new String[mResolutionsName.size()];
-                mResolutionsName.toArray(names);
-                mNumberPicker.setDisplayedValues(names);
-                mNumberPicker.setValue(0);
-                mNumberPicker.setMinValue(0);
-                mNumberPicker.setMaxValue(names.length - 1);
-                mNumberPicker.setWrapSelectorWheel(false);
-                mNumberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-                mNumberPicker.setFormatter(new NumberPicker.Formatter() {
-                    @Override
-                    public String format(int i) {
-                        return mResolutionsName.get(i);
-                    }
-                });
+            Camera.Size actualSz = mCamManager.getParameters().getPictureSize();
+            mNumberPicker = new NumberPicker(mContext);
+            String[] names = new String[mResolutionsName.size()];
+            mResolutionsName.toArray(names);
+            mNumberPicker.setDisplayedValues(names);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setView(mNumberPicker);
-                builder.setTitle(null);
-                builder.setCancelable(false);
-                builder.setPositiveButton(mContext.getString(R.string.OK), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        mInitialOrientation = -1;
+            mNumberPicker.setMinValue(0);
+            mNumberPicker.setMaxValue(names.length - 1);
+            mNumberPicker.setWrapSelectorWheel(false);
+            mNumberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+            mNumberPicker.setFormatter(new NumberPicker.Formatter() {
+                @Override
+                public String format(int i) {
+                    return mResolutionsName.get(i);
+                }
+            });
 
-                        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
-                            // Set picture size
-                            mCamManager.setPictureSize(mResolutions.get(mNumberPicker.getValue()));
-                        } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-                            // Set video size
-                            String resolution = mVideoResolutions.get(mNumberPicker.getValue());
-                            if (resolution.equals("1920x1080")) {
-                                // TODO cameraId!!
-                                mContext.getSnapManager().setVideoProfile(
-                                        CamcorderProfile.get(CamcorderProfile.QUALITY_1080P));
-                            } else if (resolution.equals("1280x720")) {
-                                mContext.getSnapManager().setVideoProfile(
-                                        CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
-                            } else if (resolution.equals("720x480")) {
-                                mContext.getSnapManager().setVideoProfile(
-                                        CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
-                            } else if (resolution.equals("352x288")) {
-                                mContext.getSnapManager().setVideoProfile(
-                                        CamcorderProfile.get(CamcorderProfile.QUALITY_CIF));
-                            }
-                        }
-                    }
-                });
-
-                mPickerDialog = builder.create();
-                mPickerDialog.show();
-                ((ViewGroup)mNumberPicker.getParent().getParent().getParent())
-                        .animate().rotation(mOrientation).setDuration(300).start();
+            for (int i = 0; i < mResolutions.size(); i++) {
+                if (mResolutions.get(i).equals(actualSz)) {
+                    mNumberPicker.setValue(i);
+                    break;
+                }
             }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setView(mNumberPicker);
+            builder.setTitle(null);
+            builder.setCancelable(false);
+            builder.setPositiveButton(mContext.getString(R.string.OK), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    mInitialOrientation = -1;
+                    Camera.Size size = mResolutions.get(mNumberPicker.getValue());
+
+                    if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
+                        // Set picture size
+                        mCamManager.setPictureSize(size);
+                        SettingsStorage.storeCameraSetting(mContext, mCamManager.getCurrentFacing(),
+                                "picture-size", ""+size.width+"x"+size.height);
+                    } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+                        // Set video size
+                        applyVideoResolution(mVideoResolutions.get(mNumberPicker.getValue()));
+                        SettingsStorage.storeCameraSetting(mContext, mCamManager.getCurrentFacing(),
+                                "video-size", ""+size.width+"x"+size.height);
+                    }
+                }
+            });
+
+            mPickerDialog = builder.create();
+            mPickerDialog.show();
+            ((ViewGroup)mNumberPicker.getParent().getParent().getParent())
+                    .animate().rotation(mOrientation).setDuration(300).start();
         }
     };
 
@@ -146,6 +148,11 @@ public class SettingsWidget extends WidgetBase {
                 float megapixels = size.width * size.height / 1000000.0f;
                 mResolutionsName.add(df.format(megapixels) + "MP (" + size.width + "x" + size.height + ")");
             }
+
+            // Restore picture size if we have any
+            String resolution = SettingsStorage.getCameraSetting(context, mCamManager.getCurrentFacing(),
+                    "picture-size", ""+mResolutions.get(0).width+"x"+mResolutions.get(0).height);
+            mCamManager.setPictureSize(resolution);
         } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
             mResolutions = cam.getParameters().getSupportedVideoSizes();
 
@@ -170,15 +177,27 @@ public class SettingsWidget extends WidgetBase {
                 }
             }
 
+            // Restore video size if we have any
+            String resolution = SettingsStorage.getCameraSetting(context, mCamManager.getCurrentFacing(),
+                    "video-size", mVideoResolutions.get(0));
+            applyVideoResolution(resolution);
         }
+
 
         mResolutionButton = new WidgetOptionButton(R.drawable.ic_widget_placeholder, context);
         mResolutionButton.setOnClickListener(mResolutionClickListener);
         addViewToContainer(mResolutionButton);
 
-
         mToggleExposureRing = new WidgetOptionButton(R.drawable.ic_widget_placeholder, context);
         mToggleExposureRing.setOnClickListener(mExpoRingClickListener);
+
+        // Restore exposure ring state
+        if (SettingsStorage.getAppSetting(mContext, KEY_SHOW_EXPOSURE_RING, "1").equals("1")) {
+            mContext.setExposureRingVisible(true);
+        } else {
+            mContext.setExposureRingVisible(false);
+        }
+
         if (mContext.isExposureRingVisible()) {
             mToggleExposureRing.setActiveDrawable(DRAWABLE_KEY_EXPO_RING);
         }
@@ -208,6 +227,22 @@ public class SettingsWidget extends WidgetBase {
             ((ViewGroup) mNumberPicker.getParent().getParent().getParent().getParent())
                     .animate().rotation(orientation - mInitialOrientation).setDuration(300).start();
 
+        }
+    }
+
+    private void applyVideoResolution(String resolution) {
+        if (resolution.equals("1920x1080")) {
+            mContext.getSnapManager().setVideoProfile(
+                    CamcorderProfile.get(CamcorderProfile.QUALITY_1080P));
+        } else if (resolution.equals("1280x720")) {
+            mContext.getSnapManager().setVideoProfile(
+                    CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
+        } else if (resolution.equals("720x480")) {
+            mContext.getSnapManager().setVideoProfile(
+                    CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
+        } else if (resolution.equals("352x288")) {
+            mContext.getSnapManager().setVideoProfile(
+                    CamcorderProfile.get(CamcorderProfile.QUALITY_CIF));
         }
     }
 

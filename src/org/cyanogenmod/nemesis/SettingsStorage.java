@@ -20,7 +20,6 @@ package org.cyanogenmod.nemesis;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 
 /**
@@ -28,7 +27,20 @@ import android.util.Log;
  */
 public class SettingsStorage {
     private final static String PREFS_CAMERA = "nemesis-camera";
+    private final static String PREFS_APP = "nemesis-app";
     public final static String TAG = "SettingsStorage";
+
+    private static void store(Context context, String prefsName, String key, String value) {
+        SharedPreferences prefs = context.getSharedPreferences(prefsName, 0);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+    private static String retrieve(Context context, String prefsName, String key, String def) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_CAMERA, 0);
+        return prefs.getString(key, def);
+    }
 
     /**
      * Stores a setting of the camera parameters array
@@ -37,11 +49,7 @@ public class SettingsStorage {
      * @param value
      */
     public static void storeCameraSetting(Context context, int facing, String key, String value) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_CAMERA, 0);
-        SharedPreferences.Editor editor = prefs.edit();
-
-        editor.putString(Integer.toString(facing) + ":" + key, value);
-        editor.commit();
+        store(context, PREFS_CAMERA, Integer.toString(facing) + ":" + key, value);
     }
 
 
@@ -53,9 +61,29 @@ public class SettingsStorage {
      * @return
      */
     public static String getCameraSetting(Context context, int facing, String key, String def) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_CAMERA, 0);
-        String value = prefs.getString(Integer.toString(facing) + ":" + key, def);
-
-        return value;
+        return retrieve(context, PREFS_CAMERA, Integer.toString(facing) + ":" + key, def);
     }
+
+    /**
+     * Stores a setting of the camera parameters array
+     * @param context
+     * @param key
+     * @param value
+     */
+    public static void storeAppSetting(Context context, String key, String value) {
+        store(context, PREFS_APP, key, value);
+    }
+
+
+    /**
+     * Returns a setting of the app
+     * @param context
+     * @param key
+     * @param def Default if key doesn't exist
+     * @return
+     */
+    public static String getAppSetting(Context context, String key, String def) {
+        return retrieve(context, PREFS_APP, key, def);
+    }
+
 }

@@ -179,10 +179,6 @@ public class CameraManager {
                     mCurrentFacing = cameraId;
                     mParameters = mCamera.getParameters();
 
-                    // Default to the biggest preview size
-                    List<Camera.Size> sizes = mParameters.getSupportedPictureSizes();
-                    mParameters.setPictureSize(sizes.get(0).width, sizes.get(0).height);
-
                     String params = mCamera.getParameters().flatten();
                     final int step = params.length() > 256 ? 256 : params.length();
                     for (int i = 0; i < params.length(); i += step) {
@@ -397,6 +393,20 @@ public class CameraManager {
     public void setPictureSize(Camera.Size sz) {
         Camera.Parameters params = getParameters();
         params.setPictureSize(sz.width, sz.height);
+        mCamera.setParameters(params);
+    }
+
+    /**
+     * Defines a new size for the recorded picture
+     * @param sz The size string in format widthxheight
+     */
+    public void setPictureSize(String sz) {
+        String[] splat = sz.split("x");
+        int width = Integer.parseInt(splat[0]);
+        int height = Integer.parseInt(splat[1]);
+
+        Camera.Parameters params = getParameters();
+        params.setPictureSize(width, height);
         mCamera.setParameters(params);
     }
 

@@ -19,12 +19,13 @@
 package org.cyanogenmod.nemesis.ui;
 
 import android.content.Context;
+import android.hardware.Camera;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.HorizontalScrollView;
-import android.widget.ScrollView;
 
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraCapabilities;
@@ -76,7 +77,13 @@ public class SideBar extends HorizontalScrollView {
         }
 
         mCapabilities = new CameraCapabilities(activity);
-        mCapabilities.populateSidebar(activity.getCamManager().getParameters(), mToggleContainer, widgetsContainer);
+        Camera.Parameters params = activity.getCamManager().getParameters();
+
+        if (params != null) {
+            mCapabilities.populateSidebar(params, mToggleContainer, widgetsContainer);
+        } else {
+            Log.e(TAG, "Parameters were null when capabilities were checked");
+        }
     }
 
     /**
