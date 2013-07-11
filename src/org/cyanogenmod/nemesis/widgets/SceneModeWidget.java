@@ -28,7 +28,9 @@ public class SceneModeWidget extends SimpleToggleWidget {
 
     public SceneModeWidget(CameraManager cam, Context context) {
         super(cam, context, KEY_SCENEMODE, R.drawable.ic_widget_scenemode);
-        inflateFromXml(R.array.widget_scenemode_values, R.array.widget_scenemode_icons);
+        inflateFromXml(R.array.widget_scenemode_values, R.array.widget_scenemode_icons,
+                R.array.widget_scenemode_hints);
+        getToggleButton().setHintText(R.string.widget_scenemode);
         restoreValueFromStorage(KEY_SCENEMODE);
     }
 }

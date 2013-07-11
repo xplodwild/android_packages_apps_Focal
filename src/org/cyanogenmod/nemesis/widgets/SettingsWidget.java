@@ -132,6 +132,8 @@ public class SettingsWidget extends WidgetBase {
         mContext = context;
         CameraManager cam = context.getCamManager();
 
+        getToggleButton().setHintText(R.string.widget_settings);
+
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
             // Get the available photo size. Unlike AOSP app, we don't
             // store manually each resolution in an XML, but we calculate it directly

@@ -117,6 +117,8 @@ public class EnhancementsWidget extends WidgetBase {
         mValueLabel[ROW_CONTRAST].setText(restoreValueFromStorage(KEY_CONTRAST_PARAMETER));
         mValueLabel[ROW_SHARPNESS].setText(restoreValueFromStorage(KEY_SHARPNESS_PARAMETER));
         mValueLabel[ROW_SATURATION].setText(restoreValueFromStorage(KEY_SATURATION_PARAMETER));
+
+        getToggleButton().setHintText(R.string.widget_enhancements);
     }
 
     @Override

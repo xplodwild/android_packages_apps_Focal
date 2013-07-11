@@ -32,12 +32,14 @@ public class FlashWidget extends SimpleToggleWidget {
 
     public FlashWidget(CameraManager cam, Context context) {
         super(cam, context, KEY_FLASH_MODE, R.drawable.ic_widget_flash_on);
-        inflateFromXml(R.array.widget_flash_values, R.array.widget_flash_icons);
+        inflateFromXml(R.array.widget_flash_values, R.array.widget_flash_icons,
+                R.array.widget_flash_hints);
+        getToggleButton().setHintText(R.string.widget_flash);
         restoreValueFromStorage(KEY_FLASH_MODE);
     }
 
     /**
-     * When the flash is enable, try to enable red-eye reduction (qualcomm)
+     * When the flash is enabled, try to enable red-eye reduction (qualcomm)
      *
      * @param value The value set to the key
      */

@@ -70,6 +70,8 @@ public class TimerModeWidget extends WidgetBase implements View.OnClickListener 
 
         mTransformer = new TimerCapture(activity);
         mLabel.setText(Integer.toString(mTransformer.getTimer()));
+
+        getToggleButton().setHintText(R.string.widget_timermode);
     }
 
     @Override

@@ -280,6 +280,7 @@ public abstract class WidgetBase {
             if (event.getActionMasked() == MotionEvent.ACTION_UP && mCancelOpenOnDown) {
                 toggleBackground(false);
                 defaultResult = false;
+                return true;
             } else {
                 defaultResult = super.onTouchEvent(event);
             }

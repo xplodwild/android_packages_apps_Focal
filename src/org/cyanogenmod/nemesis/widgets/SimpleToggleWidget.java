@@ -93,8 +93,9 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
      *
      * @param value The value that the key of this widget can take
      * @param resId The icon that represents it
+     * @param hint  The hint text that appears when long-pressing the button
      */
-    public void addValue(String value, int resId) {
+    public void addValue(String value, int resId, String hint) {
         Camera.Parameters params = mCamManager.getParameters();
 
         String values = params.get(mKey + "-values");
@@ -104,6 +105,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
                 || Arrays.asList(values.split(",")).contains(value)) {
             WidgetBase.WidgetOptionButton button = new WidgetBase.WidgetOptionButton(resId, mContext);
             button.setOnClickListener(this);
+            button.setHintText(hint);
             mButtonsValues.put(button, value);
             addViewToContainer(button);
 
@@ -227,18 +229,20 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
     }
 
     /**
-     * Inflate the buttons and icons from the provided values and icons
+     * Inflate the buttons and icons from the provided values, icons and hints
      * arrays.
      *
      * @param valuesArray
      * @param iconsArray
+     * @param hintsArray
      */
-    public void inflateFromXml(int valuesArray, int iconsArray) {
+    public void inflateFromXml(int valuesArray, int iconsArray, int hintsArray) {
         String[] values = mContext.getResources().getStringArray(valuesArray);
+        String[] hints = mContext.getResources().getStringArray(hintsArray);
         TypedArray icons = mContext.getResources().obtainTypedArray(iconsArray);
 
         for (int i = 0; i < values.length; i++) {
-            addValue(values[i], icons.getResourceId(i, -1));
+            addValue(values[i], icons.getResourceId(i, -1), hints[i]);
         }
     }
 

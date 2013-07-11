@@ -59,6 +59,7 @@ public class CameraManager {
     private PreviewPauseListener mPreviewPauseListener;
     private CameraReadyListener mCameraReadyListener;
     private Handler mHandler;
+    private Context mContext;
     private long mLastPreviewFrameTime;
     private boolean mIsModeSwitching;
 
@@ -112,8 +113,7 @@ public class CameraManager {
                         + workingValue + "'", e);
 
                 // Reset the parameter back in storage
-                SettingsStorage.storeCameraSetting(mPreview.getContext(), mCurrentFacing,
-                        mKey, workingValue);
+                SettingsStorage.storeCameraSetting(mContext, mCurrentFacing, mKey, workingValue);
 
                 // Reset the camera as it likely crashed if we reached here
                 open(mCurrentFacing);
@@ -153,6 +153,7 @@ public class CameraManager {
         mCameraReady = true;
         mHandler = new Handler();
         mIsModeSwitching = false;
+        mContext = context;
     }
 
     /**
@@ -385,8 +386,7 @@ public class CameraManager {
 
         // Convert YUV420SP preview data to RGB
         if (data != null) {
-            return Util.decodeYUV420SP(mPreview.getContext(),
-                    data, previewWidth, previewHeight);
+            return Util.decodeYUV420SP(mContext, data, previewWidth, previewHeight);
         } else {
             return null;
         }
@@ -399,6 +399,10 @@ public class CameraManager {
      */
     public long getLastPreviewFrameTime() {
         return mLastPreviewFrameTime;
+    }
+
+    public Context getContext() {
+        return mContext;
     }
 
     /**

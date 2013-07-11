@@ -45,13 +45,21 @@
     </string-array>
 
 
-    <array name="widget_flash_icons">
+    <array name="widget_flash_icons" translatable="false">
         <item>@drawable/ic_widget_flash_auto</item>
         <item>@drawable/ic_widget_flash_off</item>
         <item>@drawable/ic_widget_flash_on</item>
         <item>@drawable/ic_widget_flash_on</item>
         <item>@drawable/ic_widget_flash_redeye</item>
     </array>
+
+    <string-array name="widget_flash_hints">
+        <item>Auto</item>
+        <item>Disabled</item>
+        <item>Enabled</item>
+        <item>Torch</item>
+        <item>Red-eye reduction</item>
+    </string-array>
 
 
     <!-- Effects widget values -->
@@ -70,7 +78,7 @@
         <item>neon</item>
     </string-array>
 
-    <array name="widget_effects_icons">
+    <array name="widget_effects_icons" translatable="false">
         <item>@drawable/ic_widget_effect_none</item>
         <item>@drawable/ic_widget_effect_mono</item>
         <item>@drawable/ic_widget_effect_negative</item>
@@ -85,6 +93,21 @@
         <item>@drawable/ic_widget_effect_neon</item>
     </array>
 
+    <string-array name="widget_effects_hints">
+        <item>Disabled</item>
+        <item>Black &amp; White</item>
+        <item>Negative</item>
+        <item>Solarize</item>
+        <item>Sepia</item>
+        <item>Posterize</item>
+        <item>Blackboard</item>
+        <item>Whiteboard</item>
+        <item>Aqua</item>
+        <item>Emboss</item>
+        <item>Sketch</item>
+        <item>Neon</item>
+    </string-array>
+
     <!-- ISO widget values -->
     <string-array name="widget_iso_values" translatable="false">
         <item>auto</item>
@@ -96,7 +119,7 @@
         <item>ISO1600</item>
     </string-array>
 
-    <array name="widget_iso_icons">
+    <array name="widget_iso_icons" translatable="false">
         <item>@drawable/ic_widget_iso_auto</item>
         <item>@drawable/ic_widget_iso_hjr</item>
         <item>@drawable/ic_widget_iso_100</item>
@@ -106,12 +129,23 @@
         <item>@drawable/ic_widget_iso_1600</item>
     </array>
 
+    <string-array name="widget_iso_hints">
+        <item>Automatic ISO</item>
+        <item>Hands-Jitter Reduction ISO</item>
+        <item>100 ISO</item>
+        <item>200 ISO</item>
+        <item>400 ISO</item>
+        <item>800 ISO</item>
+        <item>1600 ISO</item>
+    </string-array>
+
+
     <!-- Scene Mode widget values -->
     <string-array name="widget_scenemode_values" translatable="false">
         <item>auto</item>
         <item>anti-motion-blur</item>
         <item>AR</item>
-        <item>asd</item>
+        <item>Best Shot</item>
         <item>baby</item>
         <item>backlight</item>
         <item>backlight-portrait</item>
@@ -143,7 +177,7 @@
         <item>theatre</item>
     </string-array>
 
-    <array name="widget_scenemode_icons">
+    <array name="widget_scenemode_icons" translatable="false">
         <item>@drawable/ic_widget_scenemode_auto</item>
         <item>@drawable/ic_widget_scenemode_antimotionblur</item>
         <item>@drawable/ic_widget_placeholder</item>
@@ -179,6 +213,42 @@
         <item>@drawable/ic_widget_placeholder</item>
     </array>
 
+    <string-array name="widget_scenemode_hints">
+        <item>Automatic</item>
+        <item>Motion Blur Reduction</item>
+        <item>Augmented Reality</item>
+        <item>asd</item>
+        <item>Baby</item>
+        <item>Backlight</item>
+        <item>Portrait Backlight</item>
+        <item>Barcode</item>
+        <item>Beach</item>
+        <item>Candlelight</item>
+        <item>Dark</item>
+        <item>Dish</item>
+        <item>Document</item>
+        <item>Fireworks</item>
+        <item>Flowers</item>
+        <item>Handheld Twilight</item>
+        <item>HDR</item>
+        <item>High sensitivity</item>
+        <item>Landscape</item>
+        <item>Night</item>
+        <item>Night portrait</item>
+        <item>Night portrait</item>
+        <item>Party</item>
+        <item>Pet</item>
+        <item>Portrait</item>
+        <item>Snow</item>
+        <item>Soft skin</item>
+        <item>Sports</item>
+        <item>Spotlight</item>
+        <item>Steady photo</item>
+        <item>Sunset</item>
+        <item>Sweep stitch</item>
+        <item>Theatre</item>
+    </string-array>
+
     <!-- White balance widget values -->
     <string-array name="widget_whitebalance_values" translatable="false">
         <item>auto</item>
@@ -189,7 +259,7 @@
         <item>cloudy-daylight</item>
     </string-array>
 
-    <array name="widget_whitebalance_icons">
+    <array name="widget_whitebalance_icons" translatable="false">
         <item>@drawable/ic_widget_wb_auto</item>
         <item>@drawable/ic_widget_wb_cloudy</item>
         <item>@drawable/ic_widget_wb_incandescent</item>
@@ -197,4 +267,13 @@
         <item>@drawable/ic_widget_wb_daylight</item>
         <item>@drawable/ic_widget_wb_cloudy_daylight</item>
     </array>
+
+    <string-array name="widget_whitebalance_hints">
+        <item>Automatic</item>
+        <item>Cloudy</item>
+        <item>Incandescent</item>
+        <item>Fluorescent</item>
+        <item>Daylight</item>
+        <item>Cloudy Daylight</item>
+    </string-array>
 </resources>

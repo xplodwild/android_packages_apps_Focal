@@ -56,6 +56,8 @@ public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListene
         mPreviousMode.setActiveDrawable(DRAWABLE_TAG+"=off");
 
         mTransformer = new SoftwareHdrCapture(mContext);
+
+        getToggleButton().setHintText(R.string.widget_softwarehdr);
     }
 
     @Override

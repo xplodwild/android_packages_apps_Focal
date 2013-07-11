@@ -31,7 +31,8 @@ public class IsoWidget extends SimpleToggleWidget {
 
     public IsoWidget(CameraManager cam, Context context) {
         super(cam, context, KEY_ISO, R.drawable.ic_widget_iso);
-        inflateFromXml(R.array.widget_iso_values, R.array.widget_iso_icons);
+        inflateFromXml(R.array.widget_iso_values, R.array.widget_iso_icons, R.array.widget_iso_hints);
+        getToggleButton().setHintText(R.string.widget_iso);
         restoreValueFromStorage(KEY_ISO);
     }
 }

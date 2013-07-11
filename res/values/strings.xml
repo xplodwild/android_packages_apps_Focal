@@ -31,13 +31,31 @@
     <string name="no_gles20_support">Your device doesn\'t support GLES2</string>
     <string name="no_gyroscope">Your device doesn\'t have a gyroscope</string>
     <string name="ps_long_press_to_stop">Long-press the shutter button to finish your sphere.</string>
+    <string name="disabled">Disabled</string>
+    <string name="enabled">Enabled</string>
 
+    <!-- Widgets hints for non-arrayed widgets -->
     <string name="widget_burstmode">Burst mode</string>
     <string name="widget_burstmode_count_shots">Burst %d shots</string>
     <string name="widget_burstmode_off">Disable burst mode</string>
     <string name="widget_burstmode_infinite">Infinite burst</string>
 
+    <string name="widget_hdr_aebracket">Auto bracketing</string>
 
+    <string name="widget_effect">Color effects</string>
+    <string name="widget_enhancements">Color enhancements</string>
+    <string name="widget_exposure_compensation">Exposure compensation</string>
+    <string name="widget_flash">Flash mode</string>
+    <string name="widget_hdr">High Dynamic Range</string>
+    <string name="widget_iso">ISO Sensitivity</string>
+    <string name="widget_scenemode">Scene Mode</string>
+    <string name="widget_settings">Settings</string>
+    <string name="widget_skintone">Skin Tone Enhancement</string>
+    <string name="widget_softwarehdr">High Dynamic Range</string>
+    <string name="widget_timermode">Timer mode</string>
+    <string name="widget_videofr">Video Framerate</string>
+    <string name="widget_videohdr">High Dynamic Range</string>
+    <string name="widget_whitebalance">White balance</string>
 </resources>
 
 

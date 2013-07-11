@@ -72,6 +72,8 @@ public class SkinToneWidget extends WidgetBase {
 
         restoreValueFromStorage(KEY_PARAMETER);
         mValueLabel.setText(Integer.toString(getToneValue()));
+
+        getToggleButton().setHintText(R.string.widget_skintone);
     }
 
     @Override

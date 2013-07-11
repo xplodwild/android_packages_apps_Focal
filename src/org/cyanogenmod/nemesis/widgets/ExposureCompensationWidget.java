@@ -69,6 +69,8 @@ public class ExposureCompensationWidget extends WidgetBase {
         addViewToContainer(mPlusButton);
 
         mValueLabel.setText(restoreValueFromStorage(KEY_PARAMETER));
+
+        getToggleButton().setHintText(R.string.widget_exposure_compensation);
     }
 
     @Override

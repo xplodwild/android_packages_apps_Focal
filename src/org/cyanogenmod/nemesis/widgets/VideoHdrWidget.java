@@ -43,13 +43,15 @@ public class VideoHdrWidget extends SimpleToggleWidget {
         if (params.get(KEY_SONY_VIDEO_HDR) != null) {
             // Use Sony values
             setKey(KEY_SONY_VIDEO_HDR);
-            addValue("off", R.drawable.ic_widget_hdr_off);
-            addValue("on", R.drawable.ic_widget_hdr_on);
+            addValue("off", R.drawable.ic_widget_hdr_off, context.getString(R.string.disabled));
+            addValue("on", R.drawable.ic_widget_hdr_on, context.getString(R.string.enabled));
         } else if (params.get(KEY_QCOM_VIDEO_HDR) != null) {
             // Use Qcom values
             setKey(KEY_QCOM_VIDEO_HDR);
-            addValue("0", R.drawable.ic_widget_hdr_off);
-            addValue("1", R.drawable.ic_widget_hdr_on);
+            addValue("0", R.drawable.ic_widget_hdr_off, context.getString(R.string.disabled));
+            addValue("1", R.drawable.ic_widget_hdr_on, context.getString(R.string.enabled));
         }
+
+        getToggleButton().setHintText(R.string.widget_videohdr);
     }
 }

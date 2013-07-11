@@ -29,6 +29,7 @@ public class HdrWidget extends SimpleToggleWidget {
 
     public HdrWidget(CameraManager cam, Context context) {
         super(cam, context, "ae-bracket-hdr", R.drawable.ic_widget_hdr);
+        getToggleButton().setHintText(R.string.widget_hdr);
 
         // Reminder: AOSP's HDR mode is scene-mode, so we did put that in scene-mode
         // Here, it's for qualcomm's ae-bracket-hdr param. We filter out scene-mode hdr
@@ -37,9 +38,10 @@ public class HdrWidget extends SimpleToggleWidget {
         Camera.Parameters params = cam.getParameters();
 
         if (!params.getSupportedSceneModes().contains("hdr")) {
-            addValue("Off", R.drawable.ic_widget_hdr_off);
-            addValue("HDR", R.drawable.ic_widget_hdr_on);
-            addValue("AE-Bracket", R.drawable.ic_widget_hdr_aebracket);
+            addValue("Off", R.drawable.ic_widget_hdr_off, context.getString(R.string.disabled));
+            addValue("HDR", R.drawable.ic_widget_hdr_on, context.getString(R.string.enabled));
+            addValue("AE-Bracket", R.drawable.ic_widget_hdr_aebracket,
+                    context.getString(R.string.widget_hdr_aebracket));
 
             restoreValueFromStorage(KEY_PARAMETER);
         }
