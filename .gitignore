@@ -10,7 +10,6 @@ bin/
 /.idea
 /out
 /Nemesis.iml
-/jni
 /libs
 /obj
 /res\drawable-xxhdpi/Thumbs.db
