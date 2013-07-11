@@ -379,8 +379,11 @@ public class SnapshotManager {
         info.mExposureCompensation = exposureCompensation;
         info.mThumbnail = mCameraManager.getLastPreviewFrame();
         info.mBypassProcessing = mBypassProcessing;
-        if (mCameraManager.getParameters().getExposureCompensation() != exposureCompensation) {
-            mCameraManager.getParameters().setExposureCompensation(exposureCompensation);
+
+        Camera.Parameters params = mCameraManager.getParameters();
+        if (params.getExposureCompensation() != exposureCompensation) {
+            params.setExposureCompensation(exposureCompensation);
+            mCameraManager.setParametersAsync(params);
             mWaitExposureSettle = true;
         }
         mSnapshotsQueue.add(info);

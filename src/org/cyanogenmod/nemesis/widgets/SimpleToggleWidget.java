@@ -207,8 +207,8 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
         String value = mButtonsValues.get(button);
 
         if (value != null) {
-            mCamManager.setParameterAsync(mKey, value);
             SettingsStorage.storeCameraSetting(mContext, mCamManager.getCurrentFacing(), mKey, value);
+            mCamManager.setParameterAsync(mKey, value);
             setButtonActivated(button, value);
         } else {
             Log.e(TAG, "Unknown value for this button!");

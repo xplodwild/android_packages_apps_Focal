@@ -63,6 +63,8 @@ public class SavePinger extends View {
 
     private void initialize() {
         mPaint = new Paint();
+        setLayerType(LAYER_TYPE_SOFTWARE, mPaint);
+        mPaint.setShadowLayer(2.0f, 0.0f, 0.0f, 0xFF444444);
 
         // start hidden
         mFadeProgress = 0.0f;
@@ -136,7 +138,8 @@ public class SavePinger extends View {
             if (circleValue > 1) circleValue = 1;
 
             mPaint.setARGB((int) ((255.0f - 255.0f * circleValue) * mFadeProgress * 0.5f),
-                    255, 255, 255);
+                    224, 224, 224);
+
             canvas.drawCircle(getWidth() / 2, getHeight() / 2, ringProgress, mPaint);
 
             if (circleValue == 1) {

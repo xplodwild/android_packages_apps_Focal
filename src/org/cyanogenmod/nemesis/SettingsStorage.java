@@ -38,7 +38,7 @@ public class SettingsStorage {
     }
 
     private static String retrieve(Context context, String prefsName, String key, String def) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_CAMERA, 0);
+        SharedPreferences prefs = context.getSharedPreferences(prefsName, 0);
         return prefs.getString(key, def);
     }
 

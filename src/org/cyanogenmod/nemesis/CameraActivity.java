@@ -313,12 +313,16 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     // Close all widgets
                     mWidgetRenderer.closeAllWidgets();
 
-                    // Update sidebar
-                    mSideBar.checkCapabilities(CameraActivity.this, (ViewGroup) findViewById(R.id.widgets_container));
 
                     // Update focus/exposure ring support
                     mFocusHudRing.setVisibility(mCamManager.isFocusAreaSupported() ? View.VISIBLE : View.GONE);
                     mExposureHudRing.setVisibility(mCamManager.isExposureAreaSupported() ? View.VISIBLE : View.GONE);
+
+                    // Update sidebar
+                    mSideBar.checkCapabilities(CameraActivity.this, (ViewGroup) findViewById(R.id.widgets_container));
+
+                    // Set orientation
+                    updateInterfaceOrientation();
                 }
             }
         });
@@ -883,12 +887,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             else if (orientationCompensation == 270)
                 orientationCompensation -= 180;
 
-            if (mOrientationCompensation != orientationCompensation) {
-                // Avoid turning all around
-                float angleDelta = orientationCompensation - mOrientationCompensation;
-                if (angleDelta >= 270)
-                    orientationCompensation -= 360;
+            // Avoid turning all around
+            float angleDelta = orientationCompensation - mOrientationCompensation;
+            if (angleDelta >= 270)
+                orientationCompensation -= 360;
 
+            if (mOrientationCompensation != orientationCompensation) {
                 mOrientationCompensation = orientationCompensation;
                 updateInterfaceOrientation();
             }

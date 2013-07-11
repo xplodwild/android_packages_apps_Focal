@@ -102,12 +102,18 @@ public class CameraManager {
         public void run() {
             Log.v(TAG, "Asynchronously setting parameter " + mKey + " to " + mValue);
             Camera.Parameters params = getParameters();
+            String workingValue = params.get(mKey);
             params.set(mKey, mValue);
 
             try {
                 mCamera.setParameters(params);
             } catch (RuntimeException e) {
-                Log.e(TAG, "Could not set parameter " + mKey + " to '" + mValue + "'", e);
+                Log.e(TAG, "Could not set parameter " + mKey + " to '" + mValue + "', restoring '"
+                        + workingValue + "'", e);
+
+                // Reset the parameter back in storage
+                SettingsStorage.storeCameraSetting(mPreview.getContext(), mCurrentFacing,
+                        mKey, workingValue);
 
                 // Reset the camera as it likely crashed if we reached here
                 open(mCurrentFacing);
@@ -196,11 +202,8 @@ public class CameraManager {
 
                     // Default focus mode to continuous
                 } catch (Exception e) {
-                    Log.e(TAG, "Error while opening cameras: " + e.getMessage());
-                    StackTraceElement[] st = e.getStackTrace();
-                    for (StackTraceElement elemt : st) {
-                        Log.e(TAG, elemt.toString());
-                    }
+                    Log.e(TAG, "Error while opening cameras: " + e.getMessage(), e);
+
                     if (mCameraReadyListener != null) {
                         mCameraReadyListener.onCameraFailed();
                     }
@@ -421,7 +424,7 @@ public class CameraManager {
 
         Camera.Parameters params = getParameters();
         params.setPictureSize(width, height);
-        mCamera.setParameters(params);
+        setParametersAsync(params);
     }
 
     /**
@@ -507,10 +510,13 @@ public class CameraManager {
     }
 
     public void setCameraMode(final int mode) {
-        Log.e(TAG, "SET CAMERA MODE");
         if (mPreviewPauseListener != null) {
             mPreviewPauseListener.onPreviewPause();
         }
+
+        // Unlock any exposure/stab lock that was caused by
+        // swiping the ring
+        setLockSetup(false);
 
         new Thread() {
             public void run() {
@@ -525,7 +531,6 @@ public class CameraManager {
                 Camera.Parameters params = getParameters();
 
                 if (mode == CameraActivity.CAMERA_MODE_VIDEO) {
-                    Log.e(TAG, "Switching to recording hint");
                     params.setRecordingHint(true);
                 } else {
                     params.setRecordingHint(false);
