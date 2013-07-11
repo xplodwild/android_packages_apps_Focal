@@ -1081,7 +1081,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             }
 
             mHasPinchZoomed = true;
-            mCamManager.setParametersAsync(params);
+            mCamManager.setParameters(params);
 
             return true;
         }

@@ -382,8 +382,7 @@ public class SnapshotManager {
 
         Camera.Parameters params = mCameraManager.getParameters();
         if (params.getExposureCompensation() != exposureCompensation) {
-            params.setExposureCompensation(exposureCompensation);
-            mCameraManager.setParametersAsync(params);
+            mCameraManager.setParameterAsync("exposure-compensation", Integer.toString(exposureCompensation));
             mWaitExposureSettle = true;
         }
         mSnapshotsQueue.add(info);

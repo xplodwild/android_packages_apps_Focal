@@ -30,10 +30,10 @@
     <dimen name="widget_toggle_button_padding">8dp</dimen>
 
     <!-- Default font size of the WidgetOptionLabel -->
-    <dimen name="widget_option_label_font_size">10dp</dimen>
+    <dimen name="widget_option_label_font_size">10sp</dimen>
 
     <!-- Small font size of the WidgetOptionLabel -->
-    <dimen name="widget_option_label_font_size_small">10dp</dimen>
+    <dimen name="widget_option_label_font_size_small">9sp</dimen>
 
     <!-- Padding between each open widget -->
     <dimen name="widget_spacing">8dp</dimen>

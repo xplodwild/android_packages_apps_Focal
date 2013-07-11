@@ -32,9 +32,13 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 /**
  * This class is responsible for interacting with the Camera HAL.
@@ -62,6 +66,8 @@ public class CameraManager {
     private Context mContext;
     private long mLastPreviewFrameTime;
     private boolean mIsModeSwitching;
+    private List<NameValuePair> mPendingParameters;
+    private Lock mParametersLock;
 
     public interface PreviewPauseListener {
         /**
@@ -91,40 +97,52 @@ public class CameraManager {
         public void onCameraFailed();
     }
 
-    private class AsyncParamRunnable implements Runnable {
-        private String mKey;
-        private String mValue;
-
-        public AsyncParamRunnable(String key, String value) {
-            mKey = key;
-            mValue = value;
-        }
-
+    Thread mParametersThread = new Thread() {
         public void run() {
-            Log.v(TAG, "Asynchronously setting parameter " + mKey + " to " + mValue);
-            Camera.Parameters params = getParameters();
-            String workingValue = params.get(mKey);
-            params.set(mKey, mValue);
+            while (true) {
+                synchronized (this) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        break;
+                    }
 
-            try {
-                mCamera.setParameters(params);
-            } catch (RuntimeException e) {
-                Log.e(TAG, "Could not set parameter " + mKey + " to '" + mValue + "', restoring '"
-                        + workingValue + "'", e);
+                    mParametersLock.lock();
+                    List<NameValuePair> copy = new ArrayList<NameValuePair>(mPendingParameters);
+                    mPendingParameters.clear();
+                    mParametersLock.unlock();
 
-                // Reset the parameter back in storage
-                SettingsStorage.storeCameraSetting(mContext, mCurrentFacing, mKey, workingValue);
+                    for (NameValuePair pair : copy) {
+                        String key = pair.getName();
+                        String val = pair.getValue();
+                        Log.v(TAG, "Asynchronously setting parameter " + key+ " to " + val);
+                        Camera.Parameters params = getParameters();
+                        String workingValue = params.get(key);
+                        params.set(key, val);
 
-                // Reset the camera as it likely crashed if we reached here
-                open(mCurrentFacing);
+                        try {
+                            mCamera.setParameters(params);
+                        } catch (RuntimeException e) {
+                            Log.e(TAG, "Could not set parameter " + key + " to '" + val + "', restoring '"
+                                    + workingValue + "'", e);
+
+                            // Reset the parameter back in storage
+                            SettingsStorage.storeCameraSetting(mContext, mCurrentFacing, key, workingValue);
+
+                            // Reset the camera as it likely crashed if we reached here
+                            open(mCurrentFacing);
+                        }
+                    }
+
+                    // Read them from sensor
+                    mParameters = null;// getParameters();
+                }
             }
-            // Read them from sensor next time
-            mParameters = null;
         }
     }
 
     ;
-
+/*
     private class AsyncParamClassRunnable implements Runnable {
         private Camera.Parameters mParameters;
 
@@ -145,7 +163,7 @@ public class CameraManager {
             mParameters = null;
         }
     }
-
+*/
 
     public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
@@ -154,6 +172,7 @@ public class CameraManager {
         mHandler = new Handler();
         mIsModeSwitching = false;
         mContext = context;
+        mPendingParameters = new ArrayList<NameValuePair>();
     }
 
     /**
@@ -259,15 +278,19 @@ public class CameraManager {
      * @return Camera.Parameters
      */
     public Camera.Parameters getParameters() {
-        if (mCamera == null)
+        if (mCamera == null) {
+            Log.w(TAG, "getParameters when camera is null");
             return null;
+        }
 
-        if (mParameters == null) {
-            try {
-                mParameters = mCamera.getParameters();
-            } catch (RuntimeException e) {
-                Log.e(TAG, "Error while getting parameters: ", e);
-                return null;
+        synchronized (mParametersThread) {
+            if (mParameters == null) {
+                try {
+                    mParameters = mCamera.getParameters();
+                } catch (RuntimeException e) {
+                    Log.e(TAG, "Error while getting parameters: ", e);
+                    return null;
+                }
             }
         }
 
@@ -276,10 +299,12 @@ public class CameraManager {
 
     public void pause() {
         releaseCamera();
+        //mParametersThread.interrupt();
     }
 
     public void resume() {
         reconnectToCamera();
+        //mParametersThread.start();
     }
 
     private void releaseCamera() {
@@ -323,13 +348,20 @@ public class CameraManager {
     }
 
     public void setParameterAsync(String key, String value) {
-        AsyncParamRunnable run = new AsyncParamRunnable(key, value);
-        new Thread(run).start();
+        synchronized (mParametersThread) {
+            mPendingParameters.add(new BasicNameValuePair(key, value));
+            mParametersThread.notifyAll();
+        }
     }
 
-    public void setParametersAsync(Camera.Parameters params) {
-        AsyncParamClassRunnable run = new AsyncParamClassRunnable(params);
-        new Thread(run).start();
+    /**
+     * Sets a parameters class in a synchronous way. Use with caution, prefer setParameterAsync.
+     * @param params
+     */
+    public void setParameters(Camera.Parameters params) {
+        synchronized (mParametersThread) {
+            mCamera.setParameters(params);
+        }
     }
 
     /**
@@ -426,9 +458,7 @@ public class CameraManager {
         int width = Integer.parseInt(splat[0]);
         int height = Integer.parseInt(splat[1]);
 
-        Camera.Parameters params = getParameters();
-        params.setPictureSize(width, height);
-        setParametersAsync(params);
+        setParameterAsync("picture-size", Integer.toString(width)+"x"+Integer.toString(height));
     }
 
     /**
@@ -541,15 +571,18 @@ public class CameraManager {
                 }
 
                 mIsModeSwitching = true;
-                mCamera.stopPreview();
-                params.setPreviewSize(mTargetSize.x, mTargetSize.y);
-                mCamera.setParameters(params);
-                try {
-                    mCamera.startPreview();
-                    mPreview.notifyPreviewSize(mTargetSize.x, mTargetSize.y);
-                } catch (RuntimeException e) {
-                    Log.e(TAG, "Unable to start preview", e);
+                synchronized (mParametersThread) {
+                    mCamera.stopPreview();
+                    params.setPreviewSize(mTargetSize.x, mTargetSize.y);
+                    mCamera.setParameters(params);
+                    try {
+                        mCamera.startPreview();
+                        mPreview.notifyPreviewSize(mTargetSize.x, mTargetSize.y);
+                    } catch (RuntimeException e) {
+                        Log.e(TAG, "Unable to start preview", e);
+                    }
                 }
+
                 mPreview.postCallbackBuffer();
                 mIsModeSwitching = false;
 
