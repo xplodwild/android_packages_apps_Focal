@@ -46,6 +46,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
+import org.cyanogenmod.nemesis.pano.MosaicProxy;
 import org.cyanogenmod.nemesis.picsphere.PicSphereCaptureTransformer;
 import org.cyanogenmod.nemesis.picsphere.PicSphereManager;
 import org.cyanogenmod.nemesis.ui.CircleTimerView;
@@ -76,6 +77,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private MainSnapshotListener mSnapshotListener;
     private FocusManager mFocusManager;
     private PicSphereManager mPicSphereManager;
+    private MosaicProxy mMosaicProxy;
     private CameraOrientationEventListener mOrientationListener;
     private GestureDetector mGestureDetector;
     private CaptureTransformer mCaptureTransformer;
@@ -260,7 +262,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         } else if (newMode == CAMERA_MODE_PICSPHERE) {
             initializePicSphere();
         } else if (newMode == CAMERA_MODE_PANO) {
-
+            initializePanorama();
         }
 
         updateCapabilities();
@@ -491,7 +493,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mPicSphere3DView = new GLSurfaceView(this);
         mPicSphere3DView.setEGLContextClientVersion(2);
         mPicSphere3DView.setRenderer(mPicSphereManager.getRenderer());
-        ViewGroup picsphereContainer = ((ViewGroup) findViewById(R.id.picsphere_renderer_container));
+        ViewGroup picsphereContainer = ((ViewGroup) findViewById(R.id.gl_renderer_container));
         picsphereContainer.addView(mPicSphere3DView);
         picsphereContainer.setVisibility(View.VISIBLE);
 
@@ -504,7 +506,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     }
 
     public void resetPicSphere() {
-        ViewGroup picsphereContainer = ((ViewGroup) findViewById(R.id.picsphere_renderer_container));
+        ViewGroup picsphereContainer = ((ViewGroup) findViewById(R.id.gl_renderer_container));
         picsphereContainer.removeView(mPicSphere3DView);
         picsphereContainer.setVisibility(View.GONE);
 
@@ -515,6 +517,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         camContainer.setLayoutParams(root);
 
         mPicSphere3DView = null;
+    }
+
+    public void initializePanorama() {
+        mMosaicProxy = new MosaicProxy(this);
     }
 
     /**
@@ -610,6 +616,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     setCameraMode(CAMERA_MODE_PHOTO);
                     break;
 
+                case SwitchRingPad.BUTTON_PANO:
+                    setCameraMode(CAMERA_MODE_PANO);
+                    break;
+
                 case SwitchRingPad.BUTTON_VIDEO:
                     setCameraMode(CAMERA_MODE_VIDEO);
                     break;
@@ -626,6 +636,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     }
                     updateCapabilities();
                     break;
+
             }
         }
     }

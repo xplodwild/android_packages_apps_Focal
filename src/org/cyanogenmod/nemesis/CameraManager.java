@@ -38,7 +38,6 @@ import org.apache.http.message.BasicNameValuePair;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 
 /**
  * This class is responsible for interacting with the Camera HAL.
@@ -456,7 +455,7 @@ public class CameraManager {
         int width = Integer.parseInt(splat[0]);
         int height = Integer.parseInt(splat[1]);
 
-        setParameterAsync("picture-size", Integer.toString(width)+"x"+Integer.toString(height));
+        setParameterAsync("picture-size", Integer.toString(width) + "x" + Integer.toString(height));
     }
 
     /**
@@ -571,7 +570,15 @@ public class CameraManager {
                 mIsModeSwitching = true;
                 synchronized (mParametersThread) {
                     mCamera.stopPreview();
-                    params.setPreviewSize(mTargetSize.x, mTargetSize.y);
+
+                    if (mode == CameraActivity.CAMERA_MODE_PANO) {
+                        // Apply special settings for panorama mode
+                        initializePanoramaMode();
+                    } else {
+                        // Apply default values
+                        params.setPreviewSize(mTargetSize.x, mTargetSize.y);
+                    }
+
                     mCamera.setParameters(params);
                     try {
                         mCamera.startPreview();
@@ -589,6 +596,45 @@ public class CameraManager {
                 }
             }
         }.start();
+    }
+
+    /**
+     * Initializes the Panorama (mosaic) mode
+     */
+    private void initializePanoramaMode() {
+        Camera.Parameters parameters = getParameters();
+
+        List<Camera.Size> supportedSizes = parameters.getSupportedPreviewSizes();
+        Point previewSize = Util.findBestPanoPreviewSize(supportedSizes, true, true);
+        if (previewSize == null) {
+            Log.w(TAG, "No 4:3 ratio preview size supported.");
+            previewSize = Util.findBestPanoPreviewSize(supportedSizes, false, true);
+            if (previewSize == null) {
+                Log.w(TAG, "Can't find a supported preview size smaller than 960x720.");
+                previewSize = Util.findBestPanoPreviewSize(supportedSizes, false, false);
+            }
+        }
+
+        Log.v(TAG, "preview h = " + previewSize.y + " , w = " + previewSize.x);
+        parameters.setPreviewSize(previewSize.x, previewSize.y);
+
+        List<int[]> frameRates = parameters.getSupportedPreviewFpsRange();
+        int last = frameRates.size() - 1;
+        int minFps = (frameRates.get(last))[Camera.Parameters.PREVIEW_FPS_MIN_INDEX];
+        int maxFps = (frameRates.get(last))[Camera.Parameters.PREVIEW_FPS_MAX_INDEX];
+        parameters.setPreviewFpsRange(minFps, maxFps);
+        Log.v(TAG, "preview fps: " + minFps + ", " + maxFps);
+
+        List<String> supportedFocusModes = parameters.getSupportedFocusModes();
+        if (supportedFocusModes.indexOf(Camera.Parameters.FOCUS_MODE_INFINITY) >= 0) {
+            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_INFINITY);
+        } else {
+            // Use the default focus mode and log a message
+            Log.w(TAG, "Cannot set the focus mode to " + Camera.Parameters.FOCUS_MODE_INFINITY +
+                    " because the mode is not supported.");
+        }
+
+        parameters.set("recording-hint", "false");
     }
 
     /**

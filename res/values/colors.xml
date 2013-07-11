@@ -22,4 +22,8 @@
     <color name="widget_option_active">#FF33B5E5</color>
     <color name="clock_red">#FF4444</color>
     <color name="clock_white">#FFFFFF</color>
+    <color name="pano_progress_empty">#FF2E2E2E</color>
+    <color name="pano_progress_done">#FF33525E</color>
+    <color name="pano_progress_indication">#FF0099CC</color>
+    <color name="pano_progress_indication_fast">#FFFF2222</color>
 </resources>

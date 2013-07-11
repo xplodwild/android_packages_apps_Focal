@@ -44,6 +44,8 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
+import org.cyanogenmod.nemesis.pano.MosaicProxy;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -128,7 +130,14 @@ public class Util {
         return mScreenSize;
     }
 
-
+    /**
+     * Returns the optimal preview size for photo shots
+     *
+     * @param currentActivity
+     * @param sizes
+     * @param targetRatio
+     * @return
+     */
     public static Size getOptimalPreviewSize(Activity currentActivity,
                                              List<Size> sizes, double targetRatio) {
         // Use a very small tolerance because we want an exact match.
@@ -169,6 +178,13 @@ public class Util {
         return optimalSize;
     }
 
+    /**
+     * Fade in a view from startAlpha to endAlpha during duration milliseconds
+     * @param view
+     * @param startAlpha
+     * @param endAlpha
+     * @param duration
+     */
     public static void fadeIn(View view, float startAlpha, float endAlpha, long duration) {
         if (view.getVisibility() == View.VISIBLE) return;
 
@@ -178,6 +194,10 @@ public class Util {
         view.startAnimation(animation);
     }
 
+    /**
+     * Fade in a view with the default time
+     * @param view
+     */
     public static void fadeIn(View view) {
         fadeIn(view, 0F, 1F, 400);
 
@@ -197,6 +217,16 @@ public class Util {
         view.setVisibility(View.GONE);
     }
 
+    /**
+     * Converts the provided byte array from YUV420SP into an RGBA bitmap.
+     * @param context
+     * @param yuv420sp The YUV420SP data
+     * @param width Width of the data's picture
+     * @param height Height of the data's picture
+     * @return A decoded bitmap
+     * @throws NullPointerException
+     * @throws IllegalArgumentException
+     */
     public static Bitmap decodeYUV420SP(Context context, byte[] yuv420sp, int width, int height)
             throws NullPointerException, IllegalArgumentException {
 
@@ -270,22 +300,46 @@ public class Util {
         return "VID_" + mJpegDateFormat.format(new Date(dateTaken));
     }
 
+    /**
+     * Broadcast an intent to notify of a new picture in the Gallery
+     * @param context
+     * @param uri
+     */
     public static void broadcastNewPicture(Context context, Uri uri) {
         context.sendBroadcast(new Intent(ACTION_NEW_PICTURE, uri));
         // Keep compatibility
         context.sendBroadcast(new Intent("com.android.camera.NEW_PICTURE", uri));
     }
 
-    public static float dpToPx(Context context, float dp) {
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        return (int) ((dp * displayMetrics.density) + 0.5);
-    }
 
+    /**
+     * Removes an image from the gallery
+     * @param cr
+     * @param id
+     */
     public static void removeFromGallery(ContentResolver cr, long id) {
         cr.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 BaseColumns._ID + "=" + Long.toString(id), null);
     }
 
+
+    /**
+     * Converts the specified DP to PIXELS according to current screen density
+     * @param context
+     * @param dp
+     * @return
+     */
+    public static float dpToPx(Context context, float dp) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        return (int) ((dp * displayMetrics.density) + 0.5);
+    }
+
+    /**
+     * Returns the physical path (on emmc/sd) of the provided URI from MediaGallery
+     * @param context
+     * @param contentURI
+     * @return
+     */
     public static String getRealPathFromURI(Context context, Uri contentURI) {
         Cursor cursor = context.getContentResolver().query(contentURI, null, null, null, null);
         if (cursor == null) { // Source is Dropbox or other similar local file path
@@ -297,6 +351,11 @@ public class Util {
         }
     }
 
+    /**
+     * Returns the upper power-of-two
+     * @param v
+     * @return
+     */
     public static int getUpperPoT(int v) {
         v--;
         v |= v >> 1;
@@ -306,5 +365,37 @@ public class Util {
         v |= v >> 16;
         v++;
         return v;
+    }
+
+    /**
+     * Returns the best Panorama preview size
+     * @param supportedSizes
+     * @param need4To3
+     * @param needSmaller
+     * @return
+     */
+    public static Point findBestPanoPreviewSize(List<Size> supportedSizes, boolean need4To3,
+                                        boolean needSmaller) {
+        Point output = null;
+        int pixelsDiff = MosaicProxy.DEFAULT_CAPTURE_PIXELS;
+
+        for (Size size : supportedSizes) {
+            int h = size.height;
+            int w = size.width;
+            // we only want 4:3 format.
+            int d = MosaicProxy.DEFAULT_CAPTURE_PIXELS - h * w;
+            if (needSmaller && d < 0) { // no bigger preview than 960x720.
+                continue;
+            }
+            if (need4To3 && (h * 4 != w * 3)) {
+                continue;
+            }
+            d = Math.abs(d);
+            if (d < pixelsDiff) {
+                output = new Point(w, h);
+                pixelsDiff = d;
+            }
+        }
+        return output;
     }
 }
