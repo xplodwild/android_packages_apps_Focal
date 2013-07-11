@@ -47,6 +47,7 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
             mPicSphere = mPicSphereManager.createPicSphere();
         }
 
+        mSnapManager.setBypassProcessing(true);
         mSnapManager.queueSnapshot(true, 0);
     }
 
