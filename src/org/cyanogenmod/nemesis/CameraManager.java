@@ -67,7 +67,6 @@ public class CameraManager {
     private long mLastPreviewFrameTime;
     private boolean mIsModeSwitching;
     private List<NameValuePair> mPendingParameters;
-    private Lock mParametersLock;
 
     public interface PreviewPauseListener {
         /**
@@ -104,13 +103,11 @@ public class CameraManager {
                     try {
                         wait();
                     } catch (InterruptedException e) {
-                        break;
+                        // do nothing
                     }
 
-                    mParametersLock.lock();
                     List<NameValuePair> copy = new ArrayList<NameValuePair>(mPendingParameters);
                     mPendingParameters.clear();
-                    mParametersLock.unlock();
 
                     for (NameValuePair pair : copy) {
                         String key = pair.getName();
@@ -173,6 +170,7 @@ public class CameraManager {
         mIsModeSwitching = false;
         mContext = context;
         mPendingParameters = new ArrayList<NameValuePair>();
+        mParametersThread.start();
     }
 
     /**
