@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.AutoFocusMoveCallback;
@@ -34,6 +35,7 @@ import android.view.SurfaceView;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.cyanogenmod.nemesis.pano.MosaicSurfaceTexture;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -635,6 +637,9 @@ public class CameraManager {
         }
 
         parameters.set("recording-hint", "false");
+
+        // Render to a surfacetexture
+        mPreview.setRenderToTexture(new MosaicSurfaceTexture(424242));
     }
 
     /**
@@ -793,6 +798,7 @@ public class CameraManager {
         private final static String TAG = "CameraManager.CameraPreview";
 
         private SurfaceHolder mHolder;
+        private SurfaceTexture mTexture;
         private byte[] mLastFrameBytes;
 
         public CameraPreview(Context context) {
@@ -802,6 +808,22 @@ public class CameraManager {
             // underlying surface is created and destroyed.
             mHolder = getHolder();
             mHolder.addCallback(this);
+        }
+
+        /**
+         * Sets that the camera preview should rather render to a texture than the default
+         * SurfaceHolder.
+         * Note that you have to restart camera preview manually after setting this.
+         * Set to null to reset render to the SurfaceHolder.
+         *
+         * @param texture
+         */
+        public void setRenderToTexture(SurfaceTexture texture) {
+            mTexture = texture;
+        }
+
+        public SurfaceTexture getSurfaceTexture() {
+            return mTexture;
         }
 
         public void notifyPreviewSize(int width, int height) {
@@ -821,7 +843,11 @@ public class CameraManager {
                 setupCamera();
 
                 try {
-                    mCamera.setPreviewDisplay(mHolder);
+                    if (mTexture != null) {
+                        mCamera.setPreviewTexture(mTexture);
+                    } else {
+                        mCamera.setPreviewDisplay(mHolder);
+                    }
                     mCamera.startPreview();
                     mPreview.postCallbackBuffer();
                 } catch (IOException e) {

@@ -261,12 +261,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mNotifier.notify(getString(R.string.double_tap_to_snapshot), 2500);
         } else if (newMode == CAMERA_MODE_PICSPHERE) {
             initializePicSphere();
-        } else if (newMode == CAMERA_MODE_PANO) {
-            initializePanorama();
         }
 
         updateCapabilities();
         mCamManager.setCameraMode(mCameraMode);
+
+        if (newMode == CAMERA_MODE_PANO) {
+            initializePanorama();
+        }
     }
 
     /**
@@ -520,6 +522,16 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     }
 
     public void initializePanorama() {
+        if (mCamManager.getPreviewSurface().getSurfaceTexture() == null) {
+            // We cannot initialize our Mosaic Proxy while the camera is not ready, so we delay it
+            mHandler.post(new Runnable() {
+                public void run() {
+                    initializePanorama();
+                }
+            });
+            return;
+        }
+
         mMosaicProxy = new MosaicProxy(this);
     }
 

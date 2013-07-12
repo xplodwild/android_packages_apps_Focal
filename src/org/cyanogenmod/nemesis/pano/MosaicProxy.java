@@ -18,12 +18,16 @@
 
 package org.cyanogenmod.nemesis.pano;
 
+import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.Message;
+import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -70,16 +74,18 @@ public class MosaicProxy extends CaptureTransformer
 
     private int mCaptureState;
     private ViewGroup mGLRootView;
-    private GLSurfaceView mGLSurfaceView;
+    private TextureView mGLSurfaceView;
     private CameraActivity mActivity;
     private Handler mMainHandler;
+    private SurfaceTexture mCameraTexture;
+    private MosaicSurfaceTexture mMosaicTexture;
 
     public MosaicProxy(CameraActivity activity) {
         super(activity.getCamManager(), activity.getSnapManager());
         mActivity = activity;
 
         mGLRootView = (ViewGroup) mActivity.findViewById(R.id.gl_renderer_container);
-        mGLSurfaceView = new GLSurfaceView(mActivity);
+        mGLSurfaceView = new TextureView(mActivity);
         mGLRootView.addView(mGLSurfaceView);
 
         mMosaicFrameProcessor = MosaicFrameProcessor.getInstance();
@@ -154,6 +160,18 @@ public class MosaicProxy extends CaptureTransformer
         Camera.Parameters params = mActivity.getCamManager().getParameters();
         mHorizontalViewAngle = params.getHorizontalViewAngle();
         mVerticalViewAngle = params.getVerticalViewAngle();
+
+        int previewWidth = params.getPreviewSize().width;
+        int previewHeight = params.getPreviewSize().height;
+
+        PixelFormat pixelInfo = new PixelFormat();
+        PixelFormat.getPixelFormatInfo(params.getPreviewFormat(), pixelInfo);
+        // TODO: remove this extra 32 byte after the driver bug is fixed.
+        int previewBufSize = (previewWidth * previewHeight * pixelInfo.bitsPerPixel / 8) + 32;
+
+        mMosaicFrameProcessor.initialize(previewWidth, previewHeight, previewBufSize);
+        mMosaicFrameProcessorInitialized = true;
+        configMosaicPreview(previewWidth, previewHeight);
     }
 
     /**
@@ -164,6 +182,18 @@ public class MosaicProxy extends CaptureTransformer
         mGLRootView.removeView(mGLSurfaceView);
     }
 
+    private void configMosaicPreview(int w, int h) {
+        // TODO: Grab the actual REAL landscape mode from orientation sensors
+        boolean isLandscape = (mActivity.getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE);
+
+        mMosaicTexture = (MosaicSurfaceTexture) mCamManager.getPreviewSurface().getSurfaceTexture();
+        mMosaicTexture.initPreviewRenderer(w, h, isLandscape);
+        mMosaicPreviewRenderer = mMosaicTexture.getPreviewRenderer();
+
+        mCameraTexture = mMosaicPreviewRenderer.getInputSurfaceTexture();
+        mGLSurfaceView.setSurfaceTexture(mMosaicTexture);
+    }
 
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
