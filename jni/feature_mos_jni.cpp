@@ -274,7 +274,7 @@ void YUV420toYVU24_NEW(ImageType yvu24, ImageType yuv420sp, int width,
 }
 
 
-JNIEXPORT void JNICALL Java_com_android_camera_Mosaic_allocateMosaicMemory(
+JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_Mosaic_allocateMosaicMemory(
         JNIEnv* env, jobject thiz, jint width, jint height)
 {
     tWidth[HR] = width;
@@ -293,7 +293,7 @@ JNIEXPORT void JNICALL Java_com_android_camera_Mosaic_allocateMosaicMemory(
     AllocateTextureMemory(tWidth[HR], tHeight[HR], tWidth[LR], tHeight[LR]);
 }
 
-JNIEXPORT void JNICALL Java_com_android_camera_Mosaic_freeMosaicMemory(
+JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_Mosaic_freeMosaicMemory(
         JNIEnv* env, jobject thiz)
 {
     for(int i = 0; i < MAX_FRAMES; i++)
@@ -361,7 +361,7 @@ void ConvertYVUAiToPlanarYVU(unsigned char *planar, unsigned char *in, int width
     }
 }
 
-JNIEXPORT jfloatArray JNICALL Java_com_android_camera_Mosaic_setSourceImageFromGPU(
+JNIEXPORT jfloatArray JNICALL Java_org_cyanogenmod_nemesis_pano_Mosaic_setSourceImageFromGPU(
         JNIEnv* env, jobject thiz)
 {
     double  t0, t1, time_c;
@@ -413,7 +413,7 @@ JNIEXPORT jfloatArray JNICALL Java_com_android_camera_Mosaic_setSourceImageFromG
 
 
 
-JNIEXPORT jfloatArray JNICALL Java_com_android_camera_Mosaic_setSourceImage(
+JNIEXPORT jfloatArray JNICALL Java_org_cyanogenmod_nemesis_pano_Mosaic_setSourceImage(
         JNIEnv* env, jobject thiz, jbyteArray photo_data)
 {
     double  t0, t1, time_c;
@@ -470,19 +470,19 @@ JNIEXPORT jfloatArray JNICALL Java_com_android_camera_Mosaic_setSourceImage(
     return bytes;
 }
 
-JNIEXPORT void JNICALL Java_com_android_camera_Mosaic_setBlendingType(
+JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_Mosaic_setBlendingType(
         JNIEnv* env, jobject thiz, jint type)
 {
     blendingType = int(type);
 }
 
-JNIEXPORT void JNICALL Java_com_android_camera_Mosaic_setStripType(
+JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_Mosaic_setStripType(
         JNIEnv* env, jobject thiz, jint type)
 {
     stripType = int(type);
 }
 
-JNIEXPORT void JNICALL Java_com_android_camera_Mosaic_reset(
+JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_Mosaic_reset(
         JNIEnv* env, jobject thiz)
 {
     frame_number_HR = 0;
@@ -497,7 +497,7 @@ JNIEXPORT void JNICALL Java_com_android_camera_Mosaic_reset(
     Init(LR,MAX_FRAMES);
 }
 
-JNIEXPORT jint JNICALL Java_com_android_camera_Mosaic_reportProgress(
+JNIEXPORT jint JNICALL Java_org_cyanogenmod_nemesis_pano_Mosaic_reportProgress(
         JNIEnv* env, jobject thiz, jboolean hires, jboolean cancel_computation)
 {
     if(bool(hires))
@@ -511,7 +511,7 @@ JNIEXPORT jint JNICALL Java_com_android_camera_Mosaic_reportProgress(
         return (jint) gProgress[LR];
 }
 
-JNIEXPORT jint JNICALL Java_com_android_camera_Mosaic_createMosaic(
+JNIEXPORT jint JNICALL Java_org_cyanogenmod_nemesis_pano_Mosaic_createMosaic(
         JNIEnv* env, jobject thiz, jboolean value)
 {
     high_res = bool(value);
@@ -568,7 +568,7 @@ JNIEXPORT jint JNICALL Java_com_android_camera_Mosaic_createMosaic(
     return (jint) ret;
 }
 
-JNIEXPORT jintArray JNICALL Java_com_android_camera_Mosaic_getFinalMosaic(
+JNIEXPORT jintArray JNICALL Java_org_cyanogenmod_nemesis_pano_Mosaic_getFinalMosaic(
         JNIEnv* env, jobject thiz)
 {
     int y,x;
@@ -613,7 +613,7 @@ JNIEXPORT jintArray JNICALL Java_com_android_camera_Mosaic_getFinalMosaic(
     return bytes;
 }
 
-JNIEXPORT jbyteArray JNICALL Java_com_android_camera_Mosaic_getFinalMosaicNV21(
+JNIEXPORT jbyteArray JNICALL Java_org_cyanogenmod_nemesis_pano_Mosaic_getFinalMosaicNV21(
         JNIEnv* env, jobject thiz)
 {
     int y,x;
