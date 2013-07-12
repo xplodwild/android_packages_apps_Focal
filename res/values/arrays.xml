@@ -180,20 +180,20 @@
     <array name="widget_scenemode_icons" translatable="false">
         <item>@drawable/ic_widget_scenemode_auto</item>
         <item>@drawable/ic_widget_scenemode_antimotionblur</item>
+        <item>@drawable/ic_widget_scenemode_ar</item>
         <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_baby</item>
         <item>@drawable/ic_widget_scenemode_backlight</item>
         <item>@drawable/ic_widget_scenemode_backlightportrait</item>
         <item>@drawable/ic_widget_scenemode_barcode</item>
         <item>@drawable/ic_widget_scenemode_beach</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_candlelight</item>
         <item>@drawable/ic_widget_scenemode_dark</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_dish</item>
+        <item>@drawable/ic_widget_scenemode_document</item>
+        <item>@drawable/ic_widget_scenemode_fireworks</item>
+        <item>@drawable/ic_widget_scenemode_flowers</item>
+        <item>@drawable/ic_widget_scenemode_handheld</item>
         <item>@drawable/ic_widget_scenemode_hdr</item>
         <item>@drawable/ic_widget_scenemode_highsensitivity</item>
         <item>@drawable/ic_widget_scenemode_landscape</item>
@@ -204,13 +204,13 @@
         <item>@drawable/ic_widget_scenemode_pet</item>
         <item>@drawable/ic_widget_scenemode_portrait</item>
         <item>@drawable/ic_widget_scenemode_snow</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_softskin</item>
         <item>@drawable/ic_widget_scenemode_sports</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_spotlight</item>
+        <item>@drawable/ic_widget_scenemode_steadyphoto</item>
+        <item>@drawable/ic_widget_scenemode_sunset</item>
+        <item>@drawable/ic_widget_scenemode_sweepstitch</item>
+        <item>@drawable/ic_widget_scenemode_theatre</item>
     </array>
 
     <string-array name="widget_scenemode_hints">
