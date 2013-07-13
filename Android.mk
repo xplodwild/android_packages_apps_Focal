@@ -6,7 +6,10 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := Nemesis
 
-LOCAL_REQUIRED_MODULES := \
+# Change this to LOCAL_JNI_SHARED_LIBRARIES to include
+# the binaries in the apk
+LOCAL_REQUIRED_MODULESz := \
+	libjni_mosaic2 \
 	libexiv2 \
 	libglib-2.0 \
 	libgmodule-2.0 \
@@ -30,4 +33,5 @@ LOCAL_REQUIRED_MODULES := \
 
 include $(BUILD_PACKAGE)
 
--include $(call all-makefiles-under, $(ANDROID_BUILD_TOP)/external/Nemesis)
+include $(call all-makefiles-under, $(ANDROID_BUILD_TOP)/external/Nemesis)
+include $(call all-makefiles-under, jni)
