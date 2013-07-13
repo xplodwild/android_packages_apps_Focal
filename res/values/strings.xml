@@ -35,13 +35,15 @@
     <string name="enabled">Enabled</string>
 
     <!-- Widgets hints for non-arrayed widgets -->
-    <string name="widget_burstmode">Burst mode</string>
     <string name="widget_burstmode_count_shots">Burst %d shots</string>
     <string name="widget_burstmode_off">Disable burst mode</string>
     <string name="widget_burstmode_infinite">Infinite burst</string>
 
     <string name="widget_hdr_aebracket">Auto bracketing</string>
 
+    <string name="widget_settings_choose_widgets">Choose widgets in the sidebar</string>
+
+    <string name="widget_burstmode">Burst mode</string>
     <string name="widget_effect">Color effects</string>
     <string name="widget_enhancements">Color enhancements</string>
     <string name="widget_exposure_compensation">Exposure compensation</string>
@@ -54,14 +56,14 @@
     <string name="widget_softwarehdr">High Dynamic Range</string>
     <string name="widget_timermode">Timer mode</string>
     <string name="widget_videofr">Video Framerate</string>
-    <string name="widget_videohdr">High Dynamic Range</string>
+    <string name="widget_videohdr">Video High Dynamic Range</string>
     <string name="widget_whitebalance">White balance</string>
 
     <!-- Panorama mode -->
     <!-- Filename prefix for panorama output. -->
     <string name="pano_file_name_format" translatable="false">"'PANO'_yyyyMMdd_HHmmss"</string>
 
-    <string name="pano_panorama_rendering_failed">Couldn\'t save panorama.</string>
+    <string name="pano_panorama_rendering_failed">Failed to render panorama.\nTry to take a shorter one.</string>
     <string name="pano_panorama_rendering">Rendering panorama...</string>
 </resources>
 

@@ -27,12 +27,16 @@ import android.view.ViewGroup;
 import android.widget.NumberPicker;
 
 import org.cyanogenmod.nemesis.CameraActivity;
+import org.cyanogenmod.nemesis.CameraCapabilities;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SettingsStorage;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,11 +47,14 @@ public class SettingsWidget extends WidgetBase {
     private static final String KEY_SHOW_EXPOSURE_RING = "ShowExposureRing";
     private WidgetOptionButton mResolutionButton;
     private WidgetOptionButton mToggleExposureRing;
+    private WidgetOptionButton mToggleWidgetsButton;
     private CameraActivity mContext;
+    private CameraCapabilities mCapabilities;
     private List<String> mResolutionsName;
     private List<String> mVideoResolutions;
     private List<Camera.Size> mResolutions;
-    private AlertDialog mPickerDialog;
+    private AlertDialog mResolutionDialog;
+    private AlertDialog mWidgetsDialog;
     private NumberPicker mNumberPicker;
     private int mInitialOrientation = -1;
     private int mOrientation;
@@ -120,16 +127,18 @@ public class SettingsWidget extends WidgetBase {
                 }
             });
 
-            mPickerDialog = builder.create();
-            mPickerDialog.show();
+            mResolutionDialog = builder.create();
+            mResolutionDialog.show();
             ((ViewGroup)mNumberPicker.getParent().getParent().getParent())
                     .animate().rotation(mOrientation).setDuration(300).start();
         }
     };
 
-    public SettingsWidget(CameraActivity context) {
+    public SettingsWidget(CameraActivity context, CameraCapabilities capabilities) {
         super(context.getCamManager(), context, R.drawable.ic_widget_settings);
         mContext = context;
+        mCapabilities = capabilities;
+
         CameraManager cam = context.getCamManager();
 
         getToggleButton().setHintText(R.string.widget_settings);
@@ -199,6 +208,15 @@ public class SettingsWidget extends WidgetBase {
             mToggleExposureRing.setActiveDrawable(DRAWABLE_KEY_EXPO_RING);
         }
         addViewToContainer(mToggleExposureRing);
+
+        mToggleWidgetsButton = new WidgetOptionButton(R.drawable.ic_widget_settings, context);
+        mToggleWidgetsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openWidgetsToggleDialog();
+            }
+        });
+        addViewToContainer(mToggleWidgetsButton);
     }
 
     @Override
@@ -214,16 +232,14 @@ public class SettingsWidget extends WidgetBase {
         if (mOrientation == orientation) return;
 
         mOrientation = orientation;
-        if (mPickerDialog != null) {
-            float finalRot = orientation;
-            if (mInitialOrientation <= 0)
-                finalRot -= mInitialOrientation;
-            else
-                finalRot += mInitialOrientation;
-
+        if (mResolutionDialog != null) {
             ((ViewGroup) mNumberPicker.getParent().getParent().getParent().getParent())
                     .animate().rotation(orientation - mInitialOrientation).setDuration(300).start();
+        }
 
+        if (mWidgetsDialog != null) {
+            ((ViewGroup) mWidgetsDialog.getListView().getParent().getParent().getParent().getParent())
+                    .animate().rotation(orientation - mInitialOrientation).setDuration(300).start();
         }
     }
 
@@ -243,4 +259,62 @@ public class SettingsWidget extends WidgetBase {
         }
     }
 
+    private void openWidgetsToggleDialog() {
+        final List<WidgetBase> widgets = mCapabilities.getWidgets();
+        List<String> widgetsName = new ArrayList<String>();
+
+        // Construct a list of widgets
+        for (WidgetBase widget : widgets) {
+            widgetsName.add(widget.getToggleButton().getHintText());
+        }
+
+        CharSequence[] items = widgetsName.toArray(new CharSequence[widgetsName.size()]);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setTitle(mContext.getString(R.string.widget_settings_choose_widgets));
+        builder.setMultiChoiceItems(items, null,
+                new DialogInterface.OnMultiChoiceClickListener() {
+                    // indexSelected contains the index of item (of which checkbox checked)
+                    @Override
+                    public void onClick(DialogInterface dialog, int indexSelected,
+                                        boolean isChecked) {
+                        widgets.get(indexSelected).setHidden(!isChecked);
+                    }
+                })
+                // Set the action buttons
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Store the widget visibility status in SharedPreferences, using the
+                        // widget class name as key
+                        for (WidgetBase widget : widgets) {
+                            if (widget.getClass().getName().contains("SettingsWidgets")) continue;
+
+                            SettingsStorage.storeVisibilitySetting(mContext,
+                                    widget.getClass().getName(), !widget.isHidden());
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Restore visibility status from storage
+                        for (WidgetBase widget : widgets) {
+                            if (widget.getClass().getName().contains("SettingsWidgets")) continue;
+
+                            widget.setHidden(!SettingsStorage.getVisibilitySetting(
+                                    mContext, widget.getClass().getName()));
+                        }
+                    }
+                });
+
+
+        mWidgetsDialog = builder.create();
+        mWidgetsDialog.show();
+        for (int i = 0; i < widgets.size(); i++) {
+            mWidgetsDialog.getListView().setItemChecked(i, !widgets.get(i).isHidden());
+        }
+        ((ViewGroup)mWidgetsDialog.getListView().getParent().getParent().getParent())
+                .animate().rotation(mOrientation).setDuration(300).start();
+    }
 }

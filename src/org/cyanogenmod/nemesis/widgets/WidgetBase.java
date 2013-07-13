@@ -24,6 +24,7 @@ import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -82,6 +83,10 @@ public abstract class WidgetBase {
         mToggleButton.setImageResource(iconResId);
 
         mWidgetMaxWidth = context.getResources().getInteger(R.integer.widget_default_max_width);
+
+        Log.e(TAG, "Widget: " + this.getClass().getName());
+        setHidden(!SettingsStorage.getVisibilitySetting(
+                context, this.getClass().getName()));
     }
 
     /**
@@ -220,6 +225,14 @@ public abstract class WidgetBase {
         mIsOpen = false;
     }
 
+    public void setHidden(boolean hide) {
+        mToggleButton.setVisibility(hide ? View.GONE : View.VISIBLE);
+    }
+
+    public boolean isHidden() {
+        return mToggleButton.getVisibility() == View.GONE;
+    }
+
 
     /**
      * Represents the button that toggles the widget, in the
@@ -263,6 +276,10 @@ public abstract class WidgetBase {
 
         public void setHintText(int resId) {
             mHintText = getResources().getString(resId);
+        }
+
+        public String getHintText() {
+            return mHintText;
         }
 
         public void toggleBackground(boolean active) {

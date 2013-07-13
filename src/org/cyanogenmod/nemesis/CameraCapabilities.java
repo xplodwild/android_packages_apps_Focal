@@ -61,7 +61,14 @@ public class CameraCapabilities {
         mWidgets.add(new BurstModeWidget(context));
         mWidgets.add(new TimerModeWidget(context));
         mWidgets.add(new VideoFrWidget(cam, context));
-        mWidgets.add(new SettingsWidget(context));
+        mWidgets.add(new SettingsWidget(context, this));
+    }
+
+    /**
+     * @return The list of currently enabled/capable widgets
+     */
+    public List<WidgetBase> getWidgets() {
+        return mWidgets;
     }
 
     /**
@@ -88,7 +95,8 @@ public class CameraCapabilities {
             }
         }
 
-        for (int i = 0; i < unsupported.size(); i++)
+        for (int i = 0; i < unsupported.size(); i++) {
             mWidgets.remove(unsupported.get(i));
+        }
     }
 }

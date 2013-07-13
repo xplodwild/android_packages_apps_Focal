@@ -28,6 +28,7 @@ import android.content.SharedPreferences;
 public class SettingsStorage {
     private final static String PREFS_CAMERA = "nemesis-camera";
     private final static String PREFS_APP = "nemesis-app";
+    private final static String PREFS_VISIBILITY = "nemesis-visibility";
     public final static String TAG = "SettingsStorage";
 
     private static void store(Context context, String prefsName, String key, String value) {
@@ -84,6 +85,27 @@ public class SettingsStorage {
      */
     public static String getAppSetting(Context context, String key, String def) {
         return retrieve(context, PREFS_APP, key, def);
+    }
+
+    /**
+     * Stores a setting of the widgets visibility
+     * @param context
+     * @param key
+     * @param visible
+     */
+    public static void storeVisibilitySetting(Context context, String key, boolean visible) {
+        store(context, PREFS_VISIBILITY, key, visible ? "true" : "false");
+    }
+
+
+    /**
+     * Returns a setting of the app (always defaults to visible)
+     * @param context
+     * @param key
+     * @return
+     */
+    public static boolean getVisibilitySetting(Context context, String key) {
+        return retrieve(context, PREFS_VISIBILITY, key, "true").equals("true");
     }
 
 }
