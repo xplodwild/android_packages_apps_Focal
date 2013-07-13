@@ -25,7 +25,7 @@ import android.util.Log;
 public class MosaicFrameProcessor {
     private static final String TAG = "MosaicFrameProcessor";
     private static final int NUM_FRAMES_IN_BUFFER = 2;
-    private static final int MAX_NUMBER_OF_FRAMES = 100;
+    private static final int MAX_NUMBER_OF_FRAMES = 200;
     private static final int MOSAIC_RET_CODE_INDEX = 10;
     private static final int FRAME_COUNT_INDEX = 9;
     private static final int X_COORD_INDEX = 2;
@@ -172,6 +172,7 @@ public class MosaicFrameProcessor {
 
             // TODO: make the termination condition regarding reaching
             // MAX_NUMBER_OF_FRAMES solely determined in the library.
+            Log.e(TAG, "Frame count: " + mTotalFrameCount + "/" + MAX_NUMBER_OF_FRAMES);
             if (mTotalFrameCount < MAX_NUMBER_OF_FRAMES) {
                 // If we are still collecting new frames for the current mosaic,
                 // process the new frame.

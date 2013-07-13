@@ -238,6 +238,7 @@ int Blend::runBlend(MosaicFrame **oframes, MosaicFrame **rframes,
     Mwidth = (unsigned short) ((Mwidth + 3) & ~3);
     Mheight = (unsigned short) ((Mheight + 3) & ~3);    // Round up.
 
+#ifdef CHECK_MOSAIC_SIZE
     ret = MosaicSizeCheck(LIMIT_SIZE_MULTIPLIER, LIMIT_HEIGHT_MULTIPLIER);
     if (ret != BLEND_RET_OK)
     {
@@ -246,6 +247,7 @@ int Blend::runBlend(MosaicFrame **oframes, MosaicFrame **rframes,
             "(%d, %d) vs (%d, %d)", width, height, Mwidth, Mheight);
        return ret;
     }
+#endif
 
     LOGI("Allocate mosaic image for blending - size: %d x %d", Mwidth, Mheight);
     YUVinfo *imgMos = YUVinfo::allocateImage(Mwidth, Mheight);

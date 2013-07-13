@@ -66,8 +66,7 @@ public class MosaicProxy extends CaptureTransformer
         implements SurfaceTexture.OnFrameAvailableListener, TextureView.SurfaceTextureListener {
     private static final String TAG = "CAM PanoModule";
 
-    public static final int DEFAULT_SWEEP_ANGLE = 160;
-    public static final int DEFAULT_BLEND_MODE = Mosaic.BLENDTYPE_HORIZONTAL;
+    public static final int DEFAULT_SWEEP_ANGLE = 360;
     // The unit of speed is degrees per frame.
     private static final float PANNING_SPEED_THRESHOLD = 2.5f;
 
@@ -410,6 +409,7 @@ public class MosaicProxy extends CaptureTransformer
                 if (isFinished
                         || (Math.abs(accumulatedHorizontalAngle) >= DEFAULT_SWEEP_ANGLE)
                         || (Math.abs(accumulatedVerticalAngle) >= DEFAULT_SWEEP_ANGLE)) {
+                    Util.fadeOut(mShutterButton);
                     stopCapture(false);
                 } else {
                     float panningRateXInDegree = panningRateX * mHorizontalViewAngle;

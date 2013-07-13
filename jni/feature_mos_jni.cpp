@@ -38,7 +38,7 @@ extern "C" {
 
 char buffer[1024];
 
-const int MAX_FRAMES = 100;
+const int MAX_FRAMES = 200;
 
 static double mTx;
 
