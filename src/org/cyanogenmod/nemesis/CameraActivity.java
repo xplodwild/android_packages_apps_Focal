@@ -244,6 +244,26 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         return mPanoProgressBar;
     }
 
+    public void displayOverlayBitmap(Bitmap bmp) {
+        final ImageView iv = (ImageView) findViewById(R.id.camera_preview_overlay);
+        iv.setImageBitmap(bmp);
+        iv.setAlpha(1.0f);
+        iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        Util.fadeIn(iv);
+        iv.setVisibility(View.VISIBLE);
+    }
+
+    public void hideOverlayBitmap() {
+        final ImageView iv = (ImageView) findViewById(R.id.camera_preview_overlay);
+        Util.fadeOut(iv);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                iv.setVisibility(View.GONE);
+            }
+        }, 300);
+    }
+
     /**
      * Sets the mode of the activity
      * See CameraActivity.CAMERA_MODE_*

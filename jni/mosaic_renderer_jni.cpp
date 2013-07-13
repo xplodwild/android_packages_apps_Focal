@@ -373,13 +373,13 @@ void UpdateWarpTransformation(float *trs)
     db_Multiply3x3_3x3(Htemp1, H, gKm);
     db_Multiply3x3_3x3(Hp, gKminv, Htemp1);
 
-    if (gIsLandscapeOrientation) {
+    //if (gIsLandscapeOrientation) {
         ConvertAffine3x3toGL4x4(g_dAffinetransPan, Hp);
-    } else {
-        // rotate Hp by 90 degress.
-        db_Multiply3x3_3x3(Htemp1, gRotation90, Hp);
-        ConvertAffine3x3toGL4x4(g_dAffinetransPan, Htemp1);
-    }
+    //} else {
+    //    // rotate Hp by 90 degress.
+    //    db_Multiply3x3_3x3(Htemp1, gRotation90, Hp);
+    //    ConvertAffine3x3toGL4x4(g_dAffinetransPan, Htemp1);
+   // }
 }
 
 void AllocateTextureMemory(int widthHR, int heightHR, int widthLR, int heightLR)
@@ -483,6 +483,8 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_MosaicRenderer_reset(
             JNIEnv * env, jobject obj,  jint width, jint height,
             jboolean isLandscapeOrientation);
+    JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_MosaicRenderer_setIsLandscape(
+            JNIEnv * env, jobject obj, jboolean isLandscapeOrientation);
     JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_MosaicRenderer_preprocess(
             JNIEnv * env, jobject obj, jfloatArray stMatrix);
     JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_MosaicRenderer_transferGPUtoCPU(
@@ -576,6 +578,12 @@ void calculateUILayoutScaling(int width, int height, bool isLandscape) {
         gUILayoutScalingX = ((float) gPreviewFBOHeight / gPreviewFBOWidth)
                 / ((float) width / height) * PREVIEW_FBO_WIDTH_SCALE;
     }
+}
+
+JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_MosaicRenderer_setIsLandscape(
+        JNIEnv * env, jobject obj, jboolean isLandscapeOrientation)
+{
+    gIsLandscapeOrientation = isLandscapeOrientation;
 }
 
 JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_MosaicRenderer_reset(
@@ -736,11 +744,11 @@ JNIEXPORT void JNICALL Java_org_cyanogenmod_nemesis_pano_MosaicRenderer_step(
 
         gWarper2.DrawTexture(g_dTranslationToFBOCenterGL);
 
-        if (gIsLandscapeOrientation) {
+        //if (gIsLandscapeOrientation) {
             gPreview.DrawTexture(g_dAffinetransIdentGL);
-        } else {
-            gPreview.DrawTexture(g_dAffinetransRotation90GL);
-        }
+        //} else {
+        //    gPreview.DrawTexture(g_dAffinetransRotation90GL);
+        //}
     }
     else
     {

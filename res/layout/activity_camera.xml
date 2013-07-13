@@ -39,7 +39,7 @@
     </org.cyanogenmod.nemesis.ui.PreviewFrameLayout>
 
     <org.cyanogenmod.nemesis.ui.PreviewFrameLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="visible"
             android:layout_gravity="center"
@@ -47,7 +47,7 @@
 
         <ImageView
                 android:layout_height="match_parent"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_centerInParent="true"
                 android:scaleType="fitXY"
                 android:alpha="0.0"
@@ -58,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="4dp"
-            android:background="#88333333"
+            android:background="#99333333"
             android:focusableInTouchMode="false"
             android:id="@+id/notifier_container"
             android:alpha="0"
@@ -72,6 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#FFFFFFFF"
                 android:id="@+id/notifier_text"/>
     </org.cyanogenmod.nemesis.ui.Notifier>
 
@@ -162,9 +163,12 @@
 
     <org.cyanogenmod.nemesis.ui.PanoProgressBar
         android:id="@+id/panorama_progress_bar"
+        android:visibility="gone"
         android:layout_width="128dp"
         android:layout_height="32dp"
-        android:layout_gravity="center_vertical|left"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="72dp"
+        android:layout_gravity="left|top"
         />
 
     <FrameLayout

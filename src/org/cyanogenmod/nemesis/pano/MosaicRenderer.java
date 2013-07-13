@@ -49,6 +49,13 @@ public class MosaicRenderer
     public static native void reset(int width, int height, boolean isLandscapeOrientation);
 
     /**
+     * Changes the orientation of the stitching
+     *
+     * @param isLandscape
+     */
+    public static native void setIsLandscape(boolean isLandscape);
+
+    /**
      * Calling this function will render the SurfaceTexture to a new 2D texture
      * using the provided STMatrix.
      *

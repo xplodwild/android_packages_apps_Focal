@@ -152,7 +152,7 @@ public class MosaicPreviewRenderer {
             mGl = (GL10) mEglContext.getGL();
 
             mInputSurfaceTexture = new SurfaceTexture(MosaicRenderer.init());
-            MosaicRenderer.reset(mWidth, mHeight, mIsLandscape);
+            MosaicRenderer.reset(mWidth, mHeight, true);
         }
 
         private void doRelease() {
@@ -199,6 +199,10 @@ public class MosaicPreviewRenderer {
 
     public void release() {
         mEglHandler.sendEmptyMessage(EGLHandler.MSG_RELEASE);
+    }
+
+    public void setLandscape(boolean landscape) {
+        MosaicRenderer.setIsLandscape(landscape);
     }
 
     public void showPreviewFrameSync() {
