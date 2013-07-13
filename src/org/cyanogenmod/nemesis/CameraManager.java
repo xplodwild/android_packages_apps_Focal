@@ -136,31 +136,7 @@ public class CameraManager {
                 }
             }
         }
-    }
-
-    ;
-/*
-    private class AsyncParamClassRunnable implements Runnable {
-        private Camera.Parameters mParameters;
-
-        public AsyncParamClassRunnable(Camera.Parameters params) {
-            mParameters = params;
-        }
-
-        public void run() {
-            try {
-                mCamera.setParameters(mParameters);
-            } catch (RuntimeException e) {
-                Log.e(TAG, "Could not set parameters", e);
-
-                // Reset the camera as it likely crashed if we reached here
-                open(mCurrentFacing);
-            }
-            // Read them from sensor next time
-            mParameters = null;
-        }
-    }
-*/
+    };
 
     public CameraManager(Context context) {
         mPreview = new CameraPreview(context);
@@ -606,19 +582,23 @@ public class CameraManager {
     private void initializePanoramaMode() {
         Camera.Parameters parameters = getParameters();
 
+        int pixels = mContext.getResources().getInteger(R.integer.config_panoramaDefaultWidth)
+                * mContext.getResources().getInteger(R.integer.config_panoramaDefaultHeight);
+
         List<Camera.Size> supportedSizes = parameters.getSupportedPreviewSizes();
-        Point previewSize = Util.findBestPanoPreviewSize(supportedSizes, true, true);
+        Point previewSize = Util.findBestPanoPreviewSize(supportedSizes, true, true, pixels);
         if (previewSize == null) {
-            Log.w(TAG, "No 4:3 ratio preview size supported.");
-            previewSize = Util.findBestPanoPreviewSize(supportedSizes, false, true);
+            //Log.w(TAG, "No 4:3 ratio preview size supported.");
+            previewSize = Util.findBestPanoPreviewSize(supportedSizes, false, true, pixels);
             if (previewSize == null) {
-                Log.w(TAG, "Can't find a supported preview size smaller than 960x720.");
-                previewSize = Util.findBestPanoPreviewSize(supportedSizes, false, false);
+                //Log.w(TAG, "Can't find a supported preview size smaller than 960x720.");
+                previewSize = Util.findBestPanoPreviewSize(supportedSizes, false, false, pixels);
             }
         }
 
         Log.v(TAG, "preview h = " + previewSize.y + " , w = " + previewSize.x);
         parameters.setPreviewSize(previewSize.x, previewSize.y);
+        mTargetSize = previewSize;
 
         List<int[]> frameRates = parameters.getSupportedPreviewFpsRange();
         int last = frameRates.size() - 1;
@@ -637,6 +617,7 @@ public class CameraManager {
         }
 
         parameters.set("recording-hint", "false");
+        mParameters = parameters;
     }
 
     /**

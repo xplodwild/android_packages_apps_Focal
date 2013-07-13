@@ -375,15 +375,17 @@ public class Util {
      * @return
      */
     public static Point findBestPanoPreviewSize(List<Size> supportedSizes, boolean need4To3,
-                                        boolean needSmaller) {
+                                        boolean needSmaller, int defaultPixels) {
+        need4To3 = false;
+        needSmaller = false;
         Point output = null;
-        int pixelsDiff = MosaicProxy.DEFAULT_CAPTURE_PIXELS;
+        int pixelsDiff = defaultPixels;
 
         for (Size size : supportedSizes) {
             int h = size.height;
             int w = size.width;
             // we only want 4:3 format.
-            int d = MosaicProxy.DEFAULT_CAPTURE_PIXELS - h * w;
+            int d = defaultPixels - h * w;
             if (needSmaller && d < 0) { // no bigger preview than 960x720.
                 continue;
             }

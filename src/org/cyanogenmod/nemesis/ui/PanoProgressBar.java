@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.cyanogenmod.nemesis.pano;
+package org.cyanogenmod.nemesis.ui;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -24,7 +24,7 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-class PanoProgressBar extends ImageView {
+public class PanoProgressBar extends ImageView {
     @SuppressWarnings("unused")
     private static final String TAG = "PanoProgressBar";
     public static final int DIRECTION_NONE = 0;

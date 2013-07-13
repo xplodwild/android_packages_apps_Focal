@@ -113,6 +113,8 @@ public class ReviewDrawer extends LinearLayout {
         super.onFinishInflate();
 
         mImagesList = (ListView) findViewById(R.id.list_reviewed_images);
+        if (mImagesList == null) return;
+
         mImagesList.setAdapter(mImagesListAdapter);
         mImagesList.setOnItemClickListener(new ImageListClickListener());
 

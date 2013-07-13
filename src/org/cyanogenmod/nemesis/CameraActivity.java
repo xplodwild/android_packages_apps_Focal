@@ -47,6 +47,7 @@ import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
 import org.cyanogenmod.nemesis.pano.MosaicProxy;
+import org.cyanogenmod.nemesis.ui.PanoProgressBar;
 import org.cyanogenmod.nemesis.picsphere.PicSphereCaptureTransformer;
 import org.cyanogenmod.nemesis.picsphere.PicSphereManager;
 import org.cyanogenmod.nemesis.ui.CircleTimerView;
@@ -93,6 +94,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private SwitchRingPad mSwitchRingPad;
     private ShutterButton mShutterButton;
     private SavePinger mSavePinger;
+    private PanoProgressBar mPanoProgressBar;
     private CircleTimerView mTimerView;
     private ViewGroup mRecTimerContainer;
     private static Notifier mNotifier;
@@ -121,6 +123,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mSwitchRingPad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
         mSwitchRingPad.setListener(new MainRingPadListener());
 
+        mPanoProgressBar = (PanoProgressBar) findViewById(R.id.panorama_progress_bar);
         mRecTimerContainer = (ViewGroup) findViewById(R.id.recording_timer_container);
         mNotifier = (Notifier) findViewById(R.id.notifier_container);
 
@@ -203,6 +206,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         }
 
         super.onResume();
+        mReviewDrawer.close();
     }
 
     @Override
@@ -231,6 +235,13 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
      */
     public static void notify(String text, int lengthMs) {
         mNotifier.notify(text, lengthMs);
+    }
+
+    /**
+     * @return The Panorama Progress Bar view
+     */
+    public PanoProgressBar getPanoProgressBar() {
+        return mPanoProgressBar;
     }
 
     /**
@@ -296,6 +307,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         setViewRotation(mShutterButton, mOrientationCompensation);
         setViewRotation(mRecTimerContainer, mOrientationCompensation);
         setViewRotation(mNotifier, mOrientationCompensation);
+        setViewRotation(mPanoProgressBar, mOrientationCompensation);
         mCamManager.setOrientation(mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
@@ -316,7 +328,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 } else {
                     // Close all widgets
                     mWidgetRenderer.closeAllWidgets();
-
 
                     // Update focus/exposure ring support
                     mFocusHudRing.setVisibility(mCamManager.isFocusAreaSupported() ? View.VISIBLE : View.GONE);
@@ -525,6 +536,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mMosaicProxy = new MosaicProxy(this);
         findViewById(R.id.camera_preview_container).setVisibility(View.GONE);
         setCaptureTransformer(mMosaicProxy);
+        mExposureHudRing.setVisibility(View.GONE);
+        mFocusHudRing.setVisibility(View.GONE);
     }
 
     /**

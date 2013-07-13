@@ -69,14 +69,18 @@ public class Notifier extends LinearLayout {
      * @param durationMs
      * @note This method must be ran in UI thread!
      */
-    public void notify(String text, long durationMs) {
-        mHandler.removeCallbacks(mFadeOutRunnable);
-        mTextView = (TextView) findViewById(R.id.notifier_text);
-        mTextView.setText(text);
-        setAlpha(0.0f);
+    public void notify(final String text, final long durationMs) {
+        mHandler.post(new Runnable() {
+            public void run() {
+                mHandler.removeCallbacks(mFadeOutRunnable);
+                mTextView = (TextView) findViewById(R.id.notifier_text);
+                mTextView.setText(text);
+                setAlpha(0.0f);
 
-        fadeIn();
-        mHandler.postDelayed(mFadeOutRunnable, durationMs);
+                fadeIn();
+                mHandler.postDelayed(mFadeOutRunnable, durationMs);
+            }
+        });
     }
 
     private void fadeIn() {

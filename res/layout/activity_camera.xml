@@ -160,6 +160,13 @@
             android:layout_marginLeft="2dp"
             android:layout_marginTop="2dp"/>
 
+    <org.cyanogenmod.nemesis.ui.PanoProgressBar
+        android:id="@+id/panorama_progress_bar"
+        android:layout_width="128dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_vertical|left"
+        />
+
     <FrameLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

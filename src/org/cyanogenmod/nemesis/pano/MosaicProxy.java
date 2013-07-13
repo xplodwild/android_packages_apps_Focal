@@ -25,6 +25,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.graphics.YuvImage;
@@ -50,6 +51,7 @@ import org.cyanogenmod.nemesis.SnapshotManager;
 import org.cyanogenmod.nemesis.Storage;
 import org.cyanogenmod.nemesis.Util;
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
+import org.cyanogenmod.nemesis.ui.PanoProgressBar;
 import org.cyanogenmod.nemesis.ui.ShutterButton;
 
 import java.io.ByteArrayOutputStream;
@@ -66,7 +68,8 @@ public class MosaicProxy extends CaptureTransformer
 
     public static final int DEFAULT_SWEEP_ANGLE = 160;
     public static final int DEFAULT_BLEND_MODE = Mosaic.BLENDTYPE_HORIZONTAL;
-    public static final int DEFAULT_CAPTURE_PIXELS = 960 * 720;
+    // The unit of speed is degrees per frame.
+    private static final float PANNING_SPEED_THRESHOLD = 2.5f;
 
     private static final int MSG_LOW_RES_FINAL_MOSAIC_READY = 1;
     private static final int MSG_GENERATE_FINAL_MOSAIC_ERROR = 2;
@@ -77,11 +80,8 @@ public class MosaicProxy extends CaptureTransformer
     private static final int PREVIEW_ACTIVE = 1;
     private static final int CAPTURE_STATE_VIEWFINDER = 0;
     private static final int CAPTURE_STATE_MOSAIC = 1;
-    private final String mPreparePreviewString;
-    private final String mDialogTitle;
-    private final String mDialogOkString;
-    private final String mDialogPanoramaFailedString;
-    private final String mDialogWaitingPreviousString;
+    private final int mIndicatorColor;
+    private final int mIndicatorColorFast;
 
     private Runnable mOnFrameAvailableRunnable;
     private MosaicFrameProcessor mMosaicFrameProcessor;
@@ -99,7 +99,13 @@ public class MosaicProxy extends CaptureTransformer
     private SurfaceTexture mMosaicTexture;
     private boolean mCancelComputation;
     private long mTimeTaken;
+    private PanoProgressBar mPanoProgressBar;
     private Matrix mProgressDirectionMatrix = new Matrix();
+    private float[] mProgressAngle = new float[2];
+    private int mPreviewWidth;
+    private int mPreviewHeight;
+    private boolean mThreadRunning;
+    private Object mWaitObject = new Object();
 
     private class MosaicJpeg {
         public MosaicJpeg(byte[] data, int width, int height) {
@@ -126,6 +132,8 @@ public class MosaicProxy extends CaptureTransformer
         super(activity.getCamManager(), activity.getSnapManager());
         mActivity = activity;
         mCaptureState = CAPTURE_STATE_VIEWFINDER;
+        mPanoProgressBar = activity.getPanoProgressBar();
+
 
         mGLRootView = (FrameLayout) mActivity.findViewById(R.id.gl_renderer_container);
         mGLSurfaceView = new TextureView(mActivity);
@@ -140,11 +148,20 @@ public class MosaicProxy extends CaptureTransformer
 
         mMosaicFrameProcessor = MosaicFrameProcessor.getInstance();
         Resources appRes = mActivity.getResources();
-        mPreparePreviewString = appRes.getString(R.string.pano_dialog_prepare_preview);
-        mDialogTitle = appRes.getString(R.string.pano_dialog_title);
-        mDialogOkString = appRes.getString(R.string.OK);
-        mDialogPanoramaFailedString = appRes.getString(R.string.pano_dialog_panorama_failed);
-        mDialogWaitingPreviousString = appRes.getString(R.string.pano_dialog_waiting_previous);
+        mIndicatorColor = appRes.getColor(R.color.pano_progress_indication);
+        mIndicatorColorFast = appRes.getColor(R.color.pano_progress_indication_fast);
+        mPanoProgressBar.setBackgroundColor(appRes.getColor(R.color.pano_progress_empty));
+        mPanoProgressBar.setDoneColor(appRes.getColor(R.color.pano_progress_done));
+        mPanoProgressBar.setIndicatorColor(mIndicatorColor);
+        mPanoProgressBar.setOnDirectionChangeListener(
+                new PanoProgressBar.OnDirectionChangeListener () {
+                    @Override
+                    public void onDirectionChange(int direction) {
+                        if (mCaptureState == CAPTURE_STATE_MOSAIC) {
+                            showDirectionIndicators(direction);
+                        }
+                    }
+                });
 
         // This runs in UI thread.
         mOnFrameAvailableRunnable = new Runnable() {
@@ -178,7 +195,10 @@ public class MosaicProxy extends CaptureTransformer
                         saveHighResMosaic();
                         break;
                     case MSG_GENERATE_FINAL_MOSAIC_ERROR:
-                        /*onBackgroundThreadFinished();
+                        CameraActivity.notify(
+                                mActivity.getString(R.string.pano_panorama_rendering_failed), 2000);
+                        resetToPreview();
+                        /*
                         if (mPaused) {
                             resetToPreview();
                         } else {
@@ -194,9 +214,9 @@ public class MosaicProxy extends CaptureTransformer
                         clearMosaicFrameProcessorIfNeeded();*/
                         break;
                     case MSG_RESET_TO_PREVIEW:
-                        /*onBackgroundThreadFinished();
                         resetToPreview();
-                        clearMosaicFrameProcessorIfNeeded();*/
+                        clearMosaicFrameProcessorIfNeeded();
+                        mThreadRunning = false;
                         break;
                     case MSG_CLEAR_SCREEN_DELAY:
                         mActivity.getWindow().clearFlags(WindowManager.LayoutParams.
@@ -211,7 +231,27 @@ public class MosaicProxy extends CaptureTransformer
         mHorizontalViewAngle = params.getHorizontalViewAngle();
         mVerticalViewAngle = params.getVerticalViewAngle();
 
+        int pixels = mActivity.getResources().getInteger(R.integer.config_panoramaDefaultWidth)
+                * mActivity.getResources().getInteger(R.integer.config_panoramaDefaultHeight);
+
+        Point size = Util.findBestPanoPreviewSize(params.getSupportedPreviewSizes(), true, true, pixels);
+        mPreviewWidth = size.x;
+        mPreviewHeight = size.y;
+
     }
+
+    // This function will be called upon the first camera frame is available.
+    private void resetToPreview() {
+        mCaptureState = CAPTURE_STATE_VIEWFINDER;
+
+        Util.fadeOut(mPanoProgressBar);
+        //mPanoProgressBar.setVisibility(View.GONE);
+        mMosaicFrameProcessor.reset();
+        mCameraTexture.setOnFrameAvailableListener(this);
+        setupProgressDirectionMatrix();
+        mCamManager.setRenderToTexture(mCameraTexture);
+    }
+
 
     /**
      * Call this when you're done using MosaicProxy, to remove views added and shutdown
@@ -295,19 +335,16 @@ public class MosaicProxy extends CaptureTransformer
     public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i2) {
         mMosaicTexture = surfaceTexture;
 
-        Camera.Parameters params = mActivity.getCamManager().getParameters();
-        int previewWidth = params.getPreviewSize().width;
-        int previewHeight = params.getPreviewSize().height;
+        initMosaicFrameProcessorIfNeeded();
 
+        configMosaicPreview(mPreviewWidth, mPreviewHeight);
+    }
+
+    public int getPreviewBufSize() {
         PixelFormat pixelInfo = new PixelFormat();
-        PixelFormat.getPixelFormatInfo(params.getPreviewFormat(), pixelInfo);
+        PixelFormat.getPixelFormatInfo(mActivity.getCamManager().getParameters().getPreviewFormat(), pixelInfo);
         // TODO: remove this extra 32 byte after the driver bug is fixed.
-        int previewBufSize = (previewWidth * previewHeight * pixelInfo.bitsPerPixel / 8) + 32;
-
-        mMosaicFrameProcessor.initialize(previewWidth, previewHeight, previewBufSize);
-        mMosaicFrameProcessorInitialized = true;
-
-        configMosaicPreview(previewWidth, previewHeight);
+        return (mPreviewWidth * mPreviewHeight * pixelInfo.bitsPerPixel / 8) + 32;
     }
 
     @Override
@@ -330,10 +367,12 @@ public class MosaicProxy extends CaptureTransformer
         // Reset values so we can do this again.
         mCancelComputation = false;
         mTimeTaken = System.currentTimeMillis();
-       // mShutterButton.setImageResource(R.drawable.btn_shutter_recording);
+        // mShutterButton.setImageResource(R.drawable.btn_shutter_recording);
         mCaptureState = CAPTURE_STATE_MOSAIC;
         //mCaptureIndicator.setVisibility(View.VISIBLE);
         //showDirectionIndicators(PanoProgressBar.DIRECTION_NONE);
+        mPanoProgressBar.setDoneColor(mActivity.getResources().getColor(R.color.pano_progress_done));
+        mPanoProgressBar.setIndicatorColor(mIndicatorColor);
 
         mMosaicFrameProcessor.setProgressListener(new MosaicFrameProcessor.ProgressListener() {
             @Override
@@ -344,23 +383,23 @@ public class MosaicProxy extends CaptureTransformer
                 if (isFinished
                         || (Math.abs(accumulatedHorizontalAngle) >= DEFAULT_SWEEP_ANGLE)
                         || (Math.abs(accumulatedVerticalAngle) >= DEFAULT_SWEEP_ANGLE)) {
-                    Log.e(TAG, "TODO: STOP CAPTURE"); // TODO
-                    //stopCapture(false);
+                    stopCapture(false);
                 } else {
                     float panningRateXInDegree = panningRateX * mHorizontalViewAngle;
                     float panningRateYInDegree = panningRateY * mVerticalViewAngle;
-                    //updateProgress(panningRateXInDegree, panningRateYInDegree,
-                    //        accumulatedHorizontalAngle, accumulatedVerticalAngle);
+                    updateProgress(panningRateXInDegree, panningRateYInDegree,
+                            accumulatedHorizontalAngle, accumulatedVerticalAngle);
                 }
             }
         });
 
-        //mPanoProgressBar.reset();
+        mPanoProgressBar.reset();
         // TODO: calculate the indicator width according to different devices to reflect the actual
         // angle of view of the camera device.
-        //mPanoProgressBar.setIndicatorWidth(20);
-        //mPanoProgressBar.setMaxProgress(DEFAULT_SWEEP_ANGLE);
-        //mPanoProgressBar.setVisibility(View.VISIBLE);
+        mPanoProgressBar.setIndicatorWidth(20);
+        mPanoProgressBar.setMaxProgress(DEFAULT_SWEEP_ANGLE);
+        mPanoProgressBar.setVisibility(View.VISIBLE);
+        Util.fadeIn(mPanoProgressBar);
         //mDeviceOrientationAtCapture = mDeviceOrientation;
         //keepScreenOn();
         //mActivity.getOrientationManager().lockOrientation();
@@ -378,12 +417,15 @@ public class MosaicProxy extends CaptureTransformer
 
         mCameraTexture.setOnFrameAvailableListener(null);
 
+        mPanoProgressBar.setDoneColor(mActivity.getResources().getColor(R.color.pano_saving_done));
+        mPanoProgressBar.setIndicatorColor(mActivity.getResources().getColor(R.color.pano_saving_indication));
+
         if (!aborted /*&& !mThreadRunning*/) {
             //mRotateDialog.showWaitingDialog(mPreparePreviewString);
             // Hide shutter button, shutter icon, etc when waiting for
             // panorama to stitch
             //mActivity.hideUI();
-            new Thread() {
+            runInBackground(new Thread() {
                 @Override
                 public void run() {
                     MosaicJpeg jpeg = generateFinalMosaic(false);
@@ -398,7 +440,7 @@ public class MosaicProxy extends CaptureTransformer
                                 MSG_RESET_TO_PREVIEW));
                     }
                 }
-            }.start();
+            });
         }
         //keepScreenOnAwhile();
     }
@@ -460,7 +502,8 @@ public class MosaicProxy extends CaptureTransformer
     }
 
     public void saveHighResMosaic() {
-        new Thread() {
+        CameraActivity.notify(mActivity.getString(R.string.pano_panorama_rendering), 2000);
+        runInBackground(new Thread() {
             @Override
             public void run() {
                 //mPartialWakeLock.acquire();
@@ -481,12 +524,13 @@ public class MosaicProxy extends CaptureTransformer
                     if (uri != null) {
                         Util.broadcastNewPicture(mActivity, uri);
                     }
+
                     mMainHandler.sendMessage(
                             mMainHandler.obtainMessage(MSG_RESET_TO_PREVIEW));
                 }
             }
-        }.start();
-        //reportProgress();
+        });
+        reportProgress();
     }
 
     private Uri savePanorama(byte[] jpegData, int width, int height, int orientation) {
@@ -516,5 +560,125 @@ public class MosaicProxy extends CaptureTransformer
                     null, orientation, jpegLength, filepath, width, height);
         }
         return null;
+    }
+
+
+    private void clearMosaicFrameProcessorIfNeeded() {
+        //if (!mPaused || mThreadRunning) return;
+        // Only clear the processor if it is initialized by this activity
+        // instance. Other activity instances may be using it.
+        if (mMosaicFrameProcessorInitialized) {
+            //mMosaicFrameProcessor.clear();
+            //mMosaicFrameProcessorInitialized = false;
+        }
+    }
+
+    private void initMosaicFrameProcessorIfNeeded() {
+        //if (mPaused || mThreadRunning) return;
+        if (mMosaicFrameProcessorInitialized == false) {
+            mMosaicFrameProcessor.initialize(
+                    mPreviewWidth, mPreviewHeight, getPreviewBufSize());
+            mMosaicFrameProcessorInitialized = true;
+        }
+    }
+
+    private void updateProgress(float panningRateXInDegree, float panningRateYInDegree,
+                                float progressHorizontalAngle, float progressVerticalAngle) {
+        mGLRootView.invalidate();
+
+        if ((Math.abs(panningRateXInDegree) > PANNING_SPEED_THRESHOLD)
+                || (Math.abs(panningRateYInDegree) > PANNING_SPEED_THRESHOLD)) {
+            showTooFastIndication();
+        } else {
+            hideTooFastIndication();
+        }
+
+        // progressHorizontalAngle and progressVerticalAngle are relative to the
+        // camera. Convert them to UI direction.
+        mProgressAngle[0] = progressHorizontalAngle;
+        mProgressAngle[1] = progressVerticalAngle;
+        mProgressDirectionMatrix.mapPoints(mProgressAngle);
+
+        int angleInMajorDirection =
+                (Math.abs(mProgressAngle[0]) > Math.abs(mProgressAngle[1]))
+                        ? (int) mProgressAngle[0]
+                        : (int) mProgressAngle[1];
+        mPanoProgressBar.setProgress((angleInMajorDirection));
+    }
+
+    public void reportProgress() {
+        mPanoProgressBar.reset();
+        mPanoProgressBar.setRightIncreasing(true);
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                while (mThreadRunning) {
+                    final int progress = mMosaicFrameProcessor.reportProgress(
+                            true, mCancelComputation);
+
+                    try {
+                        synchronized (mWaitObject) {
+                            mWaitObject.wait(50);
+                        }
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException("Panorama reportProgress failed", e);
+                    }
+                    // Update the progress bar
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mPanoProgressBar.setProgress(progress);
+                        }
+                    });
+                }
+            }
+        };
+        t.start();
+    }
+
+    private void runInBackground(Thread t) {
+        mThreadRunning = true;
+        t.start();
+    }
+
+    private void showTooFastIndication() {
+        //mTooFastPrompt.setVisibility(View.VISIBLE);
+        // The PreviewArea also contains the border for "too fast" indication.
+        //mPreviewArea.setVisibility(View.VISIBLE);
+        mPanoProgressBar.setIndicatorColor(mIndicatorColorFast);
+        //mLeftIndicator.setEnabled(true);
+        //mRightIndicator.setEnabled(true);
+    }
+
+    private void hideTooFastIndication() {
+        //mTooFastPrompt.setVisibility(View.GONE);
+        // We set "INVISIBLE" instead of "GONE" here because we need mPreviewArea to have layout
+        // information so we can know the size and position for mCameraScreenNail.
+        //mPreviewArea.setVisibility(View.INVISIBLE);
+        mPanoProgressBar.setIndicatorColor(mIndicatorColor);
+        //mLeftIndicator.setEnabled(false);
+        //mRightIndicator.setEnabled(false);
+    }
+
+    private void hideDirectionIndicators() {
+        /*mLeftIndicator.setVisibility(View.GONE);
+        mRightIndicator.setVisibility(View.GONE);*/
+    }
+
+    private void showDirectionIndicators(int direction) {
+        /*switch (direction) {
+            case PanoProgressBar.DIRECTION_NONE:
+                mLeftIndicator.setVisibility(View.VISIBLE);
+                mRightIndicator.setVisibility(View.VISIBLE);
+                break;
+            case PanoProgressBar.DIRECTION_LEFT:
+                mLeftIndicator.setVisibility(View.VISIBLE);
+                mRightIndicator.setVisibility(View.GONE);
+                break;
+            case PanoProgressBar.DIRECTION_RIGHT:
+                mLeftIndicator.setVisibility(View.GONE);
+                mRightIndicator.setVisibility(View.VISIBLE);
+                break;
+        }*/
     }
 }
