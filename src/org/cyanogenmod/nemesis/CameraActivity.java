@@ -499,8 +499,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mCamManager.doAutofocus(mFocusManager);
             return true;
         } else if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
-            // Use the volume up button as shutter button
-            mShutterButton.performClick();
+            // Use the volume up button as shutter button (or snapshot button in video mode)
+            if (mCameraMode == CAMERA_MODE_VIDEO) {
+                mSnapshotManager.queueSnapshot(true, 0);
+            } else {
+                mShutterButton.performClick();
+            }
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -1060,7 +1064,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            // In VIDEO mode, a double tap focuses
+            // In VIDEO mode, a double tap snapshots (or volume up)
             if (mCameraMode == CAMERA_MODE_VIDEO) {
                 mSnapshotManager.queueSnapshot(true, 0);
             }
