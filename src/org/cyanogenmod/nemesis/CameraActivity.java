@@ -522,18 +522,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     }
 
     public void initializePanorama() {
-        /*if (mCamManager.getPreviewSurface().getSurfaceTexture() == null) {
-            // We cannot initialize our Mosaic Proxy while the camera is not ready, so we delay it
-            mHandler.post(new Runnable() {
-                public void run() {
-                    initializePanorama();
-                }
-            });
-            return;
-        }*/
-
         mMosaicProxy = new MosaicProxy(this);
         findViewById(R.id.camera_preview_container).setVisibility(View.GONE);
+        setCaptureTransformer(mMosaicProxy);
     }
 
     /**

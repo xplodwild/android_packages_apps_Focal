@@ -20,25 +20,41 @@ package org.cyanogenmod.nemesis.pano;
 
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SnapshotManager;
+import org.cyanogenmod.nemesis.Storage;
+import org.cyanogenmod.nemesis.Util;
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
 import org.cyanogenmod.nemesis.ui.ShutterButton;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Nemesis interface to interact with Google's mosaic interface
@@ -75,20 +91,51 @@ public class MosaicProxy extends CaptureTransformer
     private float mVerticalViewAngle;
 
     private int mCaptureState;
-    private ViewGroup mGLRootView;
+    private FrameLayout mGLRootView;
     private TextureView mGLSurfaceView;
     private CameraActivity mActivity;
     private Handler mMainHandler;
     private SurfaceTexture mCameraTexture;
     private SurfaceTexture mMosaicTexture;
+    private boolean mCancelComputation;
+    private long mTimeTaken;
+    private Matrix mProgressDirectionMatrix = new Matrix();
+
+    private class MosaicJpeg {
+        public MosaicJpeg(byte[] data, int width, int height) {
+            this.data = data;
+            this.width = width;
+            this.height = height;
+            this.isValid = true;
+        }
+
+        public MosaicJpeg() {
+            this.data = null;
+            this.width = 0;
+            this.height = 0;
+            this.isValid = false;
+        }
+
+        public final byte[] data;
+        public final int width;
+        public final int height;
+        public final boolean isValid;
+    }
 
     public MosaicProxy(CameraActivity activity) {
         super(activity.getCamManager(), activity.getSnapManager());
         mActivity = activity;
+        mCaptureState = CAPTURE_STATE_VIEWFINDER;
 
-        mGLRootView = (ViewGroup) mActivity.findViewById(R.id.gl_renderer_container);
+        mGLRootView = (FrameLayout) mActivity.findViewById(R.id.gl_renderer_container);
         mGLSurfaceView = new TextureView(mActivity);
         mGLRootView.addView(mGLSurfaceView);
+
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
+        layoutParams.width = FrameLayout.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = FrameLayout.LayoutParams.WRAP_CONTENT;
+        layoutParams.gravity = Gravity.CENTER;
+
         mGLSurfaceView.setSurfaceTextureListener(this);
 
         mMosaicFrameProcessor = MosaicFrameProcessor.getInstance();
@@ -126,9 +173,9 @@ public class MosaicProxy extends CaptureTransformer
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case MSG_LOW_RES_FINAL_MOSAIC_READY:
-                        /*onBackgroundThreadFinished();
-                        showFinalMosaic((Bitmap) msg.obj);
-                        saveHighResMosaic();*/
+                        //onBackgroundThreadFinished();
+                        //showFinalMosaic((Bitmap) msg.obj);
+                        saveHighResMosaic();
                         break;
                     case MSG_GENERATE_FINAL_MOSAIC_ERROR:
                         /*onBackgroundThreadFinished();
@@ -164,16 +211,6 @@ public class MosaicProxy extends CaptureTransformer
         mHorizontalViewAngle = params.getHorizontalViewAngle();
         mVerticalViewAngle = params.getVerticalViewAngle();
 
-        int previewWidth = params.getPreviewSize().width;
-        int previewHeight = params.getPreviewSize().height;
-
-        PixelFormat pixelInfo = new PixelFormat();
-        PixelFormat.getPixelFormatInfo(params.getPreviewFormat(), pixelInfo);
-        // TODO: remove this extra 32 byte after the driver bug is fixed.
-        int previewBufSize = (previewWidth * previewHeight * pixelInfo.bitsPerPixel / 8) + 32;
-
-        mMosaicFrameProcessor.initialize(previewWidth, previewHeight, previewBufSize);
-        mMosaicFrameProcessorInitialized = true;
     }
 
     /**
@@ -185,12 +222,11 @@ public class MosaicProxy extends CaptureTransformer
     }
 
     private void configMosaicPreview(int w, int h) {
+        Log.d(TAG, "Mosaic Preview: " + w + "x" + h);
         // TODO: Grab the actual REAL landscape mode from orientation sensors
         boolean isLandscape = (mActivity.getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE);
 
-        int[] mTextures = new int[1];
-        GLES20.glGenTextures(1, mTextures, 0);
         mMosaicPreviewRenderer = new MosaicPreviewRenderer(mMosaicTexture, w, h, isLandscape);
 
         mCameraTexture = mMosaicPreviewRenderer.getInputSurfaceTexture();
@@ -203,13 +239,16 @@ public class MosaicProxy extends CaptureTransformer
         /* This function may be called by some random thread,
          * so let's be safe and jump back to ui thread.
          * No OpenGL calls can be done here. */
-        Log.e(TAG, "Frame available!");
         mActivity.runOnUiThread(mOnFrameAvailableRunnable);
     }
 
     @Override
     public void onShutterButtonClicked(ShutterButton button) {
-
+        if (mCaptureState == CAPTURE_STATE_MOSAIC) {
+            stopCapture(false);
+        } else {
+            startCapture();
+        }
     }
 
     @Override
@@ -259,6 +298,15 @@ public class MosaicProxy extends CaptureTransformer
         Camera.Parameters params = mActivity.getCamManager().getParameters();
         int previewWidth = params.getPreviewSize().width;
         int previewHeight = params.getPreviewSize().height;
+
+        PixelFormat pixelInfo = new PixelFormat();
+        PixelFormat.getPixelFormatInfo(params.getPreviewFormat(), pixelInfo);
+        // TODO: remove this extra 32 byte after the driver bug is fixed.
+        int previewBufSize = (previewWidth * previewHeight * pixelInfo.bitsPerPixel / 8) + 32;
+
+        mMosaicFrameProcessor.initialize(previewWidth, previewHeight, previewBufSize);
+        mMosaicFrameProcessorInitialized = true;
+
         configMosaicPreview(previewWidth, previewHeight);
     }
 
@@ -275,5 +323,198 @@ public class MosaicProxy extends CaptureTransformer
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
 
+    }
+
+    public void startCapture() {
+        Log.e(TAG, "Starting Panorama capture");
+        // Reset values so we can do this again.
+        mCancelComputation = false;
+        mTimeTaken = System.currentTimeMillis();
+       // mShutterButton.setImageResource(R.drawable.btn_shutter_recording);
+        mCaptureState = CAPTURE_STATE_MOSAIC;
+        //mCaptureIndicator.setVisibility(View.VISIBLE);
+        //showDirectionIndicators(PanoProgressBar.DIRECTION_NONE);
+
+        mMosaicFrameProcessor.setProgressListener(new MosaicFrameProcessor.ProgressListener() {
+            @Override
+            public void onProgress(boolean isFinished, float panningRateX, float panningRateY,
+                                   float progressX, float progressY) {
+                float accumulatedHorizontalAngle = progressX * mHorizontalViewAngle;
+                float accumulatedVerticalAngle = progressY * mVerticalViewAngle;
+                if (isFinished
+                        || (Math.abs(accumulatedHorizontalAngle) >= DEFAULT_SWEEP_ANGLE)
+                        || (Math.abs(accumulatedVerticalAngle) >= DEFAULT_SWEEP_ANGLE)) {
+                    Log.e(TAG, "TODO: STOP CAPTURE"); // TODO
+                    //stopCapture(false);
+                } else {
+                    float panningRateXInDegree = panningRateX * mHorizontalViewAngle;
+                    float panningRateYInDegree = panningRateY * mVerticalViewAngle;
+                    //updateProgress(panningRateXInDegree, panningRateYInDegree,
+                    //        accumulatedHorizontalAngle, accumulatedVerticalAngle);
+                }
+            }
+        });
+
+        //mPanoProgressBar.reset();
+        // TODO: calculate the indicator width according to different devices to reflect the actual
+        // angle of view of the camera device.
+        //mPanoProgressBar.setIndicatorWidth(20);
+        //mPanoProgressBar.setMaxProgress(DEFAULT_SWEEP_ANGLE);
+        //mPanoProgressBar.setVisibility(View.VISIBLE);
+        //mDeviceOrientationAtCapture = mDeviceOrientation;
+        //keepScreenOn();
+        //mActivity.getOrientationManager().lockOrientation();
+        setupProgressDirectionMatrix();
+    }
+
+    private void stopCapture(boolean aborted) {
+        mCaptureState = CAPTURE_STATE_VIEWFINDER;
+        //mCaptureIndicator.setVisibility(View.GONE);
+        //hideTooFastIndication();
+        //hideDirectionIndicators();
+
+        mMosaicFrameProcessor.setProgressListener(null);
+        //stopCameraPreview();
+
+        mCameraTexture.setOnFrameAvailableListener(null);
+
+        if (!aborted /*&& !mThreadRunning*/) {
+            //mRotateDialog.showWaitingDialog(mPreparePreviewString);
+            // Hide shutter button, shutter icon, etc when waiting for
+            // panorama to stitch
+            //mActivity.hideUI();
+            new Thread() {
+                @Override
+                public void run() {
+                    MosaicJpeg jpeg = generateFinalMosaic(false);
+
+                    if (jpeg != null && jpeg.isValid) {
+                        Bitmap bitmap = null;
+                        bitmap = BitmapFactory.decodeByteArray(jpeg.data, 0, jpeg.data.length);
+                        mMainHandler.sendMessage(mMainHandler.obtainMessage(
+                                MSG_LOW_RES_FINAL_MOSAIC_READY, bitmap));
+                    } else {
+                        mMainHandler.sendMessage(mMainHandler.obtainMessage(
+                                MSG_RESET_TO_PREVIEW));
+                    }
+                }
+            }.start();
+        }
+        //keepScreenOnAwhile();
+    }
+
+    /**
+     * Generate the final mosaic image.
+     *
+     * @param highRes flag to indicate whether we want to get a high-res version.
+     * @return a MosaicJpeg with its isValid flag set to true if successful; null if the generation
+     *         process is cancelled; and a MosaicJpeg with its isValid flag set to false if there
+     *         is an error in generating the final mosaic.
+     */
+    public MosaicJpeg generateFinalMosaic(boolean highRes) {
+        int mosaicReturnCode = mMosaicFrameProcessor.createMosaic(highRes);
+        if (mosaicReturnCode == Mosaic.MOSAIC_RET_CANCELLED) {
+            return null;
+        } else if (mosaicReturnCode == Mosaic.MOSAIC_RET_ERROR) {
+            return new MosaicJpeg();
+        }
+
+        byte[] imageData = mMosaicFrameProcessor.getFinalMosaicNV21();
+        if (imageData == null) {
+            Log.e(TAG, "getFinalMosaicNV21() returned null.");
+            return new MosaicJpeg();
+        }
+
+        int len = imageData.length - 8;
+        int width = (imageData[len + 0] << 24) + ((imageData[len + 1] & 0xFF) << 16)
+                + ((imageData[len + 2] & 0xFF) << 8) + (imageData[len + 3] & 0xFF);
+        int height = (imageData[len + 4] << 24) + ((imageData[len + 5] & 0xFF) << 16)
+                + ((imageData[len + 6] & 0xFF) << 8) + (imageData[len + 7] & 0xFF);
+        Log.v(TAG, "ImLength = " + (len) + ", W = " + width + ", H = " + height);
+
+        if (width <= 0 || height <= 0) {
+            // TODO: pop up an error message indicating that the final result is not generated.
+            Log.e(TAG, "width|height <= 0!!, len = " + (len) + ", W = " + width + ", H = " +
+                    height);
+            return new MosaicJpeg();
+        }
+
+        YuvImage yuvimage = new YuvImage(imageData, ImageFormat.NV21, width, height, null);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        yuvimage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
+        try {
+            out.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Exception in storing final mosaic", e);
+            return new MosaicJpeg();
+        }
+        return new MosaicJpeg(out.toByteArray(), width, height);
+    }
+
+    void setupProgressDirectionMatrix() {
+        int degrees = Util.getDisplayRotation(mActivity);
+        int cameraId = 0; //CameraHolder.instance().getBackCameraId();
+        int orientation = 0; // TODO //Util.getDisplayOrientation(degrees, cameraId);
+        mProgressDirectionMatrix.reset();
+        mProgressDirectionMatrix.postRotate(orientation);
+    }
+
+    public void saveHighResMosaic() {
+        new Thread() {
+            @Override
+            public void run() {
+                //mPartialWakeLock.acquire();
+                MosaicJpeg jpeg;
+                try {
+                    jpeg = generateFinalMosaic(true);
+                } finally {
+                    //mPartialWakeLock.release();
+                }
+
+                if (jpeg == null) {  // Cancelled by user.
+                    mMainHandler.sendEmptyMessage(MSG_RESET_TO_PREVIEW);
+                } else if (!jpeg.isValid) {  // Error when generating mosaic.
+                    mMainHandler.sendEmptyMessage(MSG_GENERATE_FINAL_MOSAIC_ERROR);
+                } else {
+                    int orientation = 0; //getCaptureOrientation();
+                    Uri uri = savePanorama(jpeg.data, jpeg.width, jpeg.height, orientation);
+                    if (uri != null) {
+                        Util.broadcastNewPicture(mActivity, uri);
+                    }
+                    mMainHandler.sendMessage(
+                            mMainHandler.obtainMessage(MSG_RESET_TO_PREVIEW));
+                }
+            }
+        }.start();
+        //reportProgress();
+    }
+
+    private Uri savePanorama(byte[] jpegData, int width, int height, int orientation) {
+        if (jpegData != null) {
+            String filename = PanoUtil.createName(
+                    mActivity.getResources().getString(R.string.pano_file_name_format), mTimeTaken);
+            String filepath = Storage.getStorage().writeFile(filename, jpegData);
+
+            // Add Exif tags.
+            try {
+                ExifInterface exif = new ExifInterface(filepath);
+                /*exif.setAttribute(ExifInterface.TAG_GPS_DATESTAMP,
+                        mGPSDateStampFormat.format(mTimeTaken));
+                exif.setAttribute(ExifInterface.TAG_GPS_TIMESTAMP,
+                        mGPSTimeStampFormat.format(mTimeTaken));
+                exif.setAttribute(ExifInterface.TAG_DATETIME,
+                        mDateTimeStampFormat.format(mTimeTaken));
+                exif.setAttribute(ExifInterface.TAG_ORIENTATION,
+                        getExifOrientation(orientation));*/
+                exif.saveAttributes();
+            } catch (IOException e) {
+                Log.e(TAG, "Cannot set EXIF for " + filepath, e);
+            }
+
+            int jpegLength = (int) (new File(filepath).length());
+            return Storage.getStorage().addImage(mActivity.getContentResolver(), filename, mTimeTaken,
+                    null, orientation, jpegLength, filepath, width, height);
+        }
+        return null;
     }
 }

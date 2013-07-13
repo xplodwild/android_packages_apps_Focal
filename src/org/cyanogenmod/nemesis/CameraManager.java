@@ -581,6 +581,7 @@ public class CameraManager {
                     }
 
                     mCamera.setParameters(params);
+                    mParameters = mCamera.getParameters();
                     try {
                         mCamera.startPreview();
                         mPreview.notifyPreviewSize(mTargetSize.x, mTargetSize.y);
