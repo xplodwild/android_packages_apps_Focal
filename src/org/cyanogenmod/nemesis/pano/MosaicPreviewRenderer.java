@@ -138,6 +138,7 @@ public class MosaicPreviewRenderer {
             if (mEglContext == null || mEglContext == EGL10.EGL_NO_CONTEXT) {
                 throw new RuntimeException("failed to createContext");
             }
+
             mEglSurface = mEgl.eglCreateWindowSurface(
                     mEglDisplay, mEglConfig, mMosaicOutputSurfaceTexture, null);
             if (mEglSurface == null || mEglSurface == EGL10.EGL_NO_SURFACE) {

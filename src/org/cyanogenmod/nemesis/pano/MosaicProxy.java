@@ -23,9 +23,11 @@ import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
@@ -43,7 +45,7 @@ import org.cyanogenmod.nemesis.ui.ShutterButton;
  * Strongly inspired from AOSP's PanoramaModule
  */
 public class MosaicProxy extends CaptureTransformer
-        implements SurfaceTexture.OnFrameAvailableListener {
+        implements SurfaceTexture.OnFrameAvailableListener, TextureView.SurfaceTextureListener {
     private static final String TAG = "CAM PanoModule";
 
     public static final int DEFAULT_SWEEP_ANGLE = 160;
@@ -78,7 +80,7 @@ public class MosaicProxy extends CaptureTransformer
     private CameraActivity mActivity;
     private Handler mMainHandler;
     private SurfaceTexture mCameraTexture;
-    private MosaicSurfaceTexture mMosaicTexture;
+    private SurfaceTexture mMosaicTexture;
 
     public MosaicProxy(CameraActivity activity) {
         super(activity.getCamManager(), activity.getSnapManager());
@@ -87,6 +89,7 @@ public class MosaicProxy extends CaptureTransformer
         mGLRootView = (ViewGroup) mActivity.findViewById(R.id.gl_renderer_container);
         mGLSurfaceView = new TextureView(mActivity);
         mGLRootView.addView(mGLSurfaceView);
+        mGLSurfaceView.setSurfaceTextureListener(this);
 
         mMosaicFrameProcessor = MosaicFrameProcessor.getInstance();
         Resources appRes = mActivity.getResources();
@@ -117,7 +120,6 @@ public class MosaicProxy extends CaptureTransformer
                 }
             }
         };
-
 
         mMainHandler = new Handler() {
             @Override
@@ -157,6 +159,7 @@ public class MosaicProxy extends CaptureTransformer
             }
         };
 
+        // Initialization
         Camera.Parameters params = mActivity.getCamManager().getParameters();
         mHorizontalViewAngle = params.getHorizontalViewAngle();
         mVerticalViewAngle = params.getVerticalViewAngle();
@@ -171,7 +174,6 @@ public class MosaicProxy extends CaptureTransformer
 
         mMosaicFrameProcessor.initialize(previewWidth, previewHeight, previewBufSize);
         mMosaicFrameProcessorInitialized = true;
-        configMosaicPreview(previewWidth, previewHeight);
     }
 
     /**
@@ -187,12 +189,13 @@ public class MosaicProxy extends CaptureTransformer
         boolean isLandscape = (mActivity.getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE);
 
-        mMosaicTexture = (MosaicSurfaceTexture) mCamManager.getPreviewSurface().getSurfaceTexture();
-        mMosaicTexture.initPreviewRenderer(w, h, isLandscape);
-        mMosaicPreviewRenderer = mMosaicTexture.getPreviewRenderer();
+        int[] mTextures = new int[1];
+        GLES20.glGenTextures(1, mTextures, 0);
+        mMosaicPreviewRenderer = new MosaicPreviewRenderer(mMosaicTexture, w, h, isLandscape);
 
         mCameraTexture = mMosaicPreviewRenderer.getInputSurfaceTexture();
-        mGLSurfaceView.setSurfaceTexture(mMosaicTexture);
+        mCameraTexture.setOnFrameAvailableListener(this);
+        mActivity.getCamManager().setRenderToTexture(mCameraTexture);
     }
 
     @Override
@@ -200,6 +203,7 @@ public class MosaicProxy extends CaptureTransformer
         /* This function may be called by some random thread,
          * so let's be safe and jump back to ui thread.
          * No OpenGL calls can be done here. */
+        Log.e(TAG, "Frame available!");
         mActivity.runOnUiThread(mOnFrameAvailableRunnable);
     }
 
@@ -245,6 +249,31 @@ public class MosaicProxy extends CaptureTransformer
 
     @Override
     public void onVideoRecordingStop() {
+
+    }
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i2) {
+        mMosaicTexture = surfaceTexture;
+
+        Camera.Parameters params = mActivity.getCamManager().getParameters();
+        int previewWidth = params.getPreviewSize().width;
+        int previewHeight = params.getPreviewSize().height;
+        configMosaicPreview(previewWidth, previewHeight);
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i2) {
+
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+        return false;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
 
     }
 }
