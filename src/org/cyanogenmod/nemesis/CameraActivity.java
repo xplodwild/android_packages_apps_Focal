@@ -189,6 +189,15 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         // Use SavePinger to animate a bit while we open the camera device
         mSavePinger.setPingOnly(true);
         mSavePinger.startSaving();
+
+        // Hack because review drawer size might not be measured yet
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mReviewDrawer.open();
+                mReviewDrawer.close();
+            }
+        }, 300);
     }
 
 
