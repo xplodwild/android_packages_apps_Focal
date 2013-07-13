@@ -7,6 +7,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_PACKAGE_NAME := Nemesis
 
 LOCAL_REQUIRED_MODULES := \
+	libjni_mosaic2 \
 	libexiv2 \
 	libglib-2.0 \
 	libgmodule-2.0 \
@@ -30,4 +31,5 @@ LOCAL_REQUIRED_MODULES := \
 
 include $(BUILD_PACKAGE)
 
--include $(call all-makefiles-under, $(ANDROID_BUILD_TOP)/external/Nemesis)
+include $(call all-makefiles-under, $(ANDROID_BUILD_TOP)/external/Nemesis)
+include $(call all-makefiles-under, jni)
