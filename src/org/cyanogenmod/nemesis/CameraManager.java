@@ -551,6 +551,9 @@ public class CameraManager {
                     if (mode == CameraActivity.CAMERA_MODE_PANO) {
                         // Apply special settings for panorama mode
                         initializePanoramaMode();
+                    } else {
+                        // Make sure the Infinity mode from panorama is gone
+                        params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
                     }
 
                     params.setPreviewSize(mTargetSize.x, mTargetSize.y);

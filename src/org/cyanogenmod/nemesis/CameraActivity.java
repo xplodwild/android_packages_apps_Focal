@@ -278,6 +278,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         // Reset PicSphere 3D renderer if we were in PS mode
         if (mCameraMode == CAMERA_MODE_PICSPHERE) {
             resetPicSphere();
+        } else if (mCameraMode == CAMERA_MODE_PANO) {
+            resetPanorama();
         }
 
         mCameraMode = newMode;
@@ -577,6 +579,13 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         setCaptureTransformer(mMosaicProxy);
         mExposureHudRing.setVisibility(View.GONE);
         mFocusHudRing.setVisibility(View.GONE);
+    }
+
+    public void resetPanorama() {
+        mMosaicProxy.tearDown();
+        mCamManager.setRenderToTexture(null);
+        findViewById(R.id.camera_preview_container).setVisibility(View.VISIBLE);
+        findViewById(R.id.gl_renderer_container).setVisibility(View.GONE);
     }
 
     /**
