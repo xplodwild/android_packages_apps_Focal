@@ -294,7 +294,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             initializePicSphere();
         }
 
-        updateCapabilities();
+        if (newMode != CAMERA_MODE_PANO) {
+            updateCapabilities();
+        }
+
         mCamManager.setCameraMode(mCameraMode);
 
         if (newMode == CAMERA_MODE_PANO) {

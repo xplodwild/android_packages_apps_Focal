@@ -551,10 +551,9 @@ public class CameraManager {
                     if (mode == CameraActivity.CAMERA_MODE_PANO) {
                         // Apply special settings for panorama mode
                         initializePanoramaMode();
-                    } else {
-                        // Apply default values
-                        params.setPreviewSize(mTargetSize.x, mTargetSize.y);
                     }
+
+                    params.setPreviewSize(mTargetSize.x, mTargetSize.y);
 
                     mCamera.setParameters(params);
                     mParameters = mCamera.getParameters();
@@ -599,6 +598,8 @@ public class CameraManager {
         Log.v(TAG, "preview h = " + previewSize.y + " , w = " + previewSize.x);
         parameters.setPreviewSize(previewSize.x, previewSize.y);
         mTargetSize = previewSize;
+
+        parameters.setPictureSize(previewSize.x, previewSize.y);
 
         List<int[]> frameRates = parameters.getSupportedPreviewFpsRange();
         int last = frameRates.size() - 1;
@@ -902,6 +903,7 @@ public class CameraManager {
                 }
                 mCamera.startPreview();
 
+                mParameters = mCamera.getParameters();
 
             } catch (Exception e) {
                 Log.d(TAG, "Error starting camera preview: " + e.getMessage());

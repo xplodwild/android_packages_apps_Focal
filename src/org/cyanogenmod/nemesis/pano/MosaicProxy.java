@@ -88,6 +88,7 @@ public class MosaicProxy extends CaptureTransformer
     private float mHorizontalViewAngle;
     private float mVerticalViewAngle;
 
+    private ShutterButton mShutterButton;
     private int mCaptureState;
     private FrameLayout mGLRootView;
     private TextureView mGLSurfaceView;
@@ -137,10 +138,6 @@ public class MosaicProxy extends CaptureTransformer
         mGLSurfaceView = new TextureView(mActivity);
         mGLRootView.addView(mGLSurfaceView);
 
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
-        layoutParams.width = FrameLayout.LayoutParams.WRAP_CONTENT;
-        layoutParams.height = FrameLayout.LayoutParams.WRAP_CONTENT;
-        layoutParams.gravity = Gravity.CENTER;
 
         mGLSurfaceView.setSurfaceTextureListener(this);
 
@@ -237,16 +234,28 @@ public class MosaicProxy extends CaptureTransformer
         mPreviewWidth = size.x;
         mPreviewHeight = size.y;
 
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
+        layoutParams.width = FrameLayout.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = FrameLayout.LayoutParams.WRAP_CONTENT;
+        layoutParams.gravity = Gravity.CENTER;
+        mGLSurfaceView.setLayoutParams(layoutParams);
+
+        layoutParams = (FrameLayout.LayoutParams) mGLRootView.getLayoutParams();
+        layoutParams.width = FrameLayout.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = FrameLayout.LayoutParams.WRAP_CONTENT;
+        layoutParams.gravity = Gravity.CENTER;
+        mGLSurfaceView.setLayoutParams(layoutParams);
+
     }
 
     // This function will be called upon the first camera frame is available.
     private void resetToPreview() {
         mCaptureState = CAPTURE_STATE_VIEWFINDER;
 
+        Util.fadeIn(mShutterButton);
         Util.fadeIn(mGLRootView);
         mActivity.hideOverlayBitmap();
         Util.fadeOut(mPanoProgressBar);
-        //mPanoProgressBar.setVisibility(View.GONE);
         mMosaicFrameProcessor.reset();
         mCameraTexture.setOnFrameAvailableListener(this);
         setupProgressDirectionMatrix();
@@ -266,12 +275,22 @@ public class MosaicProxy extends CaptureTransformer
         boolean isLandscape = (mCamManager.getOrientation() != -90);
         Log.d(TAG, "isLandscape ? " + isLandscape + " (orientation: " + mCamManager.getOrientation() + ")");
 
-        mMosaicPreviewRenderer = new MosaicPreviewRenderer(mMosaicTexture, mPreviewWidth,
-                mPreviewHeight, isLandscape);
+        int viewWidth = mGLRootView.getMeasuredWidth();
+        int viewHeight = mGLRootView.getMeasuredHeight();
+
+        mMosaicPreviewRenderer = new MosaicPreviewRenderer(mMosaicTexture, viewWidth,
+                viewHeight, isLandscape);
 
         mCameraTexture = mMosaicPreviewRenderer.getInputSurfaceTexture();
+        mCameraTexture.setDefaultBufferSize(mPreviewWidth, mPreviewHeight);
         mCameraTexture.setOnFrameAvailableListener(this);
-        mActivity.getCamManager().setRenderToTexture(mCameraTexture);
+        mMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mActivity.getCamManager().setRenderToTexture(mCameraTexture);
+            }
+        });
+        mMosaicTexture.setDefaultBufferSize(viewWidth, viewHeight);
     }
 
     @Override
@@ -284,10 +303,15 @@ public class MosaicProxy extends CaptureTransformer
 
     @Override
     public void onShutterButtonClicked(ShutterButton button) {
+        mShutterButton = button;
+
         if (mCaptureState == CAPTURE_STATE_MOSAIC) {
             stopCapture(false);
+            Util.fadeOut(button);
+            button.setImageResource(R.drawable.btn_shutter_photo);
         } else {
             startCapture();
+            button.setImageResource(R.drawable.btn_shutter_stop);
         }
     }
 
@@ -361,7 +385,8 @@ public class MosaicProxy extends CaptureTransformer
     }
 
     public void startCapture() {
-        Log.e(TAG, "Starting Panorama capture");
+        Log.v(TAG, "Starting Panorama capture");
+
         // Reset values so we can do this again.
         mCancelComputation = false;
         mTimeTaken = System.currentTimeMillis();
@@ -509,7 +534,7 @@ public class MosaicProxy extends CaptureTransformer
     }
 
     public void saveHighResMosaic() {
-        CameraActivity.notify(mActivity.getString(R.string.pano_panorama_rendering), 2000);
+        CameraActivity.notify(mActivity.getString(R.string.pano_panorama_rendering), 3000);
         runInBackground(new Thread() {
             @Override
             public void run() {
