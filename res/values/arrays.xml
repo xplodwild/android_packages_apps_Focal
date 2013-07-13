@@ -276,4 +276,23 @@
         <item>Daylight</item>
         <item>Cloudy Daylight</item>
     </string-array>
+
+    <!-- Auto-exposure widget values -->
+    <string-array name="widget_autoexposure_values" translatable="false">
+        <item>frame-average</item>
+        <item>center-weighted</item>
+        <item>spot-metering</item>
+    </string-array>
+
+    <array name="widget_autoexposure_icons" translatable="false">
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_placeholder</item>
+    </array>
+
+    <string-array name="widget_autoexposure_hints">
+        <item>Frame average</item>
+        <item>Center weighted</item>
+        <item>Spot metering</item>
+    </string-array>
 </resources>
