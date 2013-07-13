@@ -137,7 +137,6 @@ public class MosaicProxy extends CaptureTransformer
         mGLSurfaceView = new TextureView(mActivity);
         mGLRootView.addView(mGLSurfaceView);
 
-
         mGLSurfaceView.setSurfaceTextureListener(this);
 
         mMosaicFrameProcessor = MosaicFrameProcessor.getInstance();
@@ -194,20 +193,6 @@ public class MosaicProxy extends CaptureTransformer
                         CameraActivity.notify(
                                 mActivity.getString(R.string.pano_panorama_rendering_failed), 2000);
                         resetToPreview();
-                        /*
-                        if (mPaused) {
-                            resetToPreview();
-                        } else {
-                            mRotateDialog.showAlertDialog(
-                                    mDialogTitle, mDialogPanoramaFailedString,
-                                    mDialogOkString, new Runnable() {
-                                @Override
-                                public void run() {
-                                    resetToPreview();
-                                }},
-                                    null, null);
-                        }
-                        clearMosaicFrameProcessorIfNeeded();*/
                         break;
                     case MSG_RESET_TO_PREVIEW:
                         resetToPreview();
@@ -250,6 +235,9 @@ public class MosaicProxy extends CaptureTransformer
     // This function will be called upon the first camera frame is available.
     private void resetToPreview() {
         mCaptureState = CAPTURE_STATE_VIEWFINDER;
+        if (mShutterButton != null) {
+            mShutterButton.setImageResource(R.drawable.btn_shutter_photo);
+        }
 
         Util.fadeIn(mShutterButton);
         Util.fadeIn(mGLRootView);
@@ -307,7 +295,7 @@ public class MosaicProxy extends CaptureTransformer
         if (mCaptureState == CAPTURE_STATE_MOSAIC) {
             stopCapture(false);
             Util.fadeOut(button);
-            button.setImageResource(R.drawable.btn_shutter_photo);
+
         } else {
             startCapture();
             button.setImageResource(R.drawable.btn_shutter_stop);

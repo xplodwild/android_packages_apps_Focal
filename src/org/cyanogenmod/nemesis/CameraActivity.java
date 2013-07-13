@@ -32,12 +32,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -486,6 +488,20 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                         Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            // Use the volume down button as focus button
+            mCamManager.doAutofocus(mFocusManager);
+            return true;
+        } else if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
+            // Use the volume up button as shutter button
+            mShutterButton.performClick();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     public CameraManager getCamManager() {
