@@ -30,10 +30,10 @@ public class AutoExposureWidget extends SimpleToggleWidget {
     private static final String KEY_AUTOEXPOSURE = "auto-exposure";
 
     public AutoExposureWidget(CameraManager cam, Context context) {
-        super(cam, context, KEY_AUTOEXPOSURE, R.drawable.ic_widget_placeholder);
+        super(cam, context, KEY_AUTOEXPOSURE, R.drawable.ic_widget_autoexposure);
         inflateFromXml(R.array.widget_autoexposure_values, R.array.widget_autoexposure_icons,
                 R.array.widget_autoexposure_hints);
-        getToggleButton().setHintText(R.string.widget_whitebalance);
+        getToggleButton().setHintText(R.string.widget_autoexposure);
         restoreValueFromStorage(KEY_AUTOEXPOSURE);
     }
 }

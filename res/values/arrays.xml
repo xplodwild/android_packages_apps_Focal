@@ -181,7 +181,7 @@
         <item>@drawable/ic_widget_scenemode_auto</item>
         <item>@drawable/ic_widget_scenemode_antimotionblur</item>
         <item>@drawable/ic_widget_scenemode_ar</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_scenemode_asd</item>
         <item>@drawable/ic_widget_scenemode_baby</item>
         <item>@drawable/ic_widget_scenemode_backlight</item>
         <item>@drawable/ic_widget_scenemode_backlightportrait</item>
@@ -285,9 +285,9 @@
     </string-array>
 
     <array name="widget_autoexposure_icons" translatable="false">
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
-        <item>@drawable/ic_widget_placeholder</item>
+        <item>@drawable/ic_widget_autoexposure_frameaverage</item>
+        <item>@drawable/ic_widget_autoexposure_centerweighted</item>
+        <item>@drawable/ic_widget_autoexposure_spotmetering</item>
     </array>
 
     <string-array name="widget_autoexposure_hints">

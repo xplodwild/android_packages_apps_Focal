@@ -32,11 +32,8 @@ import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SettingsStorage;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -190,11 +187,11 @@ public class SettingsWidget extends WidgetBase {
         }
 
 
-        mResolutionButton = new WidgetOptionButton(R.drawable.ic_widget_placeholder, context);
+        mResolutionButton = new WidgetOptionButton(R.drawable.ic_widget_settings_resolution, context);
         mResolutionButton.setOnClickListener(mResolutionClickListener);
         addViewToContainer(mResolutionButton);
 
-        mToggleExposureRing = new WidgetOptionButton(R.drawable.ic_widget_placeholder, context);
+        mToggleExposureRing = new WidgetOptionButton(R.drawable.ic_widget_settings_exposurering, context);
         mToggleExposureRing.setOnClickListener(mExpoRingClickListener);
 
         // Restore exposure ring state
@@ -209,7 +206,7 @@ public class SettingsWidget extends WidgetBase {
         }
         addViewToContainer(mToggleExposureRing);
 
-        mToggleWidgetsButton = new WidgetOptionButton(R.drawable.ic_widget_settings, context);
+        mToggleWidgetsButton = new WidgetOptionButton(R.drawable.ic_widget_settings_widgets, context);
         mToggleWidgetsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

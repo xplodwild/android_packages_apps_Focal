@@ -43,6 +43,7 @@
 
     <string name="widget_settings_choose_widgets">Choose widgets in the sidebar</string>
 
+    <string name="widget_autoexposure">Exposure measure mode</string>
     <string name="widget_burstmode">Burst mode</string>
     <string name="widget_effect">Color effects</string>
     <string name="widget_enhancements">Color enhancements</string>
