@@ -8,7 +8,7 @@ LOCAL_PACKAGE_NAME := Nemesis
 
 # Change this to LOCAL_JNI_SHARED_LIBRARIES to include
 # the binaries in the apk
-LOCAL_REQUIRED_MODULESz := \
+LOCAL_REQUIRED_MODULES := \
 	libjni_mosaic2 \
 	libexiv2 \
 	libglib-2.0 \
