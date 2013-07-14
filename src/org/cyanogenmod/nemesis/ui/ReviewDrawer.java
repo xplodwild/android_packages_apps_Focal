@@ -42,6 +42,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.Util;
 
@@ -121,8 +122,12 @@ public class ReviewDrawer extends LinearLayout {
         mReviewedImage = (ImageView) findViewById(R.id.reviewed_image);
         mReviewedImageContainer = (ViewGroup) findViewById(R.id.reviewed_image_container);
 
-        // Load pictures from gallery
-        updateFromGallery();
+        // Load pictures or videos from gallery
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+            updateFromGallery(false);
+        } else {
+            updateFromGallery(true);
+        }
 
         // Make sure drawer is initially closed
         setTranslationX(-99999);
@@ -132,7 +137,6 @@ public class ReviewDrawer extends LinearLayout {
         View.OnTouchListener touchListener = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent ev) {
-                Log.e(TAG, "event");
                 if (ev.getActionMasked() == MotionEvent.ACTION_UP) {
                     clampReviewedImageSliding();
                 }
@@ -147,27 +151,36 @@ public class ReviewDrawer extends LinearLayout {
 
     /**
      * Clears the list of images and reload it from the Gallery (MediaStore)
+     * This method is threaded!
      *
-     * @note This method is threaded!
+     * @param images True to get images, false to get videos
      */
-    public void updateFromGallery() {
+    public void updateFromGallery(final boolean images) {
         new Thread() {
             public void run() {
-                updateFromGallerySynchronous();
+                updateFromGallerySynchronous(images);
             }
         }.start();
     }
 
     /**
      * Clears the list of images and reload it from the Gallery (MediaStore)
+     * This method is synchronous, see updateFromGallery for the threaded one.
      *
-     * @note This method is synchronous, see updateFromGallery for the threaded one
+     * @param images True to get images, false to get videos
      */
-    public void updateFromGallerySynchronous() {
+    public void updateFromGallerySynchronous(boolean images) {
         mImages.clear();
 
-        final String[] columns = {MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID};
-        final String orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
+        String[] columns = null;
+        String orderBy = null;
+        if (images) {
+            columns = new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID};
+            orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
+        } else {
+            columns = new String[]{MediaStore.Video.Media.DATA, MediaStore.Video.Media._ID};
+            orderBy = MediaStore.Video.Media.DATE_TAKEN + " ASC";
+        }
 
         // Select only the images that has been taken from the Camera
         ContentResolver cr = getContext().getContentResolver();
@@ -175,24 +188,33 @@ public class ReviewDrawer extends LinearLayout {
             Log.e(TAG, "No content resolver!");
             return;
         }
-        final Cursor cursor = getContext().getContentResolver().query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
-                new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
+        Cursor cursor = null;
+
+        if (images) {
+            cursor = cr.query(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
+                    new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
+        } else {
+            cursor = cr.query(
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Video.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
+                    new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
+        }
 
         if (cursor == null) {
             Log.e(TAG, "Null cursor from MediaStore!");
             return;
         }
 
-        final int imageColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+        final int imageColumnIndex = cursor.getColumnIndex(images ? MediaStore.Images.Media._ID : MediaStore.Video.Media._ID);
+        final Cursor finalCursor = cursor;
 
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < cursor.getCount(); i++) {
-                    cursor.moveToPosition(i);
+                for (int i = 0; i < finalCursor.getCount(); i++) {
+                    finalCursor.moveToPosition(i);
 
-                    int id = cursor.getInt(imageColumnIndex);
+                    int id = finalCursor.getInt(imageColumnIndex);
                     addImageToList(id);
                 }
             }
@@ -213,15 +235,19 @@ public class ReviewDrawer extends LinearLayout {
      * @return The orientation of the image, or 0 if it failed
      */
     public int getCameraPhotoOrientation(final int id) {
-        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
-                .appendPath(Integer.toString(id)).build();
-
-        String[] orientationColumn = {MediaStore.Images.Media.ORIENTATION};
-        Cursor cur = getContext().getContentResolver().query(uri, orientationColumn, null, null, null);
-        if (cur != null && cur.moveToFirst()) {
-            return cur.getInt(cur.getColumnIndex(orientationColumn[0]));
-        } else {
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
             return 0;
+        } else {
+            Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(id)).build();;
+            String[] orientationColumn = new String[]{MediaStore.Images.Media.ORIENTATION};
+
+            Cursor cur = getContext().getContentResolver().query(uri, orientationColumn, null, null, null);
+            if (cur != null && cur.moveToFirst()) {
+                return cur.getInt(cur.getColumnIndex(orientationColumn[0]));
+            } else {
+                return 0;
+            }
         }
     }
 
@@ -236,9 +262,15 @@ public class ReviewDrawer extends LinearLayout {
                 if (mReviewedBitmap != null)
                     mReviewedBitmap.recycle();
                 mReviewedImageId = id;
-                mReviewedBitmap = MediaStore.Images.Thumbnails.getThumbnail(
-                        getContext().getContentResolver(), id,
-                        MediaStore.Images.Thumbnails.MINI_KIND, null);
+                if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+                    mReviewedBitmap = MediaStore.Video.Thumbnails.getThumbnail(
+                            getContext().getContentResolver(), id,
+                            MediaStore.Video.Thumbnails.MINI_KIND, null);
+                } else {
+                    mReviewedBitmap = MediaStore.Images.Thumbnails.getThumbnail(
+                            getContext().getContentResolver(), id,
+                            MediaStore.Images.Thumbnails.MINI_KIND, null);
+                }
 
                 mReviewedImageOrientation = getCameraPhotoOrientation(id);
 
@@ -271,7 +303,12 @@ public class ReviewDrawer extends LinearLayout {
 
     private void openInGallery(int imageId) {
         if (imageId > 0) {
-            Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
+            Uri uri = null;
+            if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+                uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
+            } else {
+                uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
+            }
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             getContext().startActivity(intent);
         }
@@ -390,7 +427,11 @@ public class ReviewDrawer extends LinearLayout {
      */
     public void removeReviewedImage() {
         Util.removeFromGallery(getContext().getContentResolver(), mReviewedImageId);
-        updateFromGallery();
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+            updateFromGallery(false);
+        } else {
+            updateFromGallery(true);
+        }
 
         mHandler.postDelayed(new Runnable() {
             @Override
@@ -543,9 +584,13 @@ public class ReviewDrawer extends LinearLayout {
             final ImageView finalImageView = imageView;
             new Thread() {
                 public void run() {
-                    final Bitmap thumbnail = MediaStore.Images.Thumbnails.getThumbnail(
+                    final Bitmap thumbnail = CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO ?
+                            (MediaStore.Video.Thumbnails.getThumbnail(
                             getContext().getContentResolver(), mImages.get(i),
-                            MediaStore.Images.Thumbnails.MICRO_KIND, null);
+                            MediaStore.Video.Thumbnails.MICRO_KIND, null)) :
+                            (MediaStore.Images.Thumbnails.getThumbnail(
+                            getContext().getContentResolver(), mImages.get(i),
+                            MediaStore.Images.Thumbnails.MICRO_KIND, null));
 
                     if (thumbnail == null) {
                         Log.e(TAG, "Thumbnail is null!");

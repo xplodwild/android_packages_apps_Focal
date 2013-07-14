@@ -336,6 +336,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         if (newMode == CAMERA_MODE_PANO) {
             initializePanorama();
         }
+
+        // Reload pictures in the ReviewDrawer
+        mReviewDrawer.updateFromGallery(newMode != CAMERA_MODE_VIDEO);
     }
 
     /**

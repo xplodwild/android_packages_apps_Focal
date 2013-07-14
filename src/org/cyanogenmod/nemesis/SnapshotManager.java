@@ -590,7 +590,7 @@ public class SnapshotManager {
     public void onPause() {
         mPaused = true;
 
-        if (!mImageIsProcessing) {
+        if (!mImageIsProcessing && mImageSaver != null) {
             // We wait until the last processing image was saved
             mImageSaver.finish();
         }
@@ -602,6 +602,8 @@ public class SnapshotManager {
     }
 
     public void onResume() {
+        mPaused = false;
+
         // Restore threads if needed
         if (mImageSaver == null) {
             mImageSaver = new ImageSaver();
