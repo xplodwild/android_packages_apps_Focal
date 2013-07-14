@@ -89,9 +89,10 @@ public class PixelBuffer {
 
         int[] version = new int[2];
         int[] attribList = null;
+        final int mMaxTextureSize = mContext.getResources().getInteger(R.integer.config_maxTextureSize);
 
-        if (context.getResources().getBoolean(R.bool.config_deviceSupportsNonPoTTextures)) {
-            // The device supports non-PoT textures, so use the real image size
+        if (mWidth < mMaxTextureSize && mHeight < mMaxTextureSize) {
+            // The texture is smaller than the maximum supported size, use it directly.
             attribList = new int[] {
                     EGL_WIDTH, mWidth,
                     EGL_HEIGHT, mHeight,
@@ -100,11 +101,10 @@ public class PixelBuffer {
                     EGL_NONE
             };
         } else {
-            // The device requires a PoT texture, use the maximal size
-            final int maxSize = mContext.getResources().getInteger(R.integer.config_maxPoTTextureSize);
+            // Use the maximum supported texture size.
             attribList = new int[] {
-                    EGL_WIDTH, Math.min(maxSize, Util.getUpperPoT(mWidth)),
-                    EGL_HEIGHT, Math.min(maxSize, Util.getUpperPoT(mHeight)),
+                    EGL_WIDTH, mMaxTextureSize,
+                    EGL_HEIGHT, mMaxTextureSize,
                     EGL_LARGEST_PBUFFER, 1,
                     EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGBA,
                     EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
@@ -224,11 +224,11 @@ public class PixelBuffer {
     }
 
     private void convertToBitmap() {
-        boolean isScaled = !mContext.getResources().getBoolean(R.bool.config_deviceSupportsNonPoTTextures);
-        final int maxSize = mContext.getResources().getInteger(R.integer.config_maxPoTTextureSize);
+        final int mMaxTextureSize = mContext.getResources().getInteger(R.integer.config_maxTextureSize);
+        boolean isScaled = (mWidth > mMaxTextureSize || mHeight > mMaxTextureSize);
 
-        int scaledWidth = isScaled ? Math.min(maxSize, Util.getUpperPoT(mWidth)) : mWidth;
-        int scaledHeight = isScaled ? Math.min(maxSize, Util.getUpperPoT(mHeight)) : mHeight;
+        int scaledWidth = isScaled ? mMaxTextureSize : mWidth;
+        int scaledHeight = isScaled ? mMaxTextureSize : mHeight;
 
         IntBuffer ib = IntBuffer.allocate(scaledWidth*scaledHeight);
         IntBuffer ibt = IntBuffer.allocate(scaledWidth*scaledHeight);

@@ -27,13 +27,8 @@
      This enables snapshot during videos on older devices. -->
     <bool name="config_usePreviewForVideoSnapshot">false</bool>
 
-    <!-- Whether or not the device supports non-Power of Two textures (basically,
-    if AutoPictureEnhancer crashes) -->
-    <bool name="config_deviceSupportsNonPoTTextures">true</bool>
-
-    <!-- If deviceSupportsNonPoTTextures is false, this size is the maximal size
-    the texture can take (aka. the largest possible GL texture size) -->
-    <integer name="config_maxPoTTextureSize">4096</integer>
+    <!-- The largest possible GL texture size -->
+    <integer name="config_maxTextureSize">4096</integer>
 
     <!-- The ideal panorama picture resolution to use. AOSP enforces a 640x480 resolution
     whenever possible, but we can get better shots with higher resolution just as well. -->

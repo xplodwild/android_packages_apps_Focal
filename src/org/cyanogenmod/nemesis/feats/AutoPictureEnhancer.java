@@ -78,12 +78,11 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
         // Generate textures
         GLES20.glGenTextures(1, mTextures, 0);
 
+        final int mMaxTextureSize = mContext.getResources().getInteger(R.integer.config_maxTextureSize);
         // Load input bitmap
-        if (!mContext.getResources().getBoolean(R.bool.config_deviceSupportsNonPoTTextures)) {
-            final int maxSize = mContext.getResources().getInteger(R.integer.config_maxPoTTextureSize);
-
-            mImageWidth = Math.min(maxSize, Util.getUpperPoT(bitmap.getWidth()));
-            mImageHeight = Math.min(maxSize, Util.getUpperPoT(bitmap.getHeight()));
+        if (bitmap.getWidth() > mMaxTextureSize || bitmap.getHeight() > mMaxTextureSize) {
+            mImageWidth = mMaxTextureSize;
+            mImageHeight = mMaxTextureSize;
         } else {
             mImageWidth = bitmap.getWidth();
             mImageHeight = bitmap.getHeight();
@@ -152,9 +151,10 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        final int mMaxTextureSize = mContext.getResources().getInteger(R.integer.config_maxTextureSize);
         if (mTexRenderer != null) {
-            if (!mContext.getResources().getBoolean(R.bool.config_deviceSupportsNonPoTTextures)) {
-                mTexRenderer.updateViewSize(width, width);
+            if (width > mMaxTextureSize || height > mMaxTextureSize) {
+                mTexRenderer.updateViewSize(mMaxTextureSize, mMaxTextureSize);
             } else {
                 mTexRenderer.updateViewSize(width, height);
             }
