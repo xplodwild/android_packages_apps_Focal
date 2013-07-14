@@ -107,6 +107,29 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private boolean mCancelSideBarClose;
 
     /**
+     * Gesture listeners to apply on camera previews views
+     */
+    private View.OnTouchListener mPreviewTouchListener =  new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent ev) {
+            if (ev.getAction() == MotionEvent.ACTION_UP) {
+                mSideBar.clampSliding();
+                mReviewDrawer.clampSliding();
+            }
+
+            // Process HUD gestures only if we aren't pinching
+            mHasPinchZoomed = false;
+            mZoomGestureDetector.onTouchEvent(ev);
+
+            if (!mHasPinchZoomed) {
+                mGestureDetector.onTouchEvent(ev);
+            }
+
+            return true;
+        }
+    };
+
+    /**
      * Event: Activity created
      */
     @Override
@@ -164,27 +187,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         // Setup gesture detection
         mGestureDetector = new GestureDetector(this, new GestureListener());
         mZoomGestureDetector = new ScaleGestureDetector(this, new ZoomGestureListener());
-        View.OnTouchListener touchListener = new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent ev) {
-                if (ev.getAction() == MotionEvent.ACTION_UP) {
-                    mSideBar.clampSliding();
-                    mReviewDrawer.clampSliding();
-                }
 
-                // Process HUD gestures only if we aren't pinching
-                mHasPinchZoomed = false;
-                mZoomGestureDetector.onTouchEvent(ev);
-
-                if (!mHasPinchZoomed) {
-                    mGestureDetector.onTouchEvent(ev);
-                }
-
-                return true;
-            }
-        };
-
-        mCamManager.getPreviewSurface().setOnTouchListener(touchListener);
+        mCamManager.getPreviewSurface().setOnTouchListener(mPreviewTouchListener);
 
         // Use SavePinger to animate a bit while we open the camera device
         mSavePinger.setPingOnly(true);
@@ -589,6 +593,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     public void initializePanorama() {
         mMosaicProxy = new MosaicProxy(this);
         findViewById(R.id.camera_preview_container).setVisibility(View.GONE);
+        findViewById(R.id.gl_renderer_container).setOnTouchListener(mPreviewTouchListener);
         setCaptureTransformer(mMosaicProxy);
         mExposureHudRing.setVisibility(View.GONE);
         mFocusHudRing.setVisibility(View.GONE);
@@ -599,6 +604,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mCamManager.setRenderToTexture(null);
         findViewById(R.id.camera_preview_container).setVisibility(View.VISIBLE);
         findViewById(R.id.gl_renderer_container).setVisibility(View.GONE);
+        findViewById(R.id.gl_renderer_container).setOnTouchListener(null);
     }
 
     /**
@@ -727,6 +733,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         @Override
         public void onSlideOpen() {
             mSwitchRingPad.animateOpen();
+
+            // Tapping the shutter button locked exposure/WB, so we unlock it if we slide our finger
+            mCamManager.setLockSetup(false);
         }
 
         @Override

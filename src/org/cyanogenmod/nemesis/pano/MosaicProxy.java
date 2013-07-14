@@ -104,6 +104,7 @@ public class MosaicProxy extends CaptureTransformer
     private int mPreviewHeight;
     private boolean mThreadRunning;
     final private Object mWaitObject = new Object();
+    private int mCurrentOrientation;
 
     private class MosaicJpeg {
         public MosaicJpeg(byte[] data, int width, int height) {
@@ -239,6 +240,7 @@ public class MosaicProxy extends CaptureTransformer
             mShutterButton.setImageResource(R.drawable.btn_shutter_photo);
         }
 
+        mCamManager.setLockSetup(false);
         Util.fadeIn(mShutterButton);
         Util.fadeIn(mGLRootView);
         mActivity.hideOverlayBitmap();
@@ -387,6 +389,10 @@ public class MosaicProxy extends CaptureTransformer
         boolean isLandscape = (mCamManager.getOrientation() != -90);
         Log.d(TAG, "isLandscape ? " + isLandscape + " (orientation: " + mCamManager.getOrientation() + ")");
         mMosaicPreviewRenderer.setLandscape(isLandscape);
+
+        mCurrentOrientation = mActivity.getCamManager().getOrientation();
+        if (mCurrentOrientation == -90) mCurrentOrientation = 90;
+        if (mCurrentOrientation < 0) mCurrentOrientation += 360;
 
         mMosaicFrameProcessor.setProgressListener(new MosaicFrameProcessor.ProgressListener() {
             @Override
@@ -539,8 +545,7 @@ public class MosaicProxy extends CaptureTransformer
                 } else if (!jpeg.isValid) {  // Error when generating mosaic.
                     mMainHandler.sendEmptyMessage(MSG_GENERATE_FINAL_MOSAIC_ERROR);
                 } else {
-                    int orientation = 0; //getCaptureOrientation();
-                    Uri uri = savePanorama(jpeg.data, jpeg.width, jpeg.height, orientation);
+                    Uri uri = savePanorama(jpeg.data, jpeg.width, jpeg.height, mCurrentOrientation);
                     if (uri != null) {
                         Util.broadcastNewPicture(mActivity, uri);
                     }
@@ -567,9 +572,9 @@ public class MosaicProxy extends CaptureTransformer
                 exif.setAttribute(ExifInterface.TAG_GPS_TIMESTAMP,
                         mGPSTimeStampFormat.format(mTimeTaken));
                 exif.setAttribute(ExifInterface.TAG_DATETIME,
-                        mDateTimeStampFormat.format(mTimeTaken));
+                        mDateTimeStampFormat.format(mTimeTaken));*/
                 exif.setAttribute(ExifInterface.TAG_ORIENTATION,
-                        getExifOrientation(orientation));*/
+                        getExifOrientation(orientation));
                 exif.saveAttributes();
             } catch (IOException e) {
                 Log.e(TAG, "Cannot set EXIF for " + filePath, e);
@@ -580,6 +585,21 @@ public class MosaicProxy extends CaptureTransformer
                     null, orientation, jpegLength, filePath, width, height);
         }
         return null;
+    }
+
+    private static String getExifOrientation(int orientation) {
+        switch (orientation) {
+            case 0:
+                return String.valueOf(ExifInterface.ORIENTATION_NORMAL);
+            case 90:
+                return String.valueOf(ExifInterface.ORIENTATION_ROTATE_90);
+            case 180:
+                return String.valueOf(ExifInterface.ORIENTATION_ROTATE_180);
+            case 270:
+                return String.valueOf(ExifInterface.ORIENTATION_ROTATE_270);
+            default:
+                throw new AssertionError("invalid: " + orientation);
+        }
     }
 
     private void initMosaicFrameProcessorIfNeeded() {
