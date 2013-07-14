@@ -18,10 +18,17 @@
 
 package org.cyanogenmod.nemesis.picsphere;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.util.Log;
 
+import org.cyanogenmod.nemesis.CameraActivity;
+import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SnapshotManager;
 
 import java.io.File;
@@ -29,7 +36,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class manages the interaction and processing of Picture Spheres ("PicSphere"). PicSphere
@@ -38,9 +47,11 @@ import java.util.List;
  *
  * Can you feel the awesomeness?
  */
-public class PicSphereManager {
+public class PicSphereManager implements PicSphere.ProgressListener {
     public final static String TAG = "PicSphereManager";
     private List<PicSphere> mPicSpheres;
+    private Map<PicSphere, Integer> mPicSpheresNotif;
+    int mNextNotificationId;
     private Context mContext;
     private SnapshotManager mSnapManager;
     private Capture3DRenderer mCapture3DRenderer;
@@ -49,6 +60,8 @@ public class PicSphereManager {
         mContext = context;
         mSnapManager = snapMan;
         mPicSpheres = new ArrayList<PicSphere>();
+        mPicSpheresNotif = new HashMap<PicSphere, Integer>();
+        mNextNotificationId = 0;
         new Thread() {
             public void run() { copyBinaries(); }
         }.start();
@@ -86,6 +99,7 @@ public class PicSphereManager {
 
         new Thread() {
             public void run() {
+                sphere.setProgressListener(PicSphereManager.this);
                 sphere.render();
             }
         }.start();
@@ -117,7 +131,7 @@ public class PicSphereManager {
     private boolean copyBinaries() {
         try {
             String files[] = {
-                "autooptimiser", "autopano", "celeste", "enblend", "enfuse", "nona", "pano_modify",
+                    "autooptimiser", "autopano", "celeste", "enblend", "enfuse", "nona", "pano_modify",
                     "ptclean", "tiffinfo", "align_image_stack",
                     "libexiv2.so", "libglib-2.0.so", "libgmodule-2.0.so", "libgobject-2.0.so",
                     "libgthread-2.0.so", "libjpeg.so", "libpano13.so", "libtiff.so", "libtiffdecoder.so",
@@ -158,5 +172,76 @@ public class PicSphereManager {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void onRenderStart(PicSphere sphere) {
+        // Notify toast
+        CameraActivity.notify("Rendering your PicSphere in the background...", 2500);
+
+        // Display a notification
+        NotificationManager mNotificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(mNextNotificationId, buildProgressNotification(0, "Preparing..."));
+
+        // Store notification ID to reuse it later
+        mPicSpheresNotif.put(sphere, mNextNotificationId);
+        mNextNotificationId++;
+    }
+
+    @Override
+    public void onStepChange(PicSphere sphere, int newStep) {
+        int progressPerStep = 100 / PicSphere.STEP_TOTAL;
+        int progress = newStep * progressPerStep;
+        String text = "";
+
+        switch (newStep) {
+            case PicSphere.STEP_AUTOPANO:
+                text = mContext.getString(R.string.picsphere_step_autopano);
+                break;
+
+            case PicSphere.STEP_PTCLEAN:
+                text = mContext.getString(R.string.picsphere_step_ptclean);
+                break;
+
+            case PicSphere.STEP_AUTOOPTIMISER:
+                text = mContext.getString(R.string.picsphere_step_autooptimiser);
+                break;
+
+            case PicSphere.STEP_PANOMODIFY:
+                text = mContext.getString(R.string.picsphere_step_panomodify);
+                break;
+
+            case PicSphere.STEP_NONA:
+                text = mContext.getString(R.string.picsphere_step_nona);
+                break;
+
+            case PicSphere.STEP_ENBLEND:
+                text = mContext.getString(R.string.picsphere_step_enblend);
+                break;
+        }
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(mPicSpheresNotif.get(sphere),
+                buildProgressNotification(progress, text));
+    }
+
+    @Override
+    public void onRenderDone(PicSphere sphere) {
+        NotificationManager mNotificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(mPicSpheresNotif.get(sphere));
+    }
+
+    private Notification buildProgressNotification(int percentage, String text) {
+        Notification.Builder mBuilder =
+                new Notification.Builder(mContext)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle(mContext.getString(R.string.picsphere_notif_title))
+                        .setContentText(percentage+"% ("+text+")")
+                        .setOngoing(true);
+
+        return mBuilder.build();
     }
 }

@@ -64,7 +64,16 @@
     <string name="pano_file_name_format" translatable="false">"'PANO'_yyyyMMdd_HHmmss"</string>
 
     <string name="pano_panorama_rendering_failed">Failed to render panorama.\nTry to take a shorter one.</string>
-    <string name="pano_panorama_rendering">Rendering panorama...</string>
+    <string name="pano_panorama_rendering">Rendering panorama&#8230;</string>
+
+    <!-- PicSphere status -->
+    <string name="picsphere_notif_title">Rendering PicSphere&#8230;</string>
+    <string name="picsphere_step_autopano">Matching pictures&#8230;</string>
+    <string name="picsphere_step_autooptimiser">Optimizing matches&#8230;</string>
+    <string name="picsphere_step_ptclean">Cleaning matching points&#8230;</string>
+    <string name="picsphere_step_panomodify">Cropping empty areas&#8230;</string>
+    <string name="picsphere_step_nona">Stitching pictures&#8230;</string>
+    <string name="picsphere_step_enblend">Blending pictures&#8230;</string>
 </resources>
 
 

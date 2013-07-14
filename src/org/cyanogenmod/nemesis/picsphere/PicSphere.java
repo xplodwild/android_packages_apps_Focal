@@ -61,6 +61,7 @@ public class PicSphere {
     public final static int STEP_PANOMODIFY = 4;
     public final static int STEP_NONA = 5;
     public final static int STEP_ENBLEND = 6;
+    public final static int STEP_TOTAL = 6;
 
     private Thread mOutputLogger = new Thread() {
         public void run() {
@@ -104,8 +105,13 @@ public class PicSphere {
      * Renders the sphere
      */
     protected void render() {
+        if (mProgressListener != null) {
+            mProgressListener.onRenderStart(this);
+        }
+
         // Prepare a temporary directory
         Log.d(TAG, "Preparing temp dir for PicSphere rendering...");
+
         File appFilesDir = mContext.getFilesDir();
         mPathPrefix = appFilesDir.getAbsolutePath() + "/";
         String tempPathStr = appFilesDir.getAbsolutePath() + "/" + System.currentTimeMillis();
@@ -147,6 +153,10 @@ public class PicSphere {
             doEnblend();
         } catch (IOException ex) {
             Log.e(TAG, "Unable to process: ", ex);
+        }
+
+        if (mProgressListener != null) {
+            mProgressListener.onRenderDone(this);
         }
     }
 

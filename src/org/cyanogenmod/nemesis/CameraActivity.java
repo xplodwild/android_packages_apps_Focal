@@ -584,7 +584,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         picsphereContainer.addView(mPicSphere3DView);
         picsphereContainer.setVisibility(View.VISIBLE);
 
-
         // Setup the capture transformer
         setCaptureTransformer(new PicSphereCaptureTransformer(mPicSphereManager, mCamManager, mSnapshotManager));
 
