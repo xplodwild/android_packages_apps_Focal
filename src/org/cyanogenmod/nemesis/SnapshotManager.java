@@ -140,6 +140,7 @@ public class SnapshotManager {
     private ImageNamer mImageNamer;
     private PixelBuffer mOffscreenGL;
     private AutoPictureEnhancer mAutoPicEnhancer;
+    private boolean mImageIsProcessing;
 
     // Video-related variables
     private long mRecordingStartTime;
@@ -208,6 +209,7 @@ public class SnapshotManager {
                 if (!snap.mBypassProcessing) {
                     new Thread() {
                         public void run() {
+                            mImageIsProcessing = true;
                             for (SnapshotListener listener : mListeners) {
                                 listener.onSnapshotProcessing(snap);
                             }
@@ -223,12 +225,23 @@ public class SnapshotManager {
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
                             mOffscreenGL.getBitmap().compress(Bitmap.CompressFormat.JPEG, 90, baos);
 
-                            mImageSaver.addImage(baos.toByteArray(), uri, title, null,
-                                    width, height, correctedOrientation);
+                            if (mImageSaver != null) {
+                                mImageSaver.addImage(baos.toByteArray(), uri, title, null,
+                                        width, height, correctedOrientation);
+                            } else {
+                                Log.e(TAG, "ImageSaver was null: couldn't save image!");
+                            }
+
+                            if (mPaused) {
+                                // We were paused, stop the saver now
+                                mImageSaver.finish();
+                                mImageSaver = null;
+                            }
 
                             for (SnapshotListener listener : mListeners) {
                                 listener.onSnapshotSaved(snap);
                             }
+                            mImageIsProcessing = false;
                         }
                     }.start();
                 } else {
@@ -318,6 +331,7 @@ public class SnapshotManager {
         mContentResolver = ctx.getContentResolver();
         mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
         mPaused = false;
+        mImageIsProcessing = false;
     }
 
     public void addListener(SnapshotListener listener) {
@@ -574,7 +588,12 @@ public class SnapshotManager {
     }
 
     public void onPause() {
-        mImageSaver.finish();
+        mPaused = true;
+
+        if (!mImageIsProcessing) {
+            // We wait until the last processing image was saved
+            mImageSaver.finish();
+        }
         mImageNamer.finish();
         mVideoNamer.finish();
         mImageSaver = null;
