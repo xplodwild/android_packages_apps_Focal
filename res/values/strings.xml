@@ -68,7 +68,9 @@
     <string name="pano_panorama_rendering">Rendering panorama&#8230;</string>
 
     <!-- PicSphere status -->
+    <string name="picsphere_toast_background_render">Rendering your PicSphere in the background&#8230;</string>
     <string name="picsphere_notif_title">Rendering PicSphere&#8230;</string>
+    <string name="picsphere_step_preparing">Preparing&#8230;</string>
     <string name="picsphere_step_autopano">Matching pictures&#8230;</string>
     <string name="picsphere_step_autooptimiser">Optimizing matches&#8230;</string>
     <string name="picsphere_step_ptclean">Cleaning matching points&#8230;</string>

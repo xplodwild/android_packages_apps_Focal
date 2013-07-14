@@ -177,12 +177,13 @@ public class PicSphereManager implements PicSphere.ProgressListener {
     @Override
     public void onRenderStart(PicSphere sphere) {
         // Notify toast
-        CameraActivity.notify("Rendering your PicSphere in the background...", 2500);
+        CameraActivity.notify(mContext.getString(R.string.picsphere_toast_background_render), 2500);
 
         // Display a notification
         NotificationManager mNotificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(mNextNotificationId, buildProgressNotification(0, "Preparing..."));
+        mNotificationManager.notify(mNextNotificationId, buildProgressNotification(0,
+                mContext.getString(R.string.picsphere_step_preparing)));
 
         // Store notification ID to reuse it later
         mPicSpheresNotif.put(sphere, mNextNotificationId);
