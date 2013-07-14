@@ -48,6 +48,7 @@ import java.util.List;
  */
 public class SnapshotManager {
     public final static String TAG = "SnapshotManager";
+    private boolean mPaused;
 
     public interface SnapshotListener {
         /**
@@ -316,6 +317,7 @@ public class SnapshotManager {
         mVideoNamer = new VideoNamer();
         mContentResolver = ctx.getContentResolver();
         mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+        mPaused = false;
     }
 
     public void addListener(SnapshotListener listener) {
@@ -569,6 +571,30 @@ public class SnapshotManager {
             return ".mp4";
         }
         return ".3gp";
+    }
+
+    public void onPause() {
+        mImageSaver.finish();
+        mImageNamer.finish();
+        mVideoNamer.finish();
+        mImageSaver = null;
+        mImageNamer = null;
+        mVideoNamer = null;
+    }
+
+    public void onResume() {
+        // Restore threads if needed
+        if (mImageSaver == null) {
+            mImageSaver = new ImageSaver();
+        }
+
+        if (mImageNamer == null) {
+            mImageNamer = new ImageNamer();
+        }
+
+        if (mVideoNamer == null) {
+            mVideoNamer = new VideoNamer();
+        }
     }
 
     // Each SaveRequest remembers the data needed to save an image.

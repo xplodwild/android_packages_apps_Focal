@@ -209,6 +209,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     protected void onPause() {
         // Pause the camera preview
         mCamManager.pause();
+        mSnapshotManager.onPause();
+        mOrientationListener.disable();
+
+        if (mPicSphereManager != null) {
+            mPicSphereManager.onPause();
+        }
 
         super.onPause();
     }
@@ -219,6 +225,16 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         if (mCamManager != null) {
             mCamManager.resume();
         }
+
+        if (mSnapshotManager != null) {
+            mSnapshotManager.onResume();
+        }
+
+        if (mPicSphereManager != null) {
+            mPicSphereManager.onResume();
+        }
+
+        mOrientationListener.enable();
 
         super.onResume();
         mReviewDrawer.close();
@@ -586,6 +602,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         root.width = FrameLayout.LayoutParams.MATCH_PARENT;
         root.height = FrameLayout.LayoutParams.MATCH_PARENT;
         camContainer.setLayoutParams(root);
+
+        setCaptureTransformer(null);
 
         mPicSphere3DView = null;
     }

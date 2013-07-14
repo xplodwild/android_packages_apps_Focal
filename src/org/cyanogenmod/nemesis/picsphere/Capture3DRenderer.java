@@ -234,7 +234,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         // Set the OpenGL viewport to the same size as the surface.
         GLES20.glViewport(0, 0, width, height);
 
-        // We use  here a field of view of 60, which is mostly find for a camera app representation
+        // We use here a field of view of 60, which is mostly fine for a camera app representation
         final float fov = 60.0f;
 
         // Create a new perspective projection matrix. The height will stay the same
@@ -262,6 +262,18 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
             snap.draw();
         }
         mListBusy.unlock();
+    }
+
+    public void onPause() {
+        if (mSensorFusion != null) {
+            mSensorFusion.onPauseOrStop();
+        }
+    }
+
+    public void onResume() {
+        if (mSensorFusion != null) {
+            mSensorFusion.onResume();
+        }
     }
 
     public void setCameraOrientation(float rX, float rY, float rZ) {

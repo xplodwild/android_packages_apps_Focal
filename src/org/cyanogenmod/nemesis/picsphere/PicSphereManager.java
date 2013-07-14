@@ -91,6 +91,24 @@ public class PicSphereManager {
         }.start();
     }
 
+    public void tearDown() {
+        if (mCapture3DRenderer != null) {
+            mCapture3DRenderer.onPause();
+            mCapture3DRenderer = null;
+        }
+    }
+
+    public void onPause() {
+        if (mCapture3DRenderer != null) {
+            mCapture3DRenderer.onPause();
+        }
+    }
+
+    public void onResume() {
+        if (mCapture3DRenderer != null) {
+            mCapture3DRenderer.onResume();
+        }
+    }
 
     /**
      * Copy the required binaries and libraries to the data folder
