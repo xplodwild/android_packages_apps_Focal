@@ -34,4 +34,7 @@
     whenever possible, but we can get better shots with higher resolution just as well. -->
     <integer name="config_panoramaDefaultWidth">1280</integer>
     <integer name="config_panoramaDefaultHeight">720</integer>
+
+    <!-- Whether or not to enable Samsung HDR capabilities -->
+    <bool name="config_useSamsungHDR">false</bool>
 </resources>

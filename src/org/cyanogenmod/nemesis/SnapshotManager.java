@@ -131,6 +131,7 @@ public class SnapshotManager {
 
     // Photo-related variables
     private boolean mWaitExposureSettle;
+    private int mResetExposure;
     private List<SnapshotInfo> mSnapshotsQueue;
     private int mCurrentShutterQueueIndex;
     private List<SnapshotListener> mListeners;
@@ -174,25 +175,39 @@ public class SnapshotManager {
             for (SnapshotListener listener : mListeners) {
                 listener.onSnapshotShutter(snap);
             }
+
+            // If we used Samsung HDR, reset exposure
+            if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR)) {
+                mCameraManager.setParameterAsync("exposure-compensation", Integer.toString(mResetExposure));
+            }
         }
     };
 
     private Camera.PictureCallback mJpegPictureCallback = new Camera.PictureCallback() {
         @Override
-        public void onPictureTaken(final byte[] jpegData, Camera camera) {
+        public void onPictureTaken(byte[] jpegData, Camera camera) {
             Log.v(TAG, "onPicture: Got JPEG data");
             mCameraManager.restartPreviewIfNeeded();
 
+            // Calculate the width and the height of the jpeg.
+            final Camera.Size s = mCameraManager.getParameters().getPictureSize();
+            int orientation = Exif.getOrientation(jpegData) - mCameraManager.getOrientation();
+            final int width = s.width,
+                    height = s.height;
+
             final SnapshotInfo snap = mSnapshotsQueue.get(0);
+
+            // If we have a Samsung HDR, convert from YUV422 to JPEG first
+            if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR)) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                Bitmap bm = Util.decodeYUV422P(jpegData, s.width, s.height);
+                // TODO: Replace 90 with real JPEG compression level when we'll have that setting
+                bm.compress(Bitmap.CompressFormat.JPEG, 90, baos);
+                jpegData = baos.toByteArray();
+            }
 
             // Store the jpeg on internal memory if needed
             if (snap.mSave) {
-                // Calculate the width and the height of the jpeg.
-                final Camera.Size s = mCameraManager.getParameters().getPictureSize();
-                int orientation = Exif.getOrientation(jpegData) - mCameraManager.getOrientation();
-                final int width = s.width,
-                        height = s.height;
-
                 final Uri uri = mImageNamer.getUri();
                 final String title = mImageNamer.getTitle();
                 snap.mUri = uri;
@@ -202,8 +217,9 @@ public class SnapshotManager {
                 while (orientation < 0) {
                     orientation += 360;
                 }
-                final int correctedOrientation = orientation;
 
+                final int correctedOrientation = orientation;
+                final byte[] finalData = jpegData;
 
                 // TODO: Toggle Automatic Picture Enhancement
                 if (!snap.mBypassProcessing) {
@@ -220,7 +236,7 @@ public class SnapshotManager {
                             mOffscreenGL = new PixelBuffer(mContext, s.width, s.height);
                             mAutoPicEnhancer = new AutoPictureEnhancer(mContext);
                             mOffscreenGL.setRenderer(mAutoPicEnhancer);
-                            mAutoPicEnhancer.setTexture(BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length));
+                            mAutoPicEnhancer.setTexture(BitmapFactory.decodeByteArray(finalData, 0, finalData.length));
 
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
                             mOffscreenGL.getBitmap().compress(Bitmap.CompressFormat.JPEG, 90, baos);
@@ -389,6 +405,12 @@ public class SnapshotManager {
         }
 
         if (mSnapshotsQueue.size() == 2) return; // No more than 2 shots at a time
+
+        // If we use Samsung HDR, we must set exposure level, as it corresponds to the HDR bracket
+        if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR)) {
+            exposureCompensation = mCameraManager.getParameters().getMaxExposureCompensation();
+            mResetExposure = mCameraManager.getParameters().getExposureCompensation();
+        }
 
         SnapshotInfo info = new SnapshotInfo();
         info.mSave = save;

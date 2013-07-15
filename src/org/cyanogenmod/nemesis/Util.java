@@ -292,6 +292,48 @@ public class Util {
         return bmp;
     }
 
+    public static Bitmap decodeYUV422P(byte[] yuv422p, int width, int height)
+            throws NullPointerException, IllegalArgumentException {
+        final int frameSize = width * height;
+        int[] rgb = new int[frameSize];
+        for (int j = 0, yp = 0; j < height; j++) {
+            int up = frameSize + (j * (width/2)), u = 0, v = 0;
+            int vp = ((int)(frameSize*1.5) + (j*(width/2)));
+            for (int i = 0; i < width; i++, yp++) {
+                int y = (0xff & ((int) yuv422p[yp])) - 16;
+                if (y < 0)
+                    y = 0;
+
+                if ((i & 1) == 0) {
+                    u = (0xff & yuv422p[up++]) - 128;
+                    v = (0xff & yuv422p[vp++]) - 128;
+                }
+
+                int y1192 = 1192 * y;
+                int r = (y1192 + 1634 * v);
+                int g = (y1192 - 833 * v - 400 * u);
+                int b = (y1192 + 2066 * u);
+
+                if (r < 0)
+                    r = 0;
+                else if (r > 262143)
+                    r = 262143;
+                if (g < 0)
+                    g = 0;
+                else if (g > 262143)
+                    g = 262143;
+                if (b < 0)
+                    b = 0;
+                else if (b > 262143)
+                    b = 262143;
+
+                rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
+            }
+        }
+
+        return Bitmap.createBitmap(rgb, width, height, Bitmap.Config.ARGB_8888);
+    }
+
     public static String createJpegName(long dateTaken) {
         return "IMG_" + mJpegDateFormat.format(new Date(dateTaken));
     }
@@ -375,7 +417,7 @@ public class Util {
      * @return
      */
     public static Point findBestPanoPreviewSize(List<Size> supportedSizes, boolean need4To3,
-                                        boolean needSmaller, int defaultPixels) {
+                                                boolean needSmaller, int defaultPixels) {
         need4To3 = false;
         needSmaller = false;
         Point output = null;
