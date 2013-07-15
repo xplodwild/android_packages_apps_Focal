@@ -191,7 +191,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mCamManager.getPreviewSurface().setOnTouchListener(mPreviewTouchListener);
 
         // Use SavePinger to animate a bit while we open the camera device
-        mSavePinger.setPingOnly(true);
+        mSavePinger.setPingMode(SavePinger.PING_MODE_SIMPLE);
         mSavePinger.startSaving();
 
         // Hack because review drawer size might not be measured yet
@@ -917,7 +917,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         public void onSnapshotProcessing(SnapshotManager.SnapshotInfo info) {
             runOnUiThread(new Runnable() {
                 public void run() {
-                    mSavePinger.setPingOnly(true);
+                    mSavePinger.setPingMode(SavePinger.PING_MODE_ENHANCER);
                     mSavePinger.startSaving();
                 }
             });
@@ -939,7 +939,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mSavePinger.setPingOnly(false);
+                    mSavePinger.setPingMode(SavePinger.PING_MODE_SAVE);
                     mSavePinger.startSaving();
                 }
             });

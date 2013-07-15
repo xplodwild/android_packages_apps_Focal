@@ -33,6 +33,13 @@ import org.cyanogenmod.nemesis.R;
 public class SavePinger extends View {
     public final static String TAG = "SavePinger";
 
+    // Just the circles pulsing
+    public final static int PING_MODE_SIMPLE = 0;
+    // Circles pulsing + save icon
+    public final static int PING_MODE_SAVE = 1;
+    // Circles pulsing + enhancer icon
+    public final static int PING_MODE_ENHANCER = 2;
+
     private ValueAnimator mFadeAnimator;
     private ValueAnimator mConstantAnimator;
     private float mFadeProgress;
@@ -40,8 +47,9 @@ public class SavePinger extends View {
     private long mRingTime[] = new long[CIRCLES_COUNT];
     private long mLastTime;
     private Bitmap mSaveIcon;
+    private Bitmap mEnhanceIcon;
     private int mOrientation;
-    private boolean mPingOnly;
+    private int mPingMode;
 
     private final static int CIRCLES_COUNT = 3;
     private float mRingRadius;
@@ -100,8 +108,8 @@ public class SavePinger extends View {
         }
     }
 
-    public void setPingOnly(boolean pingOnly) {
-        mPingOnly = pingOnly;
+    public void setPingMode(int mode) {
+        mPingMode = mode;
     }
 
     public void startSaving() {
@@ -147,13 +155,20 @@ public class SavePinger extends View {
             }
         }
 
-        if (!mPingOnly) {
+        if (mPingMode != PING_MODE_SIMPLE) {
             int alpha = (int) (((Math.cos((double) systemTime / 200.0) + 1.0f) / 2.0f) * 255.0f);
             canvas.save();
             canvas.translate(getWidth() / 2, getHeight() / 2);
             canvas.rotate(mOrientation);
             mPaint.setARGB((int) (alpha * mFadeProgress), 255, 255, 255);
-            canvas.drawBitmap(mSaveIcon, -mSaveIcon.getWidth() / 2, -mSaveIcon.getHeight() / 2, mPaint);
+
+            if (mPingMode == PING_MODE_SAVE) {
+                canvas.drawBitmap(mSaveIcon, -mSaveIcon.getWidth() / 2,
+                        -mSaveIcon.getHeight() / 2, mPaint);
+            } else if (mPingMode == PING_MODE_ENHANCER) {
+                canvas.drawBitmap(mEnhanceIcon, -mEnhanceIcon.getWidth() / 2,
+                        -mEnhanceIcon.getHeight() / 2, mPaint);
+            }
 
             canvas.restore();
         }
