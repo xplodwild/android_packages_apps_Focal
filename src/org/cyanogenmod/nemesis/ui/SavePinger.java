@@ -78,6 +78,7 @@ public class SavePinger extends View {
         mFadeProgress = 0.0f;
 
         mSaveIcon = ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_save)).getBitmap();
+        mEnhanceIcon = ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_enhancing)).getBitmap();
 
         mFadeAnimator = new ValueAnimator();
         mFadeAnimator.setDuration(1500);
