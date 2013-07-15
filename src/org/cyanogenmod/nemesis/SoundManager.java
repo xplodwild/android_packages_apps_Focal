@@ -53,7 +53,7 @@ public class SoundManager {
      * call preload() before doing anything so the sounds are loaded!
      */
     private SoundManager() {
-        mSoundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+        mSoundPool = new SoundPool(3, AudioManager.STREAM_NOTIFICATION, 0);
     }
 
     public void preload(Context ctx) {
