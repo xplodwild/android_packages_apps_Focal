@@ -24,6 +24,8 @@ import android.hardware.Camera;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 
+import java.util.List;
+
 public class HdrWidget extends SimpleToggleWidget {
     private final static String KEY_PARAMETER = "ae-bracket-hdr";
 
@@ -36,8 +38,9 @@ public class HdrWidget extends SimpleToggleWidget {
         // in priority though, for devices like Nexus 4 which reports ae-bracket-hdr, but
         // doesn't use it.
         Camera.Parameters params = cam.getParameters();
+        List<String> sceneModes = params.getSupportedSceneModes();
 
-        if (!params.getSupportedSceneModes().contains("hdr")) {
+        if (sceneModes != null && !sceneModes.contains("hdr")) {
             addValue("Off", R.drawable.ic_widget_hdr_off, context.getString(R.string.disabled));
             addValue("HDR", R.drawable.ic_widget_hdr_on, context.getString(R.string.enabled));
             addValue("AE-Bracket", R.drawable.ic_widget_hdr_aebracket,

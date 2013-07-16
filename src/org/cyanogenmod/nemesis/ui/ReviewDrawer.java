@@ -19,6 +19,7 @@
 package org.cyanogenmod.nemesis.ui;
 
 import android.animation.Animator;
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -310,7 +311,11 @@ public class ReviewDrawer extends LinearLayout {
                 uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
             }
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            getContext().startActivity(intent);
+            try {
+                getContext().startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                CameraActivity.notify(getContext().getString(R.string.no_video_player), 2000);
+            }
         }
     }
 
