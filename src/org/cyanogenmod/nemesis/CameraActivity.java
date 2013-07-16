@@ -526,18 +526,21 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            // Use the volume down button as focus button
-            mCamManager.doAutofocus(mFocusManager);
-            return true;
-        } else if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
-            // Use the volume up button as shutter button (or snapshot button in video mode)
-            if (mCameraMode == CAMERA_MODE_VIDEO) {
-                mSnapshotManager.queueSnapshot(true, 0);
-            } else {
-                mShutterButton.performClick();
-            }
-            return true;
+        switch(keyCode) {
+            case KeyEvent.KEYCODE_FOCUS:
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                // Use the volume down button as focus button
+                mCamManager.doAutofocus(mFocusManager);
+                return true;
+            case KeyEvent.KEYCODE_CAMERA:
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                // Use the volume up button as shutter button (or snapshot button in video mode)
+                if (mCameraMode == CAMERA_MODE_VIDEO) {
+                    mSnapshotManager.queueSnapshot(true, 0);
+                } else {
+                    mShutterButton.performClick();
+                }
+                return true;
         }
         return super.onKeyDown(keyCode, event);
     }
