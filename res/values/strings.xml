@@ -33,7 +33,7 @@
     <string name="ps_long_press_to_stop">Long-press the shutter button to finish your sphere.</string>
     <string name="disabled">Disabled</string>
     <string name="enabled">Enabled</string>
-    <string name="no_video_player">Couldn't play the video, no player found</string>
+    <string name="no_video_player">Couldn\'t play the video, no player found</string>
 
     <!-- Widgets hints for non-arrayed widgets -->
     <string name="widget_burstmode_count_shots">Burst %d shots</string>
