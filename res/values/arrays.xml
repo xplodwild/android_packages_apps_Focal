@@ -295,4 +295,22 @@
         <item>Center weighted</item>
         <item>Spot metering</item>
     </string-array>
+
+    <!-- Shutter speed values -->
+    <string-array name="widget_shutter_speed_display_values" translatable="false">
+        <item>Auto</item>
+        <item>1\"</item>
+        <item>1/2</item>
+        <item>1/4</item>
+        <item>1/8</item>
+        <item>1/16</item>
+        <item>1/32</item>
+        <item>1/100</item>
+        <item>1/125</item>
+        <item>1/250</item>
+        <item>1/500</item>
+        <item>1/1000</item>
+        <item>1/2000</item>
+        <item>1/3333</item>
+    </string-array>
 </resources>

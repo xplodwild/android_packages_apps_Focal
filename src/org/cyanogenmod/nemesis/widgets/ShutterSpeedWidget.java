@@ -73,7 +73,7 @@ public class ShutterSpeedWidget extends WidgetBase {
         addViewToContainer(mValueLabel);
         addViewToContainer(mPlusButton);
 
-        mValueLabel.setText(restoreValueFromStorage(KEY_PARAMETER));
+        mValueLabel.setText(getShutterSpeedDisplayValue(restoreValueFromStorage(KEY_PARAMETER)));
 
         getToggleButton().setHintText(R.string.widget_shutter_speed);
     }
@@ -122,6 +122,15 @@ public class ShutterSpeedWidget extends WidgetBase {
         }
         SettingsStorage.storeCameraSetting(mWidget.getContext(), mCamManager.getCurrentFacing(),
                 KEY_PARAMETER, valueStr);
-        mValueLabel.setText(valueStr);
+        mValueLabel.setText(getShutterSpeedDisplayValue(valueStr));
+    }
+
+    public String getShutterSpeedDisplayValue(String value) {
+        String[] values = mWidget.getContext().getResources().getStringArray(R.array.widget_shutter_speed_display_values);
+        if (value == null || value.equals("auto")) {
+           return values[0];
+        } else {
+           return values[Integer.parseInt(value) + 1];
+        }
     }
 }
