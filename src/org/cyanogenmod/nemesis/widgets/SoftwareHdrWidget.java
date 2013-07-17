@@ -25,6 +25,8 @@ import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.feats.SoftwareHdrCapture;
 
+import java.util.List;
+
 /**
  * Software HDR widget
  * This is distinct from the hardware HDR to avoid putting everything in one same class
@@ -69,6 +71,11 @@ public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListene
 
         // We hide the software HDR widget if either we have scene-mode=hdr, or any of the
         // hdr setting key defined
+        List<String> sceneModes = params.getSupportedSceneModes();
+        if (sceneModes != null && sceneModes.contains("hdr")) {
+            return false;
+        }
+
         String[] keys = mContext.getResources().getStringArray(R.array.hardware_hdr_keys);
         for (String key : keys) {
             if (params.get(key) != null) {
