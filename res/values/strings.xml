@@ -73,6 +73,7 @@
     <string name="picsphere_toast_background_render">Rendering your PicSphere in the background&#8230;</string>
     <string name="picsphere_notif_title">Rendering PicSphere&#8230;</string>
     <string name="picsphere_failed">Failed to render your PicSphere</string>
+    <string name="picsphere_failed_details">Make sure pictures only overlaps on their edges.</string>
     <string name="picsphere_step_preparing">Preparing&#8230;</string>
     <string name="picsphere_step_autopano">Matching pictures&#8230;</string>
     <string name="picsphere_step_autooptimiser">Optimizing matches&#8230;</string>

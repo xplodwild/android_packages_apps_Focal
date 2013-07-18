@@ -75,8 +75,9 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
         new Thread() {
             public void run() {
                 if (!sphere.render()) {
-                    Toast.makeText(PicSphereRenderingService.this,
-                            getString(R.string.picsphere_failed), Toast.LENGTH_LONG);
+                    mNM.notify(NOTIFICATION,
+                            buildFailureNotification(getString(R.string.picsphere_failed),
+                                    getString(R.string.picsphere_failed_details)));
                 }
                 PicSphereRenderingService.this.stopSelf();
             }
@@ -160,6 +161,17 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
                         .setContentTitle(getString(R.string.picsphere_notif_title))
                         .setContentText(percentage+"% ("+text+")")
                         .setOngoing(true);
+
+        return mBuilder.build();
+    }
+
+    private Notification buildFailureNotification(String title, String text) {
+        Notification.Builder mBuilder =
+                new Notification.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle(title)
+                        .setContentText(text)
+                        .setOngoing(false);
 
         return mBuilder.build();
     }
