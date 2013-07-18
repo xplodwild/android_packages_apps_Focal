@@ -45,10 +45,12 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
         if (mPicSphere == null) {
             // Initialize a new sphere
             mPicSphere = mPicSphereManager.createPicSphere();
+            mPicSphere.setHorizontalAngle(40);
         }
 
         mSnapManager.setBypassProcessing(true);
         mSnapManager.queueSnapshot(true, 0);
+
     }
 
     @Override

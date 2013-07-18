@@ -63,6 +63,8 @@ public class PicSphere {
     public final static int STEP_ENBLEND = 6;
     public final static int STEP_TOTAL = 6;
 
+    private float mHorizontalAngle;
+
     private Thread mOutputLogger = new Thread() {
         public void run() {
             while (true) {
@@ -99,6 +101,10 @@ public class PicSphere {
      */
     public void addPicture(Uri pic) {
         mPictures.add(Uri.fromFile(new File(Util.getRealPathFromURI(mContext, pic))));
+    }
+
+    public void setHorizontalAngle(float angle) {
+        mHorizontalAngle = angle;
     }
 
     /**
@@ -238,7 +244,7 @@ public class PicSphere {
         }
 
         // TODO: Load the horizontal view angle from the camera
-        run("autopano --projection 0,50 " + mProjectFile + " " + filesStr);
+        run("autopano --align --ransac on --projection 0,"+mHorizontalAngle+" " + mProjectFile + " " + filesStr);
         consumeProcLogs();
 
         Log.d(TAG, "Autopano... done");
@@ -259,7 +265,7 @@ public class PicSphere {
     private boolean doPtclean() throws IOException {
         Log.d(TAG, "Ptclean...");
         notifyStep(STEP_PTCLEAN);
-        //run("ptclean -o " + mProjectFile + " " + mProjectFile);
+        run("ptclean -o " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "Ptclean... done");
@@ -277,7 +283,7 @@ public class PicSphere {
     private boolean doAutoOptimiser() throws IOException {
         Log.d(TAG, "AutoOptimiser...");
         notifyStep(STEP_AUTOOPTIMISER);
-        run("autooptimiser -a -l -s -m -o " + mProjectFile + " " + mProjectFile);
+        run("autooptimiser -v "+mHorizontalAngle+" -a -l -s -m -o " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "AutoOptimiser... done");
@@ -293,7 +299,7 @@ public class PicSphere {
     private boolean doPanoModify() throws IOException {
         Log.d(TAG, "PanoModify...");
         notifyStep(STEP_PANOMODIFY);
-        run("pano_modify -o " + mProjectFile + " --center --straighten --canvas=AUTO --crop=AUTO " + mProjectFile);
+        run("pano_modify -o " + mProjectFile + " --center --canvas=AUTO --crop=AUTO " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "PanoModify... done");
