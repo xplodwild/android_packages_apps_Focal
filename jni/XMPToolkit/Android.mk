@@ -1,17 +1,18 @@
-LOCAL_PATH:= $(LOCAL_PATH)/XMPToolkit
+LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH) \
+LOCAL_C_INCLUDES := \
+	$(LOCAL_PATH) \
 	$(LOCAL_PATH)/public/include \
 	$(LOCAL_PATH)/XMPFilesPlugins/api/source
 
 LOCAL_CFLAGS := -O3 -DNDEBUG -fstrict-aliasing -fexceptions -frtti \
 	-DUNIX_ENV -DHAVE_MEMMOVE -DkBigEndianHost=0 -DEnableDynamicMediaHandlers=0 \
-	-DEnableMiscHandlers=0 -DEnablePluginManager=0
+	-DEnableMiscHandlers=0 -DEnablePluginManager=0 -Wno-address
 
 LOCAL_SRC_FILES := \
-        XMPFiles/source/HandlerRegistry.cpp \
+	XMPFiles/source/HandlerRegistry.cpp \
 	XMPFiles/source/WXMPFiles.cpp \
 	XMPFiles/source/XMPFiles.cpp \
 	XMPFiles/source/XMPFiles_Impl.cpp \
@@ -67,22 +68,16 @@ LOCAL_SRC_FILES := \
 	third-party/expat/lib/xmltok.c \
 	third-party/expat/lib/xmltok_impl.c \
 	third-party/expat/lib/xmltok_ns.c
-	
-ifeq ($(TARGET_ARCH), arm)
-        LOCAL_SDK_VERSION := 9
-endif
-
-ifeq ($(TARGET_ARCH), x86)
-        LOCAL_SDK_VERSION := 9
-endif
-
-ifeq ($(TARGET_ARCH), mips)
-        LOCAL_SDK_VERSION := 9
-endif
 
 LOCAL_LDFLAGS := -lz
 
+LOCAL_SHARED_LIBRARIES := libz
+
+LOCAL_NDK_STL_VARIANT := gnustl_static
+
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE    := libxmptoolkit
+LOCAL_MODULE := libxmptoolkit
+
+-include external/Nemesis/gnustl.mk
 include $(BUILD_SHARED_LIBRARY)
