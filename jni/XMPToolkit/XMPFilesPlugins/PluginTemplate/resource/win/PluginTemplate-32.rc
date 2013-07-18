@@ -1,0 +1,8 @@
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// TXT
+//
+
+XMPPLUGINUIDS           TXT                     "../../resource/txt/XMPPLUGINUIDS-32.txt"
+MODULE_IDENTIFIER       TXT                     "../../resource/txt/MODULE_IDENTIFIER.txt"

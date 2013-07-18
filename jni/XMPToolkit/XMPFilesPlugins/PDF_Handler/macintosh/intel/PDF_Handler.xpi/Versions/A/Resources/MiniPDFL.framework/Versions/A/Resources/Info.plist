@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AcrobatCL</key>
+	<string>448391</string>
+	<key>BuildDate</key>
+	<string>0000/00/00-00:00:00</string>
+	<key>BuildID</key>
+	<string>1</string>
+	<key>BuildVersion</key>
+	<string>1.00000</string>
+	<key>CFBundleGetInfoString</key>
+	<string>MiniPDFL 1.0.0.1, © 1987-2012 Adobe Systems Incorporated.
+ All Rights Reserved.</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.adobe.PDFL</string>
+	<key>CFBundleName</key>
+	<string>MiniPDFL</string>
+	<key>CFBundlePackageType</key>
+	<string>FMWK</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>CFBundleVersion</key>
+	<string>1.0.0.1</string>
+	<key>PDFL_IPID</key>
+	<string>&lt;AdobeIP#0000583&gt;</string>
+	<key>ReleaseCL</key>
+	<string>0</string>
+	<key>CFBundleExecutable</key>
+	<string>MiniPDFL</string>
+</dict>
+</plist>

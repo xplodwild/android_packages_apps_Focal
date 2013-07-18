@@ -1,5 +1,8 @@
 LOCAL_PATH:= $(call my-dir)
 
+###
+# Build libmosaic_jni
+###
 include $(CLEAR_VARS)
 
 LOCAL_C_INCLUDES := \
@@ -58,3 +61,44 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_MODULE    := libjni_mosaic2
 include $(BUILD_SHARED_LIBRARY)
+
+###
+# Build libxmphelper_jni
+###
+
+include $(CLEAR_VARS)
+
+LOCAL_C_INCLUDES := \
+	XMPToolkit \
+        XMPToolkit/public/include \
+	feature_mos/src
+
+LOCAL_CFLAGS := -O3 -DNDEBUG -fstrict-aliasing -fexceptions -DUNIX_ENV
+
+LOCAL_SRC_FILES := \
+        xmp_helper_jni.cpp
+
+ifeq ($(TARGET_ARCH), arm)
+        LOCAL_SDK_VERSION := 9
+endif
+
+ifeq ($(TARGET_ARCH), x86)
+        LOCAL_SDK_VERSION := 9
+endif
+
+ifeq ($(TARGET_ARCH), mips)
+        LOCAL_SDK_VERSION := 9
+endif
+
+LOCAL_LDFLAGS := -llog
+
+LOCAL_MODULE_TAGS := optional
+LOCAL_SHARED_LIBRARIES := libxmptoolkit
+
+LOCAL_MODULE    := libxmphelper_jni
+include $(BUILD_SHARED_LIBRARY)
+
+###
+# Build Adobe XMP toolkit
+###
+include XMPToolkit/Android.mk

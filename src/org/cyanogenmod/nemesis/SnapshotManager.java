@@ -36,18 +36,11 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
 import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.imaging.jpeg.JpegProcessingException;
-import com.drew.imaging.jpeg.JpegSegmentReader;
-import com.drew.lang.ByteArrayReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
-import com.drew.metadata.MetadataReader;
 import com.drew.metadata.Tag;
-import com.drew.metadata.exif.ExifReader;
-import com.drew.metadata.iptc.IptcReader;
 
 import org.cyanogenmod.nemesis.feats.AutoPictureEnhancer;
 import org.cyanogenmod.nemesis.feats.PixelBuffer;
@@ -57,9 +50,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**

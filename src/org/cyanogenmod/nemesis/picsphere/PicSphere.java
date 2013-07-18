@@ -22,9 +22,9 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import org.apache.sanselan.common.byteSources.ByteSourceFile;
 import org.cyanogenmod.nemesis.SnapshotManager;
 import org.cyanogenmod.nemesis.Util;
+import org.cyanogenmod.nemesis.XMPHelper;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -283,7 +283,7 @@ public class PicSphere {
     private boolean doAutoOptimiser() throws IOException {
         Log.d(TAG, "AutoOptimiser...");
         notifyStep(STEP_AUTOOPTIMISER);
-        run("autooptimiser -v "+mHorizontalAngle+" -a -l -s -m -o " + mProjectFile + " " + mProjectFile);
+        run("autooptimiser -v " + mHorizontalAngle + " -a -l -s -m -o " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "AutoOptimiser... done");
@@ -350,9 +350,7 @@ public class PicSphere {
         consumeProcLogs();
 
         // Apply PhotoSphere EXIF tags on the final jpeg
-        if (doExifTagging()) {
-            jpegPath = mTempPath + "/final.tagged.jpg";
-        }
+        doExifTagging();
 
 
         // Save it to gallery
@@ -381,22 +379,12 @@ public class PicSphere {
     }
 
     private boolean doExifTagging() throws IOException {
-        Log.d(TAG, "Exiv2 tagging...");
+        Log.d(TAG, "XMP metadata tagging...");
 
-        try {
-            File file = new File(mTempPath + "/final.jpg");
-            File newFile = new File(mTempPath + "/final.tagged.jpg");
-            org.apache.sanselan.formats.jpeg.xmp.JpegXmpRewriter xmpWriter =
-                    new org.apache.sanselan.formats.jpeg.xmp.JpegXmpRewriter();
-            xmpWriter.updateXmpXml(new ByteSourceFile(file),
-                    new BufferedOutputStream(new FileOutputStream(newFile)),
-                    generatePhotoSphereXMP(2000, 2000, mPictures.size()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        XMPHelper xmp = new XMPHelper();
+        xmp.writeXmpToFile(mTempPath + "/final.jpg", generatePhotoSphereXMP(100, 100, mPictures.size()));
 
-        Log.d(TAG, "Exiv2... done");
+        Log.d(TAG, "XMP metadata tagging... done");
         return true;
     }
 
@@ -409,8 +397,7 @@ public class PicSphere {
      * @return Exiv2 config file string
      */
     public static String generatePhotoSphereXMP(int width, int height, int sourceImageCount) {
-        return "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.1.0-jc003\">\n" +
-                "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
+        return "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description rdf:about=\"\"\n" +
                 "        xmlns:GPano=\"http://ns.google.com/photos/1.0/panorama/\"\n" +
                 "      GPano:UsePanoramaViewer=\"True\"\n" +
@@ -424,8 +411,7 @@ public class PicSphere {
                 "      GPano:SourcePhotosCount=\""+sourceImageCount+"\"\n" +
                 "      GPano:CroppedAreaImageWidthPixels=\""+width+"\"\n" +
                 //"      GPano:LastPhotoDate=\"2012-11-22T23:16:41.177Z\"\n" +
-                "      GPano:CroppedAreaTopPixels=\"0\"\n" +
-                "  </rdf:RDF>\n" +
-                "</x:xmpmeta>";
+                "      GPano:CroppedAreaTopPixels=\"0\" />\n" +
+                "  </rdf:RDF>";
     }
 }

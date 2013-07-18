@@ -1,0 +1,34 @@
+VERSION {
+global:
+
+	WXMPFiles_Initialize_1;
+	WXMPFiles_Initialize_2;
+	WXMPFiles_Terminate_1;
+	WXMPFiles_CTor_1;
+	WXMPFiles_IncrementRefCount_1;
+	WXMPFiles_DecrementRefCount_1;
+	WXMPFiles_GetVersionInfo_1;
+	WXMPFiles_GetFormatInfo_1;
+	WXMPFiles_CheckFileFormat_1;
+	WXMPFiles_CheckPackageFormat_1;
+	WXMPFiles_GetFileModDate_1;
+	WXMPFiles_OpenFile_1;
+	WXMPFiles_CloseFile_1;
+	WXMPFiles_GetFileInfo_1;
+	WXMPFiles_SetAbortProc_1;
+	WXMPFiles_GetXMP_1;
+	WXMPFiles_PutXMP_1;
+	WXMPFiles_CanPutXMP_1;
+	WXMPFiles_SetDefaultProgressCallback_1;
+	WXMPFiles_SetProgressCallback_1;
+	WXMPFiles_SetDefaultErrorCallback_1;
+	WXMPFiles_SetErrorCallback_1;
+	WXMPFiles_ResetErrorCallbackLimit_1;
+	WXMPFiles_GetAssociatedResources_1;
+	WXMPFiles_IsMetadataWritable_1;
+
+local:
+
+	*;
+
+};

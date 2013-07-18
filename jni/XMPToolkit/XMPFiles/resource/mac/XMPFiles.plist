@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleExecutable</key>
+	<string>XMPFiles</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.xmp.XMPFiles</string>
+	<key>CFBundleName</key>
+	<string>XMPFiles</string>
+	<key>CFBundleGetInfoString</key>
+	<string>XMP Files kBasicVersion, kXMP_Copyright</string>
+	<key>CFBundleShortVersionString</key>
+	<string>XMP Files kBasicVersion</string>
+	<key>CFBundlePackageType</key>
+	<string>FMWK</string>
+	<key>CFBundleSignature</key>
+	<string>XMP </string>
+	<key>Configuration</key>
+	<string>kConfig</string>
+	<key>FileVersion</key>
+	<string>kBasicVersion</string>
+	<key>ProductName</key>
+	<string>XMP Files</string>
+	<key>ProductVersion</key>
+	<string>XMPFILES_API_VERSION</string>
+</dict>
+</plist>

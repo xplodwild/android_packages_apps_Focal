@@ -1,0 +1,110 @@
+VERSION {
+global:
+
+	WXMPMeta_GetVersionInfo_1;
+	WXMPMeta_Initialize_1;
+	WXMPMeta_Terminate_1;
+
+	WXMPMeta_CTor_1;
+	WXMPMeta_IncrementRefCount_1;
+	WXMPMeta_DecrementRefCount_1;
+
+	WXMPMeta_GetGlobalOptions_1;
+	WXMPMeta_SetGlobalOptions_1;
+	WXMPMeta_DumpNamespaces_1;
+	WXMPMeta_RegisterNamespace_1;
+	WXMPMeta_GetNamespacePrefix_1;
+	WXMPMeta_GetNamespaceURI_1;
+	WXMPMeta_DeleteNamespace_1;
+
+	WXMPMeta_GetProperty_1;
+	WXMPMeta_GetArrayItem_1;
+	WXMPMeta_GetStructField_1;
+	WXMPMeta_GetQualifier_1;
+	WXMPMeta_SetProperty_1;
+	WXMPMeta_SetArrayItem_1;
+	WXMPMeta_AppendArrayItem_1;
+	WXMPMeta_SetStructField_1;
+	WXMPMeta_SetQualifier_1;
+	WXMPMeta_DeleteProperty_1;
+	WXMPMeta_DeleteArrayItem_1;
+	WXMPMeta_DeleteStructField_1;
+	WXMPMeta_DeleteQualifier_1;
+	WXMPMeta_DoesPropertyExist_1;
+	WXMPMeta_DoesArrayItemExist_1;
+	WXMPMeta_DoesStructFieldExist_1;
+	WXMPMeta_DoesQualifierExist_1;
+	WXMPMeta_GetLocalizedText_1;
+	WXMPMeta_SetLocalizedText_1;
+	WXMPMeta_DeleteLocalizedText_1;
+	WXMPMeta_GetProperty_Bool_1;
+	WXMPMeta_GetProperty_Int_1;
+	WXMPMeta_GetProperty_Int64_1;
+	WXMPMeta_GetProperty_Float_1;
+	WXMPMeta_GetProperty_Date_1;
+	WXMPMeta_SetProperty_Bool_1;
+	WXMPMeta_SetProperty_Int_1;
+	WXMPMeta_SetProperty_Int64_1;
+	WXMPMeta_SetProperty_Float_1;
+	WXMPMeta_SetProperty_Date_1;
+	WXMPMeta_GetObjectName_1;
+	WXMPMeta_SetObjectName_1;
+	WXMPMeta_GetObjectOptions_1;
+	WXMPMeta_SetObjectOptions_1;
+	WXMPMeta_Clone_1;
+	WXMPMeta_Sort_1;
+	WXMPMeta_Erase_1;
+	WXMPMeta_CountArrayItems_1;
+	WXMPMeta_DumpObject_1;
+	WXMPMeta_ParseFromBuffer_1;
+	WXMPMeta_SerializeToBuffer_1;
+
+	WXMPMeta_SetDefaultErrorCallback_1;
+	WXMPMeta_SetErrorCallback_1;
+	WXMPMeta_ResetErrorCallbackLimit_1;
+
+	WXMPIterator_PropCTor_1;
+	WXMPIterator_TableCTor_1;
+	WXMPIterator_IncrementRefCount_1;
+	WXMPIterator_DecrementRefCount_1;
+	WXMPIterator_Next_1;
+	WXMPIterator_Skip_1;
+
+	WXMPUtils_ComposeArrayItemPath_1;
+	WXMPUtils_ComposeStructFieldPath_1;
+	WXMPUtils_ComposeQualifierPath_1;
+	WXMPUtils_ComposeLangSelector_1;
+	WXMPUtils_ComposeFieldSelector_1;
+	WXMPUtils_ConvertFromBool_1;
+	WXMPUtils_ConvertFromInt_1;
+	WXMPUtils_ConvertFromInt64_1;
+	WXMPUtils_ConvertFromFloat_1;
+	WXMPUtils_ConvertFromDate_1;
+	WXMPUtils_ConvertToBool_1;
+	WXMPUtils_ConvertToInt_1;
+	WXMPUtils_ConvertToInt64_1;
+	WXMPUtils_ConvertToFloat_1;
+	WXMPUtils_ConvertToDate_1;
+	WXMPUtils_CurrentDateTime_1;
+	WXMPUtils_SetTimeZone_1;
+	WXMPUtils_ConvertToUTCTime_1;
+	WXMPUtils_ConvertToLocalTime_1;
+	WXMPUtils_CompareDateTime_1;
+	WXMPUtils_EncodeToBase64_1;
+	WXMPUtils_DecodeFromBase64_1;
+	WXMPUtils_PackageForJPEG_1;
+	WXMPUtils_MergeFromJPEG_1;
+
+	WXMPUtils_CatenateArrayItems_1;
+	WXMPUtils_SeparateArrayItems_1;
+	WXMPUtils_ApplyTemplate_1;
+	WXMPUtils_RemoveProperties_1;
+	WXMPUtils_DuplicateSubtree_1;
+	
+	XMP_NewExpatAdapter;
+
+local:
+
+	*;
+
+};
