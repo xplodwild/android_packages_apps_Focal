@@ -27,6 +27,7 @@ import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.location.Location;
 import android.media.CamcorderProfile;
+import android.media.ExifInterface;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Handler;
@@ -35,12 +36,30 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.imaging.jpeg.JpegMetadataReader;
+import com.drew.imaging.jpeg.JpegProcessingException;
+import com.drew.imaging.jpeg.JpegSegmentReader;
+import com.drew.lang.ByteArrayReader;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.MetadataReader;
+import com.drew.metadata.Tag;
+import com.drew.metadata.exif.ExifReader;
+import com.drew.metadata.iptc.IptcReader;
+
 import org.cyanogenmod.nemesis.feats.AutoPictureEnhancer;
 import org.cyanogenmod.nemesis.feats.PixelBuffer;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -230,6 +249,22 @@ public class SnapshotManager {
                                 listener.onSnapshotProcessing(snap);
                             }
 
+                            // Read EXIF
+                            List<Tag> tagsList = new ArrayList<Tag>();
+                            BufferedInputStream is = new BufferedInputStream(new ByteArrayInputStream(finalData));
+                            try {
+                                Metadata metadata = JpegMetadataReader.readMetadata(is, false);
+
+                                for (Directory directory : metadata.getDirectories()) {
+                                    for (Tag tag : directory.getTags()) {
+                                        Log.e(TAG, "Saving tag: " + tag.toString());
+                                        tagsList.add(tag);
+                                    }
+                                }
+                            } catch (JpegProcessingException e) {
+                                Log.e(TAG, "Error processing input JPEG", e);
+                            }
+
                             // XXX: PixelBuffer has to be created every time because the GL context
                             // can only be used from its original thread. It's not very intense, but
                             // ideally we would be re-using the same thread every time.
@@ -243,7 +278,7 @@ public class SnapshotManager {
 
                             if (mImageSaver != null) {
                                 mImageSaver.addImage(baos.toByteArray(), uri, title, null,
-                                        width, height, correctedOrientation);
+                                        width, height, correctedOrientation, tagsList);
                             } else {
                                 Log.e(TAG, "ImageSaver was null: couldn't save image!");
                             }
@@ -654,6 +689,7 @@ public class SnapshotManager {
         Location loc;
         int width, height;
         int orientation;
+        List<Tag> exifTags;
     }
 
     // We use a queue to store the SaveRequests that have not been completed
@@ -686,6 +722,13 @@ public class SnapshotManager {
         // Runs in main thread
         public void addImage(final byte[] data, Uri uri, String title,
                              Location loc, int width, int height, int orientation) {
+           addImage(data, uri, title, loc, width, height, orientation, null);
+        }
+
+        // Runs in main thread
+        public void addImage(final byte[] data, Uri uri, String title,
+                             Location loc, int width, int height, int orientation,
+                             List<Tag> exifTags) {
             SaveRequest r = new SaveRequest();
             r.data = data;
             r.uri = uri;
@@ -694,6 +737,7 @@ public class SnapshotManager {
             r.width = width;
             r.height = height;
             r.orientation = orientation;
+            r.exifTags = exifTags;
             synchronized (this) {
                 while (mQueue.size() >= QUEUE_LIMIT) {
                     try {
@@ -733,7 +777,7 @@ public class SnapshotManager {
                     }
                 }
                 storeImage(r.data, r.uri, r.title, r.loc, r.width, r.height,
-                        r.orientation);
+                        r.orientation, r.exifTags);
                 synchronized (this) {
                     mQueue.remove(0);
                     for (SnapshotListener listener : mListeners) {
@@ -773,10 +817,32 @@ public class SnapshotManager {
 
         // Runs in saver thread
         private void storeImage(final byte[] data, Uri uri, String title,
-                                Location loc, int width, int height, int orientation) {
+                                Location loc, int width, int height, int orientation,
+                                List<Tag> exifTags) {
             boolean ok = Storage.getStorage().updateImage(mContentResolver, uri, title, loc,
                     orientation, data, width, height);
+
             if (ok) {
+                if (exifTags != null && exifTags.size() > 0) {
+                    // Write exif tags to final picture
+                    try {
+                        ExifInterface exifIf = new ExifInterface(Util.getRealPathFromURI(mContext, uri));
+
+                        for (Tag tag : exifTags) {
+                            Log.e(TAG, "Restoring tag: " + tag.toString());
+                            // move along
+                            String[] hack = tag.toString().split("\\]");
+                            hack = hack[1].split("-");
+                            exifIf.setAttribute(tag.getTagName(), hack[1].trim());
+                        }
+
+                        exifIf.saveAttributes();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
                 Util.broadcastNewPicture(mContext, uri);
             }
         }
