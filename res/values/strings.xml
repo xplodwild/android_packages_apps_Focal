@@ -72,6 +72,7 @@
     <!-- PicSphere status -->
     <string name="picsphere_toast_background_render">Rendering your PicSphere in the background&#8230;</string>
     <string name="picsphere_notif_title">Rendering PicSphere&#8230;</string>
+    <string name="picsphere_failed">Failed to render your PicSphere</string>
     <string name="picsphere_step_preparing">Preparing&#8230;</string>
     <string name="picsphere_step_autopano">Matching pictures&#8230;</string>
     <string name="picsphere_step_autooptimiser">Optimizing matches&#8230;</string>
@@ -79,6 +80,7 @@
     <string name="picsphere_step_panomodify">Cropping empty areas&#8230;</string>
     <string name="picsphere_step_nona">Stitching pictures&#8230;</string>
     <string name="picsphere_step_enblend">Blending pictures&#8230;</string>
+
 </resources>
 
 

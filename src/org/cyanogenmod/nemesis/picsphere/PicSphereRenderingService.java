@@ -74,7 +74,10 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
         sphere.setProgressListener(this);
         new Thread() {
             public void run() {
-                sphere.render();
+                if (!sphere.render()) {
+                    Toast.makeText(PicSphereRenderingService.this,
+                            getString(R.string.picsphere_failed), Toast.LENGTH_LONG);
+                }
                 PicSphereRenderingService.this.stopSelf();
             }
         }.start();

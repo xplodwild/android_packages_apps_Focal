@@ -556,7 +556,16 @@ public class CameraManager {
                         params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
                     }
 
-                    params.setPreviewSize(mTargetSize.x, mTargetSize.y);
+                    if (mode == CameraActivity.CAMERA_MODE_PICSPHERE) {
+                        // If we are in PicSphere mode, set pic size to 640x480 to avoid using
+                        // all the phone's resources when rendering, as well as not take 15 min
+                        // to render. Eventually, we could put up a setting somewhere to let users
+                        // rendering super high quality pictures.
+                        params.setPictureSize(640, 480);
+                        params.setPreviewSize(640, 480);
+                    } else {
+                        params.setPreviewSize(mTargetSize.x, mTargetSize.y);
+                    }
 
                     mCamera.setParameters(params);
                     mParameters = mCamera.getParameters();

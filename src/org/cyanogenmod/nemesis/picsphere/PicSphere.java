@@ -104,7 +104,7 @@ public class PicSphere {
     /**
      * Renders the sphere
      */
-    protected void render() {
+    protected boolean render() {
         if (mProgressListener != null) {
             mProgressListener.onRenderStart(this);
         }
@@ -153,11 +153,14 @@ public class PicSphere {
             doEnblend();
         } catch (IOException ex) {
             Log.e(TAG, "Unable to process: ", ex);
+            return false;
         }
 
         if (mProgressListener != null) {
             mProgressListener.onRenderDone(this);
         }
+
+        return true;
     }
 
     private void run(String command) throws IOException {
