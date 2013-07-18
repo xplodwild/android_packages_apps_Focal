@@ -10,6 +10,7 @@ LOCAL_PACKAGE_NAME := Nemesis
 # the binaries in the apk
 LOCAL_REQUIRED_MODULES := \
 	libjni_mosaic2 \
+	libxmphelper_jni \
 	libexiv2 \
 	libglib-2.0 \
 	libgmodule-2.0 \
@@ -29,7 +30,8 @@ LOCAL_REQUIRED_MODULES := \
 	nona \
 	ptclean \
 	enblend \
-	enfuse
+	enfuse \
+	libxmptoolkit
 
 include $(BUILD_PACKAGE)
 
