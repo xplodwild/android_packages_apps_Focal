@@ -60,8 +60,8 @@ include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_C_INCLUDES := \
-	$(LOCAL_PATH)/XMPToolkit \
-	$(LOCAL_PATH)/XMPToolkit/public/include \
+	external/Nemesis/XMPToolkit \
+	external/Nemesis/XMPToolkit/public/include \
 	$(LOCAL_PATH)/feature_mos/src
 
 LOCAL_CFLAGS := -O3 -DNDEBUG -fstrict-aliasing -fexceptions -DUNIX_ENV -Wno-return-type
@@ -82,8 +82,3 @@ LOCAL_MODULE := libxmphelper_jni
 
 -include external/Nemesis/gnustl.mk
 include $(BUILD_SHARED_LIBRARY)
-
-###
-# Build Adobe XMP toolkit
-###
-include $(LOCAL_PATH)/XMPToolkit/Android.mk
