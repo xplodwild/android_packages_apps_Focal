@@ -299,7 +299,7 @@ public class PicSphere {
     private boolean doPanoModify() throws IOException {
         Log.d(TAG, "PanoModify...");
         notifyStep(STEP_PANOMODIFY);
-        run("pano_modify -o " + mProjectFile + " --center --canvas=AUTO --crop=AUTO " + mProjectFile);
+        run("pano_modify -o " + mProjectFile + " --center --straighten --canvas=AUTO --crop=AUTO " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "PanoModify... done");
