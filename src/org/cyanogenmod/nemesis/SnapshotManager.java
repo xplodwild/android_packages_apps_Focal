@@ -383,8 +383,14 @@ public class SnapshotManager {
 
     public void saveImage(Uri uri, String title, int width, int height,
                           int orientation, byte[] jpegData) {
+        if (mImageSaver == null) {
+            // ImageSaver can be dead if the user exitted the app. We restart it temporarily.
+            mImageSaver = new ImageSaver();
+        }
         mImageSaver.addImage(jpegData, uri, title, null,
                 width, height, orientation);
+        mImageSaver.waitDone();
+        mImageSaver.finish();
     }
 
     /**

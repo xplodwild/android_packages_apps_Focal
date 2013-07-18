@@ -140,8 +140,8 @@ public class SensorFusion implements SensorEventListener {
 
     public float[] getFusedOrientation() {
         float[] rotMat = getRotationMatrixFromOrientation(fusedOrientation);
-        SensorManager.remapCoordinateSystem(rotMat, SensorManager.AXIS_Y,
-                SensorManager.AXIS_MINUS_Z, rotMat);
+        SensorManager.remapCoordinateSystem(rotMat, SensorManager.AXIS_X,
+                SensorManager.AXIS_Z, rotMat);
         float[] fusedRemappedOrientation = new float[fusedOrientation.length];
         SensorManager.getOrientation(rotMat, fusedRemappedOrientation);
 

@@ -22,10 +22,14 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.res.AssetManager;
+import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.R;
@@ -39,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import android.os.Handler;
 
 /**
  * This class manages the interaction and processing of Picture Spheres ("PicSphere"). PicSphere
@@ -47,7 +52,7 @@ import java.util.Map;
  *
  * Can you feel the awesomeness?
  */
-public class PicSphereManager implements PicSphere.ProgressListener {
+public class PicSphereManager {
     public final static String TAG = "PicSphereManager";
     private List<PicSphere> mPicSpheres;
     private Map<PicSphere, Integer> mPicSpheresNotif;
@@ -55,6 +60,34 @@ public class PicSphereManager implements PicSphere.ProgressListener {
     private Context mContext;
     private SnapshotManager mSnapManager;
     private Capture3DRenderer mCapture3DRenderer;
+    private PicSphereRenderingService mBoundService;
+    private Handler mHandler;
+    private boolean mIsBound;
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service.  Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+            mBoundService = ((PicSphereRenderingService.LocalBinder)service).getService();
+
+            // Tell the user about this for our demo.
+            Toast.makeText(mContext, "Local service connected",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            // Because it is running in our same process, we should never
+            // see this happen.
+            mBoundService = null;
+            Toast.makeText(mContext, "Service disconnected",
+                    Toast.LENGTH_SHORT).show();
+        }
+    };
 
     public PicSphereManager(Context context, SnapshotManager snapMan) {
         mContext = context;
@@ -62,6 +95,9 @@ public class PicSphereManager implements PicSphere.ProgressListener {
         mPicSpheres = new ArrayList<PicSphere>();
         mPicSpheresNotif = new HashMap<PicSphere, Integer>();
         mNextNotificationId = 0;
+        mHandler = new Handler();
+        mIsBound = false;
+        doBindService();
         new Thread() {
             public void run() { copyBinaries(); }
         }.start();
@@ -95,20 +131,42 @@ public class PicSphereManager implements PicSphere.ProgressListener {
      * @param sphere The PicSphere to render
      */
     public void startRendering(final PicSphere sphere) {
-        // TODO: Handle app exit better
+        // Notify toast
+        CameraActivity.notify(mContext.getString(R.string.picsphere_toast_background_render), 2500);
 
-        new Thread() {
-            public void run() {
-                sphere.setProgressListener(PicSphereManager.this);
-                sphere.render();
-            }
-        }.start();
+        if (mIsBound && mBoundService != null) {
+            mBoundService.render(sphere);
+        } else {
+            doBindService();
+            mHandler.postDelayed(new Runnable() {
+                public void run() {
+                    startRendering(sphere);
+                }
+            }, 500);
+        }
+    }
+
+    void doBindService() {
+        // Establish a connection with the service.  We use an explicit
+        // class name because we want a specific service implementation that
+        // we know will be running in our own process (and thus won't be
+        // supporting component replacement by other applications).
+        Log.e(TAG, "BINDING SERVICE");
+        mContext.bindService(new Intent(mContext, PicSphereRenderingService.class),
+                mServiceConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
     }
 
     public void tearDown() {
         if (mCapture3DRenderer != null) {
             mCapture3DRenderer.onPause();
             mCapture3DRenderer = null;
+        }
+
+        if (mIsBound) {
+            // Detach our existing connection.
+            mContext.unbindService(mServiceConnection);
+            mIsBound = false;
         }
     }
 
@@ -174,75 +232,5 @@ public class PicSphereManager implements PicSphere.ProgressListener {
         return true;
     }
 
-    @Override
-    public void onRenderStart(PicSphere sphere) {
-        // Notify toast
-        CameraActivity.notify(mContext.getString(R.string.picsphere_toast_background_render), 2500);
 
-        // Display a notification
-        NotificationManager mNotificationManager =
-                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(mNextNotificationId, buildProgressNotification(0,
-                mContext.getString(R.string.picsphere_step_preparing)));
-
-        // Store notification ID to reuse it later
-        mPicSpheresNotif.put(sphere, mNextNotificationId);
-        mNextNotificationId++;
-    }
-
-    @Override
-    public void onStepChange(PicSphere sphere, int newStep) {
-        int progressPerStep = 100 / PicSphere.STEP_TOTAL;
-        int progress = newStep * progressPerStep;
-        String text = "";
-
-        switch (newStep) {
-            case PicSphere.STEP_AUTOPANO:
-                text = mContext.getString(R.string.picsphere_step_autopano);
-                break;
-
-            case PicSphere.STEP_PTCLEAN:
-                text = mContext.getString(R.string.picsphere_step_ptclean);
-                break;
-
-            case PicSphere.STEP_AUTOOPTIMISER:
-                text = mContext.getString(R.string.picsphere_step_autooptimiser);
-                break;
-
-            case PicSphere.STEP_PANOMODIFY:
-                text = mContext.getString(R.string.picsphere_step_panomodify);
-                break;
-
-            case PicSphere.STEP_NONA:
-                text = mContext.getString(R.string.picsphere_step_nona);
-                break;
-
-            case PicSphere.STEP_ENBLEND:
-                text = mContext.getString(R.string.picsphere_step_enblend);
-                break;
-        }
-
-        NotificationManager mNotificationManager =
-                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(mPicSpheresNotif.get(sphere),
-                buildProgressNotification(progress, text));
-    }
-
-    @Override
-    public void onRenderDone(PicSphere sphere) {
-        NotificationManager mNotificationManager =
-                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(mPicSpheresNotif.get(sphere));
-    }
-
-    private Notification buildProgressNotification(int percentage, String text) {
-        Notification.Builder mBuilder =
-                new Notification.Builder(mContext)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle(mContext.getString(R.string.picsphere_notif_title))
-                        .setContentText(percentage+"% ("+text+")")
-                        .setOngoing(true);
-
-        return mBuilder.build();
-    }
 }

@@ -15,12 +15,14 @@
     <uses-feature android:name="android.hardware.camera"/>
     <uses-feature android:name="android.hardware.camera.autofocus"/>
 
+
     <application
             android:allowBackup="true"
             android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
             android:theme="@style/AppTheme"
             android:largeHeap="true">
+        <service android:name="org.cyanogenmod.nemesis.picsphere.PicSphereRenderingService" />
         <activity
                 android:name="org.cyanogenmod.nemesis.CameraActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"
