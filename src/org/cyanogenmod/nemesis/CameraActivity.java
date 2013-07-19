@@ -39,7 +39,6 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -49,13 +48,13 @@ import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
 import org.cyanogenmod.nemesis.pano.MosaicProxy;
-import org.cyanogenmod.nemesis.ui.PanoProgressBar;
 import org.cyanogenmod.nemesis.picsphere.PicSphereCaptureTransformer;
 import org.cyanogenmod.nemesis.picsphere.PicSphereManager;
 import org.cyanogenmod.nemesis.ui.CircleTimerView;
 import org.cyanogenmod.nemesis.ui.ExposureHudRing;
 import org.cyanogenmod.nemesis.ui.FocusHudRing;
 import org.cyanogenmod.nemesis.ui.Notifier;
+import org.cyanogenmod.nemesis.ui.PanoProgressBar;
 import org.cyanogenmod.nemesis.ui.PreviewFrameLayout;
 import org.cyanogenmod.nemesis.ui.ReviewDrawer;
 import org.cyanogenmod.nemesis.ui.SavePinger;
@@ -208,9 +207,17 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     @Override
     protected void onPause() {
         // Pause the camera preview
-        mCamManager.pause();
-        mSnapshotManager.onPause();
-        mOrientationListener.disable();
+        if (mCamManager != null) {
+            mCamManager.pause();
+        }
+
+        if (mSnapshotManager != null) {
+            mSnapshotManager.onPause();
+        }
+
+        if (mOrientationListener != null) {
+            mOrientationListener.disable();
+        }
 
         if (mPicSphereManager != null) {
             mPicSphereManager.onPause();
