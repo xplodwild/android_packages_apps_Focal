@@ -389,12 +389,12 @@ public class PicSphere {
     }
 
     /**
-     * Generate PhotoSphere XMP data file for use with exiv2 tool
+     * Generate PhotoSphere XMP data file to apply on panorama images
      * https://developers.google.com/photo-sphere/metadata/
      *
      * @param width The width of the panorama
      * @param height The height of the panorama
-     * @return Exiv2 config file string
+     * @return RDF XML XMP metadata
      */
     public static String generatePhotoSphereXMP(int width, int height, int sourceImageCount) {
         return "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +

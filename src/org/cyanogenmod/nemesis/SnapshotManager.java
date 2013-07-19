@@ -152,6 +152,7 @@ public class SnapshotManager {
     private PixelBuffer mOffscreenGL;
     private AutoPictureEnhancer mAutoPicEnhancer;
     private boolean mImageIsProcessing;
+    private boolean mDoAutoEnhance;
 
     // Video-related variables
     private long mRecordingStartTime;
@@ -231,8 +232,7 @@ public class SnapshotManager {
                 final int correctedOrientation = orientation;
                 final byte[] finalData = jpegData;
 
-                // TODO: Toggle Automatic Picture Enhancement
-                if (!snap.mBypassProcessing) {
+                if (!snap.mBypassProcessing && mDoAutoEnhance) {
                     new Thread() {
                         public void run() {
                             mImageIsProcessing = true;
@@ -287,6 +287,7 @@ public class SnapshotManager {
                         }
                     }.start();
                 } else {
+                    // Just save it as is
                     mImageSaver.addImage(jpegData, uri, title, null,
                             width, height, correctedOrientation);
 
@@ -393,6 +394,14 @@ public class SnapshotManager {
      */
     public void setBypassProcessing(boolean bypass) {
         mBypassProcessing = bypass;
+    }
+
+    public void setAutoEnhance(boolean enhance) {
+        mDoAutoEnhance = enhance;
+    }
+
+    public boolean getAutoEnhance() {
+        return mDoAutoEnhance;
     }
 
     public void prepareNamerUri(int width, int height) {

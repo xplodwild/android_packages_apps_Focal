@@ -31,6 +31,7 @@ import org.cyanogenmod.nemesis.CameraCapabilities;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SettingsStorage;
+import org.cyanogenmod.nemesis.SnapshotManager;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -41,9 +42,12 @@ import java.util.List;
  */
 public class SettingsWidget extends WidgetBase {
     private static final String DRAWABLE_KEY_EXPO_RING = "_Nemesis_ExposureRing=true";
+    private static final String DRAWABLE_KEY_AUTO_ENHANCE = "_Nemesis_AutoEnhance=true";
     private static final String KEY_SHOW_EXPOSURE_RING = "ShowExposureRing";
+    private static final String KEY_ENABLE_AUTO_ENHANCE = "AutoEnhanceEnabled";
     private WidgetOptionButton mResolutionButton;
     private WidgetOptionButton mToggleExposureRing;
+    private WidgetOptionButton mToggleAutoEnhancer;
     private WidgetOptionButton mToggleWidgetsButton;
     private CameraActivity mContext;
     private CameraCapabilities mCapabilities;
@@ -68,6 +72,23 @@ public class SettingsWidget extends WidgetBase {
 
             SettingsStorage.storeAppSetting(mContext, KEY_SHOW_EXPOSURE_RING,
                     mContext.isExposureRingVisible() ? "1" : "0");
+        }
+    };
+
+    private View.OnClickListener mAutoEnhanceClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            SnapshotManager snapMan = mContext.getSnapManager();
+            snapMan.setAutoEnhance(!snapMan.getAutoEnhance());
+
+            if (snapMan.getAutoEnhance()) {
+                mToggleAutoEnhancer.setActiveDrawable(DRAWABLE_KEY_AUTO_ENHANCE);
+            } else {
+                mToggleAutoEnhancer.resetImage();
+            }
+
+            SettingsStorage.storeAppSetting(mContext, KEY_ENABLE_AUTO_ENHANCE,
+                    snapMan.getAutoEnhance() ? "1" : "0");
         }
     };
 
@@ -197,15 +218,27 @@ public class SettingsWidget extends WidgetBase {
         // Restore exposure ring state
         if (SettingsStorage.getAppSetting(mContext, KEY_SHOW_EXPOSURE_RING, "1").equals("1")) {
             mContext.setExposureRingVisible(true);
+            mToggleExposureRing.setActiveDrawable(DRAWABLE_KEY_EXPO_RING);
         } else {
             mContext.setExposureRingVisible(false);
         }
-
-        if (mContext.isExposureRingVisible()) {
-            mToggleExposureRing.setActiveDrawable(DRAWABLE_KEY_EXPO_RING);
-        }
         addViewToContainer(mToggleExposureRing);
 
+        // Toggle auto enhancer
+        mToggleAutoEnhancer = new WidgetOptionButton(R.drawable.ic_widget_skintone, context);
+        mToggleAutoEnhancer.setOnClickListener(mAutoEnhanceClickListener);
+
+        // Restore auto enhancer state
+        if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_AUTO_ENHANCE, "1").equals("1")) {
+            mContext.getSnapManager().setAutoEnhance(true);
+            mToggleAutoEnhancer.setActiveDrawable(DRAWABLE_KEY_AUTO_ENHANCE);
+        } else {
+            mContext.getSnapManager().setAutoEnhance(false);
+        }
+
+        addViewToContainer(mToggleAutoEnhancer);
+
+        // Choose widgets to appear
         mToggleWidgetsButton = new WidgetOptionButton(R.drawable.ic_widget_settings_widgets, context);
         mToggleWidgetsButton.setOnClickListener(new View.OnClickListener() {
             @Override
