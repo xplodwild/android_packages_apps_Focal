@@ -70,6 +70,9 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
 
             // Scale it!
             b=Bitmap.createScaledBitmap(bmp, w, h, true);
+
+            // Release original bitmap
+            bmp.recycle();
         }
         return b;
     }
@@ -97,6 +100,10 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
         } else {
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
         }
+
+        bitmap.recycle();
+        System.gc();
+        Runtime.getRuntime().gc();
 
         // Set texture parameters
         GLToolbox.initTexParams();

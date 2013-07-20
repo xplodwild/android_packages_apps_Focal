@@ -18,6 +18,7 @@
 
 package org.cyanogenmod.nemesis.feats;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.opengl.GLSurfaceView;
@@ -224,6 +225,9 @@ public class PixelBuffer {
     }
 
     private void convertToBitmap() {
+        System.gc();
+        Runtime.getRuntime().gc();
+
         final int mMaxTextureSize = mContext.getResources().getInteger(R.integer.config_maxTextureSize);
         boolean isScaled = (mWidth > mMaxTextureSize || mHeight > mMaxTextureSize);
 
@@ -244,7 +248,31 @@ public class PixelBuffer {
         mBitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
         mBitmap.copyPixelsFromBuffer(ibt);
 
+        // Release IntBuffers memory
+        ibt = null;
+        ib = null;
+
         if (isScaled) {
+            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+            ActivityManager activityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+            activityManager.getMemoryInfo(mi);
+            long availableMegs = mi.availMem / 1048576L;
+            Log.d(TAG, "Available memory: " + availableMegs + "MB");
+            while (availableMegs < 200) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.e(TAG, "Waiting for more memory! (Free: " + availableMegs + "MB)");
+                // We're going to need some memory
+                System.gc();
+                Runtime.getRuntime().gc();
+
+                activityManager.getMemoryInfo(mi);
+                availableMegs = mi.availMem / 1048576L;
+            }
+
             // Image was converted to a power of two texture, scale it back
             Log.v(TAG, "Image was scaled, scaling back to " + mWidth + "x" + mHeight);
             Bitmap scaled = Bitmap.createScaledBitmap(mBitmap, mWidth, mHeight, true);

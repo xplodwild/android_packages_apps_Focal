@@ -104,6 +104,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private GLSurfaceView mPicSphere3DView;
     private boolean mHasPinchZoomed;
     private boolean mCancelSideBarClose;
+    private boolean mIsFocusButtonDown;
+    private boolean mIsShutterButtonDown;
 
     /**
      * Gesture listeners to apply on camera previews views
@@ -127,6 +129,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             return true;
         }
     };
+
 
     /**
      * Event: Activity created
@@ -553,19 +556,44 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             case KeyEvent.KEYCODE_FOCUS:
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 // Use the volume down button as focus button
-                mCamManager.doAutofocus(mFocusManager);
+                if (!mIsFocusButtonDown) {
+                    mCamManager.doAutofocus(mFocusManager);
+                    mCamManager.setLockSetup(true);
+                    mIsFocusButtonDown = true;
+                }
                 return true;
             case KeyEvent.KEYCODE_CAMERA:
             case KeyEvent.KEYCODE_VOLUME_UP:
                 // Use the volume up button as shutter button (or snapshot button in video mode)
-                if (mCameraMode == CAMERA_MODE_VIDEO) {
-                    mSnapshotManager.queueSnapshot(true, 0);
-                } else {
-                    mShutterButton.performClick();
+                if (!mIsShutterButtonDown) {
+                    if (mCameraMode == CAMERA_MODE_VIDEO) {
+                        mSnapshotManager.queueSnapshot(true, 0);
+                    } else {
+                        mShutterButton.performClick();
+                    }
+                    mIsShutterButtonDown = true;
                 }
                 return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_FOCUS:
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                mIsFocusButtonDown = false;
+                mCamManager.setLockSetup(false);
+                break;
+
+            case KeyEvent.KEYCODE_CAMERA:
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                mIsShutterButtonDown = false;
+                break;
+        }
+
+        return super.onKeyUp(keyCode, event);
     }
 
     public CameraManager getCamManager() {
