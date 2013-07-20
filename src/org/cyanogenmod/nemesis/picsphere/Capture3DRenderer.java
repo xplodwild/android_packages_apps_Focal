@@ -262,7 +262,9 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         float rY = (float) (orientation[0] * 180.0f/Math.PI);
 
         // Update quaternion from euler angles out of orientation
-        mCameraQuat.fromEuler( -rX, 0.0f, -rY);
+        mCameraQuat.fromEuler( rX, 0.0f, rY);
+        mCameraQuat = mCameraQuat.getConjugate();
+        mCameraQuat.normalise();
         mViewMatrix = mCameraQuat.getMatrix();
 
 

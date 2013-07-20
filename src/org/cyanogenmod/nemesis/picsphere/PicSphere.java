@@ -283,7 +283,7 @@ public class PicSphere {
     private boolean doAutoOptimiser() throws IOException {
         Log.d(TAG, "AutoOptimiser...");
         notifyStep(STEP_AUTOOPTIMISER);
-        run("autooptimiser -v " + mHorizontalAngle + " -a -l -s -m -o " + mProjectFile + " " + mProjectFile);
+        run("autooptimiser -v " + mHorizontalAngle + " -p -a -o " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "AutoOptimiser... done");
