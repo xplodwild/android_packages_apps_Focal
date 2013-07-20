@@ -773,6 +773,8 @@ public class CameraManager {
      */
     public void setStabilization(boolean enabled) {
         Camera.Parameters params = getParameters();
+        if (params == null) return;
+
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
             // Sony
             if (params.get("sony-is") != null) {

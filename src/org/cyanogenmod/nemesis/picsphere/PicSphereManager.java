@@ -55,8 +55,6 @@ import android.os.Handler;
 public class PicSphereManager {
     public final static String TAG = "PicSphereManager";
     private List<PicSphere> mPicSpheres;
-    private Map<PicSphere, Integer> mPicSpheresNotif;
-    int mNextNotificationId;
     private Context mContext;
     private SnapshotManager mSnapManager;
     private Capture3DRenderer mCapture3DRenderer;
@@ -72,10 +70,6 @@ public class PicSphereManager {
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
             mBoundService = ((PicSphereRenderingService.LocalBinder)service).getService();
-
-            // Tell the user about this for our demo.
-            Toast.makeText(mContext, "Local service connected",
-                    Toast.LENGTH_SHORT).show();
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -84,8 +78,6 @@ public class PicSphereManager {
             // Because it is running in our same process, we should never
             // see this happen.
             mBoundService = null;
-            Toast.makeText(mContext, "Service disconnected",
-                    Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -93,8 +85,6 @@ public class PicSphereManager {
         mContext = context;
         mSnapManager = snapMan;
         mPicSpheres = new ArrayList<PicSphere>();
-        mPicSpheresNotif = new HashMap<PicSphere, Integer>();
-        mNextNotificationId = 0;
         mHandler = new Handler();
         mIsBound = false;
         doBindService();
@@ -151,7 +141,7 @@ public class PicSphereManager {
         // class name because we want a specific service implementation that
         // we know will be running in our own process (and thus won't be
         // supporting component replacement by other applications).
-        Log.e(TAG, "BINDING SERVICE");
+        Log.v(TAG, "Binding PicSphere rendering service");
         mContext.bindService(new Intent(mContext, PicSphereRenderingService.class),
                 mServiceConnection, Context.BIND_AUTO_CREATE);
         mIsBound = true;

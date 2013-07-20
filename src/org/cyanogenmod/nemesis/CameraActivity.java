@@ -245,6 +245,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         super.onResume();
         mReviewDrawer.close();
+
+        // Reset to photo
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                setCameraMode(CAMERA_MODE_PHOTO);
+            }
+        });
     }
 
     @Override
@@ -308,8 +316,16 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
      *
      * @param newMode
      */
-    public void setCameraMode(int newMode) {
+    public void setCameraMode(final int newMode) {
         if (mCameraMode == newMode) return;
+
+        if (mCamManager.getParameters() == null) {
+            mHandler.post(new Runnable() {
+                public void run() {
+                    setCameraMode(newMode);
+                }
+            });
+        }
 
         // Reset PicSphere 3D renderer if we were in PS mode
         if (mCameraMode == CAMERA_MODE_PICSPHERE) {
