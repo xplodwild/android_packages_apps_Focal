@@ -33,7 +33,12 @@ LOCAL_REQUIRED_MODULES := \
 	enfuse \
 	libxmptoolkit
 
+LOCAL_STATIC_JAVA_LIBRARIES := \
+	metadata-extractor \
+	xmpcore
+
 include $(BUILD_PACKAGE)
 
 include $(call all-makefiles-under, $(ANDROID_BUILD_TOP)/external/Nemesis)
 include $(call all-makefiles-under, jni)
+include $(call all-makefiles-under, libs)
