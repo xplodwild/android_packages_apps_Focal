@@ -117,6 +117,7 @@ public class ShutterSpeedWidget extends WidgetBase {
 
         if (mIsSony) {
             mCamManager.setParameterAsync(KEY_SONY_PARAMETER, valueStr);
+            mCamManager.setParameterAsync("sony-ae-mode", "shutter-prio");
         } else {
             mCamManager.setParameterAsync(KEY_PARAMETER, valueStr);
         }
