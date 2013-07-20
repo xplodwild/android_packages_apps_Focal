@@ -268,7 +268,7 @@ public class SnapshotManager {
 
                             if (mImageSaver != null) {
                                 mImageSaver.addImage(baos.toByteArray(), uri, title, null,
-                                        width, height, correctedOrientation, tagsList);
+                                        width, height, correctedOrientation, tagsList, snap);
                             } else {
                                 Log.e(TAG, "ImageSaver was null: couldn't save image!");
                             }
@@ -279,20 +279,13 @@ public class SnapshotManager {
                                 mImageSaver = null;
                             }
 
-                            for (SnapshotListener listener : mListeners) {
-                                listener.onSnapshotSaved(snap);
-                            }
                             mImageIsProcessing = false;
                         }
                     }.start();
                 } else {
                     // Just save it as is
                     mImageSaver.addImage(jpegData, uri, title, null,
-                            width, height, correctedOrientation);
-
-                    for (SnapshotListener listener : mListeners) {
-                        listener.onSnapshotSaved(snap);
-                    }
+                            width, height, correctedOrientation, snap);
                 }
             }
 
@@ -689,6 +682,7 @@ public class SnapshotManager {
         int width, height;
         int orientation;
         List<Tag> exifTags;
+        SnapshotInfo snap;
     }
 
     // We use a queue to store the SaveRequests that have not been completed
@@ -720,14 +714,20 @@ public class SnapshotManager {
 
         // Runs in main thread
         public void addImage(final byte[] data, Uri uri, String title,
+                             Location loc, int width, int height, int orientation, SnapshotInfo snap) {
+            addImage(data, uri, title, loc, width, height, orientation, null, snap);
+        }
+
+        // Runs in main thread
+        public void addImage(final byte[] data, Uri uri, String title,
                              Location loc, int width, int height, int orientation) {
-           addImage(data, uri, title, loc, width, height, orientation, null);
+           addImage(data, uri, title, loc, width, height, orientation, null, null);
         }
 
         // Runs in main thread
         public void addImage(final byte[] data, Uri uri, String title,
                              Location loc, int width, int height, int orientation,
-                             List<Tag> exifTags) {
+                             List<Tag> exifTags, SnapshotInfo snap) {
             SaveRequest r = new SaveRequest();
             r.data = data;
             r.uri = uri;
@@ -737,6 +737,7 @@ public class SnapshotManager {
             r.height = height;
             r.orientation = orientation;
             r.exifTags = exifTags;
+            r.snap = snap;
             synchronized (this) {
                 while (mQueue.size() >= QUEUE_LIMIT) {
                     try {
@@ -776,7 +777,7 @@ public class SnapshotManager {
                     }
                 }
                 storeImage(r.data, r.uri, r.title, r.loc, r.width, r.height,
-                        r.orientation, r.exifTags);
+                        r.orientation, r.exifTags, r.snap);
                 synchronized (this) {
                     mQueue.remove(0);
                     for (SnapshotListener listener : mListeners) {
@@ -817,7 +818,7 @@ public class SnapshotManager {
         // Runs in saver thread
         private void storeImage(final byte[] data, Uri uri, String title,
                                 Location loc, int width, int height, int orientation,
-                                List<Tag> exifTags) {
+                                List<Tag> exifTags, SnapshotInfo snap) {
             boolean ok = Storage.getStorage().updateImage(mContentResolver, uri, title, loc,
                     orientation, data, width, height);
 
@@ -836,11 +837,17 @@ public class SnapshotManager {
 
                         exifIf.saveAttributes();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Log.e(TAG, "Couldn't write exif", e);
                     }
                 }
 
                 Util.broadcastNewPicture(mContext, uri);
+
+                if (snap != null) {
+                    for (SnapshotListener listener : mListeners) {
+                        listener.onSnapshotSaved(snap);
+                    }
+                }
             }
         }
     }
