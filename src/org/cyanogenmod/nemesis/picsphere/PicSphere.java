@@ -372,7 +372,7 @@ public class PicSphere {
             f.close();
         }
 
-        mSnapManager.saveImage(mOutputUri, mOutputTitle, 100, 100, 0, jpegData);
+        mSnapManager.saveImage(mOutputUri, mOutputTitle, 100, 100, 90, jpegData);
 
         Log.d(TAG, "Enblend... done");
         return true;
