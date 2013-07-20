@@ -378,7 +378,8 @@ public abstract class WidgetBase {
         }
 
         private void initialize() {
-            setWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
+            setMinimumWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
+            setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
             int padding = getResources().getDimensionPixelSize(R.dimen.widget_option_button_padding);
             setPadding(padding, padding, padding, padding);
             setGravity(Gravity.CENTER);

@@ -662,7 +662,9 @@ public class CameraManager {
 
                 mHandler.post(new Runnable() {
                     public void run() {
-                        mCamera.autoFocus(cb);
+                        try {
+                            mCamera.autoFocus(cb);
+                        } catch (Exception e) { }
                     }
                 });
 
