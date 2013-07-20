@@ -248,7 +248,6 @@ public class SnapshotManager {
 
                                 for (Directory directory : metadata.getDirectories()) {
                                     for (Tag tag : directory.getTags()) {
-                                        Log.e(TAG, "Saving tag: " + tag.toString());
                                         tagsList.add(tag);
                                     }
                                 }
@@ -829,7 +828,6 @@ public class SnapshotManager {
                         ExifInterface exifIf = new ExifInterface(Util.getRealPathFromURI(mContext, uri));
 
                         for (Tag tag : exifTags) {
-                            Log.e(TAG, "Restoring tag: " + tag.toString());
                             // move along
                             String[] hack = tag.toString().split("\\]");
                             hack = hack[1].split("-");
@@ -840,7 +838,6 @@ public class SnapshotManager {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                 }
 
                 Util.broadcastNewPicture(mContext, uri);

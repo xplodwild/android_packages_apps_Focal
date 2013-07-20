@@ -20,6 +20,7 @@ package org.cyanogenmod.nemesis;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
@@ -392,7 +393,18 @@ public class CameraManager {
 
         // Convert YUV420SP preview data to RGB
         if (data != null) {
-            return Util.decodeYUV420SP(mContext, data, previewWidth, previewHeight);
+            Bitmap bitmap = Util.decodeYUV420SP(mContext, data, previewWidth, previewHeight);
+            if (mCurrentFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                // Frontcam has the image flipped, flip it back to not look weird in portrait
+                Matrix m = new Matrix();
+                m.preScale(-1, 1);
+                Bitmap dst = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                        bitmap.getHeight(), m, false);
+                bitmap.recycle();
+                bitmap = dst;
+            }
+
+            return bitmap;
         } else {
             return null;
         }
