@@ -10,6 +10,10 @@ bin/
 /.idea
 /out
 /Nemesis.iml
-/libs
+!/libs/Android.mk
+!/libs/LICENSE-metadata-extractor.txt
+!/libs/metadata-extractor-2.6.4.jar
+!/libs/xmpcore.jar
+/libs/*/*
 /obj
 /res\drawable-xxhdpi/Thumbs.db
