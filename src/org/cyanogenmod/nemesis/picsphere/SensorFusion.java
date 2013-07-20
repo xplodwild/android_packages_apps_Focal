@@ -57,9 +57,6 @@ public class SensorFusion implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        // We invert the X axis
-        event.values[2] = -event.values[2];
-
         if (mRotationMatrix == null) {
             mRotationMatrix = new float[16];
         }
@@ -68,8 +65,8 @@ public class SensorFusion implements SensorEventListener {
         SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
 
         // Remap the axes
-        SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_Z,
-                SensorManager.AXIS_Y, mRotationMatrix);
+        SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_MINUS_Z,
+                SensorManager.AXIS_X, mRotationMatrix);
 
         // Get back a remapped orientation vector
         SensorManager.getOrientation(mRotationMatrix, mOrientation);

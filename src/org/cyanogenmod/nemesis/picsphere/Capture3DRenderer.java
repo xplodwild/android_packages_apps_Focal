@@ -258,11 +258,11 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
 
         float[] orientation = mSensorFusion.getFusedOrientation();
         // Convert angles to degrees
-        float rX = (float) (orientation[2] * 180.0f/Math.PI);
-        float rY = (float) (orientation[1] * 180.0f/Math.PI);
+        float rX = (float) (orientation[1] * 180.0f/Math.PI);
+        float rY = (float) (orientation[0] * 180.0f/Math.PI);
 
         // Update quaternion from euler angles out of orientation
-        mCameraQuat.fromEuler( rX, 0.0f, rY);
+        mCameraQuat.fromEuler( -rX, 0.0f, -rY);
         mViewMatrix = mCameraQuat.getMatrix();
 
 
