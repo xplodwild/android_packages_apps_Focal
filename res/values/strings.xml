@@ -43,6 +43,11 @@
     <string name="widget_hdr_aebracket">Auto bracketing</string>
 
     <string name="widget_settings_choose_widgets">Choose widgets in the sidebar</string>
+    <string name="widget_settings_choose_widgets_button">Choose widgets</string>
+    <string name="widget_settings_picture_size">Image size</string>
+    <string name="widget_settings_exposure_ring">Show exposure ring</string>
+    <string name="widget_settings_autoenhance">Auto-enhancement</string>
+
 
     <string name="widget_autoexposure">Exposure measure mode</string>
     <string name="widget_burstmode">Burst mode</string>

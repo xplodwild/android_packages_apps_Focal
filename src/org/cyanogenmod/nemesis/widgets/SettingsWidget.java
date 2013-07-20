@@ -191,7 +191,8 @@ public class SettingsWidget extends WidgetBase {
             mResolutionsName = new ArrayList<String>();
             mVideoResolutions = new ArrayList<String>();
             for (Camera.Size size : mResolutions) {
-                if (size.width == 1920 && size.height == 1080) {
+                if (size.width == 1920 && size.height == 1080
+                        || size.width == 1920 && size.height == 1088) {
                     mResolutionsName.add(mContext.getString(R.string.video_res_1080p));
                     mVideoResolutions.add("1920x1080");
                 } else if (size.width == 1280 && size.height == 720) {
@@ -210,9 +211,11 @@ public class SettingsWidget extends WidgetBase {
 
         mResolutionButton = new WidgetOptionButton(R.drawable.ic_widget_settings_resolution, context);
         mResolutionButton.setOnClickListener(mResolutionClickListener);
+        mResolutionButton.setHintText(mContext.getString(R.string.widget_settings_picture_size));
         addViewToContainer(mResolutionButton);
 
         mToggleExposureRing = new WidgetOptionButton(R.drawable.ic_widget_settings_exposurering, context);
+        mToggleExposureRing.setHintText(mContext.getString(R.string.widget_settings_exposure_ring));
         mToggleExposureRing.setOnClickListener(mExpoRingClickListener);
 
         // Restore exposure ring state
@@ -227,6 +230,7 @@ public class SettingsWidget extends WidgetBase {
         // Toggle auto enhancer
         mToggleAutoEnhancer = new WidgetOptionButton(R.drawable.ic_widget_skintone, context);
         mToggleAutoEnhancer.setOnClickListener(mAutoEnhanceClickListener);
+        mToggleAutoEnhancer.setHintText(mContext.getString(R.string.widget_settings_autoenhance));
 
         // Restore auto enhancer state
         if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_AUTO_ENHANCE, "1").equals("1")) {
@@ -240,6 +244,7 @@ public class SettingsWidget extends WidgetBase {
 
         // Choose widgets to appear
         mToggleWidgetsButton = new WidgetOptionButton(R.drawable.ic_widget_settings_widgets, context);
+        mToggleWidgetsButton.setHintText(mContext.getString(R.string.widget_settings_choose_widgets_button));
         mToggleWidgetsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
