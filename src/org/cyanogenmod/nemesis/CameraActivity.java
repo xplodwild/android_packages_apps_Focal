@@ -699,6 +699,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mPicSphereManager.tearDown();
         setCaptureTransformer(null);
 
+        mPicSphereUndo.setVisibility(View.GONE);
+
         mPicSphere3DView = null;
     }
 
