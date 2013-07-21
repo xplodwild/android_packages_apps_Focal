@@ -609,21 +609,15 @@ public class CameraManager {
                 * mContext.getResources().getInteger(R.integer.config_panoramaDefaultHeight);
 
         List<Camera.Size> supportedSizes = parameters.getSupportedPreviewSizes();
-        Point previewSize = Util.findBestPanoPreviewSize(supportedSizes, true, true, pixels);
-        if (previewSize == null) {
-            //Log.w(TAG, "No 4:3 ratio preview size supported.");
-            previewSize = Util.findBestPanoPreviewSize(supportedSizes, false, true, pixels);
-            if (previewSize == null) {
-                //Log.w(TAG, "Can't find a supported preview size smaller than 960x720.");
-                previewSize = Util.findBestPanoPreviewSize(supportedSizes, false, false, pixels);
-            }
-        }
+        Point previewSize = Util.findBestPanoPreviewSize(supportedSizes, false, false, pixels);
 
         Log.v(TAG, "preview h = " + previewSize.y + " , w = " + previewSize.x);
         parameters.setPreviewSize(previewSize.x, previewSize.y);
         mTargetSize = previewSize;
 
-        parameters.setPictureSize(previewSize.x, previewSize.y);
+        List<Camera.Size> supportedPicSizes = parameters.getSupportedPictureSizes();
+        Point pictureSize = Util.findBestPanoPreviewSize(supportedPicSizes, false, false, pixels);
+        parameters.setPictureSize(pictureSize.x, pictureSize.y);
 
         List<int[]> frameRates = parameters.getSupportedPreviewFpsRange();
         int last = frameRates.size() - 1;

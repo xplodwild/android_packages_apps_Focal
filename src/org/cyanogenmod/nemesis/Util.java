@@ -418,8 +418,6 @@ public class Util {
      */
     public static Point findBestPanoPreviewSize(List<Size> supportedSizes, boolean need4To3,
                                                 boolean needSmaller, int defaultPixels) {
-        need4To3 = false;
-        needSmaller = false;
         Point output = null;
         int pixelsDiff = defaultPixels;
 
