@@ -553,16 +553,22 @@ public class CameraManager {
                     e.printStackTrace();
                 }
 
-                Camera.Parameters params = getParameters();
-
-                if (mode == CameraActivity.CAMERA_MODE_VIDEO) {
-                    params.setRecordingHint(true);
-                } else {
-                    params.setRecordingHint(false);
-                }
-
                 mIsModeSwitching = true;
                 synchronized (mParametersThread) {
+                    Camera.Parameters params = getParameters();
+
+                    if (params == null) {
+                        // We're likely in the middle of a transient state. Just do that again
+                        // shortly when the camera will be available.
+                        return;
+                    }
+
+                    if (mode == CameraActivity.CAMERA_MODE_VIDEO) {
+                        params.setRecordingHint(true);
+                    } else {
+                        params.setRecordingHint(false);
+                    }
+
                     mCamera.stopPreview();
 
                     if (mode == CameraActivity.CAMERA_MODE_PANO) {

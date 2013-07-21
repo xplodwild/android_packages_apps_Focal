@@ -172,7 +172,6 @@ public class MosaicFrameProcessor {
 
             // TODO: make the termination condition regarding reaching
             // MAX_NUMBER_OF_FRAMES solely determined in the library.
-            Log.e(TAG, "Frame count: " + mTotalFrameCount + "/" + MAX_NUMBER_OF_FRAMES);
             if (mTotalFrameCount < MAX_NUMBER_OF_FRAMES) {
                 // If we are still collecting new frames for the current mosaic,
                 // process the new frame.

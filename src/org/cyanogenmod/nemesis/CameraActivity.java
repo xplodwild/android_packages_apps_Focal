@@ -696,7 +696,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         root.height = FrameLayout.LayoutParams.MATCH_PARENT;
         camContainer.setLayoutParams(root);
 
-        mPicSphereManager.tearDown();
+        if (mPicSphereManager != null) {
+            mPicSphereManager.tearDown();
+        }
         setCaptureTransformer(null);
 
         mPicSphereUndo.setVisibility(View.GONE);
