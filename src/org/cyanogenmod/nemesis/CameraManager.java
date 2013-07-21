@@ -575,6 +575,9 @@ public class CameraManager {
                         // rendering super high quality pictures.
                         params.setPictureSize(640, 480);
                         params.setPreviewSize(640, 480);
+
+                        // Set focus mode to infinity
+                        setInfinityFocus(params);
                     } else {
                         params.setPreviewSize(mTargetSize.x, mTargetSize.y);
                     }
@@ -626,6 +629,13 @@ public class CameraManager {
         parameters.setPreviewFpsRange(minFps, maxFps);
         Log.v(TAG, "preview fps: " + minFps + ", " + maxFps);
 
+        setInfinityFocus(parameters);
+
+        parameters.set("recording-hint", "false");
+        mParameters = parameters;
+    }
+
+    private void setInfinityFocus(Camera.Parameters parameters) {
         List<String> supportedFocusModes = parameters.getSupportedFocusModes();
         if (supportedFocusModes.indexOf(Camera.Parameters.FOCUS_MODE_INFINITY) >= 0) {
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_INFINITY);
@@ -634,9 +644,6 @@ public class CameraManager {
             Log.w(TAG, "Cannot set the focus mode to " + Camera.Parameters.FOCUS_MODE_INFINITY +
                     " because the mode is not supported.");
         }
-
-        parameters.set("recording-hint", "false");
-        mParameters = parameters;
     }
 
     /**
