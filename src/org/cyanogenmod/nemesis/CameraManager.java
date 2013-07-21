@@ -763,6 +763,35 @@ public class CameraManager {
     }
 
     /**
+     * Enable the device image stabilization system. Toggle device-specific
+     * stab as well if they exist and are implemented.
+     * @param enabled
+     */
+    public void setStabilization(boolean enabled) {
+        Camera.Parameters params = getParameters();
+        if (params == null) return;
+
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
+            // Sony
+            if (params.get("sony-is") != null) {
+                // XXX: on-still-hdr
+                params.set("sony-is", enabled ? "on" : "off");
+            }
+            // HTC
+            else if (params.get("ois_mode") != null) {
+                params.set("ois_mode", enabled ? "on" : "off");
+            }
+
+        } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+            if (params.get("sony-vs") != null) {
+                params.set("sony-vs", enabled ? "on" : "off");
+            } else {
+                params.setVideoStabilization(enabled);
+            }
+        }
+    }
+
+    /**
      * Sets the camera device to render to a texture rather than a SurfaceHolder
      * @param texture The texture to which render
      */
