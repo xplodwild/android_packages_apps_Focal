@@ -106,6 +106,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private boolean mCancelSideBarClose;
     private boolean mIsFocusButtonDown;
     private boolean mIsShutterButtonDown;
+    private boolean mUserWantsExposureRing;
 
     /**
      * Gesture listeners to apply on camera previews views
@@ -141,6 +142,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         getWindow().getDecorView()
                 .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+
+        mUserWantsExposureRing = true;
 
         mSideBar = (SideBar) findViewById(R.id.sidebar_scroller);
         mWidgetRenderer = (WidgetRenderer) findViewById(R.id.widgets_container);
@@ -415,8 +418,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     mWidgetRenderer.closeAllWidgets();
 
                     // Update focus/exposure ring support
-                    mFocusHudRing.setVisibility(mCamManager.isFocusAreaSupported() ? View.VISIBLE : View.GONE);
-                    mExposureHudRing.setVisibility(mCamManager.isExposureAreaSupported() ? View.VISIBLE : View.GONE);
+                    updateRingsVisibility();
 
                     // Update sidebar
                     mSideBar.checkCapabilities(CameraActivity.this, (ViewGroup) findViewById(R.id.widgets_container));
@@ -428,12 +430,28 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         });
     }
 
+    public void updateRingsVisibility() {
+        // Rings logic: * PicSphere and panorama don't need it (infinity focus when possible)
+        //              * Show focus all the time otherwise in photo and video
+        //              * Show exposure ring in photo and video, if it's not toggled off
+        if (mCameraMode == CAMERA_MODE_PHOTO || mCameraMode == CAMERA_MODE_VIDEO) {
+            mFocusHudRing.setVisibility(mCamManager.isFocusAreaSupported() ?
+                    View.VISIBLE : View.GONE);
+            mExposureHudRing.setVisibility(mCamManager.isExposureAreaSupported()
+                    && mUserWantsExposureRing ? View.VISIBLE : View.GONE);
+        } else {
+            mFocusHudRing.setVisibility(View.GONE);
+            mExposureHudRing.setVisibility(View.GONE);
+        }
+    }
+
     public boolean isExposureRingVisible() {
         return (mExposureHudRing.getVisibility() == View.VISIBLE);
     }
 
     public void setExposureRingVisible(boolean visible) {
-        mExposureHudRing.setVisibility(visible ? View.VISIBLE : View.GONE);
+        mUserWantsExposureRing = visible;
+        updateRingsVisibility();
 
         // Internally reset the position of the exposure ring, while still
         // leaving it at its position so that if the user toggles it back
@@ -670,8 +688,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         findViewById(R.id.camera_preview_container).setVisibility(View.GONE);
         findViewById(R.id.gl_renderer_container).setOnTouchListener(mPreviewTouchListener);
         setCaptureTransformer(mMosaicProxy);
-        mExposureHudRing.setVisibility(View.GONE);
-        mFocusHudRing.setVisibility(View.GONE);
+        updateRingsVisibility();
     }
 
     public void resetPanorama() {
