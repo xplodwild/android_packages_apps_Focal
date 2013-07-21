@@ -351,6 +351,17 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     }
 
     /**
+     * Removes the last taken snapshot
+     */
+    public void removeLastPicture() {
+        mListBusy.lock();
+        if (mSnapshots.size() > 0) {
+            mSnapshots.remove(mSnapshots.size()-1);
+        }
+        mListBusy.unlock();
+    }
+
+    /**
      * Clear sphere's snapshots
      */
     public void clearSnapshots() {

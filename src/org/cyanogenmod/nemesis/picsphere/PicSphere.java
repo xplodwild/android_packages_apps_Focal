@@ -103,6 +103,26 @@ public class PicSphere {
         mPictures.add(Uri.fromFile(new File(Util.getRealPathFromURI(mContext, pic))));
     }
 
+    /**
+     * Removes the last picture of the sphere
+     */
+    public void removeLastPicture() {
+        if (mPictures.size() > 0) {
+            mPictures.remove(mPictures.size()-1);
+        }
+    }
+
+    public int getPicturesCount() {
+        return mPictures.size();
+    }
+
+    /**
+     * Sets the horizontal angle of the camera. AOSP don't check values are real values, and
+     * OEMs don't seem to care much about returning a real value (sony reports 360°...), so we
+     * pass 45° by default.
+     *
+     * @param angle The horizontal angle, in degrees
+     */
     public void setHorizontalAngle(float angle) {
         mHorizontalAngle = angle;
     }
@@ -170,7 +190,7 @@ public class PicSphere {
     }
 
     private void run(String command) throws IOException {
-        Log.e(TAG, "Running: " + command);
+        Log.v(TAG, "Running: " + command);
         Runtime rt = Runtime.getRuntime();
         Process proc = rt.exec(command, new String[]{"PATH="+mPathPrefix+":/system/bin",
                 "LD_LIBRARY_PATH="+mPathPrefix+":/system/lib"});
@@ -243,7 +263,6 @@ public class PicSphere {
             filesStr += " " + picture.getPath();
         }
 
-        // TODO: Load the horizontal view angle from the camera
         run("autopano --align --ransac on --projection 0,"+mHorizontalAngle+" " + mProjectFile + " " + filesStr);
         consumeProcLogs();
 

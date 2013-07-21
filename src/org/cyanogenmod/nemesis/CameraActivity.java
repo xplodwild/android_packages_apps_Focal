@@ -41,6 +41,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -96,6 +97,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private ShutterButton mShutterButton;
     private SavePinger mSavePinger;
     private PanoProgressBar mPanoProgressBar;
+    private ImageButton mPicSphereUndo;
     private CircleTimerView mTimerView;
     private ViewGroup mRecTimerContainer;
     private static Notifier mNotifier;
@@ -151,6 +153,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mWidgetRenderer = (WidgetRenderer) findViewById(R.id.widgets_container);
         mSavePinger = (SavePinger) findViewById(R.id.save_pinger);
         mTimerView = (CircleTimerView) findViewById(R.id.timer_view);
+        mPicSphereUndo = (ImageButton) findViewById(R.id.btn_picsphere_undo);
 
         mSwitchRingPad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
         mSwitchRingPad.setListener(new MainRingPadListener());
@@ -398,6 +401,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         setViewRotation(mRecTimerContainer, mOrientationCompensation);
         setViewRotation(mNotifier, mOrientationCompensation);
         setViewRotation(mPanoProgressBar, mOrientationCompensation);
+        setViewRotation(mPicSphereUndo, mOrientationCompensation);
         mCamManager.setOrientation(mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
@@ -436,6 +440,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         // Rings logic: * PicSphere and panorama don't need it (infinity focus when possible)
         //              * Show focus all the time otherwise in photo and video
         //              * Show exposure ring in photo and video, if it's not toggled off
+        //              * Fullscreen shutter hides all the rings
         if ((mCameraMode == CAMERA_MODE_PHOTO && !mIsFullscreenShutter)
                 || mCameraMode == CAMERA_MODE_VIDEO) {
             mFocusHudRing.setVisibility(mCamManager.isFocusAreaSupported() ?
@@ -663,11 +668,22 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         picsphereContainer.setVisibility(View.VISIBLE);
 
         // Setup the capture transformer
-        setCaptureTransformer(new PicSphereCaptureTransformer(mPicSphereManager, mCamManager, mSnapshotManager));
+        final PicSphereCaptureTransformer transformer =
+                new PicSphereCaptureTransformer(mPicSphereManager, mCamManager, mSnapshotManager);
+        setCaptureTransformer(transformer);
+
+        mPicSphereUndo.setVisibility(View.VISIBLE);
+        mPicSphereUndo.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                transformer.removeLastPicture();
+            }
+        });
 
         // Notify how to finish a sphere
         mNotifier.notify(getString(R.string.ps_long_press_to_stop), 4000);
     }
+
 
     public void resetPicSphere() {
         ViewGroup picsphereContainer = ((ViewGroup) findViewById(R.id.gl_renderer_container));

@@ -253,5 +253,16 @@
 
     </org.cyanogenmod.nemesis.ui.ReviewDrawer>
 
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_picsphere_undo"
+            android:layout_gravity="right"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_picsphere_undo"
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:visibility="gone"/>
+
 
 </FrameLayout>

@@ -20,6 +20,7 @@ package org.cyanogenmod.nemesis.picsphere;
 
 import android.util.Log;
 
+import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SnapshotManager;
@@ -40,6 +41,13 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
         mPicSphereManager = psMan;
     }
 
+    public void removeLastPicture() {
+        if (mPicSphere != null) {
+            mPicSphere.removeLastPicture();
+        }
+        mPicSphereManager.getRenderer().removeLastPicture();
+    }
+
     @Override
     public void onShutterButtonClicked(ShutterButton button) {
         if (mPicSphere == null) {
@@ -56,6 +64,11 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
     @Override
     public void onShutterButtonLongPressed(ShutterButton button) {
         if (mPicSphere != null) {
+            if (mPicSphere.getPicturesCount() <= 1) {
+                CameraActivity.notify(mCamManager.getContext()
+                        .getString(R.string.picsphere_need_two_pics), 2000);
+                return;
+            }
             mPicSphereManager.startRendering(mPicSphere);
             mPicSphereManager.getRenderer().clearSnapshots();
             mPicSphere = null;
