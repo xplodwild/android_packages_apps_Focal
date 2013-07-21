@@ -46,6 +46,7 @@ public class PicSphere {
     public final static String TAG = "PicSphere";
     private String mPathPrefix;
     private List<Uri> mPictures;
+    private List<Uri> mPicturesUri;
     private Context mContext;
     private File mTempPath;
     private BufferedReader mProcStdOut;
@@ -86,6 +87,7 @@ public class PicSphere {
 
     protected PicSphere(Context context, SnapshotManager snapMan) {
         mPictures = new ArrayList<Uri>();
+        mPicturesUri = new ArrayList<Uri>();
         mContext = context;
         mSnapManager = snapMan;
         mOutputLogger.start();
@@ -101,6 +103,7 @@ public class PicSphere {
      */
     public void addPicture(Uri pic) {
         mPictures.add(Uri.fromFile(new File(Util.getRealPathFromURI(mContext, pic))));
+        mPicturesUri.add(pic);
     }
 
     /**
@@ -185,6 +188,14 @@ public class PicSphere {
         if (mProgressListener != null) {
             mProgressListener.onRenderDone(this);
         }
+
+        // Remove source pictures and temporary path
+        for (Uri uri : mPicturesUri) {
+            List<String> segments = uri.getPathSegments();
+            Util.removeFromGallery(mContext.getContentResolver(), Integer.parseInt(segments.get(segments.size()-1)));
+        }
+
+        mTempPath.delete();
 
         return true;
     }
