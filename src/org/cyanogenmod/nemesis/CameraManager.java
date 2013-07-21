@@ -624,8 +624,9 @@ public class CameraManager {
         mTargetSize = previewSize;
 
         List<Camera.Size> supportedPicSizes = parameters.getSupportedPictureSizes();
-        Point pictureSize = Util.findBestPanoPreviewSize(supportedPicSizes, false, false, pixels);
-        parameters.setPictureSize(pictureSize.x, pictureSize.y);
+        if (supportedPicSizes.contains(mTargetSize)) {
+            parameters.setPictureSize(mTargetSize.x, mTargetSize.y);
+        }
 
         List<int[]> frameRates = parameters.getSupportedPreviewFpsRange();
         int last = frameRates.size() - 1;
