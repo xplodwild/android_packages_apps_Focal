@@ -30,18 +30,17 @@ import org.cyanogenmod.nemesis.SettingsStorage;
  * Shutter speed setup widget
  */
 public class ShutterSpeedWidget extends WidgetBase {
+    // XXX We use shutter-speed here because the wrapper sets the ae-mode
+    // according to the value of shutter speed as well as ISO.
+    // What is done here (0-12, auto) is sony-specific anyway, so it
+    // makes sense to keep it this way
     private static final String KEY_PARAMETER = "shutter-speed";
-    private static final String KEY_MAX_PARAMETER = "max-shutter-speed";
-    private static final String KEY_MIN_PARAMETER = "min-shutter-speed";
-    private static final String KEY_SONY_PARAMETER = "sony-shutter-speed";
-    private static final String KEY_SONY_MAX_PARAMETER = "sony-max-shutter-speed";
-    private static final String KEY_SONY_MIN_PARAMETER = "sony-min-shutter-speed";
+    private static final String KEY_MAX_PARAMETER = "sony-max-shutter-speed";
+    private static final String KEY_MIN_PARAMETER = "sony-min-shutter-speed";
 
     private WidgetOptionButton mMinusButton;
     private WidgetOptionButton mPlusButton;
     private WidgetOptionLabel mValueLabel;
-
-    private boolean mIsSony;
 
 
     private class MinusClickListener implements View.OnClickListener {
@@ -78,49 +77,27 @@ public class ShutterSpeedWidget extends WidgetBase {
         getToggleButton().setHintText(R.string.widget_shutter_speed);
     }
 
-    public boolean isSupportedSony(Camera.Parameters params) {
-        return params.get(KEY_SONY_PARAMETER) != null;
-    }
-
     @Override
     public boolean isSupported(Camera.Parameters params) {
-        mIsSony = isSupportedSony(params);
-        return (params.get(KEY_PARAMETER) != null || mIsSony);
+        return params.get(KEY_PARAMETER) != null;
     }
 
     public int getShutterSpeedValue() {
-        if (mIsSony) {
-            return Integer.parseInt(mCamManager.getParameters().get(KEY_SONY_PARAMETER));
-        } else {
-            return Integer.parseInt(mCamManager.getParameters().get(KEY_PARAMETER));
-        }
+        return Integer.parseInt(mCamManager.getParameters().get(KEY_PARAMETER));
     }
 
     public int getMinShutterSpeedValue() {
-        if (mIsSony) {
-            return Integer.parseInt(mCamManager.getParameters().get(KEY_SONY_MIN_PARAMETER));
-        } else {
-            return Integer.parseInt(mCamManager.getParameters().get(KEY_MIN_PARAMETER));
-        }
+        return Integer.parseInt(mCamManager.getParameters().get(KEY_MIN_PARAMETER));
     }
 
     public int getMaxShutterSpeedValue() {
-        if (mIsSony) {
-            return Integer.parseInt(mCamManager.getParameters().get(KEY_SONY_MAX_PARAMETER));
-        } else {
-            return Integer.parseInt(mCamManager.getParameters().get(KEY_MAX_PARAMETER));
-        }
+        return Integer.parseInt(mCamManager.getParameters().get(KEY_MAX_PARAMETER));
     }
 
     public void setShutterSpeedValue(int value) {
         String valueStr = Integer.toString(value);
 
-        if (mIsSony) {
-            mCamManager.setParameterAsync(KEY_SONY_PARAMETER, valueStr);
-            mCamManager.setParameterAsync("sony-ae-mode", "shutter-prio");
-        } else {
-            mCamManager.setParameterAsync(KEY_PARAMETER, valueStr);
-        }
+        mCamManager.setParameterAsync(KEY_PARAMETER, valueStr);
         SettingsStorage.storeCameraSetting(mWidget.getContext(), mCamManager.getCurrentFacing(),
                 KEY_PARAMETER, valueStr);
         mValueLabel.setText(getShutterSpeedDisplayValue(valueStr));
