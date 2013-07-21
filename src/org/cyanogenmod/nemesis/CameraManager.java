@@ -763,8 +763,7 @@ public class CameraManager {
     }
 
     /**
-     * Enable the device image stabilization system. Toggle device-specific
-     * stab as well if they exist and are implemented.
+     * Enable the device image stabilization system.
      * @param enabled
      */
     public void setStabilization(boolean enabled) {
@@ -772,20 +771,12 @@ public class CameraManager {
         if (params == null) return;
 
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
-            // Sony
-            if (params.get("sony-is") != null) {
-                // XXX: on-still-hdr
-                params.set("sony-is", enabled ? "on" : "off");
+            // In wrappers: sony has sony-is, HTC has ois_mode, etc.
+            if (params.get("image-stabilization") != null) {
+                params.set("image-stabilization", enabled ? "on" : "off");
             }
-            // HTC
-            else if (params.get("ois_mode") != null) {
-                params.set("ois_mode", enabled ? "on" : "off");
-            }
-
         } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-            if (params.get("sony-vs") != null) {
-                params.set("sony-vs", enabled ? "on" : "off");
-            } else {
+            if (params.isVideoStabilizationSupported()) {
                 params.setVideoStabilization(enabled);
             }
         }
