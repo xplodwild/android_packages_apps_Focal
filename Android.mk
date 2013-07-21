@@ -40,5 +40,4 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
 include $(BUILD_PACKAGE)
 
 include $(call all-makefiles-under, $(ANDROID_BUILD_TOP)/external/Nemesis)
-include $(call all-makefiles-under, jni)
 include $(call all-makefiles-under, libs)
