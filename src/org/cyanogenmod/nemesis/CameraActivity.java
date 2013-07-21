@@ -107,6 +107,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private boolean mIsFocusButtonDown;
     private boolean mIsShutterButtonDown;
     private boolean mUserWantsExposureRing;
+    private boolean mIsFullscreenShutter;
 
     /**
      * Gesture listeners to apply on camera previews views
@@ -144,6 +145,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 
         mUserWantsExposureRing = true;
+        mIsFullscreenShutter = false;
 
         mSideBar = (SideBar) findViewById(R.id.sidebar_scroller);
         mWidgetRenderer = (WidgetRenderer) findViewById(R.id.widgets_container);
@@ -434,7 +436,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         // Rings logic: * PicSphere and panorama don't need it (infinity focus when possible)
         //              * Show focus all the time otherwise in photo and video
         //              * Show exposure ring in photo and video, if it's not toggled off
-        if (mCameraMode == CAMERA_MODE_PHOTO || mCameraMode == CAMERA_MODE_VIDEO) {
+        if ((mCameraMode == CAMERA_MODE_PHOTO && !mIsFullscreenShutter)
+                || mCameraMode == CAMERA_MODE_VIDEO) {
             mFocusHudRing.setVisibility(mCamManager.isFocusAreaSupported() ?
                     View.VISIBLE : View.GONE);
             mExposureHudRing.setVisibility(mCamManager.isExposureAreaSupported()
@@ -683,6 +686,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mPicSphere3DView = null;
     }
 
+    /**
+     * Initializes the panorama (mosaic) subsystem
+     */
     public void initializePanorama() {
         mMosaicProxy = new MosaicProxy(this);
         findViewById(R.id.camera_preview_container).setVisibility(View.GONE);
@@ -691,12 +697,27 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         updateRingsVisibility();
     }
 
+    /**
+     * Turns off the panorama (mosaic) subsystem
+     */
     public void resetPanorama() {
         mMosaicProxy.tearDown();
         mCamManager.setRenderToTexture(null);
         findViewById(R.id.camera_preview_container).setVisibility(View.VISIBLE);
         findViewById(R.id.gl_renderer_container).setVisibility(View.GONE);
         findViewById(R.id.gl_renderer_container).setOnTouchListener(null);
+    }
+
+    public void toggleFullscreenShutter() {
+        if (mIsFullscreenShutter) {
+            mIsFullscreenShutter = false;
+            mShutterButton.animate().translationX(0).setDuration(400).start();
+        } else {
+            mIsFullscreenShutter = true;
+            mShutterButton.animate().translationX(mShutterButton.getWidth()).setDuration(400).start();
+            notify(getString(R.string.fullscreen_shutter_info), 2000);
+        }
+        updateRingsVisibility();
     }
 
     /**
@@ -1165,9 +1186,15 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            // A single tap equals to touch-to-focus in all modes
-            mFocusHudRing.setPosition(e.getRawX(), e.getRawY());
-            mFocusManager.refocus();
+            // A single tap equals to touch-to-focus in photo/video
+            if ((mCameraMode == CAMERA_MODE_PHOTO && !mIsFullscreenShutter)
+                    || mCameraMode == CAMERA_MODE_VIDEO) {
+                mFocusHudRing.setPosition(e.getRawX(), e.getRawY());
+                mFocusManager.refocus();
+            } else if (mCameraMode == CAMERA_MODE_PHOTO && mIsFullscreenShutter) {
+                // We are in fullscreen shutter mode, so just take a picture
+                mSnapshotManager.queueSnapshot(true, 0);
+            }
 
             return super.onSingleTapConfirmed(e);
         }
@@ -1177,6 +1204,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             // In VIDEO mode, a double tap snapshots (or volume up)
             if (mCameraMode == CAMERA_MODE_VIDEO) {
                 mSnapshotManager.queueSnapshot(true, 0);
+            }
+            else if (mCameraMode == CAMERA_MODE_PHOTO) {
+                // Toggle fullscreen shutter
+                toggleFullscreenShutter();
             }
 
             return super.onDoubleTap(e);

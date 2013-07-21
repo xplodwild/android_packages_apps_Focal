@@ -34,6 +34,7 @@
     <string name="disabled">Disabled</string>
     <string name="enabled">Enabled</string>
     <string name="no_video_player">Couldn\'t play the video, no player found</string>
+    <string name="fullscreen_shutter_info">Tap anywhere to shoot</string>
 
     <!-- Widgets hints for non-arrayed widgets -->
     <string name="widget_burstmode_count_shots">Burst %d shots</string>
