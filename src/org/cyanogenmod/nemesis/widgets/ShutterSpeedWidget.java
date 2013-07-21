@@ -59,7 +59,7 @@ public class ShutterSpeedWidget extends WidgetBase {
     }
 
     public ShutterSpeedWidget(CameraManager cam, Context context) {
-        super(cam, context, R.drawable.ic_widget_placeholder);
+        super(cam, context, R.drawable.ic_widget_shutterspeed);
 
         // Add views in the widget
         mMinusButton = new WidgetOptionButton(R.drawable.ic_widget_timer_minus, context);
