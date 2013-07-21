@@ -642,6 +642,7 @@ public class MosaicProxy extends CaptureTransformer
     public void reportProgress() {
         mPanoProgressBar.reset();
         mPanoProgressBar.setRightIncreasing(true);
+        mPanoProgressBar.setMaxProgress(100);
         Thread t = new Thread() {
             @Override
             public void run() {
