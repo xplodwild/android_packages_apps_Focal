@@ -22,6 +22,7 @@ import android.animation.Animator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 
 /**
@@ -29,8 +30,8 @@ import android.widget.ImageView;
  * after it was taken.
  */
 public class ThumbnailFlinger extends ImageView {
-    private final static int FADE_IN_DURATION_MS = 200;
-    private final static int FADE_OUT_DURATION_MS = 200;
+    private final static int FADE_IN_DURATION_MS = 250;
+    private final static int FADE_OUT_DURATION_MS = 250;
 
     public ThumbnailFlinger(Context context) {
         super(context);
@@ -55,7 +56,8 @@ public class ThumbnailFlinger extends ImageView {
         setTranslationY(0.0f);
 
         // First step of animation: fade in quick
-        animate().alpha(1.0f).scaleX(1.0f).scaleY(1.0f).setDuration(FADE_IN_DURATION_MS)
+        animate().alpha(1.0f).scaleX(1.0f).scaleY(1.0f).setInterpolator(new AccelerateInterpolator())
+                .setDuration(FADE_IN_DURATION_MS)
                 .setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {

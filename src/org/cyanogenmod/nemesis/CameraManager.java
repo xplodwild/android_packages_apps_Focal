@@ -362,6 +362,7 @@ public class CameraManager {
             params.setAutoWhiteBalanceLock(lock);
         }
 
+
         try {
             mCamera.setParameters(params);
         } catch (RuntimeException e) {
@@ -522,11 +523,15 @@ public class CameraManager {
     }
 
     public void restartPreviewIfNeeded() {
-        try {
-            mCamera.startPreview();
-        } catch (Exception e) {
-            // ignore
-        }
+        new Thread() {
+            public void run() {
+                try {
+                    mCamera.startPreview();
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
+        }.start();
     }
 
     public void setCameraMode(final int mode) {
@@ -787,6 +792,8 @@ public class CameraManager {
                 params.setVideoStabilization(enabled);
             }
         }
+
+        mCamera.setParameters(params);
     }
 
     /**
