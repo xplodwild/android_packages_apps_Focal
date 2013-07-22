@@ -40,6 +40,8 @@ public class VideoHdrWidget extends SimpleToggleWidget {
 
         // We cannot inflate from XML here, because there are device-specific keys and values
         Camera.Parameters params = mCamManager.getParameters();
+        if (params == null) return;
+
         if (params.get(KEY_SONY_VIDEO_HDR) != null) {
             // Use Sony values
             setKey(KEY_SONY_VIDEO_HDR);
