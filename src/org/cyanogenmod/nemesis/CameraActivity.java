@@ -40,6 +40,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -97,13 +98,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private ShutterButton mShutterButton;
     private SavePinger mSavePinger;
     private PanoProgressBar mPanoProgressBar;
-    private ImageButton mPicSphereUndo;
+    private Button mPicSphereUndo;
     private CircleTimerView mTimerView;
     private ViewGroup mRecTimerContainer;
     private static Notifier mNotifier;
     private ReviewDrawer mReviewDrawer;
     private ScaleGestureDetector mZoomGestureDetector;
     private GLSurfaceView mPicSphere3DView;
+    private TextView mHelperText;
     private boolean mHasPinchZoomed;
     private boolean mCancelSideBarClose;
     private boolean mIsFocusButtonDown;
@@ -153,7 +155,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mWidgetRenderer = (WidgetRenderer) findViewById(R.id.widgets_container);
         mSavePinger = (SavePinger) findViewById(R.id.save_pinger);
         mTimerView = (CircleTimerView) findViewById(R.id.timer_view);
-        mPicSphereUndo = (ImageButton) findViewById(R.id.btn_picsphere_undo);
+        mHelperText = (TextView) findViewById(R.id.txt_helper);
+        mPicSphereUndo = (Button) findViewById(R.id.btn_picsphere_undo);
 
         mSwitchRingPad = (SwitchRingPad) findViewById(R.id.switch_ring_pad);
         mSwitchRingPad.setListener(new MainRingPadListener());
@@ -338,6 +341,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             });
         }
 
+        setHelperText("");
+
         // Reset PicSphere 3D renderer if we were in PS mode
         if (mCameraMode == CAMERA_MODE_PICSPHERE) {
             resetPicSphere();
@@ -402,12 +407,17 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         setViewRotation(mNotifier, mOrientationCompensation);
         setViewRotation(mPanoProgressBar, mOrientationCompensation);
         setViewRotation(mPicSphereUndo, mOrientationCompensation);
+        setViewRotation(mHelperText, mOrientationCompensation);
         mCamManager.setOrientation(mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
         mSwitchRingPad.notifyOrientationChanged(mOrientationCompensation);
         mSavePinger.notifyOrientationChanged(mOrientationCompensation);
         mReviewDrawer.notifyOrientationChanged(mOrientationCompensation);
+
+        if (mPicSphereManager != null && mCameraMode == CAMERA_MODE_PICSPHERE) {
+            mPicSphereManager.notifyOrientationChanged(mOrientationCompensation);
+        }
     }
 
     public void updateCapabilities() {
@@ -630,6 +640,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         return mSnapshotManager;
     }
 
+    public PicSphereManager getPicSphereManager() {
+        return mPicSphereManager;
+    }
+
     public ReviewDrawer getReviewDrawer() {
         return mReviewDrawer;
     }
@@ -669,10 +683,11 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         // Setup the capture transformer
         final PicSphereCaptureTransformer transformer =
-                new PicSphereCaptureTransformer(mPicSphereManager, mCamManager, mSnapshotManager);
+                new PicSphereCaptureTransformer(this);
         setCaptureTransformer(transformer);
 
         mPicSphereUndo.setVisibility(View.VISIBLE);
+        mPicSphereUndo.setAlpha(0.0f);
         mPicSphereUndo.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -680,8 +695,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             }
         });
 
-        // Notify how to finish a sphere
-        mNotifier.notify(getString(R.string.ps_long_press_to_stop), 4000);
+        // Notify how to start a sphere
+        setHelperText(getString(R.string.picsphere_start_hint));
     }
 
 
@@ -735,6 +750,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         findViewById(R.id.gl_renderer_container).setOnTouchListener(null);
     }
 
+    /**
+     * Toggles the fullscreen shutter that lets user take pictures by tapping on the screen
+     */
     public void toggleFullscreenShutter() {
         if (mIsFullscreenShutter) {
             mIsFullscreenShutter = false;
@@ -745,6 +763,53 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             notify(getString(R.string.fullscreen_shutter_info), 2000);
         }
         updateRingsVisibility();
+    }
+
+    /**
+     * Show a persistent helper text that indicates the user a required action
+     * @param text The text to show, or empty/null to hide
+     */
+    public void setHelperText(final CharSequence text) {
+        setHelperText(text, false);
+    }
+
+    /**
+     * Show a persistent helper text that indicates the user a required action
+     * @param text The text to show, or empty/null to hide
+     * @param beware Show the text in red
+     */
+    public void setHelperText(final CharSequence text, final boolean beware) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (text == null || text.equals("")) {
+                    // Hide it
+                    Util.fadeOut(mHelperText);
+                } else {
+                    mHelperText.setText(text);
+                    if (beware) {
+                        mHelperText.setTextColor(getResources().getColor(R.color.clock_red));
+                    } else {
+                        mHelperText.setTextColor(0xFFFFFFFF);
+                    }
+                    Util.fadeIn(mHelperText);
+                }
+            }
+        });
+    }
+
+    public void setPicSphereUndoVisible(final boolean visible) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (visible) {
+                    mPicSphereUndo.setVisibility(View.VISIBLE);
+                    mPicSphereUndo.setAlpha(1.0f);
+                } else {
+                    Util.fadeOut(mPicSphereUndo);
+                }
+            }
+        });
     }
 
     /**

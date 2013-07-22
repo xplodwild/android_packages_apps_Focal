@@ -18,6 +18,7 @@
 
 package org.cyanogenmod.nemesis.picsphere;
 
+import android.os.Handler;
 import android.util.Log;
 
 import org.cyanogenmod.nemesis.CameraActivity;
@@ -35,10 +36,12 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
     public final static String TAG = "PicSphereCaptureTransformer";
     private PicSphereManager mPicSphereManager;
     private PicSphere mPicSphere;
+    private CameraActivity mContext;
 
-    public PicSphereCaptureTransformer(PicSphereManager psMan, CameraManager camMan, SnapshotManager snapshotMan) {
-        super(camMan, snapshotMan);
-        mPicSphereManager = psMan;
+    public PicSphereCaptureTransformer(CameraActivity context) {
+        super(context.getCamManager(), context.getSnapManager());
+        mContext = context;
+        mPicSphereManager = context.getPicSphereManager();
     }
 
     public void removeLastPicture() {
@@ -46,18 +49,32 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
             mPicSphere.removeLastPicture();
         }
         mPicSphereManager.getRenderer().removeLastPicture();
+
+        if (mPicSphere.getPicturesCount() == 0) {
+            mContext.setPicSphereUndoVisible(false);
+        }
     }
 
     @Override
     public void onShutterButtonClicked(ShutterButton button) {
         if (mPicSphere == null) {
-            // Initialize a new sphere
-            mPicSphere = mPicSphereManager.createPicSphere();
-            mPicSphere.setHorizontalAngle(40);
+            if (mPicSphereManager.getSpheresCount() == 0) {
+                // Initialize a new sphere
+                mPicSphere = mPicSphereManager.createPicSphere();
+                mPicSphere.setHorizontalAngle(40);
+            } else {
+                CameraActivity.notify(mContext.getString(R.string.picsphere_already_rendering), 2000);
+                return;
+            }
         }
 
         mSnapManager.setBypassProcessing(true);
         mSnapManager.queueSnapshot(true, 0);
+
+        // Notify how to finish a sphere
+        if (mPicSphere != null && mPicSphere.getPicturesCount() == 0) {
+            CameraActivity.notify(mContext.getString(R.string.ps_long_press_to_stop), 4000);
+        }
 
     }
 
@@ -72,6 +89,8 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
             mPicSphereManager.startRendering(mPicSphere);
             mPicSphereManager.getRenderer().clearSnapshots();
             mPicSphere = null;
+
+            mContext.setPicSphereUndoVisible(false);
         }
     }
 
@@ -94,6 +113,8 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
     public void onSnapshotSaved(SnapshotManager.SnapshotInfo info) {
         if (mPicSphere != null) {
             mPicSphere.addPicture(info.mUri);
+            mContext.setPicSphereUndoVisible(true);
+            mContext.setHelperText("");
         } else {
             Log.e(TAG, "No current PicSphere");
         }

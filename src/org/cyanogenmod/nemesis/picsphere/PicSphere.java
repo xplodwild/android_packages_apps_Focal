@@ -55,7 +55,8 @@ public class PicSphere {
     private SnapshotManager mSnapManager;
     private Uri mOutputUri;
     private String mOutputTitle;
-    private ProgressListener mProgressListener;
+    private List<ProgressListener> mProgressListeners;
+    private int mRenderProgress = 0;
     public final static int STEP_AUTOPANO = 1;
     public final static int STEP_PTCLEAN = 2;
     public final static int STEP_AUTOOPTIMISER = 3;
@@ -88,13 +89,14 @@ public class PicSphere {
     protected PicSphere(Context context, SnapshotManager snapMan) {
         mPictures = new ArrayList<Uri>();
         mPicturesUri = new ArrayList<Uri>();
+        mProgressListeners = new ArrayList<ProgressListener>();
         mContext = context;
         mSnapManager = snapMan;
         mOutputLogger.start();
     }
 
-    public void setProgressListener(ProgressListener listener) {
-        mProgressListener = listener;
+    public void addProgressListener(ProgressListener listener) {
+        mProgressListeners.add(listener);
     }
 
     /**
@@ -130,12 +132,16 @@ public class PicSphere {
         mHorizontalAngle = angle;
     }
 
+    public int getRenderProgress() {
+        return mRenderProgress;
+    }
+
     /**
      * Renders the sphere
      */
     protected boolean render() {
-        if (mProgressListener != null) {
-            mProgressListener.onRenderStart(this);
+        for (ProgressListener listener : mProgressListeners) {
+            listener.onRenderStart(this);
         }
 
         // Prepare a temporary directory
@@ -167,10 +173,12 @@ public class PicSphere {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    continue;
+                    break;
                 }
             }
         }
+
+        mRenderProgress = STEP_AUTOPANO * 100 / STEP_TOTAL;
 
         // Process our images
         try {
@@ -185,8 +193,8 @@ public class PicSphere {
             return false;
         }
 
-        if (mProgressListener != null) {
-            mProgressListener.onRenderDone(this);
+        for (ProgressListener listener : mProgressListeners) {
+            listener.onRenderDone(this);
         }
 
         // Remove source pictures and temporary path
@@ -197,6 +205,7 @@ public class PicSphere {
 
         mTempPath.delete();
 
+        mRenderProgress = -1;
         return true;
     }
 
@@ -234,8 +243,11 @@ public class PicSphere {
     }
 
     private void notifyStep(int step) {
-        if (mProgressListener != null) {
-            mProgressListener.onStepChange(this, step);
+        int progressPerStep = 100 / PicSphere.STEP_TOTAL;
+        mRenderProgress = step * progressPerStep;
+
+        for (ProgressListener listener : mProgressListeners) {
+            listener.onStepChange(this, step);
         }
     }
 

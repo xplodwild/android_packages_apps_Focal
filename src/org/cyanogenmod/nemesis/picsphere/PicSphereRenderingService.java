@@ -2,16 +2,12 @@ package org.cyanogenmod.nemesis.picsphere;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
-import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.R;
 
 /**
@@ -65,7 +61,7 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
     private final IBinder mBinder = new LocalBinder();
 
     public void render(final PicSphere sphere) {
-        sphere.setProgressListener(this);
+        sphere.addProgressListener(this);
         new Thread() {
             public void run() {
                 if (!sphere.render()) {

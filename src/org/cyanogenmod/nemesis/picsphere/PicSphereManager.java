@@ -52,10 +52,10 @@ import android.os.Handler;
  *
  * Can you feel the awesomeness?
  */
-public class PicSphereManager {
+public class PicSphereManager implements PicSphere.ProgressListener {
     public final static String TAG = "PicSphereManager";
     private List<PicSphere> mPicSpheres;
-    private Context mContext;
+    private CameraActivity mContext;
     private SnapshotManager mSnapManager;
     private Capture3DRenderer mCapture3DRenderer;
     private PicSphereRenderingService mBoundService;
@@ -81,7 +81,7 @@ public class PicSphereManager {
         }
     };
 
-    public PicSphereManager(Context context, SnapshotManager snapMan) {
+    public PicSphereManager(CameraActivity context, SnapshotManager snapMan) {
         mContext = context;
         mSnapManager = snapMan;
         mPicSpheres = new ArrayList<PicSphere>();
@@ -93,6 +93,18 @@ public class PicSphereManager {
         }.start();
     }
 
+    public void notifyOrientationChanged(int orientation) {
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
+            if (orientation != -90) {
+                mContext.setHelperText(mContext.getString(R.string.picsphere_turn_portrait), true);
+            } else if (mPicSpheres.size() == 0 || mPicSpheres.get(0).getPicturesCount() == 0) {
+                mContext.setHelperText(mContext.getString(R.string.picsphere_start_hint), false);
+            } else if (mPicSpheres.size() > 0 && mPicSpheres.get(0).getRenderProgress() >= 0) {
+                onStepChange(mPicSpheres.get(0), -1);
+            }
+        }
+    }
+
     /**
      * Creates an empty PicSphere
      * @return A PicSphere that is empty
@@ -101,6 +113,10 @@ public class PicSphereManager {
         PicSphere sphere = new PicSphere(mContext, mSnapManager);
         mPicSpheres.add(sphere);
         return sphere;
+    }
+
+    public void clearSpheres() {
+        mPicSpheres.clear();
     }
 
     /**
@@ -115,6 +131,18 @@ public class PicSphereManager {
     }
 
     /**
+     * Returns the progress of the currently rendering picsphere
+     * @return The percentage of progress, or -1 if no picsphere is rendering
+     */
+    public int getRenderingProgress() {
+        if (mPicSpheres.size() > 0) {
+            return mPicSpheres.get(0).getRenderProgress();
+        }
+
+        return -1;
+    }
+
+    /**
      * Starts rendering the provided PicSphere in a thread, and handles a service
      * that will keep on processing even once Nemesis is closed
      *
@@ -125,6 +153,7 @@ public class PicSphereManager {
         CameraActivity.notify(mContext.getString(R.string.picsphere_toast_background_render), 2500);
 
         if (mIsBound && mBoundService != null) {
+            sphere.addProgressListener(this);
             mBoundService.render(sphere);
         } else {
             doBindService();
@@ -170,6 +199,10 @@ public class PicSphereManager {
         if (mCapture3DRenderer != null) {
             mCapture3DRenderer.onResume();
         }
+    }
+
+    public int getSpheresCount() {
+        return mPicSpheres.size();
     }
 
     /**
@@ -223,4 +256,25 @@ public class PicSphereManager {
     }
 
 
+    @Override
+    public void onRenderStart(PicSphere sphere) {
+
+    }
+
+    @Override
+    public void onStepChange(PicSphere sphere, int newStep) {
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
+            mContext.setHelperText(String.format(mContext.getString(R.string.picsphere_rendering_progress),
+                    sphere.getRenderProgress()));
+        }
+    }
+
+    @Override
+    public void onRenderDone(PicSphere sphere) {
+        mPicSpheres.remove(sphere);
+
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
+            mContext.setHelperText(mContext.getString(R.string.picsphere_start_hint));
+        }
+    }
 }

@@ -76,7 +76,11 @@
     <string name="pano_panorama_rendering">Rendering panorama&#8230;</string>
 
     <!-- PicSphere status -->
-    <string name="picsphere_toast_background_render">Rendering started in the background&#8230;</string>
+    <string name="picsphere_start_hint">Take a picture to start your sphere</string>
+    <string name="picsphere_turn_portrait">Turn to portrait</string>
+    <string name="picsphere_already_rendering">Please wait for the current PicSphere to render</string>
+    <string name="picsphere_rendering_progress">Rendering... (%d %%)</string>
+    <string name="picsphere_toast_background_render">Rendering started&#8230;</string>
     <string name="picsphere_notif_title">Rendering PicSphere&#8230;</string>
     <string name="picsphere_failed">PicSphere rendering failed</string>
     <string name="picsphere_failed_details">Make sure pictures only overlap on their edges.</string>
