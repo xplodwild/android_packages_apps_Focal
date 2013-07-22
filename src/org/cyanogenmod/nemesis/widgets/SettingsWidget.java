@@ -243,7 +243,7 @@ public class SettingsWidget extends WidgetBase {
         addViewToContainer(mToggleExposureRing);
 
         // Toggle auto enhancer
-        mToggleAutoEnhancer = new WidgetOptionButton(R.drawable.ic_widget_skintone, context);
+        mToggleAutoEnhancer = new WidgetOptionButton(R.drawable.ic_enhancing, context);
         mToggleAutoEnhancer.setOnClickListener(mAutoEnhanceClickListener);
         mToggleAutoEnhancer.setHintText(mContext.getString(R.string.widget_settings_autoenhance));
 

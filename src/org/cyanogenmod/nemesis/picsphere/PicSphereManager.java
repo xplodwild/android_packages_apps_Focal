@@ -18,18 +18,14 @@
 
 package org.cyanogenmod.nemesis.picsphere;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.AssetManager;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.R;
@@ -40,10 +36,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import android.os.Handler;
 
 /**
  * This class manages the interaction and processing of Picture Spheres ("PicSphere"). PicSphere
@@ -96,11 +89,14 @@ public class PicSphereManager implements PicSphere.ProgressListener {
     public void notifyOrientationChanged(int orientation) {
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
             if (orientation != -90) {
+                Log.e(TAG, ""+orientation);
                 mContext.setHelperText(mContext.getString(R.string.picsphere_turn_portrait), true);
             } else if (mPicSpheres.size() == 0 || mPicSpheres.get(0).getPicturesCount() == 0) {
                 mContext.setHelperText(mContext.getString(R.string.picsphere_start_hint), false);
             } else if (mPicSpheres.size() > 0 && mPicSpheres.get(0).getRenderProgress() >= 0) {
                 onStepChange(mPicSpheres.get(0), -1);
+            } else {
+                mContext.setHelperText(null, false);
             }
         }
     }

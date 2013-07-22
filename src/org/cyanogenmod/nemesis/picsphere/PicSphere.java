@@ -26,10 +26,8 @@ import org.cyanogenmod.nemesis.SnapshotManager;
 import org.cyanogenmod.nemesis.Util;
 import org.cyanogenmod.nemesis.XMPHelper;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
@@ -328,7 +326,7 @@ public class PicSphere {
     private boolean doAutoOptimiser() throws IOException {
         Log.d(TAG, "AutoOptimiser...");
         notifyStep(STEP_AUTOOPTIMISER);
-        run("autooptimiser -v " + mHorizontalAngle + " -p -a -o " + mProjectFile + " " + mProjectFile);
+        run("autooptimiser -v " + mHorizontalAngle + " -p -o " + mProjectFile + " " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "AutoOptimiser... done");

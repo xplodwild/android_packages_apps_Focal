@@ -35,9 +35,11 @@ import org.cyanogenmod.nemesis.widgets.WidgetBase;
 public class SideBar extends HorizontalScrollView {
     public final static String TAG = "SideBar";
     public final static int SLIDE_ANIMATION_DURATION_MS = 300;
+    private final static float BAR_MARGIN = 6;
     private CameraCapabilities mCapabilities;
     private ViewGroup mToggleContainer;
     private boolean mIsOpen;
+
 
     public SideBar(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -132,8 +134,8 @@ public class SideBar extends HorizontalScrollView {
     public void slide(float distance) {
         float finalY = this.getTranslationY() + distance;
 
-        if (finalY > this.getHeight())
-            finalY = this.getHeight();
+        if (finalY > this.getHeight()-BAR_MARGIN)
+            finalY = this.getHeight()-BAR_MARGIN;
         else if (finalY < 0)
             finalY = 0;
 
@@ -163,7 +165,7 @@ public class SideBar extends HorizontalScrollView {
      * Smoothly close the sidebar
      */
     public void slideClose() {
-        this.animate().translationY(this.getHeight())
+        this.animate().translationY(this.getHeight()-BAR_MARGIN)
                 .setDuration(SLIDE_ANIMATION_DURATION_MS).start();
 
         mIsOpen = false;

@@ -60,7 +60,6 @@ public class Notifier extends LinearLayout {
 
     private void initialize() {
         mHandler = new Handler();
-        setPivotX(0.0f);
     }
 
     /**

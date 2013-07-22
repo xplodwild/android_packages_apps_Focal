@@ -49,7 +49,7 @@
         <item>@drawable/ic_widget_flash_auto</item>
         <item>@drawable/ic_widget_flash_off</item>
         <item>@drawable/ic_widget_flash_on</item>
-        <item>@drawable/ic_widget_flash_on</item>
+        <item>@drawable/ic_widget_flash_torch</item>
         <item>@drawable/ic_widget_flash_redeye</item>
     </array>
 

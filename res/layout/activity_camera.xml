@@ -271,9 +271,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/txt_helper"
             android:textSize="18sp"
-            android:shadowColor="#DDD"
-            android:shadowDx="2"
-            android:shadowDy="2"
+            android:shadowColor="#666666"
+            android:shadowRadius="12"
+            android:shadowDx="0"
+            android:shadowDy="0"
             android:layout_gravity="center_vertical|left"
             android:layout_marginLeft="18dp"
             android:textStyle="bold"/>

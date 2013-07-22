@@ -42,7 +42,6 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -372,8 +371,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_video));
             mCamManager.setStabilization(true);
             mNotifier.notify(getString(R.string.double_tap_to_snapshot), 2500);
+            mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
         } else if (newMode == CAMERA_MODE_PICSPHERE) {
             initializePicSphere();
+            mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
+        } else if (newMode == CAMERA_MODE_PANO) {
+            mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
         }
 
         if (newMode != CAMERA_MODE_PANO) {

@@ -30,7 +30,7 @@
     <string name="OK">OK</string>
     <string name="no_gles20_support">Your device doesn\'t support GLES2</string>
     <string name="no_gyroscope">Your device doesn\'t have a gyroscope</string>
-    <string name="ps_long_press_to_stop">Long-press the shutter button to finish your sphere.</string>
+    <string name="ps_long_press_to_stop">Long-press the shutter button to\nfinish your sphere.</string>
     <string name="disabled">Disabled</string>
     <string name="enabled">Enabled</string>
     <string name="no_video_player">Couldn\'t play the video, no player found</string>

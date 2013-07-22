@@ -131,7 +131,7 @@ public class SavePinger extends View {
     public void onDraw(Canvas canvas) {
         mRingRadius = getWidth() * 0.5f;
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(4.0f);
+        mPaint.setStrokeWidth(8.0f);
 
         long systemTime = System.currentTimeMillis();
         long deltaMs = systemTime - mLastTime;
@@ -147,7 +147,7 @@ public class SavePinger extends View {
             if (circleValue > 1) circleValue = 1;
 
             mPaint.setARGB((int) ((255.0f - 255.0f * circleValue) * mFadeProgress * 0.5f),
-                    224, 224, 224);
+                    51, 181, 229);
 
             canvas.drawCircle(getWidth() / 2, getHeight() / 2, ringProgress, mPaint);
 

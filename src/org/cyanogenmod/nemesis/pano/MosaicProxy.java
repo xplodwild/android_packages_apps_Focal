@@ -18,7 +18,6 @@
 
 package org.cyanogenmod.nemesis.pano;
 
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,16 +31,12 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.ExifInterface;
 import android.net.Uri;
-import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
@@ -590,6 +585,13 @@ public class MosaicProxy extends CaptureTransformer
     }
 
     private static String getExifOrientation(int orientation) {
+        if (orientation < 0) {
+            orientation += 360;
+        }
+        if (orientation >= 360) {
+            orientation -= 360;
+        }
+
         switch (orientation) {
             case 0:
                 return String.valueOf(ExifInterface.ORIENTATION_NORMAL);
