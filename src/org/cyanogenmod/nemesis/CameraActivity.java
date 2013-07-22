@@ -719,6 +719,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mMosaicProxy = new MosaicProxy(this);
         findViewById(R.id.camera_preview_container).setVisibility(View.GONE);
         findViewById(R.id.gl_renderer_container).setOnTouchListener(mPreviewTouchListener);
+        findViewById(R.id.gl_renderer_container).setVisibility(View.VISIBLE);
         setCaptureTransformer(mMosaicProxy);
         updateRingsVisibility();
     }
