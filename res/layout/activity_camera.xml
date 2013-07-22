@@ -115,7 +115,8 @@
                 android:id="@+id/hud_ring_exposure"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"/>
+                android:layout_gravity="center_vertical"
+                android:translationX="120dp"/>
 
     </FrameLayout>
 
@@ -253,7 +254,7 @@
 
     </org.cyanogenmod.nemesis.ui.ReviewDrawer>
 
-    <ImageButton
+    <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btn_picsphere_undo"
@@ -262,7 +263,9 @@
             android:layout_marginRight="16dp"
             android:src="@drawable/ic_picsphere_undo"
             style="@android:style/Widget.Holo.Button.Borderless"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:text="UNDO"
+            android:drawableRight="@drawable/ic_picsphere_undo"/>
 
 
 </FrameLayout>
