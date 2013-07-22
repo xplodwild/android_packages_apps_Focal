@@ -216,6 +216,8 @@ public class CameraManager {
                     mPreviewPauseListener.onPreviewResume();
                 }
 
+                mPreview.setPauseCopyFrame(false);
+
                 mCameraReady = true;
             }
         }.start();
@@ -279,7 +281,6 @@ public class CameraManager {
     }
 
     public void resume() {
-        mPreview.setPauseCopyFrame(false);
         reconnectToCamera();
         //mParametersThread.start();
     }
@@ -505,7 +506,9 @@ public class CameraManager {
 
     public void stopVideoRecording() {
         Log.v(TAG, "stopVideoRecording");
-        mMediaRecorder.stop();
+        try {
+            mMediaRecorder.stop();
+        } catch (Exception e) { }
         mCamera.lock();
         mMediaRecorder.reset();
         mPreview.postCallbackBuffer();
@@ -864,10 +867,12 @@ public class CameraManager {
         }
 
         public void setPauseCopyFrame(boolean pause) {
+            if (mPauseCopyFrame == pause) return;
+
             mPauseCopyFrame = pause;
 
             if (!pause && mCamera != null) {
-                mCamera.addCallbackBuffer(mLastFrameBytes);
+                postCallbackBuffer();
             }
         }
 
@@ -897,7 +902,7 @@ public class CameraManager {
                         mCamera.setPreviewDisplay(mHolder);
                     }
                     mCamera.startPreview();
-                    mPreview.postCallbackBuffer();
+                    postCallbackBuffer();
                 } catch (IOException e) {
                     Log.e(TAG, "Error setting camera preview: " + e.getMessage());
                 }
@@ -916,7 +921,7 @@ public class CameraManager {
                     mCamera.setPreviewDisplay(mHolder);
                 }
                 mCamera.startPreview();
-                mPreview.postCallbackBuffer();
+                postCallbackBuffer();
             } catch (IOException e) {
                 Log.e(TAG, "Error setting camera preview: " + e.getMessage());
             }
@@ -951,15 +956,20 @@ public class CameraManager {
                 mCamera.startPreview();
 
                 mParameters = mCamera.getParameters();
-
+                postCallbackBuffer();
             } catch (Exception e) {
                 Log.d(TAG, "Error starting camera preview: " + e.getMessage());
             }
         }
 
         public void postCallbackBuffer() {
-            mCamera.addCallbackBuffer(mLastFrameBytes);
-            mCamera.setPreviewCallbackWithBuffer(this);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mCamera.addCallbackBuffer(mLastFrameBytes);
+                    mCamera.setPreviewCallbackWithBuffer(CameraPreview.this);
+                }
+            });
         }
 
         private void setupCamera() {
