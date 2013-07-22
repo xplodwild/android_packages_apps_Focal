@@ -585,12 +585,7 @@ public class MosaicProxy extends CaptureTransformer
     }
 
     private static String getExifOrientation(int orientation) {
-        if (orientation < 0) {
-            orientation += 360;
-        }
-        if (orientation >= 360) {
-            orientation -= 360;
-        }
+        orientation = (orientation + 360) % 360;
 
         switch (orientation) {
             case 0:

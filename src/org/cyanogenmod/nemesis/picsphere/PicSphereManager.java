@@ -89,7 +89,6 @@ public class PicSphereManager implements PicSphere.ProgressListener {
     public void notifyOrientationChanged(int orientation) {
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
             if (orientation != -90) {
-                Log.e(TAG, ""+orientation);
                 mContext.setHelperText(mContext.getString(R.string.picsphere_turn_portrait), true);
             } else if (mPicSpheres.size() == 0 || mPicSpheres.get(0).getPicturesCount() == 0) {
                 mContext.setHelperText(mContext.getString(R.string.picsphere_start_hint), false);

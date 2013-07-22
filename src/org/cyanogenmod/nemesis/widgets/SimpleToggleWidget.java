@@ -130,7 +130,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
         Set<WidgetOptionButton> buttons = mButtonsValues.keySet();
         for (WidgetOptionButton btn : buttons) {
             if (mButtonsValues.get(btn).equals(value)) {
-                Log.e(TAG, "Set button activated for value " + value);
+                Log.v(TAG, "Set button activated for value " + value);
                 setButtonActivated(btn, value);
                 return;
             }

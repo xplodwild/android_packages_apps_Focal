@@ -24,7 +24,6 @@ import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -85,7 +84,6 @@ public abstract class WidgetBase {
 
         mWidgetMaxWidth = context.getResources().getInteger(R.integer.widget_default_max_width);
 
-        Log.e(TAG, "Widget: " + this.getClass().getName());
         setHidden(!SettingsStorage.getVisibilitySetting(
                 context, this.getClass().getName()));
     }
