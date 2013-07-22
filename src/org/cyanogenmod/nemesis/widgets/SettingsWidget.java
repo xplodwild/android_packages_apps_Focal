@@ -35,6 +35,8 @@ import org.cyanogenmod.nemesis.SnapshotManager;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -59,6 +61,17 @@ public class SettingsWidget extends WidgetBase {
     private NumberPicker mNumberPicker;
     private int mInitialOrientation = -1;
     private int mOrientation;
+
+    private final Comparator<? super Camera.Size> mResolutionsSorter = new Comparator<Camera.Size>() {
+        @Override
+        public int compare(Camera.Size size, Camera.Size size2) {
+            if (size.width*size.height > size2.width*size2.height) {
+                return -1;
+            } else {
+                return 1;
+            }
+        }
+    };
 
     private View.OnClickListener mExpoRingClickListener = new View.OnClickListener() {
         @Override
@@ -172,6 +185,8 @@ public class SettingsWidget extends WidgetBase {
             df.setMaximumFractionDigits(1);
             df.setMinimumFractionDigits(0);
             df.setDecimalSeparatorAlwaysShown(false);
+
+            Collections.sort(mResolutions, mResolutionsSorter);
 
             for (Camera.Size size : mResolutions) {
                 float megapixels = size.width * size.height / 1000000.0f;
