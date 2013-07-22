@@ -427,10 +427,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mSwitchRingPad.notifyOrientationChanged(mOrientationCompensation);
         mSavePinger.notifyOrientationChanged(mOrientationCompensation);
         mReviewDrawer.notifyOrientationChanged(mOrientationCompensation);
-
-        if (mPicSphereManager != null && mCameraMode == CAMERA_MODE_PICSPHERE) {
-            mPicSphereManager.notifyOrientationChanged(mOrientationCompensation);
-        }
     }
 
     public void updateCapabilities() {

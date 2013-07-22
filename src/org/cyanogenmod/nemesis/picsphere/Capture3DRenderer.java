@@ -25,7 +25,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
-import android.os.Handler;
 import android.util.Log;
 
 import org.cyanogenmod.nemesis.R;
@@ -36,7 +35,6 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -296,8 +294,8 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         // Set the OpenGL viewport to the same size as the surface.
         GLES20.glViewport(0, 0, width, height);
 
-        // We use here a field of view of 60, which is mostly fine for a camera app representation
-        final float fov = 60.0f;
+        // We use here a field of view of 40, which is mostly fine for a camera app representation
+        final float fov = 40.0f;
 
         // Create a new perspective projection matrix. The height will stay the same
         // while the width will vary as per aspect ratio.
@@ -323,14 +321,16 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         // Convert angles to degrees
         float rX = (float) (orientation[1] * 180.0f/Math.PI);
         float rY = (float) (orientation[0] * 180.0f/Math.PI);
+        float rZ = (float) (orientation[2] * 180.0f/Math.PI);
 
         // Update quaternion from euler angles out of orientation
-        mCameraQuat.fromEuler( rX, 0.0f, rY);
+        mCameraQuat.fromEuler( rX, 270.0f-rZ, rY);
         mCameraQuat = mCameraQuat.getConjugate();
         mCameraQuat.normalise();
         mViewMatrix = mCameraQuat.getMatrix();
 
         mSkyBox.draw();
+
 
         mListBusy.lock();
         for (Snapshot snap : mSnapshots) {

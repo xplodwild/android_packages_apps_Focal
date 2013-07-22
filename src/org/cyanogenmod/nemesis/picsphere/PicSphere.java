@@ -19,6 +19,7 @@
 package org.cyanogenmod.nemesis.picsphere;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
@@ -287,7 +288,8 @@ public class PicSphere {
             filesStr += " " + picture.getPath();
         }
 
-        run("autopano --align --ransac on --projection 0,"+mHorizontalAngle+" " + mProjectFile + " " + filesStr);
+        run("autopano --align --bottom-is-left --ransac on --refine-by-mean " +
+                "--projection 2,"+mHorizontalAngle+" " + mProjectFile + " " + filesStr);
         consumeProcLogs();
 
         Log.d(TAG, "Autopano... done");
@@ -300,7 +302,6 @@ public class PicSphere {
      * useful tools for cleaning control points: celeste removes points from areas of sky and
      * ptclean removes points with large error distances
      *
-     * TODO: Add celeste for outdoor cleanup
      *
      * @return
      * @throws IOException
@@ -342,7 +343,7 @@ public class PicSphere {
     private boolean doPanoModify() throws IOException {
         Log.d(TAG, "PanoModify...");
         notifyStep(STEP_PANOMODIFY);
-        run("pano_modify -o " + mProjectFile + " --center --straighten --canvas=AUTO --crop=AUTO " + mProjectFile);
+        run("pano_modify -o " + mProjectFile + " --center --canvas=AUTO " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "PanoModify... done");
@@ -424,8 +425,14 @@ public class PicSphere {
     private boolean doExifTagging() throws IOException {
         Log.d(TAG, "XMP metadata tagging...");
 
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mTempPath + "/final.jpg", opts);
+
+
         XMPHelper xmp = new XMPHelper();
-        xmp.writeXmpToFile(mTempPath + "/final.jpg", generatePhotoSphereXMP(100, 100, mPictures.size()));
+        xmp.writeXmpToFile(mTempPath + "/final.jpg", generatePhotoSphereXMP(opts.outWidth,
+                opts.outHeight, mPictures.size()));
 
         Log.d(TAG, "XMP metadata tagging... done");
         return true;
@@ -446,15 +453,15 @@ public class PicSphere {
                 "      GPano:UsePanoramaViewer=\"True\"\n" +
                 "      GPano:ProjectionType=\"equirectangular\"\n" +
                 //"      GPano:PoseHeadingDegrees=\"122.0\"\n" +
-                "      GPano:CroppedAreaLeftPixels=\"0\"\n" +
-                "      GPano:FullPanoWidthPixels=\""+width+"\"\n" +
+                "      GPano:CroppedAreaLeftPixels=\"10\"\n" +
+                "      GPano:FullPanoWidthPixels=\""+(width+10)+"\"\n" +
                 //"      GPano:FirstPhotoDate=\"2012-11-22T23:15:59.773Z\"\n" +
                 "      GPano:CroppedAreaImageHeightPixels=\""+height+"\"\n" +
-                "      GPano:FullPanoHeightPixels=\""+height+"\"\n" +
+                "      GPano:FullPanoHeightPixels=\""+(height+10)+"\"\n" +
                 "      GPano:SourcePhotosCount=\""+sourceImageCount+"\"\n" +
                 "      GPano:CroppedAreaImageWidthPixels=\""+width+"\"\n" +
                 //"      GPano:LastPhotoDate=\"2012-11-22T23:16:41.177Z\"\n" +
-                "      GPano:CroppedAreaTopPixels=\"0\" />\n" +
+                "      GPano:CroppedAreaTopPixels=\"10\" />\n" +
                 "  </rdf:RDF>";
     }
 }
