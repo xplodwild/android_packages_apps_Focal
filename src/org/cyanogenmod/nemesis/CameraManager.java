@@ -205,12 +205,12 @@ public class CameraManager {
                     return;
                 }
 
+                // Update the preview surface holder with the new opened camera
+                mPreview.notifyCameraChanged();
+
                 if (mCameraReadyListener != null) {
                     mCameraReadyListener.onCameraReady();
                 }
-
-                // Update the preview surface holder with the new opened camera
-                mPreview.notifyCameraChanged();
 
                 if (mPreviewPauseListener != null) {
                     mPreviewPauseListener.onPreviewResume();

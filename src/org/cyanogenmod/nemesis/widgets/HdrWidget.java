@@ -38,6 +38,8 @@ public class HdrWidget extends SimpleToggleWidget {
         // in priority though, for devices like Nexus 4 which reports ae-bracket-hdr, but
         // doesn't use it.
         Camera.Parameters params = cam.getParameters();
+        if (params == null) return;
+
         List<String> sceneModes = params.getSupportedSceneModes();
 
         if (sceneModes != null && !sceneModes.contains("hdr")) {
