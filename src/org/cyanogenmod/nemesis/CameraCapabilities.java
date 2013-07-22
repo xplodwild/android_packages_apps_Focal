@@ -55,7 +55,6 @@ public class CameraCapabilities {
         mWidgets.add(new VideoHdrWidget(cam, context));
         mWidgets.add(new EffectWidget(cam, context));
         mWidgets.add(new ExposureCompensationWidget(cam, context));
-        mWidgets.add(new SkinToneWidget(cam, context));
         mWidgets.add(new EnhancementsWidget(cam, context));
         mWidgets.add(new AutoExposureWidget(cam, context));
         mWidgets.add(new IsoWidget(cam, context));
