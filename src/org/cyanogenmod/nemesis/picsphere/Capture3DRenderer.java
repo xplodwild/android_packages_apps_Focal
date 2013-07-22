@@ -20,12 +20,15 @@ package org.cyanogenmod.nemesis.picsphere;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.os.Handler;
 import android.util.Log;
+
+import org.cyanogenmod.nemesis.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -52,6 +55,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     private ReentrantLock mListBusy;
     private SensorFusion mSensorFusion;
     private Quaternion mCameraQuat;
+    private Skybox mSkyBox;
     private float[] mViewMatrix = new float[16];
     private float[] mProjectionMatrix = new float[16];
 
@@ -78,7 +82,64 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     private int mTexCoordHandler;
     private int mTextureHandler;
     private int mMVPMatrixHandler;
+    private Context mContext;
     private float[] mMVPMatrix = new float[16];
+
+    private class Skybox {
+        private float DIST = 150.0f;
+        private Snapshot[] mFaces = new Snapshot[6];
+        private int FACE_NORTH = 0;
+        private int FACE_WEST = 1;
+        private int FACE_SOUTH = 2;
+        private int FACE_EAST = 3;
+        private int FACE_UP = 4;
+        private int FACE_DOWN = 5;
+
+        public Skybox() {
+            mFaces[FACE_NORTH] = new Snapshot();
+            mFaces[FACE_NORTH].mModelMatrix = matrixFromEuler(0, 90, 0, 0, 0, DIST);
+            mFaces[FACE_NORTH].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_fr));
+
+            mFaces[FACE_SOUTH] = new Snapshot();
+            mFaces[FACE_SOUTH].mModelMatrix = matrixFromEuler(0, 90, 0, 0, 0, -DIST);
+            mFaces[FACE_SOUTH].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_bk));
+
+            mFaces[FACE_WEST] = new Snapshot();
+            mFaces[FACE_WEST].mModelMatrix = matrixFromEuler(0, 90, 90, 0, 0, DIST);
+            mFaces[FACE_WEST].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_lt));
+
+            mFaces[FACE_EAST] = new Snapshot();
+            mFaces[FACE_EAST].mModelMatrix = matrixFromEuler(0, 90, 270, 0, 0, DIST);
+            mFaces[FACE_EAST].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_rt));
+
+            mFaces[FACE_UP] = new Snapshot();
+            mFaces[FACE_UP].mModelMatrix = matrixFromEuler(90, 0, 270, 0, 0, DIST);
+            mFaces[FACE_UP].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_up));
+
+            mFaces[FACE_DOWN] = new Snapshot();
+            mFaces[FACE_DOWN].mModelMatrix = matrixFromEuler(-90, 0, 90, 0, 0, DIST);
+            mFaces[FACE_DOWN].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_dn));
+        }
+
+        private float[] matrixFromEuler(float rx, float ry, float rz, float tx, float ty, float tz) {
+            Quaternion quat = new Quaternion();
+            quat.fromEuler(rx,ry,rz);
+            float[] matrix = quat.getMatrix();
+
+            Matrix.translateM(matrix, 0, tx, ty, tz);
+
+            return matrix;
+        }
+
+        public void draw() {
+            for (int i = 0; i < mFaces.length; i++) {
+                if (mFaces[i] != null) {
+                    mFaces[i].draw();
+                }
+            }
+        }
+
+    }
 
 
     /**
@@ -125,8 +186,6 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
                 loadTexture();
             }
 
-
-
             GLES20.glUseProgram(mProgram);
             mVertexBuffer.position(0);
             mTexCoordBuffer.position(0);
@@ -166,6 +225,8 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         mListBusy = new ReentrantLock();
         mSensorFusion = new SensorFusion(context);
         mCameraQuat = new Quaternion();
+        mContext = context;
+
     }
 
     @Override
@@ -226,6 +287,8 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         mTexCoordHandler     = GLES20.glGetAttribLocation(mProgram, "a_TexCoordinate");
         mMVPMatrixHandler    = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
         mTextureHandler      = GLES20.glGetUniformLocation(mProgram, "u_Texture");
+
+        mSkyBox = new Skybox();
     }
 
     @Override
@@ -240,7 +303,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         // while the width will vary as per aspect ratio.
         final float ratio = (float) width / height;
         final float near = 0.1f;
-        final float far = 500.0f;
+        final float far = 600.0f;
         final float bottom = (float) Math.tan(fov * Math.PI / 360.0f) * near;
         final float top = -bottom;
         final float right = ratio * bottom;
@@ -267,6 +330,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         mCameraQuat.normalise();
         mViewMatrix = mCameraQuat.getMatrix();
 
+        mSkyBox.draw();
 
         mListBusy.lock();
         for (Snapshot snap : mSnapshots) {

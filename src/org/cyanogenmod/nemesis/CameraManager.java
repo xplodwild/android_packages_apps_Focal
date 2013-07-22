@@ -802,7 +802,9 @@ public class CameraManager {
             }
         }
 
-        mCamera.setParameters(params);
+        try {
+            mCamera.setParameters(params);
+        } catch (Exception e) { }
     }
 
     /**
