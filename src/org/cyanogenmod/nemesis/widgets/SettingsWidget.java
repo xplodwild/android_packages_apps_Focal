@@ -252,7 +252,9 @@ public class SettingsWidget extends WidgetBase {
             mContext.getSnapManager().setAutoEnhance(true);
             mToggleAutoEnhancer.setActiveDrawable(DRAWABLE_KEY_AUTO_ENHANCE);
         } else {
-            mContext.getSnapManager().setAutoEnhance(false);
+            if (mContext.getSnapManager() != null) {
+                mContext.getSnapManager().setAutoEnhance(false);
+            }
         }
 
         addViewToContainer(mToggleAutoEnhancer);

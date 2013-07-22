@@ -190,6 +190,9 @@ public class PicSphere {
             doEnblend();
         } catch (IOException ex) {
             Log.e(TAG, "Unable to process: ", ex);
+            for (ProgressListener listener : mProgressListeners) {
+                listener.onRenderDone(this);
+            }
             return false;
         }
 

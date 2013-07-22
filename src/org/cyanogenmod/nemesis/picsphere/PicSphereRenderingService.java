@@ -21,6 +21,8 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
     // We use it on Notification start, and to cancel it.
     private int NOTIFICATION = 1337;
 
+    private boolean mHasFailed = false;
+
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -65,6 +67,7 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
         new Thread() {
             public void run() {
                 if (!sphere.render()) {
+                    mHasFailed = true;
                     mNM.notify(NOTIFICATION,
                             buildFailureNotification(getString(R.string.picsphere_failed),
                                     getString(R.string.picsphere_failed_details)));
@@ -79,6 +82,7 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
         // Display a notification
         mNM.notify(NOTIFICATION, buildProgressNotification(0,
                 getString(R.string.picsphere_step_preparing)));
+        mHasFailed = false;
     }
 
     @Override
@@ -118,7 +122,9 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
 
     @Override
     public void onRenderDone(PicSphere sphere) {
-        mNM.cancel(NOTIFICATION);
+        if (!mHasFailed) {
+            mNM.cancel(NOTIFICATION);
+        }
     }
 
     private Notification buildProgressNotification(int percentage, String text) {
