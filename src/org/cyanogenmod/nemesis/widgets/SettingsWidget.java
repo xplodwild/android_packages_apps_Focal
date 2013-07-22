@@ -219,7 +219,7 @@ public class SettingsWidget extends WidgetBase {
         mToggleExposureRing.setOnClickListener(mExpoRingClickListener);
 
         // Restore exposure ring state
-        if (SettingsStorage.getAppSetting(mContext, KEY_SHOW_EXPOSURE_RING, "1").equals("1")) {
+        if (SettingsStorage.getAppSetting(mContext, KEY_SHOW_EXPOSURE_RING, "0").equals("1")) {
             mContext.setExposureRingVisible(true);
             mToggleExposureRing.setActiveDrawable(DRAWABLE_KEY_EXPO_RING);
         } else {
@@ -233,7 +233,7 @@ public class SettingsWidget extends WidgetBase {
         mToggleAutoEnhancer.setHintText(mContext.getString(R.string.widget_settings_autoenhance));
 
         // Restore auto enhancer state
-        if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_AUTO_ENHANCE, "1").equals("1")) {
+        if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_AUTO_ENHANCE, "0").equals("1")) {
             mContext.getSnapManager().setAutoEnhance(true);
             mToggleAutoEnhancer.setActiveDrawable(DRAWABLE_KEY_AUTO_ENHANCE);
         } else {
