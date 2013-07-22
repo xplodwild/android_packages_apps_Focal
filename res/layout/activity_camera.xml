@@ -264,7 +264,7 @@
             android:src="@drawable/ic_picsphere_undo"
             style="@android:style/Widget.Holo.Button.Borderless"
             android:visibility="gone"
-            android:text="UNDO"
+            android:text="@string/picsphere_undo_button"
             android:drawableRight="@drawable/ic_picsphere_undo"/>
 
     <TextView

@@ -76,6 +76,7 @@
     <string name="pano_panorama_rendering">Rendering panorama&#8230;</string>
 
     <!-- PicSphere status -->
+    <string name="picsphere_undo_button">UNDO</string>
     <string name="picsphere_start_hint">Take a picture to start your sphere</string>
     <string name="picsphere_turn_portrait">Turn to portrait</string>
     <string name="picsphere_already_rendering">Please wait for the current PicSphere to render</string>
