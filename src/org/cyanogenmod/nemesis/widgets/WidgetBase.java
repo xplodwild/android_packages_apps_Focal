@@ -40,6 +40,7 @@ import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SettingsStorage;
+import org.cyanogenmod.nemesis.Util;
 import org.cyanogenmod.nemesis.ui.SideBar;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
@@ -326,7 +327,7 @@ public abstract class WidgetBase {
             public boolean onLongClick(View view) {
                 mCancelOpenOnDown = true;
                 if (mHintText != null && !mHintText.isEmpty()) {
-                    CameraActivity.notify(mHintText, 2000);
+                    CameraActivity.notify(mHintText, 2000, getX(), Util.getScreenSize(null).y - getHeight() - getBottom());
                 }
                 return true;
             }

@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.cyanogenmod.nemesis.R;
+import org.cyanogenmod.nemesis.Util;
 
 /**
  * Little notifier that comes in from the side of the screen
@@ -59,10 +60,11 @@ public class Notifier extends LinearLayout {
 
     private void initialize() {
         mHandler = new Handler();
+        setPivotX(0.0f);
     }
 
     /**
-     * Shows the provided {@param text} during [@param durationMs} milliseconds with
+     * Shows the provided {@param text} during {@param durationMs} milliseconds with
      * a nice animation.
      *
      * @param text
@@ -76,6 +78,33 @@ public class Notifier extends LinearLayout {
                 mTextView = (TextView) findViewById(R.id.notifier_text);
                 mTextView.setText(text);
                 setAlpha(0.0f);
+                setX(Util.getScreenSize(null).x*2.0f/3.0f);
+                setY(Util.getScreenSize(null).y*2.0f/3.0f);
+
+                fadeIn();
+                mHandler.postDelayed(mFadeOutRunnable, durationMs);
+            }
+        });
+    }
+
+    /**
+     * Shows the provided {@param text} during {@param durationMs} milliseconds at the
+     * provided {@param x} and {@param y} position with a nice animation.
+     *
+     * @param text The text to display
+     * @param durationMs How long should we display it
+     * @param x The X position
+     * @param y The Y position
+     */
+    public void notify(final String text, final long durationMs, final float x, final float y) {
+        mHandler.post(new Runnable() {
+            public void run() {
+                mHandler.removeCallbacks(mFadeOutRunnable);
+                mTextView = (TextView) findViewById(R.id.notifier_text);
+                mTextView.setText(text);
+                setAlpha(0.0f);
+                setX(x);
+                setY(y);
 
                 fadeIn();
                 mHandler.postDelayed(mFadeOutRunnable, durationMs);

@@ -290,11 +290,21 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
     /**
      * Notify, like a toast, but orientation aware
-     * @param text
-     * @param lengthMs
+     * @param text The text to show
+     * @param lengthMs The duration
      */
     public static void notify(String text, int lengthMs) {
         mNotifier.notify(text, lengthMs);
+    }
+
+    /**
+     * Notify, like a toast, but orientation aware at the specified position
+     * @param text The text to show
+     * @param lengthMs The duration
+     *
+     */
+    public static void notify(String text, int lengthMs, float x, float y) {
+        mNotifier.notify(text, lengthMs, x, y);
     }
 
     /**
