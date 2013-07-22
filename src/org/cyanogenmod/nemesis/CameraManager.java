@@ -273,11 +273,13 @@ public class CameraManager {
     }
 
     public void pause() {
+        mPreview.setPauseCopyFrame(true);
         releaseCamera();
         //mParametersThread.interrupt();
     }
 
     public void resume() {
+        mPreview.setPauseCopyFrame(false);
         reconnectToCamera();
         //mParametersThread.start();
     }
@@ -832,6 +834,7 @@ public class CameraManager {
         private SurfaceHolder mHolder;
         private SurfaceTexture mTexture;
         private byte[] mLastFrameBytes;
+        private boolean mPauseCopyFrame;
 
         public CameraPreview(Context context) {
             super(context);
@@ -856,6 +859,14 @@ public class CameraManager {
 
         public SurfaceTexture getSurfaceTexture() {
             return mTexture;
+        }
+
+        public void setPauseCopyFrame(boolean pause) {
+            mPauseCopyFrame = pause;
+
+            if (!pause && mCamera != null) {
+                mCamera.addCallbackBuffer(mLastFrameBytes);
+            }
         }
 
         public void notifyPreviewSize(int width, int height) {
@@ -969,7 +980,7 @@ public class CameraManager {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
             mLastPreviewFrameTime = System.currentTimeMillis();
-            if (mCamera != null) {
+            if (mCamera != null && !mPauseCopyFrame) {
                 mCamera.addCallbackBuffer(mLastFrameBytes);
             }
         }
