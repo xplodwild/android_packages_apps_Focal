@@ -300,6 +300,7 @@ public class SettingsWidget extends WidgetBase {
 
         // Construct a list of widgets
         for (WidgetBase widget : widgets) {
+            if (widget.getClass().getName().contains("SettingsWidget")) continue;
             widgetsName.add(widget.getToggleButton().getHintText());
         }
 
@@ -323,7 +324,7 @@ public class SettingsWidget extends WidgetBase {
                         // Store the widget visibility status in SharedPreferences, using the
                         // widget class name as key
                         for (WidgetBase widget : widgets) {
-                            if (widget.getClass().getName().contains("SettingsWidgets")) continue;
+                            if (widget.getClass().getName().contains("SettingsWidget")) continue;
 
                             SettingsStorage.storeVisibilitySetting(mContext,
                                     widget.getClass().getName(), !widget.isHidden());
@@ -335,7 +336,7 @@ public class SettingsWidget extends WidgetBase {
                     public void onClick(DialogInterface dialog, int id) {
                         // Restore visibility status from storage
                         for (WidgetBase widget : widgets) {
-                            if (widget.getClass().getName().contains("SettingsWidgets")) continue;
+                            if (widget.getClass().getName().contains("SettingsWidget")) continue;
 
                             widget.setHidden(!SettingsStorage.getVisibilitySetting(
                                     mContext, widget.getClass().getName()));
