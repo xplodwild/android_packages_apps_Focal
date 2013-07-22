@@ -260,8 +260,9 @@ public class ReviewDrawer extends LinearLayout {
     public void setPreviewedImage(final int id) {
         new Thread() {
             public void run() {
-                if (mReviewedBitmap != null)
-                    mReviewedBitmap.recycle();
+                if (mReviewedBitmap != null) {
+                    recycleBitmap(mReviewedBitmap);
+                }
                 mReviewedImageId = id;
                 if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
                     mReviewedBitmap = MediaStore.Video.Thumbnails.getThumbnail(
@@ -452,6 +453,16 @@ public class ReviewDrawer extends LinearLayout {
         // XXX: Undo popup
     }
 
+    private void recycleBitmap(final Bitmap bmp) {
+        // We delay the recycle a bit to avoid crashes when scrolling or doing things too fast
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                bmp.recycle();
+            }
+        }, 1000);
+    }
+
     /**
      * Open the drawer in Quick Review mode
      */
@@ -574,8 +585,9 @@ public class ReviewDrawer extends LinearLayout {
 
                 if (bitmapDrawable != null) {
                     Bitmap bmp = bitmapDrawable.getBitmap();
-                    if (bmp != null)
-                        bmp.recycle();
+                    if (bmp != null) {
+                        recycleBitmap(bmp);
+                    }
                 }
 
                 imageView.setImageBitmap(null);
