@@ -258,6 +258,7 @@ public class MosaicProxy extends CaptureTransformer
      */
     public void tearDown() {
         mGLRootView.removeView(mGLSurfaceView);
+        mMosaicFrameProcessor.clear();
     }
 
     private void configMosaicPreview() {
