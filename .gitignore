@@ -17,3 +17,4 @@ bin/
 /libs/*/*
 /obj
 /res\drawable-xxhdpi/Thumbs.db
+/jni

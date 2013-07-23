@@ -93,6 +93,11 @@
     <string name="picsphere_step_nona">Stitching pictures&#8230;</string>
     <string name="picsphere_step_enblend">Blending pictures&#8230;</string>
 
+    <!-- Showcase text -->
+    <string name="showcase_welcome_1_title">Welcome!</string>
+    <string name="showcase_welcome_1_body">The options are in the sidebar,\njust slide it.</string>
+    <string name="showcase_welcome_2_title">Shutter button</string>
+    <string name="showcase_welcome_2_body">Tap the shutter button to take a picture.\nSlide it to access other capture modes.</string>
 </resources>
 
 

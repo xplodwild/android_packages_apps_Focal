@@ -61,19 +61,17 @@ public class ShowcaseView extends RelativeLayout implements View.OnClickListener
 
     public static final int TYPE_NO_LIMIT = 0;
     public static final int TYPE_ONE_SHOT = 1;
-
     public static final int INSERT_TO_DECOR = 0;
     public static final int INSERT_TO_VIEW = 1;
-
     public static final int ITEM_ACTION_HOME = 0;
     public static final int ITEM_TITLE = 1;
     public static final int ITEM_SPINNER = 2;
     public static final int ITEM_ACTION_ITEM = 3;
     public static final int ITEM_ACTION_OVERFLOW = 6;
-
-    private static final String PREFS_SHOWCASE_INTERNAL = "showcase_internal";
     public static final int INNER_CIRCLE_RADIUS = 94;
-
+    private static final String PREFS_SHOWCASE_INTERNAL = "showcase_internal";
+    private final Button mEndButton;
+    private final String buttonText;
     private float showcaseX = -1;
     private float showcaseY = -1;
     private float showcaseRadius = -1;
@@ -88,7 +86,6 @@ public class ShowcaseView extends RelativeLayout implements View.OnClickListener
     private int backColor;
     private Drawable showcase;
     private View mHandy;
-    private final Button mEndButton;
     private OnShowcaseEventListener mEventListener;
     private Rect voidedArea;
     private String mTitleText, mSubText;
@@ -98,9 +95,8 @@ public class ShowcaseView extends RelativeLayout implements View.OnClickListener
     private DynamicLayout mDynamicDetailLayout;
     private float[] mBestTextPosition;
     private boolean mAlteredText = false;
-
-    private final String buttonText;
     private float scaleMultiplier = 1f;
+    private int mOrientation;
 
     public ShowcaseView(Context context) {
         this(context, null, R.styleable.CustomTheme_showcaseViewStyle);
@@ -127,6 +123,162 @@ public class ShowcaseView extends RelativeLayout implements View.OnClickListener
         ConfigOptions options = new ConfigOptions();
         options.showcaseId = getId();
         setConfigOptions(options);
+    }
+
+    /**
+     * Quick method to insert a ShowcaseView into an Activity
+     *
+     * @param viewToShowcase View to showcase
+     * @param activity       Activity to insert into
+     * @param title          Text to show as a title. Can be null.
+     * @param detailText     More detailed text. Can be null.
+     * @param options        A set of options to customise the ShowcaseView
+     * @return the created ShowcaseView instance
+     */
+    public static ShowcaseView insertShowcaseView(View viewToShowcase, Activity activity, String title,
+                                                  String detailText, ConfigOptions options) {
+        ShowcaseView sv = new ShowcaseView(activity);
+        if (options != null)
+            sv.setConfigOptions(options);
+        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
+            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
+        } else {
+            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
+        }
+        sv.setShowcaseView(viewToShowcase);
+        sv.setText(title, detailText);
+        return sv;
+    }
+
+    /**
+     * Quick method to insert a ShowcaseView into an Activity
+     *
+     * @param viewToShowcase View to showcase
+     * @param activity       Activity to insert into
+     * @param title          Text to show as a title. Can be null.
+     * @param detailText     More detailed text. Can be null.
+     * @param options        A set of options to customise the ShowcaseView
+     * @return the created ShowcaseView instance
+     */
+    public static ShowcaseView insertShowcaseView(View viewToShowcase, Activity activity, int title,
+                                                  int detailText, ConfigOptions options) {
+        ShowcaseView sv = new ShowcaseView(activity);
+        if (options != null)
+            sv.setConfigOptions(options);
+        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
+            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
+        } else {
+            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
+        }
+        sv.setShowcaseView(viewToShowcase);
+        sv.setText(title, detailText);
+        return sv;
+    }
+
+    public static ShowcaseView insertShowcaseView(int showcaseViewId, Activity activity, String title,
+                                                  String detailText, ConfigOptions options) {
+        View v = activity.findViewById(showcaseViewId);
+        if (v != null) {
+            return insertShowcaseView(v, activity, title, detailText, options);
+        }
+        return null;
+    }
+
+    public static ShowcaseView insertShowcaseView(int showcaseViewId, Activity activity, int title,
+                                                  int detailText, ConfigOptions options) {
+        View v = activity.findViewById(showcaseViewId);
+        if (v != null) {
+            return insertShowcaseView(v, activity, title, detailText, options);
+        }
+        return null;
+    }
+
+    public static ShowcaseView insertShowcaseView(float x, float y, Activity activity, String title,
+                                                  String detailText, ConfigOptions options) {
+        ShowcaseView sv = new ShowcaseView(activity);
+        if (options != null)
+            sv.setConfigOptions(options);
+        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
+            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
+        } else {
+            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
+        }
+        sv.setShowcasePosition(x, y);
+        sv.setText(title, detailText);
+        return sv;
+    }
+
+    public static ShowcaseView insertShowcaseView(float x, float y, Activity activity, int title,
+                                                  int detailText, ConfigOptions options) {
+        ShowcaseView sv = new ShowcaseView(activity);
+        if (options != null)
+            sv.setConfigOptions(options);
+        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
+            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
+        } else {
+            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
+        }
+        sv.setShowcasePosition(x, y);
+        sv.setText(title, detailText);
+        return sv;
+    }
+
+    public static ShowcaseView insertShowcaseView(View showcase, Activity activity) {
+        return insertShowcaseView(showcase, activity, null, null, null);
+    }
+
+    /**
+     * Quickly insert a ShowcaseView into an Activity, highlighting an item.
+     *
+     * @param type       the type of item to showcase (can be ITEM_ACTION_HOME, ITEM_TITLE_OR_SPINNER, ITEM_ACTION_ITEM or ITEM_ACTION_OVERFLOW)
+     * @param itemId     the ID of an Action item to showcase (only required for ITEM_ACTION_ITEM
+     * @param activity   Activity to insert the ShowcaseView into
+     * @param title      Text to show as a title. Can be null.
+     * @param detailText More detailed text. Can be null.
+     * @param options    A set of options to customise the ShowcaseView
+     * @return the created ShowcaseView instance
+     */
+    public static ShowcaseView insertShowcaseViewWithType(int type, int itemId, Activity activity, String title, String detailText, ConfigOptions options) {
+        ShowcaseView sv = new ShowcaseView(activity);
+        if (options != null)
+            sv.setConfigOptions(options);
+        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
+            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
+        } else {
+            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
+        }
+        sv.setShowcaseItem(type, itemId, activity);
+        sv.setText(title, detailText);
+        return sv;
+    }
+
+    /**
+     * Quickly insert a ShowcaseView into an Activity, highlighting an item.
+     *
+     * @param type       the type of item to showcase (can be ITEM_ACTION_HOME, ITEM_TITLE_OR_SPINNER, ITEM_ACTION_ITEM or ITEM_ACTION_OVERFLOW)
+     * @param itemId     the ID of an Action item to showcase (only required for ITEM_ACTION_ITEM
+     * @param activity   Activity to insert the ShowcaseView into
+     * @param title      Text to show as a title. Can be null.
+     * @param detailText More detailed text. Can be null.
+     * @param options    A set of options to customise the ShowcaseView
+     * @return the created ShowcaseView instance
+     */
+    public static ShowcaseView insertShowcaseViewWithType(int type, int itemId, Activity activity, int title, int detailText, ConfigOptions options) {
+        ShowcaseView sv = new ShowcaseView(activity);
+        if (options != null)
+            sv.setConfigOptions(options);
+        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
+            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
+        } else {
+            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
+        }
+        sv.setShowcaseItem(type, itemId, activity);
+        sv.setText(title, detailText);
+        return sv;
+    }
+
+    public static ShowcaseView insertShowcaseView(float x, float y, Activity activity) {
+        return insertShowcaseView(x, y, activity, null, null, null);
     }
 
     private void init() {
@@ -171,11 +323,24 @@ public class ShowcaseView extends RelativeLayout implements View.OnClickListener
             lps.height = LayoutParams.WRAP_CONTENT;
             lps.width = LayoutParams.WRAP_CONTENT;
             mEndButton.setLayoutParams(lps);
-            mEndButton.setText(buttonText != null ? buttonText : getResources().getString(R.string.ok));
+            mEndButton.setText(buttonText != null ? buttonText : getResources().getString(R.string.OK));
             if (!hasCustomClickListener) mEndButton.setOnClickListener(this);
             addView(mEndButton);
         }
 
+    }
+
+    public void notifyOrientationChanged(int orientation) {
+        if (mEndButton != null) {
+            mEndButton.animate().rotation(orientation).setDuration(300).start();
+        }
+
+        if (mHandy != null) {
+            mHandy.animate().rotation(orientation).setDuration(300).start();
+        }
+
+        mOrientation = orientation;
+        invalidate();
     }
 
     /**
@@ -435,13 +600,19 @@ public class ShowcaseView extends RelativeLayout implements View.OnClickListener
         b.recycle();
         b = null;
 
+
         if (!TextUtils.isEmpty(mTitleText) || !TextUtils.isEmpty(mSubText)) {
             if (recalculateText)
                 mBestTextPosition = getBestTextPosition(canvas.getWidth(), canvas.getHeight());
 
             if (!TextUtils.isEmpty(mTitleText)) {
                 //TODO: use a dynamic detail layout
+                canvas.save();
+                float width = mPaintTitle.measureText(mTitleText);
+                canvas.rotate(mOrientation, mBestTextPosition[0] + width / 2.0f,
+                        mBestTextPosition[1] + mPaintTitle.getTextSize() / 2.0f);
                 canvas.drawText(mTitleText, mBestTextPosition[0], mBestTextPosition[1], mPaintTitle);
+                canvas.restore();
             }
 
             if (!TextUtils.isEmpty(mSubText)) {
@@ -450,12 +621,23 @@ public class ShowcaseView extends RelativeLayout implements View.OnClickListener
                     mDynamicDetailLayout = new DynamicLayout(mSubText, mPaintDetail,
                             ((Number) mBestTextPosition[2]).intValue(), Layout.Alignment.ALIGN_NORMAL,
                             1.2f, 1.0f, true);
-                canvas.translate(mBestTextPosition[0], mBestTextPosition[1] + 12 * metricScale);
+
+                if (mOrientation % 180 == 0) {
+                    canvas.translate(mBestTextPosition[0], mBestTextPosition[1]);
+                } else {
+                    canvas.rotate(mOrientation, mDynamicDetailLayout.getWidth() / 2,
+                        mDynamicDetailLayout.getHeight() / 2);
+                }
+                //
+
+
+
                 mDynamicDetailLayout.draw(canvas);
                 canvas.restore();
 
             }
         }
+
 
         super.dispatchDraw(canvas);
 
@@ -469,16 +651,10 @@ public class ShowcaseView extends RelativeLayout implements View.OnClickListener
      * @return
      */
     private float[] getBestTextPosition(int canvasW, int canvasH) {
-
-        //if the width isn't much bigger than the voided area, just consider top & bottom
         float spaceTop = voidedArea.top;
         float spaceBottom = canvasH - voidedArea.bottom - 64 * metricScale; //64dip considers the OK button
-        //float spaceLeft = voidedArea.left;
-        //float spaceRight = canvasW - voidedArea.right;
 
-        //TODO: currently only considers above or below showcase, deal with left or right
         return new float[]{24 * metricScale, spaceTop > spaceBottom ? 128 * metricScale : 24 * metricScale + voidedArea.bottom, canvasW - 48 * metricScale};
-
     }
 
     /**
@@ -512,6 +688,7 @@ public class ShowcaseView extends RelativeLayout implements View.OnClickListener
     public void animateGesture(float offsetStartX, float offsetStartY, float offsetEndX, float offsetEndY) {
         mHandy = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.handy, null);
         addView(mHandy);
+        mHandy.setRotation(mOrientation);
         moveHand(offsetStartX, offsetStartY, offsetEndX, offsetEndY, new AnimationEndListener() {
             @Override
             public void onAnimationEnd() {
@@ -600,14 +777,6 @@ public class ShowcaseView extends RelativeLayout implements View.OnClickListener
         this.scaleMultiplier = scaleMultiplier;
     }
 
-    public interface OnShowcaseEventListener {
-
-        public void onShowcaseViewHide(ShowcaseView showcaseView);
-
-        public void onShowcaseViewShow(ShowcaseView showcaseView);
-
-    }
-
     public ShowcaseView setTextColors(int titleTextColor, int detailTextColor) {
         this.titleTextColor = titleTextColor;
         this.detailTextColor = detailTextColor;
@@ -668,170 +837,22 @@ public class ShowcaseView extends RelativeLayout implements View.OnClickListener
         AnimationUtils.createMovementAnimation(mHandy, x, y).start();
     }
 
-    private void setConfigOptions(ConfigOptions options) {
-        mOptions = options;
-    }
-
     private ConfigOptions getConfigOptions() {
         // Make sure that this method never returns null
         if (mOptions == null) return mOptions = new ConfigOptions();
         return mOptions;
     }
 
-    /**
-     * Quick method to insert a ShowcaseView into an Activity
-     *
-     * @param viewToShowcase View to showcase
-     * @param activity       Activity to insert into
-     * @param title          Text to show as a title. Can be null.
-     * @param detailText     More detailed text. Can be null.
-     * @param options        A set of options to customise the ShowcaseView
-     * @return the created ShowcaseView instance
-     */
-    public static ShowcaseView insertShowcaseView(View viewToShowcase, Activity activity, String title,
-                                                  String detailText, ConfigOptions options) {
-        ShowcaseView sv = new ShowcaseView(activity);
-        if (options != null)
-            sv.setConfigOptions(options);
-        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
-            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
-        } else {
-            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
-        }
-        sv.setShowcaseView(viewToShowcase);
-        sv.setText(title, detailText);
-        return sv;
+    private void setConfigOptions(ConfigOptions options) {
+        mOptions = options;
     }
 
-    /**
-     * Quick method to insert a ShowcaseView into an Activity
-     *
-     * @param viewToShowcase View to showcase
-     * @param activity       Activity to insert into
-     * @param title          Text to show as a title. Can be null.
-     * @param detailText     More detailed text. Can be null.
-     * @param options        A set of options to customise the ShowcaseView
-     * @return the created ShowcaseView instance
-     */
-    public static ShowcaseView insertShowcaseView(View viewToShowcase, Activity activity, int title,
-                                                  int detailText, ConfigOptions options) {
-        ShowcaseView sv = new ShowcaseView(activity);
-        if (options != null)
-            sv.setConfigOptions(options);
-        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
-            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
-        } else {
-            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
-        }
-        sv.setShowcaseView(viewToShowcase);
-        sv.setText(title, detailText);
-        return sv;
-    }
+    public interface OnShowcaseEventListener {
 
-    public static ShowcaseView insertShowcaseView(int showcaseViewId, Activity activity, String title,
-                                                  String detailText, ConfigOptions options) {
-        View v = activity.findViewById(showcaseViewId);
-        if (v != null) {
-            return insertShowcaseView(v, activity, title, detailText, options);
-        }
-        return null;
-    }
+        public void onShowcaseViewHide(ShowcaseView showcaseView);
 
-    public static ShowcaseView insertShowcaseView(int showcaseViewId, Activity activity, int title,
-                                                  int detailText, ConfigOptions options) {
-        View v = activity.findViewById(showcaseViewId);
-        if (v != null) {
-            return insertShowcaseView(v, activity, title, detailText, options);
-        }
-        return null;
-    }
+        public void onShowcaseViewShow(ShowcaseView showcaseView);
 
-    public static ShowcaseView insertShowcaseView(float x, float y, Activity activity, String title,
-                                                  String detailText, ConfigOptions options) {
-        ShowcaseView sv = new ShowcaseView(activity);
-        if (options != null)
-            sv.setConfigOptions(options);
-        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
-            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
-        } else {
-            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
-        }
-        sv.setShowcasePosition(x, y);
-        sv.setText(title, detailText);
-        return sv;
-    }
-
-    public static ShowcaseView insertShowcaseView(float x, float y, Activity activity, int title,
-                                                  int detailText, ConfigOptions options) {
-        ShowcaseView sv = new ShowcaseView(activity);
-        if (options != null)
-            sv.setConfigOptions(options);
-        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
-            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
-        } else {
-            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
-        }
-        sv.setShowcasePosition(x, y);
-        sv.setText(title, detailText);
-        return sv;
-    }
-
-    public static ShowcaseView insertShowcaseView(View showcase, Activity activity) {
-        return insertShowcaseView(showcase, activity, null, null, null);
-    }
-
-    /**
-     * Quickly insert a ShowcaseView into an Activity, highlighting an item.
-     *
-     * @param type       the type of item to showcase (can be ITEM_ACTION_HOME, ITEM_TITLE_OR_SPINNER, ITEM_ACTION_ITEM or ITEM_ACTION_OVERFLOW)
-     * @param itemId     the ID of an Action item to showcase (only required for ITEM_ACTION_ITEM
-     * @param activity   Activity to insert the ShowcaseView into
-     * @param title      Text to show as a title. Can be null.
-     * @param detailText More detailed text. Can be null.
-     * @param options    A set of options to customise the ShowcaseView
-     * @return the created ShowcaseView instance
-     */
-    public static ShowcaseView insertShowcaseViewWithType(int type, int itemId, Activity activity, String title, String detailText, ConfigOptions options) {
-        ShowcaseView sv = new ShowcaseView(activity);
-        if (options != null)
-            sv.setConfigOptions(options);
-        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
-            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
-        } else {
-            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
-        }
-        sv.setShowcaseItem(type, itemId, activity);
-        sv.setText(title, detailText);
-        return sv;
-    }
-
-    /**
-     * Quickly insert a ShowcaseView into an Activity, highlighting an item.
-     *
-     * @param type       the type of item to showcase (can be ITEM_ACTION_HOME, ITEM_TITLE_OR_SPINNER, ITEM_ACTION_ITEM or ITEM_ACTION_OVERFLOW)
-     * @param itemId     the ID of an Action item to showcase (only required for ITEM_ACTION_ITEM
-     * @param activity   Activity to insert the ShowcaseView into
-     * @param title      Text to show as a title. Can be null.
-     * @param detailText More detailed text. Can be null.
-     * @param options    A set of options to customise the ShowcaseView
-     * @return the created ShowcaseView instance
-     */
-    public static ShowcaseView insertShowcaseViewWithType(int type, int itemId, Activity activity, int title, int detailText, ConfigOptions options) {
-        ShowcaseView sv = new ShowcaseView(activity);
-        if (options != null)
-            sv.setConfigOptions(options);
-        if (sv.getConfigOptions().insert == INSERT_TO_DECOR) {
-            ((ViewGroup) activity.getWindow().getDecorView()).addView(sv);
-        } else {
-            ((ViewGroup) activity.findViewById(android.R.id.content)).addView(sv);
-        }
-        sv.setShowcaseItem(type, itemId, activity);
-        sv.setText(title, detailText);
-        return sv;
-    }
-
-    public static ShowcaseView insertShowcaseView(float x, float y, Activity activity) {
-        return insertShowcaseView(x, y, activity, null, null, null);
     }
 
     public static class ConfigOptions {

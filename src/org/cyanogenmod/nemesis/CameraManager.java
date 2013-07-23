@@ -966,8 +966,10 @@ public class CameraManager {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    mCamera.addCallbackBuffer(mLastFrameBytes);
-                    mCamera.setPreviewCallbackWithBuffer(CameraPreview.this);
+                    if (mCamera != null) {
+                        mCamera.addCallbackBuffer(mLastFrameBytes);
+                        mCamera.setPreviewCallbackWithBuffer(CameraPreview.this);
+                    }
                 }
             });
         }

@@ -23,6 +23,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -64,8 +65,9 @@ import org.cyanogenmod.nemesis.ui.SideBar;
 import org.cyanogenmod.nemesis.ui.SwitchRingPad;
 import org.cyanogenmod.nemesis.ui.ThumbnailFlinger;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
+import org.cyanogenmod.nemesis.ui.showcase.ShowcaseView;
 
-public class CameraActivity extends Activity implements CameraManager.CameraReadyListener {
+public class CameraActivity extends Activity implements CameraManager.CameraReadyListener, ShowcaseView.OnShowcaseEventListener {
     public final static String TAG = "CameraActivity";
 
     public final static int CAMERA_MODE_PHOTO = 1;
@@ -106,12 +108,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private ScaleGestureDetector mZoomGestureDetector;
     private GLSurfaceView mPicSphere3DView;
     private TextView mHelperText;
+    private ShowcaseView mShowcaseView;
     private boolean mHasPinchZoomed;
     private boolean mCancelSideBarClose;
     private boolean mIsFocusButtonDown;
     private boolean mIsShutterButtonDown;
     private boolean mUserWantsExposureRing;
     private boolean mIsFullscreenShutter;
+    private int mShowcaseIndex;
 
     /**
      * Gesture listeners to apply on camera previews views
@@ -217,8 +221,24 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 mReviewDrawer.close();
             }
         }, 300);
+
+        startShowcaseTour();
     }
 
+    public void startShowcaseTour() {
+        ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
+        co.hideOnClickOutside = true;
+        mShowcaseView = ShowcaseView.insertShowcaseView(mSideBar, this, getString(R.string.showcase_welcome_1_title),
+                getString(R.string.showcase_welcome_1_body), co);
+
+        // animate gesture
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+
+        mShowcaseView.animateGesture(size.x/2, size.y*2.0f/3.0f, size.x/2, size.y/2.0f);
+        mShowcaseView.setOnShowcaseEventListener(this);
+        mShowcaseIndex = 0;
+    }
 
     @Override
     protected void onPause() {
@@ -434,6 +454,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mSwitchRingPad.notifyOrientationChanged(mOrientationCompensation);
         mSavePinger.notifyOrientationChanged(mOrientationCompensation);
         mReviewDrawer.notifyOrientationChanged(mOrientationCompensation);
+        if (mShowcaseView != null) mShowcaseView.notifyOrientationChanged(mOrientationCompensation);
     }
 
     public void updateCapabilities() {
@@ -848,6 +869,37 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     public static void setViewRotation(View v, float rotation) {
         v.animate().rotation(rotation).setDuration(200)
                 .setInterpolator(new DecelerateInterpolator()).start();
+    }
+
+    @Override
+    public void onShowcaseViewHide(ShowcaseView showcaseView) {
+        switch (mShowcaseIndex) {
+            case 0:
+                mShowcaseIndex++;
+
+                Point size = new Point();
+                getWindowManager().getDefaultDisplay().getSize(size);
+
+                ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
+                co.hideOnClickOutside = true;
+                mShowcaseView = ShowcaseView.insertShowcaseView(size.x - Util.dpToPx(this, 16),
+                        size.y/2, this, getString(R.string.showcase_welcome_2_title),
+                        getString(R.string.showcase_welcome_2_body), co);
+                mShowcaseView.notifyOrientationChanged(mOrientationCompensation);
+
+                // animate gesture
+
+
+                mShowcaseView.animateGesture(size.x - Util.dpToPx(this, 16), size.y/2, size.x*2/3, size.y/2);
+                mShowcaseView.setOnShowcaseEventListener(this);
+
+                break;
+        }
+    }
+
+    @Override
+    public void onShowcaseViewShow(ShowcaseView showcaseView) {
+
     }
 
     /**

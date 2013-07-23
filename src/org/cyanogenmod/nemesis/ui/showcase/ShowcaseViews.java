@@ -84,7 +84,7 @@ public class ShowcaseViews {
         views.remove(0);
     }
 
-    public boolean hasViews(){
+    public boolean hasViews() {
         return !views.isEmpty();
     }
 
