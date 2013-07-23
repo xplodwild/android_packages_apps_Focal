@@ -181,12 +181,12 @@ public class PicSphere {
 
         // Process our images
         try {
-            doAutopano();
-            doPtclean();
-            doAutoOptimiser();
-            doPanoModify();
-            doNona();
-            doEnblend();
+            if (!doAutopano()) return false;
+            if (!doPtclean()) return false;
+            if (!doAutoOptimiser()) return false;
+            if (!doPanoModify()) return false;
+            if (!doNona()) return false;
+            if (!doEnblend()) return false;
         } catch (IOException ex) {
             Log.e(TAG, "Unable to process: ", ex);
             for (ProgressListener listener : mProgressListeners) {
@@ -402,8 +402,10 @@ public class PicSphere {
         // gallery data without having to reload/save the JPEG file? Because we have it already,
         // we could just move it.
         byte[] jpegData;
-        RandomAccessFile f = new RandomAccessFile(jpegPath, "r");
+        RandomAccessFile f = null;
         try {
+            f = new RandomAccessFile(jpegPath, "r");
+
             // Get and check length
             long longlength = f.length();
             int length = (int) longlength;
@@ -412,8 +414,13 @@ public class PicSphere {
             // Read file and return data
             jpegData = new byte[length];
             f.readFully(jpegData);
+        } catch (Exception e) {
+            Log.e(TAG, "Couldn't access final file, did rendering fail?");
+            return false;
         } finally {
-            f.close();
+            if (f != null) {
+                f.close();
+            }
         }
 
         mSnapManager.saveImage(mOutputUri, mOutputTitle, 100, 100, 90, jpegData);
@@ -425,14 +432,19 @@ public class PicSphere {
     private boolean doExifTagging() throws IOException {
         Log.d(TAG, "XMP metadata tagging...");
 
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mTempPath + "/final.jpg", opts);
+        try {
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(mTempPath + "/final.jpg", opts);
 
-
-        XMPHelper xmp = new XMPHelper();
-        xmp.writeXmpToFile(mTempPath + "/final.jpg", generatePhotoSphereXMP(opts.outWidth,
-                opts.outHeight, mPictures.size()));
+            XMPHelper xmp = new XMPHelper();
+            xmp.writeXmpToFile(mTempPath + "/final.jpg", generatePhotoSphereXMP(opts.outWidth,
+                    opts.outHeight, mPictures.size()));
+        }
+        catch (Exception e) {
+            Log.e(TAG, "Couldn't access final file, did rendering fail?");
+            return false;
+        }
 
         Log.d(TAG, "XMP metadata tagging... done");
         return true;
