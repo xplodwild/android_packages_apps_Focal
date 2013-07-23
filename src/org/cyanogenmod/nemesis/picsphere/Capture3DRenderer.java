@@ -55,6 +55,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     private final CameraManager mCamManager;
 
     private List<Snapshot> mSnapshots;
+    private List<Snapshot> mDots;
     private ReentrantLock mListBusy;
     private SensorFusion mSensorFusion;
     private Quaternion mCameraQuat;
@@ -144,15 +145,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
             mFaces[FACE_DOWN].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_dn));
         }
 
-        private float[] matrixFromEuler(float rx, float ry, float rz, float tx, float ty, float tz) {
-            Quaternion quat = new Quaternion();
-            quat.fromEuler(rx,ry,rz);
-            float[] matrix = quat.getMatrix();
 
-            Matrix.translateM(matrix, 0, tx, ty, tz);
-
-            return matrix;
-        }
 
         public void draw() {
             for (int i = 0; i < mFaces.length; i++) {
@@ -174,6 +167,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         private Bitmap mBitmapToLoad;
         private boolean mIsFourToThree;
         private int mMode;
+        private boolean mIsVisible = true;
 
         public Snapshot() {
             mIsFourToThree = true;
@@ -183,6 +177,10 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         public Snapshot(boolean isFourToThree) {
             mIsFourToThree = isFourToThree;
             mMode = SNAPSHOT;
+        }
+
+        public void setVisible(boolean visible) {
+            mIsVisible = visible;
         }
 
         /**
@@ -224,7 +222,9 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
             mBitmapToLoad = null;
         }
 
-        public void draw(){
+        public void draw() {
+            if (!mIsVisible) return;
+
             if (mBitmapToLoad != null) {
                 loadTexture();
             }
@@ -273,11 +273,39 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
      */
     public Capture3DRenderer(Context context, CameraManager cameraManager) {
         mSnapshots = new ArrayList<Snapshot>();
+        mDots = new ArrayList<Snapshot>();
         mCamManager = cameraManager;
         mListBusy = new ReentrantLock();
         mSensorFusion = new SensorFusion(context);
         mCameraQuat = new Quaternion();
         mContext = context;
+
+        // Position the dots every 40°
+        for (int x = 0; x < 360; x += 360/12) {
+            for (int y = 0; y < 360; y += 360/12) {
+                createDot(x, y);
+            }
+        }
+
+    }
+
+    private void createDot(float rx, float ry) {
+        Snapshot dot = new Snapshot(false);
+        dot.setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.btn_ring_camera_hover));
+        dot.mModelMatrix = matrixFromEuler(rx, 0, ry, 0, 0, 100);
+        Matrix.scaleM(dot.mModelMatrix, 0, 0.3f, 0.3f, 0.3f);
+        mDots.add(dot);
+    }
+
+    private float[] matrixFromEuler(float rx, float ry, float rz, float tx, float ty, float tz) {
+        Quaternion quat = new Quaternion();
+        quat.fromEuler(rx,ry,rz);
+        float[] matrix = quat.getMatrix();
+
+        Matrix.translateM(matrix, 0, tx, ty, tz);
+
+
+        return matrix;
     }
 
 
@@ -404,7 +432,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height);
 
         // We use here a field of view of 40, which is mostly fine for a camera app representation
-        final float vfov = 70.5f;
+        final float vfov = 90f;
         final float hfov = (float) Math.atan(Math.tan(vfov/2.0f)*(4.0f/3.0f))*2.0f;
 
         // Create a new perspective projection matrix. The height will stay the same
@@ -445,8 +473,13 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         Matrix.translateM(mCameraBillboard.mModelMatrix, 0, 0.0f, 0.0f, -DISTANCE);
 
         // Draw all teh things
+        // First the skybox, then the marker dots, then the snapshots
         mCameraSurfaceTex.updateTexImage();
         mSkyBox.draw();
+
+        for (Snapshot dot : mDots) {
+            dot.draw();
+        }
 
         mListBusy.lock();
         for (Snapshot snap : mSnapshots) {
@@ -454,7 +487,12 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         }
         mListBusy.unlock();
 
+
         mCameraBillboard.draw();
+    }
+
+    public void setCamPreviewVisible(boolean visible) {
+        mCameraBillboard.setVisible(visible);
     }
 
     public void onPause() {

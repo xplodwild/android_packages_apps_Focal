@@ -45,13 +45,14 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
     }
 
     public void removeLastPicture() {
-        if (mPicSphere != null) {
-            mPicSphere.removeLastPicture();
-        }
+        if (mPicSphere == null) return;
+
+        mPicSphere.removeLastPicture();
         mPicSphereManager.getRenderer().removeLastPicture();
 
         if (mPicSphere.getPicturesCount() == 0) {
             mContext.setPicSphereUndoVisible(false);
+            mPicSphereManager.getRenderer().setCamPreviewVisible(true);
         }
     }
 
@@ -61,7 +62,14 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
             if (mPicSphereManager.getSpheresCount() == 0) {
                 // Initialize a new sphere
                 mPicSphere = mPicSphereManager.createPicSphere();
-                mPicSphere.setHorizontalAngle(40);
+                float horizontalAngle = mCamManager.getParameters().getHorizontalViewAngle();
+
+                // In theory, drivers should return a proper value for horizontal angle. However,
+                // some careless OEMs put "0" or "360" to pass CTS, so we just check if the value
+                // seems legit, otherwise we put 45° as it's the angle of most phone lenses.
+                if (horizontalAngle < 30 || horizontalAngle > 70) horizontalAngle = 45;
+
+                mPicSphere.setHorizontalAngle(horizontalAngle);
             } else {
                 CameraActivity.notify(mContext.getString(R.string.picsphere_already_rendering), 2000);
                 return;
@@ -70,6 +78,7 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
 
         mSnapManager.setBypassProcessing(true);
         mSnapManager.queueSnapshot(true, 0);
+        mPicSphereManager.getRenderer().setCamPreviewVisible(false);
 
         // Notify how to finish a sphere
         if (mPicSphere != null && mPicSphere.getPicturesCount() == 0) {
