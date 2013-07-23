@@ -312,14 +312,16 @@ public class CameraManager {
             Log.v(TAG, "Preview size is " + width + "x" + height);
 
             if (!mIsModeSwitching) {
-                try {
-                    mCamera.stopPreview();
-                    mParameters = params;
-                    mCamera.setParameters(mParameters);
-                    mPreview.notifyPreviewSize(width, height);
-                    mCamera.startPreview();
-                } catch (RuntimeException ex) {
-                    Log.e(TAG, "Unable to set Preview Size", ex);
+                synchronized (mParametersThread) {
+                    try {
+                        mCamera.stopPreview();
+                        mParameters = params;
+                        mCamera.setParameters(mParameters);
+                        mPreview.notifyPreviewSize(width, height);
+                        mCamera.startPreview();
+                    } catch (RuntimeException ex) {
+                        Log.e(TAG, "Unable to set Preview Size", ex);
+                    }
                 }
             }
         }
@@ -889,20 +891,22 @@ public class CameraManager {
         }
 
         public void notifyCameraChanged() {
-            if (mCamera != null) {
-                mCamera.stopPreview();
-                setupCamera();
+            synchronized (mParametersThread) {
+                if (mCamera != null) {
+                    mCamera.stopPreview();
+                    setupCamera();
 
-                try {
-                    if (mTexture != null) {
-                        mCamera.setPreviewTexture(mTexture);
-                    } else {
-                        mCamera.setPreviewDisplay(mHolder);
+                    try {
+                        if (mTexture != null) {
+                            mCamera.setPreviewTexture(mTexture);
+                        } else {
+                            mCamera.setPreviewDisplay(mHolder);
+                        }
+                        mCamera.startPreview();
+                        postCallbackBuffer();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error setting camera preview: " + e.getMessage());
                     }
-                    mCamera.startPreview();
-                    postCallbackBuffer();
-                } catch (IOException e) {
-                    Log.e(TAG, "Error setting camera preview: " + e.getMessage());
                 }
             }
         }

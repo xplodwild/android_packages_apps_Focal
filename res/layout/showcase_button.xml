@@ -19,5 +19,5 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 <Button xmlns:android="http://schemas.android.com/apk/res/android"
         style="@style/ShowcaseButton"
-        android:text="@string/OK"
+        android:text="@string/ok"
         android:id="@id/showcase_button" />

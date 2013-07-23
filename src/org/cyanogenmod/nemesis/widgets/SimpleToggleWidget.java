@@ -98,6 +98,8 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
     public void addValue(String value, int resId, String hint) {
         Camera.Parameters params = mCamManager.getParameters();
 
+        if (params == null) return;
+
         String values = params.get(mKey + "-values");
 
         // If we don't have a -values provided, or if it contains the value, add it.

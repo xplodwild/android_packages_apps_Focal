@@ -138,7 +138,7 @@ public class SettingsWidget extends WidgetBase {
             builder.setView(mNumberPicker);
             builder.setTitle(null);
             builder.setCancelable(false);
-            builder.setPositiveButton(mContext.getString(R.string.OK), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(mContext.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     mInitialOrientation = -1;
