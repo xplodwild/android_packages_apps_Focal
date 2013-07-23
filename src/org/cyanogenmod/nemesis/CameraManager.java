@@ -189,8 +189,9 @@ public class CameraManager {
                         params = params.substring(step);
                     }
 
-                    if (mTargetSize != null)
+                    if (mTargetSize != null) {
                         setPreviewSize(mTargetSize.x, mTargetSize.y);
+                    }
 
                     if (mAutoFocusMoveCallback != null)
                         mCamera.setAutoFocusMoveCallback(mAutoFocusMoveCallback);
@@ -206,7 +207,7 @@ public class CameraManager {
                 }
 
                 // Update the preview surface holder with the new opened camera
-                mPreview.notifyCameraChanged();
+                mPreview.notifyCameraChanged(false);
 
                 if (mCameraReadyListener != null) {
                     mCameraReadyListener.onCameraReady();
@@ -291,7 +292,7 @@ public class CameraManager {
             mCamera.release();
             mCamera = null;
             mParameters = null;
-            mPreview.notifyCameraChanged();
+            mPreview.notifyCameraChanged(false);
             mCameraReady = true;
         }
     }
@@ -319,6 +320,8 @@ public class CameraManager {
                         mCamera.setParameters(mParameters);
                         mPreview.notifyPreviewSize(width, height);
                         mCamera.startPreview();
+
+                        mPreview.setPauseCopyFrame(false);
                     } catch (RuntimeException ex) {
                         Log.e(TAG, "Unable to set Preview Size", ex);
                     }
@@ -819,7 +822,7 @@ public class CameraManager {
     public void setRenderToTexture(SurfaceTexture texture) {
         mPreview.setRenderToTexture(texture);
         Log.i(TAG, "Needs to render to texture, rebooting preview");
-        mPreview.notifyCameraChanged();
+        mPreview.notifyCameraChanged(true);
     }
 
     /**
@@ -890,10 +893,13 @@ public class CameraManager {
             return mHolder;
         }
 
-        public void notifyCameraChanged() {
+        public void notifyCameraChanged(boolean startPreview) {
             synchronized (mParametersThread) {
                 if (mCamera != null) {
-                    mCamera.stopPreview();
+                    if (startPreview) {
+                        mCamera.stopPreview();
+                    }
+
                     setupCamera();
 
                     try {
@@ -902,8 +908,11 @@ public class CameraManager {
                         } else {
                             mCamera.setPreviewDisplay(mHolder);
                         }
-                        mCamera.startPreview();
-                        postCallbackBuffer();
+
+                        if (startPreview) {
+                            mCamera.startPreview();
+                            postCallbackBuffer();
+                        }
                     } catch (IOException e) {
                         Log.e(TAG, "Error setting camera preview: " + e.getMessage());
                     }
