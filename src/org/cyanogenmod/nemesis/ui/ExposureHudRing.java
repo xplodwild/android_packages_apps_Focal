@@ -32,6 +32,8 @@ import org.cyanogenmod.nemesis.R;
  */
 public class ExposureHudRing extends HudRing {
     private CameraManager mCamManager;
+    private long mTimeLastSet = 0;
+    private final static long SET_INTERVAL = 100;
 
     public ExposureHudRing(Context context) {
         super(context);
@@ -79,6 +81,7 @@ public class ExposureHudRing extends HudRing {
         centerPointX = (centerPointX - 500.0f) * 2.0f;
         centerPointY = (centerPointY - 500.0f) * 2.0f;
 
+        mTimeLastSet = System.currentTimeMillis();
         mCamManager.setExposurePoint((int) centerPointX, (int) centerPointY);
     }
 
@@ -87,7 +90,12 @@ public class ExposureHudRing extends HudRing {
         super.onTouch(view, motionEvent);
 
         if (motionEvent.getActionMasked() == MotionEvent.ACTION_MOVE) {
+            if (System.currentTimeMillis() - mTimeLastSet > SET_INTERVAL) {
+                applyExposurePoint();
+            }
+        } else if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
             applyExposurePoint();
+
         }
 
         return true;

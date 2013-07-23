@@ -97,9 +97,9 @@ public class FocusHudRing extends HudRing {
     public boolean onTouch(View view, MotionEvent motionEvent) {
         super.onTouch(view, motionEvent);
 
-        if (motionEvent.getActionMasked() == MotionEvent.ACTION_MOVE) {
+        if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
             applyFocusPoint();
-        } else if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
+
             if (mFocusManager != null) {
                 mFocusManager.refocus();
             }
