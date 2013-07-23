@@ -315,6 +315,9 @@ public abstract class WidgetBase {
                 if (!mIsOpen && (Math.abs(event.getX() - mDownX) > 1.0f || Math.abs(event.getY() - mDownY) > 1)) {
                     toggleBackground(false);
                 }
+
+                SideBar sb = (SideBar) WidgetToggleButton.this.getParent().getParent();
+                sb.onTouchEvent(event);
             }
 
             return true;

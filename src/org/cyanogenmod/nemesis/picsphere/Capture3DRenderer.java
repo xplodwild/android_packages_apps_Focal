@@ -21,12 +21,15 @@ package org.cyanogenmod.nemesis.picsphere;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.SurfaceTexture;
+import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 
 import java.nio.ByteBuffer;
@@ -49,6 +52,8 @@ import javax.microedition.khronos.opengles.GL10;
 public class Capture3DRenderer implements GLSurfaceView.Renderer {
     public final static String TAG = "Capture3DRenderer";
 
+    private final CameraManager mCamManager;
+
     private List<Snapshot> mSnapshots;
     private ReentrantLock mListBusy;
     private SensorFusion mSensorFusion;
@@ -57,34 +62,54 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     private float[] mViewMatrix = new float[16];
     private float[] mProjectionMatrix = new float[16];
 
-
     private FloatBuffer mVertexBuffer;
+    private FloatBuffer m43VertexBuffer;
     private FloatBuffer mTexCoordBuffer;
-    private final static float mScale = 150f;
+    private final static float SNAPSHOT_SCALE = 65.5f;
+    private final static float RATIO = 4.0f/3.0f;
+    private final static float DISTANCE = 135.0f;
+
     // x, y,
     private final float mVertexData[] =
-            {-mScale,  -mScale,
-                    -mScale, mScale,
-                    mScale, mScale,
-                    mScale, -mScale};
+            {
+                    -SNAPSHOT_SCALE,  -SNAPSHOT_SCALE,
+                    -SNAPSHOT_SCALE, SNAPSHOT_SCALE,
+                    SNAPSHOT_SCALE, SNAPSHOT_SCALE,
+                    SNAPSHOT_SCALE, -SNAPSHOT_SCALE
+            };
+
+    private final float m43VertexData[] =
+            {
+                    -SNAPSHOT_SCALE *RATIO,  -SNAPSHOT_SCALE,
+                    -SNAPSHOT_SCALE *RATIO, SNAPSHOT_SCALE,
+                    SNAPSHOT_SCALE *RATIO, SNAPSHOT_SCALE,
+                    SNAPSHOT_SCALE *RATIO, -SNAPSHOT_SCALE
+            };
     // u,v
     private final float mTexCoordData[] =   {0.0f, 0.0f,
             0.0f, 1.0f,
             1.0f, 1.0f,
             1.0f, 0.0f};
 
-    private int mProgram;
-    private int mVertexShader;
-    private int mFragmentShader;
-    private int mPositionHandler;
-    private int mTexCoordHandler;
-    private int mTextureHandler;
-    private int mMVPMatrixHandler;
+    private final static int CAMERA = 0;
+    private final static int SNAPSHOT = 1;
+
+    private int[] mProgram = new int[2];
+    private int[] mVertexShader = new int[2];
+    private int[] mFragmentShader = new int[2];
+    private int[] mPositionHandler = new int[2];
+    private int[] mTexCoordHandler = new int[2];
+    private int[] mTextureHandler = new int[2];
+    private int[] mMVPMatrixHandler = new int[2];
+
+    private SurfaceTexture mCameraSurfaceTex;
+    private int mCameraTextureId;
+    private Snapshot mCameraBillboard;
     private Context mContext;
     private float[] mMVPMatrix = new float[16];
 
     private class Skybox {
-        private float DIST = 150.0f;
+        private float DIST = SNAPSHOT_SCALE;
         private Snapshot[] mFaces = new Snapshot[6];
         private int FACE_NORTH = 0;
         private int FACE_WEST = 1;
@@ -94,27 +119,27 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         private int FACE_DOWN = 5;
 
         public Skybox() {
-            mFaces[FACE_NORTH] = new Snapshot();
+            mFaces[FACE_NORTH] = new Snapshot(false);
             mFaces[FACE_NORTH].mModelMatrix = matrixFromEuler(0, 90, 0, 0, 0, DIST);
             mFaces[FACE_NORTH].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_fr));
 
-            mFaces[FACE_SOUTH] = new Snapshot();
+            mFaces[FACE_SOUTH] = new Snapshot(false);
             mFaces[FACE_SOUTH].mModelMatrix = matrixFromEuler(0, 90, 0, 0, 0, -DIST);
             mFaces[FACE_SOUTH].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_bk));
 
-            mFaces[FACE_WEST] = new Snapshot();
+            mFaces[FACE_WEST] = new Snapshot(false);
             mFaces[FACE_WEST].mModelMatrix = matrixFromEuler(0, 90, 90, 0, 0, DIST);
             mFaces[FACE_WEST].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_lt));
 
-            mFaces[FACE_EAST] = new Snapshot();
+            mFaces[FACE_EAST] = new Snapshot(false);
             mFaces[FACE_EAST].mModelMatrix = matrixFromEuler(0, 90, 270, 0, 0, DIST);
             mFaces[FACE_EAST].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_rt));
 
-            mFaces[FACE_UP] = new Snapshot();
+            mFaces[FACE_UP] = new Snapshot(false);
             mFaces[FACE_UP].mModelMatrix = matrixFromEuler(90, 0, 270, 0, 0, DIST);
             mFaces[FACE_UP].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_up));
 
-            mFaces[FACE_DOWN] = new Snapshot();
+            mFaces[FACE_DOWN] = new Snapshot(false);
             mFaces[FACE_DOWN].mModelMatrix = matrixFromEuler(-90, 0, 90, 0, 0, DIST);
             mFaces[FACE_DOWN].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_dn));
         }
@@ -147,13 +172,33 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         private float[]mModelMatrix;
         private int mTextureData;
         private Bitmap mBitmapToLoad;
+        private boolean mIsFourToThree;
+        private int mMode;
 
         public Snapshot() {
+            mIsFourToThree = true;
+            mMode = SNAPSHOT;
+        }
 
+        public Snapshot(boolean isFourToThree) {
+            mIsFourToThree = isFourToThree;
+            mMode = SNAPSHOT;
+        }
+
+        /**
+         * Sets whether to use the CAMERA shaders or the SNAPSHOT shaders
+         * @param mode CAMERA or SNAPSHOT
+         */
+        public void setMode(int mode) {
+            mMode = mode;
         }
 
         public void setTexture(Bitmap tex) {
             mBitmapToLoad = tex;
+        }
+
+        public void setTextureId(int id) {
+            mTextureData = id;
         }
 
         private void loadTexture() {
@@ -184,16 +229,24 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
                 loadTexture();
             }
 
-            GLES20.glUseProgram(mProgram);
-            mVertexBuffer.position(0);
+            GLES20.glUseProgram(mProgram[mMode]);
+            if (mIsFourToThree) {
+                m43VertexBuffer.position(0);
+            } else {
+                mVertexBuffer.position(0);
+            }
             mTexCoordBuffer.position(0);
 
 
-            GLES20.glEnableVertexAttribArray(mTexCoordHandler);
-            GLES20.glEnableVertexAttribArray(mPositionHandler);
+            GLES20.glEnableVertexAttribArray(mTexCoordHandler[mMode]);
+            GLES20.glEnableVertexAttribArray(mPositionHandler[mMode]);
 
-            GLES20.glVertexAttribPointer(mPositionHandler, 2, GLES20.GL_FLOAT, false, 8, mVertexBuffer);
-            GLES20.glVertexAttribPointer(mTexCoordHandler, 2, GLES20.GL_FLOAT, false, 8, mTexCoordBuffer);
+            if (mIsFourToThree) {
+                GLES20.glVertexAttribPointer(mPositionHandler[mMode], 2, GLES20.GL_FLOAT, false, 8, m43VertexBuffer);
+            } else {
+                GLES20.glVertexAttribPointer(mPositionHandler[mMode], 2, GLES20.GL_FLOAT, false, 8, mVertexBuffer);
+            }
+            GLES20.glVertexAttribPointer(mTexCoordHandler[mMode], 2, GLES20.GL_FLOAT, false, 8, mTexCoordBuffer);
 
             // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
             // (which currently contains model * view).
@@ -204,12 +257,12 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
             Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
 
             // Pass in the combined matrix.
-            GLES20.glUniformMatrix4fv(mMVPMatrixHandler, 1, false, mMVPMatrix, 0);
+            GLES20.glUniformMatrix4fv(mMVPMatrixHandler[mMode], 1, false, mMVPMatrix, 0);
 
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureData);
 
-            GLES20.glUniform1i(mTextureHandler, 0);
+            GLES20.glUniform1i(mTextureHandler[mMode], 0);
 
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 4);
         }
@@ -218,14 +271,15 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     /**
      * Initialize the model data.
      */
-    public Capture3DRenderer(Context context) {
+    public Capture3DRenderer(Context context, CameraManager cameraManager) {
         mSnapshots = new ArrayList<Snapshot>();
+        mCamManager = cameraManager;
         mListBusy = new ReentrantLock();
         mSensorFusion = new SensorFusion(context);
         mCameraQuat = new Quaternion();
         mContext = context;
-
     }
+
 
     @Override
     public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
@@ -235,12 +289,17 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         // Initialize plane vertex data and texcoords data
         ByteBuffer bb_data = ByteBuffer.allocateDirect(mVertexData.length * 4);
         bb_data.order(ByteOrder.nativeOrder());
+        ByteBuffer bb_43data = ByteBuffer.allocateDirect(m43VertexData.length * 4);
+        bb_43data.order(ByteOrder.nativeOrder());
         ByteBuffer bb_texture = ByteBuffer.allocateDirect(mTexCoordData.length * 4);
         bb_texture.order(ByteOrder.nativeOrder());
 
         mVertexBuffer = bb_data.asFloatBuffer();
         mVertexBuffer.put(mVertexData);
         mVertexBuffer.position(0);
+        m43VertexBuffer = bb_43data.asFloatBuffer();
+        m43VertexBuffer.put(m43VertexData);
+        m43VertexBuffer.position(0);
         mTexCoordBuffer = bb_texture.asFloatBuffer();
         mTexCoordBuffer.put(mTexCoordData);
         mTexCoordBuffer.position(0);
@@ -258,7 +317,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
                         + "}                              \n";
 
         final String fragmentShader =
-                "precision mediump float;       \n"
+                        "precision mediump float;       \n"
                         + "uniform sampler2D u_Texture;   \n"
                         + "varying vec2 v_TexCoordinate;  \n"
                         + "void main()                    \n"
@@ -266,27 +325,77 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
                         + "   gl_FragColor = texture2D(u_Texture, v_TexCoordinate);\n"
                         + "}                              \n";
 
-        mVertexShader = compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
-        mFragmentShader = compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader);
+        // As the camera preview is stored in the OES external slot, we need a different shader
+        final String camPreviewShader = "#extension GL_OES_EGL_image_external : require\n"
+                + "precision mediump float;       \n"
+                + "uniform samplerExternalOES u_Texture;   \n"
+                + "varying vec2 v_TexCoordinate;  \n"
+                + "void main()                    \n"
+                + "{                              \n"
+                + "   gl_FragColor = texture2D(u_Texture, v_TexCoordinate);\n"
+                + "}                              \n";
+
+
+        mVertexShader[CAMERA] = compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
+        mFragmentShader[CAMERA] = compileShader(GLES20.GL_FRAGMENT_SHADER, camPreviewShader);
+
+        mVertexShader[SNAPSHOT] = compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
+        mFragmentShader[SNAPSHOT] = compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader);
 
         // create the program and bind the shader attributes
-        mProgram = GLES20.glCreateProgram();
-        GLES20.glAttachShader(mProgram, mFragmentShader);
-        GLES20.glAttachShader(mProgram, mVertexShader);
-        GLES20.glLinkProgram(mProgram);
+        for (int i = 0; i < 2; i++) {
+            mProgram[i] = GLES20.glCreateProgram();
+            GLES20.glAttachShader(mProgram[i], mFragmentShader[i]);
+            GLES20.glAttachShader(mProgram[i], mVertexShader[i]);
+            GLES20.glLinkProgram(mProgram[i]);
 
-        int[] linkStatus = new int[1];
-        GLES20.glGetProgramiv(mProgram, GLES20.GL_LINK_STATUS, linkStatus, 0);
+            int[] linkStatus = new int[1];
+            GLES20.glGetProgramiv(mProgram[i], GLES20.GL_LINK_STATUS, linkStatus, 0);
 
-        if (linkStatus[0] == 0) {
-            throw new RuntimeException("Error linking shaders");
+            if (linkStatus[0] == 0) {
+                throw new RuntimeException("Error linking shaders");
+            }
+            mPositionHandler[i]     = GLES20.glGetAttribLocation(mProgram[i], "a_Position");
+            mTexCoordHandler[i]     = GLES20.glGetAttribLocation(mProgram[i], "a_TexCoordinate");
+            mMVPMatrixHandler[i]    = GLES20.glGetUniformLocation(mProgram[i], "u_MVPMatrix");
+            mTextureHandler[i]      = GLES20.glGetUniformLocation(mProgram[i], "u_Texture");
         }
-        mPositionHandler     = GLES20.glGetAttribLocation(mProgram, "a_Position");
-        mTexCoordHandler     = GLES20.glGetAttribLocation(mProgram, "a_TexCoordinate");
-        mMVPMatrixHandler    = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
-        mTextureHandler      = GLES20.glGetUniformLocation(mProgram, "u_Texture");
 
         mSkyBox = new Skybox();
+
+        initCameraBillboard();
+    }
+
+    private void initCameraBillboard() {
+        int texture[] = new int[1];
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+        GLES20.glGenTextures(1, texture, 0);
+        mCameraTextureId = texture[0];
+
+        if (mCameraTextureId == 0) {
+            throw new RuntimeException("CAMERA TEXTURE ID == 0");
+        }
+
+        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mCameraTextureId);
+        // Can't do mipmapping with camera source
+        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER,
+                GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER,
+                GLES20.GL_LINEAR);
+        // Clamp to edge is the only option
+        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S,
+                GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T,
+                GLES20.GL_CLAMP_TO_EDGE);
+
+        mCameraSurfaceTex = new SurfaceTexture(mCameraTextureId);
+        mCameraSurfaceTex.setDefaultBufferSize(640, 480);
+
+        mCameraBillboard = new Snapshot();
+        mCameraBillboard.setTextureId(mCameraTextureId);
+        mCameraBillboard.setMode(CAMERA);
+        mCamManager.setRenderToTexture(mCameraSurfaceTex);
     }
 
     @Override
@@ -295,17 +404,18 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height);
 
         // We use here a field of view of 40, which is mostly fine for a camera app representation
-        final float fov = 40.0f;
+        final float vfov = 70.5f;
+        final float hfov = (float) Math.atan(Math.tan(vfov/2.0f)*(4.0f/3.0f))*2.0f;
 
         // Create a new perspective projection matrix. The height will stay the same
         // while the width will vary as per aspect ratio.
-        final float ratio = (float) width / height;
+        final float ratio = 640.0f / 480.0f;
         final float near = 0.1f;
-        final float far = 600.0f;
-        final float bottom = (float) Math.tan(fov * Math.PI / 360.0f) * near;
+        final float far = 1500.0f;
+        final float bottom = (float) Math.tan(vfov * Math.PI / 360.0f) * near;
         final float top = -bottom;
-        final float right = ratio * bottom;
-        final float left = ratio * top;
+        final float right = ratio * bottom / 1.0f;
+        final float left = ratio * top / 1.0f;
 
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
     }
@@ -315,9 +425,8 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         // Update camera view matrix
-        //mViewMatrix = mSensorFusion.getRotationMatrix();
-
         float[] orientation = mSensorFusion.getFusedOrientation();
+
         // Convert angles to degrees
         float rX = (float) (orientation[1] * 180.0f/Math.PI);
         float rY = (float) (orientation[0] * 180.0f/Math.PI);
@@ -329,14 +438,23 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         mCameraQuat.normalise();
         mViewMatrix = mCameraQuat.getMatrix();
 
-        mSkyBox.draw();
+        // Update camera billboard
+        mCameraBillboard.mModelMatrix = Arrays.copyOf(mViewMatrix, mViewMatrix.length);
 
+        Matrix.invertM(mCameraBillboard.mModelMatrix, 0, mCameraBillboard.mModelMatrix, 0);
+        Matrix.translateM(mCameraBillboard.mModelMatrix, 0, 0.0f, 0.0f, -DISTANCE);
+
+        // Draw all teh things
+        mCameraSurfaceTex.updateTexImage();
+        mSkyBox.draw();
 
         mListBusy.lock();
         for (Snapshot snap : mSnapshots) {
             snap.draw();
         }
         mListBusy.unlock();
+
+        mCameraBillboard.draw();
     }
 
     public void onPause() {
@@ -405,7 +523,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         snap.mModelMatrix = Arrays.copyOf(mViewMatrix, mViewMatrix.length);
 
         Matrix.invertM(snap.mModelMatrix, 0, snap.mModelMatrix, 0);
-        Matrix.translateM(snap.mModelMatrix, 0, 0.0f, 0.0f, -400);
+        Matrix.translateM(snap.mModelMatrix, 0, 0.0f, 0.0f, -DISTANCE);
 
         snap.setTexture(image);
 

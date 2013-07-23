@@ -23,9 +23,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.AssetManager;
+import android.graphics.SurfaceTexture;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.TextureView;
+import android.view.View;
+import android.widget.FrameLayout;
 
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.R;
@@ -52,6 +56,8 @@ public class PicSphereManager implements PicSphere.ProgressListener {
     private SnapshotManager mSnapManager;
     private Capture3DRenderer mCapture3DRenderer;
     private PicSphereRenderingService mBoundService;
+    private FrameLayout mGLRootView;
+    private TextureView mGLSurfaceView;
     private Handler mHandler;
     private boolean mIsBound;
 
@@ -105,7 +111,11 @@ public class PicSphereManager implements PicSphere.ProgressListener {
      */
     public Capture3DRenderer getRenderer() {
         if (mCapture3DRenderer == null) {
-            mCapture3DRenderer = new Capture3DRenderer(mContext);
+            // Initialize the 3D renderer
+            mCapture3DRenderer = new Capture3DRenderer(mContext, mContext.getCamManager());
+
+            // We route the camera preview to our texture
+            mGLRootView = (FrameLayout) mContext.findViewById(R.id.gl_renderer_container);
         }
 
         return mCapture3DRenderer;
@@ -258,4 +268,5 @@ public class PicSphereManager implements PicSphere.ProgressListener {
             mContext.setHelperText(mContext.getString(R.string.picsphere_start_hint));
         }
     }
+
 }

@@ -681,23 +681,23 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mSideBar.slideClose();
         mWidgetRenderer.closeAllWidgets();
 
+        // Hide cam preview and turn on GL surface
+        findViewById(R.id.camera_preview_container).setVisibility(View.GONE);
+        mCamManager.getPreviewSurface().setVisibility(View.GONE);
+        findViewById(R.id.gl_renderer_container).setOnTouchListener(mPreviewTouchListener);
+        findViewById(R.id.gl_renderer_container).setVisibility(View.VISIBLE);
+
         // Setup the 3D rendering
         if (mPicSphereManager == null) {
-            mPicSphereManager = new PicSphereManager(CameraActivity.this, mSnapshotManager);
+            mPicSphereManager = new PicSphereManager(this, mSnapshotManager);
         }
-
-        ViewGroup camContainer = (ViewGroup) findViewById(R.id.camera_preview_container);
-        FrameLayout.LayoutParams root = (FrameLayout.LayoutParams) camContainer.getLayoutParams();
-        root.width = 640;
-        root.height = 480;
-        camContainer.setLayoutParams(root);
 
         mPicSphere3DView = new GLSurfaceView(this);
         mPicSphere3DView.setEGLContextClientVersion(2);
         mPicSphere3DView.setRenderer(mPicSphereManager.getRenderer());
         ViewGroup picsphereContainer = ((ViewGroup) findViewById(R.id.gl_renderer_container));
         picsphereContainer.addView(mPicSphere3DView);
-        picsphereContainer.setVisibility(View.VISIBLE);
+
 
         // Setup the capture transformer
         final PicSphereCaptureTransformer transformer =
@@ -713,9 +713,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             }
         });
 
-        PreviewFrameLayout pfl = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
-        pfl.setPreviewSize(640,480);
-
         // Notify how to start a sphere
         setHelperText(getString(R.string.picsphere_start_hint));
     }
@@ -729,12 +726,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         }
 
         ViewGroup camContainer = (ViewGroup) findViewById(R.id.camera_preview_container);
-        if (camContainer != null) {
-            FrameLayout.LayoutParams root = (FrameLayout.LayoutParams) camContainer.getLayoutParams();
-            root.width = FrameLayout.LayoutParams.MATCH_PARENT;
-            root.height = FrameLayout.LayoutParams.MATCH_PARENT;
-            camContainer.setLayoutParams(root);
-        }
+        camContainer.setVisibility(View.VISIBLE);
 
         if (mPicSphereManager != null) {
             mPicSphereManager.tearDown();
@@ -827,7 +819,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     mPicSphereUndo.setVisibility(View.VISIBLE);
                     mPicSphereUndo.setAlpha(1.0f);
                 } else {
-                    Util.fadeOut(mPicSphereUndo);
+                    mPicSphereUndo.animate().alpha(0.0f).setDuration(200).start();
                 }
             }
         });

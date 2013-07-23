@@ -895,10 +895,8 @@ public class CameraManager {
 
                 try {
                     if (mTexture != null) {
-                        Log.e(TAG, "Using texture");
                         mCamera.setPreviewTexture(mTexture);
                     } else {
-                        Log.e(TAG, "Using holder");
                         mCamera.setPreviewDisplay(mHolder);
                     }
                     mCamera.startPreview();
@@ -938,27 +936,29 @@ public class CameraManager {
             }
 
             // stop preview before making changes
-            try {
-                mCamera.stopPreview();
-            } catch (Exception e) {
-                // ignore: tried to stop a non-existent preview
-            }
-
-            setupCamera();
-
-            // start preview with new settings
-            try {
-                if (mTexture != null) {
-                    mCamera.setPreviewTexture(mTexture);
-                } else {
-                    mCamera.setPreviewDisplay(mHolder);
+            synchronized (mParametersThread) {
+                try {
+                    mCamera.stopPreview();
+                } catch (Exception e) {
+                    // ignore: tried to stop a non-existent preview
                 }
-                mCamera.startPreview();
 
-                mParameters = mCamera.getParameters();
-                postCallbackBuffer();
-            } catch (Exception e) {
-                Log.d(TAG, "Error starting camera preview: " + e.getMessage());
+                setupCamera();
+
+                // start preview with new settings
+                try {
+                    if (mTexture != null) {
+                        mCamera.setPreviewTexture(mTexture);
+                    } else {
+                        mCamera.setPreviewDisplay(mHolder);
+                    }
+                    mCamera.startPreview();
+
+                    mParameters = mCamera.getParameters();
+                    postCallbackBuffer();
+                } catch (Exception e) {
+                    Log.d(TAG, "Error starting camera preview: " + e.getMessage());
+                }
             }
         }
 
