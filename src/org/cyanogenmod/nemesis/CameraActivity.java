@@ -85,6 +85,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private GestureDetector mGestureDetector;
     private CaptureTransformer mCaptureTransformer;
     private Handler mHandler;
+    private boolean mPaused;
 
     private int mOrientation = OrientationEventListener.ORIENTATION_UNKNOWN;
     private int mOrientationCompensation = 0;
@@ -143,6 +144,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+
+        mPaused = false;
 
         getWindow().getDecorView()
                 .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
@@ -220,6 +223,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     @Override
     protected void onPause() {
         // Pause the camera preview
+        mPaused = true;
+
         if (mCamManager != null) {
             mCamManager.pause();
         }
@@ -242,6 +247,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     @Override
     protected void onResume() {
         // Restore the camera preview
+        mPaused = false;
+
         if (mCamManager != null) {
             mCamManager.resume();
         }
@@ -437,7 +444,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
                 // We don't have the camera parameters yet, retry later
                 if (params == null) {
-                    mHandler.postDelayed(this, 100);
+                    if (!mPaused) {
+                        mHandler.postDelayed(this, 100);
+                    }
                 } else {
                     // Close all widgets
                     mWidgetRenderer.closeAllWidgets();
@@ -679,8 +688,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         ViewGroup camContainer = (ViewGroup) findViewById(R.id.camera_preview_container);
         FrameLayout.LayoutParams root = (FrameLayout.LayoutParams) camContainer.getLayoutParams();
-        root.width = 320;
-        root.height = 240;
+        root.width = 640;
+        root.height = 480;
         camContainer.setLayoutParams(root);
 
         mPicSphere3DView = new GLSurfaceView(this);
@@ -703,6 +712,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 transformer.removeLastPicture();
             }
         });
+
+        PreviewFrameLayout pfl = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
+        pfl.setPreviewSize(640,480);
 
         // Notify how to start a sphere
         setHelperText(getString(R.string.picsphere_start_hint));
