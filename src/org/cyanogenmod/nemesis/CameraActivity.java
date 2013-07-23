@@ -117,6 +117,11 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private boolean mIsFullscreenShutter;
     private int mShowcaseIndex;
 
+    private final static int SHOWCASE_INDEX_WELCOME_1 = 0;
+    private final static int SHOWCASE_INDEX_WELCOME_2 = 1;
+    private final static int SHOWCASE_INDEX_PANORAMA = 0;
+    private final static int SHOWCASE_INDEX_PICSPHERE = 0;
+
     /**
      * Gesture listeners to apply on camera previews views
      */
@@ -222,22 +227,61 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             }
         }, 300);
 
-        startShowcaseTour();
+
+        startShowcaseWelcome();
     }
 
-    public void startShowcaseTour() {
-        ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
-        co.hideOnClickOutside = true;
-        mShowcaseView = ShowcaseView.insertShowcaseView(mSideBar, this, getString(R.string.showcase_welcome_1_title),
-                getString(R.string.showcase_welcome_1_body), co);
+    public void startShowcaseWelcome() {
+        if (SettingsStorage.getAppSetting(this, "SHOWCASE_WELCOME", "0").equals("0")) {
+            SettingsStorage.storeAppSetting(this, "SHOWCASE_WELCOME", "1");
+            ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
+            co.hideOnClickOutside = true;
+            mShowcaseView = ShowcaseView.insertShowcaseView(mSideBar, this, getString(R.string.showcase_welcome_1_title),
+                    getString(R.string.showcase_welcome_1_body), co);
 
-        // animate gesture
-        Point size = new Point();
-        getWindowManager().getDefaultDisplay().getSize(size);
+            // animate gesture
+            Point size = new Point();
+            getWindowManager().getDefaultDisplay().getSize(size);
 
-        mShowcaseView.animateGesture(size.x/2, size.y*2.0f/3.0f, size.x/2, size.y/2.0f);
-        mShowcaseView.setOnShowcaseEventListener(this);
-        mShowcaseIndex = 0;
+            mShowcaseView.animateGesture(size.x/2, size.y*2.0f/3.0f, size.x/2, size.y/2.0f);
+            mShowcaseView.setOnShowcaseEventListener(this);
+            mShowcaseIndex = SHOWCASE_INDEX_WELCOME_1;
+
+            mShowcaseView.notifyOrientationChanged(mOrientationCompensation);
+        }
+    }
+
+    public void startShowcasePanorama() {
+        if (SettingsStorage.getAppSetting(this, "SHOWCASE_PANORAMA", "0").equals("0")) {
+            SettingsStorage.storeAppSetting(this, "SHOWCASE_PANORAMA", "1");
+            ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
+            co.hideOnClickOutside = true;
+            Point size = new Point();
+            getWindowManager().getDefaultDisplay().getSize(size);
+            mShowcaseView = ShowcaseView.insertShowcaseView(size.x - Util.dpToPx(this, 16), size.y/2, this, getString(R.string.showcase_panorama_title),
+                    getString(R.string.showcase_panorama_body), co);
+
+            mShowcaseIndex = SHOWCASE_INDEX_PANORAMA;
+
+            mShowcaseView.notifyOrientationChanged(mOrientationCompensation);
+        }
+    }
+
+    public void startShowcasePicSphere() {
+        if (SettingsStorage.getAppSetting(this, "SHOWCASE_PICSPHERE", "0").equals("0")) {
+            SettingsStorage.storeAppSetting(this, "SHOWCASE_PICSPHERE", "1");
+            ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
+            co.hideOnClickOutside = true;
+            Point size = new Point();
+            getWindowManager().getDefaultDisplay().getSize(size);
+
+            mShowcaseView = ShowcaseView.insertShowcaseView(size.x - Util.dpToPx(this, 16), size.y/2, this, getString(R.string.showcase_picsphere_title),
+                    getString(R.string.showcase_picsphere_body), co);
+
+            mShowcaseIndex = SHOWCASE_INDEX_PICSPHERE;
+
+            mShowcaseView.notifyOrientationChanged(mOrientationCompensation);
+        }
     }
 
     @Override
@@ -402,6 +446,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         } else if (newMode == CAMERA_MODE_PICSPHERE) {
             initializePicSphere();
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
+            startShowcasePicSphere();
         } else if (newMode == CAMERA_MODE_PANO) {
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
         }
@@ -414,6 +459,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         if (newMode == CAMERA_MODE_PANO) {
             initializePanorama();
+            startShowcasePanorama();
         }
 
         // Reload pictures in the ReviewDrawer
@@ -746,8 +792,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             picsphereContainer.setVisibility(View.GONE);
         }
 
-        ViewGroup camContainer = (ViewGroup) findViewById(R.id.camera_preview_container);
-        camContainer.setVisibility(View.VISIBLE);
+        mCamManager.setRenderToTexture(null);
+        findViewById(R.id.camera_preview_container).setVisibility(View.VISIBLE);
+        mCamManager.getPreviewSurface().setVisibility(View.VISIBLE);
 
         if (mPicSphereManager != null) {
             mPicSphereManager.tearDown();
@@ -874,8 +921,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     @Override
     public void onShowcaseViewHide(ShowcaseView showcaseView) {
         switch (mShowcaseIndex) {
-            case 0:
-                mShowcaseIndex++;
+            case SHOWCASE_INDEX_WELCOME_1:
+                mShowcaseIndex = SHOWCASE_INDEX_WELCOME_2;
 
                 Point size = new Point();
                 getWindowManager().getDefaultDisplay().getSize(size);
@@ -888,8 +935,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 mShowcaseView.notifyOrientationChanged(mOrientationCompensation);
 
                 // animate gesture
-
-
                 mShowcaseView.animateGesture(size.x - Util.dpToPx(this, 16), size.y/2, size.x*2/3, size.y/2);
                 mShowcaseView.setOnShowcaseEventListener(this);
 

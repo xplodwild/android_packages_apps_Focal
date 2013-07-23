@@ -98,6 +98,10 @@
     <string name="showcase_welcome_1_body">The options are in the sidebar,\njust slide it.</string>
     <string name="showcase_welcome_2_title">Shutter button</string>
     <string name="showcase_welcome_2_body">Tap the shutter button to take a picture.\nSlide it to access other capture modes.</string>
+    <string name="showcase_panorama_title">Panorama mode</string>
+    <string name="showcase_panorama_body">Tap the shutter to start your panorama,\nthen pan what you want to capture.\nOnce done, tap the shutter button again.</string>
+    <string name="showcase_picsphere_title">PicSphere mode</string>
+    <string name="showcase_picsphere_body">Align your first picture where you like,\nthen tap the shutter to take each picture\nof the sphere. The blue dots are points\nof reference you can follow.</string>
 </resources>
 
 
