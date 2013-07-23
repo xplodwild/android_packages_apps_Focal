@@ -470,10 +470,10 @@ public class PicSphere {
                 "    <GPano:InitialViewPitchDegrees>0.0</GPano:InitialViewPitchDegrees>\n" +
                 "    <GPano:InitialViewRollDegrees>0.0</GPano:InitialViewRollDegrees>\n" +
                 "    <GPano:InitialHorizontalFOVDegrees>75.0</GPano:InitialHorizontalFOVDegrees>\n" +
-                "    <GPano:CroppedAreaLeftPixels>0</GPano:CroppedAreaLeftPixels>\n" +
-                "    <GPano:CroppedAreaTopPixels>0</GPano:CroppedAreaTopPixels>\n" +
-                "    <GPano:CroppedAreaImageWidthPixels>"+width+"</GPano:CroppedAreaImageWidthPixels>\n" +
-                "    <GPano:CroppedAreaImageHeightPixels>"+height+"</GPano:CroppedAreaImageHeightPixels>\n" +
+                "    <GPano:CroppedAreaLeftPixels>10</GPano:CroppedAreaLeftPixels>\n" +
+                "    <GPano:CroppedAreaTopPixels>10</GPano:CroppedAreaTopPixels>\n" +
+                "    <GPano:CroppedAreaImageWidthPixels>"+(width-10)+"</GPano:CroppedAreaImageWidthPixels>\n" +
+                "    <GPano:CroppedAreaImageHeightPixels>"+(height-10)+"</GPano:CroppedAreaImageHeightPixels>\n" +
                 "    <GPano:FullPanoWidthPixels>"+width+"</GPano:FullPanoWidthPixels>\n" +
                 "    <GPano:FullPanoHeightPixels>"+height+"</GPano:FullPanoHeightPixels>\n" +
                 //"    <GPano:FirstPhotoDate>2012-11-07T21:03:13.465Z</GPano:FirstPhotoDate>\n" +
@@ -481,24 +481,5 @@ public class PicSphere {
                 "    <GPano:SourcePhotosCount>"+sourceImageCount+"</GPano:SourcePhotosCount>\n" +
                 "    <GPano:ExposureLockUsed>False</GPano:ExposureLockUsed>\n" +
                 "</rdf:Description></rdf:RDF>";
-        /*
-        return "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
-                "    <rdf:Description rdf:about=\"\"\n" +
-                "        xmlns:GPano=\"http://ns.google.com/photos/1.0/panorama/\"\n" +
-                "      GPano:UsePanoramaViewer=\"True\"\n" +
-                "      GPano:ProjectionType=\"equirectangular\"\n" +
-                //"      GPano:PoseHeadingDegrees=\"122.0\"\n" +
-                "      GPano:CroppedAreaLeftPixels=\"10\"\n" +
-                "      GPano:FullPanoWidthPixels=\""+(width+10)+"\"\n" +
-                //"      GPano:FirstPhotoDate=\"2012-11-22T23:15:59.773Z\"\n" +
-                "      GPano:CroppedAreaImageHeightPixels=\""+height+"\"\n" +
-                "      GPano:FullPanoHeightPixels=\""+(height+10)+"\"\n" +
-                "      GPano:SourcePhotosCount=\""+sourceImageCount+"\"\n" +
-                "      GPano:CroppedAreaImageWidthPixels=\""+width+"\"\n" +
-                "      GPano:CaptureSoftware=\"CyanogenMod Focal\"\n" +
-                //"      GPano:LastPhotoDate=\"2012-11-22T23:16:41.177Z\"\n" +
-                "      GPano:CroppedAreaTopPixels=\"10\" />\n" +
-                "  </rdf:RDF>";
-                */
     }
 }

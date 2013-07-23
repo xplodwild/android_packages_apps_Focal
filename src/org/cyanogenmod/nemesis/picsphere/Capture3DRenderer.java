@@ -101,12 +101,15 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     private int[] mPositionHandler = new int[2];
     private int[] mTexCoordHandler = new int[2];
     private int[] mTextureHandler = new int[2];
+    private int[] mAlphaHandler = new int[2];
     private int[] mMVPMatrixHandler = new int[2];
 
     private SurfaceTexture mCameraSurfaceTex;
     private int mCameraTextureId;
     private Snapshot mCameraBillboard;
+    private Snapshot mViewfinderBillboard;
     private Context mContext;
+    private Quaternion mTempQuaternion;
     private float[] mMVPMatrix = new float[16];
 
     private class Skybox {
@@ -168,6 +171,9 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         private boolean mIsFourToThree;
         private int mMode;
         private boolean mIsVisible = true;
+        private float mAlpha = 1.0f;
+        private float mAutoAlphaX;
+        private float mAutoAlphaY;
 
         public Snapshot() {
             mIsFourToThree = true;
@@ -197,6 +203,23 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
 
         public void setTextureId(int id) {
             mTextureData = id;
+        }
+
+        public void setAlpha(float alpha) {
+            mAlpha = alpha;
+        }
+
+        public void setAutoAlphaAngle(float x, float y) {
+            mAutoAlphaX = x;
+            mAutoAlphaY = y;
+        }
+
+        public float getAutoAlphaX() {
+            return mAutoAlphaX;
+        }
+
+        public float getAutoAlphaY() {
+            return mAutoAlphaY;
         }
 
         private void loadTexture() {
@@ -259,6 +282,8 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
             // Pass in the combined matrix.
             GLES20.glUniformMatrix4fv(mMVPMatrixHandler[mMode], 1, false, mMVPMatrix, 0);
 
+            GLES20.glUniform1f(mAlphaHandler[mMode], mAlpha);
+
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureData);
 
@@ -279,6 +304,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         mSensorFusion = new SensorFusion(context);
         mCameraQuat = new Quaternion();
         mContext = context;
+        mTempQuaternion = new Quaternion();
 
         // Position the dots every 40°
         for (int x = 0; x < 360; x += 360/12) {
@@ -291,9 +317,10 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
 
     private void createDot(float rx, float ry) {
         Snapshot dot = new Snapshot(false);
-        dot.setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.btn_ring_camera_hover));
+        dot.setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_picsphere_marker));
         dot.mModelMatrix = matrixFromEuler(rx, 0, ry, 0, 0, 100);
-        Matrix.scaleM(dot.mModelMatrix, 0, 0.3f, 0.3f, 0.3f);
+        Matrix.scaleM(dot.mModelMatrix, 0, 0.1f, 0.1f, 0.1f);
+        dot.setAutoAlphaAngle(rx, ry);
         mDots.add(dot);
     }
 
@@ -348,9 +375,11 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
                         "precision mediump float;       \n"
                         + "uniform sampler2D u_Texture;   \n"
                         + "varying vec2 v_TexCoordinate;  \n"
+                        + "uniform float f_Alpha;\n"
                         + "void main()                    \n"
                         + "{                              \n"
                         + "   gl_FragColor = texture2D(u_Texture, v_TexCoordinate);\n"
+                        + "   gl_FragColor.a = gl_FragColor.a * f_Alpha;"
                         + "}                              \n";
 
         // As the camera preview is stored in the OES external slot, we need a different shader
@@ -358,9 +387,11 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
                 + "precision mediump float;       \n"
                 + "uniform samplerExternalOES u_Texture;   \n"
                 + "varying vec2 v_TexCoordinate;  \n"
+                + "uniform float f_Alpha;\n"
                 + "void main()                    \n"
                 + "{                              \n"
                 + "   gl_FragColor = texture2D(u_Texture, v_TexCoordinate);\n"
+                + "   gl_FragColor.a = gl_FragColor.a * f_Alpha;"
                 + "}                              \n";
 
 
@@ -387,6 +418,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
             mTexCoordHandler[i]     = GLES20.glGetAttribLocation(mProgram[i], "a_TexCoordinate");
             mMVPMatrixHandler[i]    = GLES20.glGetUniformLocation(mProgram[i], "u_MVPMatrix");
             mTextureHandler[i]      = GLES20.glGetUniformLocation(mProgram[i], "u_Texture");
+            mAlphaHandler[i]      = GLES20.glGetUniformLocation(mProgram[i], "f_Alpha");
         }
 
         mSkyBox = new Skybox();
@@ -424,6 +456,11 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         mCameraBillboard.setTextureId(mCameraTextureId);
         mCameraBillboard.setMode(CAMERA);
         mCamManager.setRenderToTexture(mCameraSurfaceTex);
+
+        // Setup viewfinder billboard
+        mViewfinderBillboard = new Snapshot(false);
+        mViewfinderBillboard.setTexture(BitmapFactory.decodeResource(mContext.getResources(),
+                R.drawable.ic_picsphere_viewfinder));
     }
 
     @Override
@@ -452,6 +489,9 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 glUnused) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glEnable(GLES20.GL_BLEND);
+
         // Update camera view matrix
         float[] orientation = mSensorFusion.getFusedOrientation();
 
@@ -472,14 +512,16 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         Matrix.invertM(mCameraBillboard.mModelMatrix, 0, mCameraBillboard.mModelMatrix, 0);
         Matrix.translateM(mCameraBillboard.mModelMatrix, 0, 0.0f, 0.0f, -DISTANCE);
 
+        mViewfinderBillboard.mModelMatrix = Arrays.copyOf(mCameraBillboard.mModelMatrix,
+                mCameraBillboard.mModelMatrix.length);
+        Matrix.scaleM(mViewfinderBillboard.mModelMatrix, 0, 0.25f, 0.25f, 0.25f);
+
         // Draw all teh things
         // First the skybox, then the marker dots, then the snapshots
         mCameraSurfaceTex.updateTexImage();
         mSkyBox.draw();
 
-        for (Snapshot dot : mDots) {
-            dot.draw();
-        }
+        mCameraBillboard.draw();
 
         mListBusy.lock();
         for (Snapshot snap : mSnapshots) {
@@ -487,8 +529,17 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         }
         mListBusy.unlock();
 
+        for (Snapshot dot : mDots) {
+            // Set alpha based on camera distance to the point
+            float dX = dot.getAutoAlphaX() - (rX + 180.0f);
+            float dY = dot.getAutoAlphaY() - rY;
+            dX = (dX + 180.0f) % 360.0f - 180.0f;
+            dot.setAlpha(1.0f - Math.abs(dX)/180.0f * 8.0f);
 
-        mCameraBillboard.draw();
+            dot.draw();
+        }
+
+        mViewfinderBillboard.draw();
     }
 
     public void setCamPreviewVisible(boolean visible) {
