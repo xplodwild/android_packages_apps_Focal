@@ -446,7 +446,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_video));
             mCamManager.setStabilization(true);
             mNotifier.notify(getString(R.string.double_tap_to_snapshot), 2500);
-            mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
         } else if (newMode == CAMERA_MODE_PICSPHERE) {
             initializePicSphere();
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
