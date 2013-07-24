@@ -24,6 +24,7 @@ import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -312,12 +313,13 @@ public abstract class WidgetBase {
                 // will likely be clicked and its state will change.
                 toggleBackground(!mIsOpen);
             } else if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-                if (!mIsOpen && (Math.abs(event.getX() - mDownX) > 1.0f || Math.abs(event.getY() - mDownY) > 1)) {
+                Log.e(TAG, "ACTION_MOVE dX=" +  Math.abs(event.getX() - mDownX) + " dY="  + Math.abs(event.getY() - mDownY));
+                if (!mIsOpen && (Math.abs(event.getX() - mDownX) > 8 || Math.abs(event.getY() - mDownY) > 8)) {
                     toggleBackground(false);
                 }
-
+/*
                 SideBar sb = (SideBar) WidgetToggleButton.this.getParent().getParent();
-                sb.onTouchEvent(event);
+                sb.onTouchEvent(event);*/
             }
 
             return true;
@@ -330,6 +332,7 @@ public abstract class WidgetBase {
                 if (mHintText != null && !mHintText.isEmpty()) {
                     CameraActivity.notify(mHintText, 2000, getX(), Util.getScreenSize(null).y - getHeight() - getBottom());
                 }
+                toggleBackground(mIsOpen);
                 return true;
             }
         }
