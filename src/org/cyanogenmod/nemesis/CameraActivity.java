@@ -490,11 +490,11 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     public void updateInterfaceOrientation() {
         setViewRotation(mShutterButton, mOrientationCompensation);
         setViewRotation(mRecTimerContainer, mOrientationCompensation);
-        setViewRotation(mNotifier, mOrientationCompensation);
         setViewRotation(mPanoProgressBar, mOrientationCompensation);
         setViewRotation(mPicSphereUndo, mOrientationCompensation);
         setViewRotation(mHelperText, mOrientationCompensation);
         mCamManager.setOrientation(mOrientationCompensation);
+        mNotifier.notifyOrientationChanged(mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
         mSwitchRingPad.notifyOrientationChanged(mOrientationCompensation);

@@ -21,6 +21,7 @@ package org.cyanogenmod.nemesis.ui;
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
@@ -36,12 +37,15 @@ import org.cyanogenmod.nemesis.Util;
 public class Notifier extends LinearLayout {
     private TextView mTextView;
     private Handler mHandler;
+    private int mOrientation;
     private Runnable mFadeOutRunnable = new Runnable() {
         @Override
         public void run() {
             fadeOut();
         }
     };
+    private float mTargetX;
+    private float mTargetY;
 
     public Notifier(Context context) {
         super(context);
@@ -62,6 +66,22 @@ public class Notifier extends LinearLayout {
         mHandler = new Handler();
     }
 
+    public void notifyOrientationChanged(int orientation) {
+        if (mTextView == null) return;
+
+        if (orientation % 180 != 0) {
+            // We translate to fit orientation properly within the screen
+            animate().rotation(orientation).setDuration(200).x(mTargetX + mTextView.getMeasuredHeight()/2)
+                    .y(mTargetY - mTextView.getMeasuredWidth()/2).setInterpolator(new DecelerateInterpolator()).start();
+
+        } else {
+            animate().rotation(orientation).setDuration(200).x(mTargetX)
+                    .y(mTargetY).setInterpolator(new DecelerateInterpolator()).start();
+        }
+
+        mOrientation = orientation;
+    }
+
     /**
      * Shows the provided {@param text} during {@param durationMs} milliseconds with
      * a nice animation.
@@ -79,6 +99,9 @@ public class Notifier extends LinearLayout {
                 setAlpha(0.0f);
                 setX(Util.getScreenSize(null).x*2.0f/3.0f);
                 setY(Util.getScreenSize(null).y*2.0f/3.0f);
+                mTargetX = getX();
+                mTargetY = getY();
+                notifyOrientationChanged(mOrientation);
 
                 fadeIn();
                 mHandler.postDelayed(mFadeOutRunnable, durationMs);
@@ -104,6 +127,11 @@ public class Notifier extends LinearLayout {
                 setAlpha(0.0f);
                 setX(x);
                 setY(y);
+
+                mTargetX = getX();
+                mTargetY = getY();
+
+                notifyOrientationChanged(mOrientation);
 
                 fadeIn();
                 mHandler.postDelayed(mFadeOutRunnable, durationMs);
