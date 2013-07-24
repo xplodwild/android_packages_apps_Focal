@@ -20,6 +20,7 @@ package org.cyanogenmod.nemesis.widgets;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
+import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
@@ -41,6 +42,7 @@ import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SettingsStorage;
 import org.cyanogenmod.nemesis.Util;
+import org.cyanogenmod.nemesis.ui.CenteredSeekBar;
 import org.cyanogenmod.nemesis.ui.SideBar;
 import org.cyanogenmod.nemesis.ui.WidgetRenderer;
 
@@ -359,6 +361,13 @@ public abstract class WidgetBase {
          * @return Number of columns
          */
         public int getColSpan();
+
+        /**
+         * Notifies the widget that its orientation changed
+         *
+         * @param orientation The new angle
+         */
+        public void notifyOrientationChanged(int orientation);
     }
 
     /**
@@ -412,6 +421,11 @@ public abstract class WidgetBase {
             // TODO: Return a different colspan if label larger
             return 1;
         }
+
+        @Override
+        public void notifyOrientationChanged(int orientation) {
+
+        }
     }
 
     /**
@@ -445,6 +459,11 @@ public abstract class WidgetBase {
         @Override
         public int getColSpan() {
             return 1;
+        }
+
+        @Override
+        public void notifyOrientationChanged(int orientation) {
+
         }
     }
 
@@ -538,6 +557,11 @@ public abstract class WidgetBase {
         }
 
         @Override
+        public void notifyOrientationChanged(int orientation) {
+
+        }
+
+        @Override
         public boolean onLongClick(View view) {
             if (mHintText != null && mHintText.length() > 0) {
                 CameraActivity.notify(mHintText, 2000, Util.dpToPx(getContext(), 8) + getX() + mWidget.getX(),
@@ -546,6 +570,56 @@ public abstract class WidgetBase {
             } else {
                 return false;
             }
+        }
+    }
+
+    /**
+     * Represents a centered seek bar put inside
+     * a {@link WidgetContainer}.
+     */
+    public class WidgetOptionCenteredSeekBar extends CenteredSeekBar implements WidgetOption {
+
+        public WidgetOptionCenteredSeekBar(Context context, AttributeSet attrs) {
+            super(context, attrs);
+            initialize();
+        }
+
+        public WidgetOptionCenteredSeekBar(Integer min, Integer max, Context context) {
+            super(min, max, context);
+            initialize();
+        }
+
+        private void initialize() {
+            setMaxWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size) * 3);
+            setMaxHeight(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
+
+            // Set padding
+            int pad = getResources().getDimensionPixelSize(R.dimen.widget_container_padding);
+            this.setPadding(pad, pad, pad, pad);
+        }
+
+        @Override
+        public void onFinishInflate() {
+            super.onFinishInflate();
+            GridLayout.LayoutParams params = (GridLayout.LayoutParams) this.getLayoutParams();
+            params.setGravity(Gravity.CENTER);
+        }
+
+        @Override
+        public int getColSpan() {
+            return 3;
+        }
+
+        @Override
+        public void notifyOrientationChanged(int orientation) {
+            /*if (orientation % 180 == 0) {
+                setMaxWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size) * 3);
+                setMaxHeight(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
+            } else {
+                setMaxWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
+                setMaxHeight(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size) * 3);
+                invalidate();
+            }*/
         }
     }
 
@@ -694,6 +768,12 @@ public abstract class WidgetBase {
 
             for (int i = 0; i < buttonsCount; i++) {
                 View child = getChildAt(i);
+                WidgetOption option = (WidgetOption) child;
+
+                // Don't rotate seekbars
+                if (child instanceof WidgetOptionCenteredSeekBar) continue;
+
+                option.notifyOrientationChanged(orientation);
 
                 if (fastforward) {
                     child.setRotation(orientation);

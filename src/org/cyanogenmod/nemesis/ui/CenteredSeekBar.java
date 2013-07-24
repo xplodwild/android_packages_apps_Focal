@@ -312,10 +312,9 @@ public class CenteredSeekBar extends ImageView {
         final int pointerIndex = event.findPointerIndex(mActivePointerId);
         final float x = event.getX(pointerIndex);
 
-        if (Thumb.MIN.equals(pressedThumb)) {
-            setNormalizedValue(screenToNormalized(x));
-            setSelectedMinValue(normalizedToValue(normalizedValue));
-        }
+        setNormalizedValue(screenToNormalized(x));
+        setSelectedMinValue(normalizedToValue(normalizedValue));
+
     }
 
     /**
@@ -346,15 +345,7 @@ public class CenteredSeekBar extends ImageView {
      */
     @Override
     protected synchronized void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int width = 200;
-        if (MeasureSpec.UNSPECIFIED != MeasureSpec.getMode(widthMeasureSpec)) {
-            width = MeasureSpec.getSize(widthMeasureSpec);
-        }
-        int height = thumbImage.getHeight();
-        if (MeasureSpec.UNSPECIFIED != MeasureSpec.getMode(heightMeasureSpec)) {
-            height = Math.min(height, MeasureSpec.getSize(heightMeasureSpec));
-        }
-        setMeasuredDimension(width, height);
+        setMeasuredDimension(getMaxWidth(), getMaxHeight());
     }
 
     /**

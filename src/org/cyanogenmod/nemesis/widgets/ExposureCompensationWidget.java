@@ -25,50 +25,33 @@ import android.view.View;
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SettingsStorage;
+import org.cyanogenmod.nemesis.ui.CenteredSeekBar;
 
 /**
  * Exposure compensation setup widget
  */
-public class ExposureCompensationWidget extends WidgetBase {
+public class ExposureCompensationWidget extends WidgetBase implements CenteredSeekBar.OnCenteredSeekBarChangeListener {
     private static final String KEY_PARAMETER = "exposure-compensation";
     private static final String KEY_MAX_PARAMETER = "max-exposure-compensation";
     private static final String KEY_MIN_PARAMETER = "min-exposure-compensation";
 
-    private WidgetOptionButton mMinusButton;
-    private WidgetOptionButton mPlusButton;
+    private WidgetOptionCenteredSeekBar mSeekBar;
     private WidgetOptionLabel mValueLabel;
-
-
-    private class MinusClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            setExposureValue(Math.max(getExposureValue() - 1, getMinExposureValue()));
-        }
-    }
-
-    private class PlusClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            setExposureValue(Math.min(getExposureValue() + 1, getMaxExposureValue()));
-        }
-    }
 
     public ExposureCompensationWidget(CameraManager cam, Context context) {
         super(cam, context, R.drawable.ic_widget_exposure);
 
         // Add views in the widget
-        mMinusButton = new WidgetOptionButton(R.drawable.ic_widget_timer_minus, context);
-        mPlusButton = new WidgetOptionButton(R.drawable.ic_widget_timer_plus, context);
+        mSeekBar = new WidgetOptionCenteredSeekBar(getMinExposureValue(), getMaxExposureValue(), context);
+        mSeekBar.setNotifyWhileDragging(true);
         mValueLabel = new WidgetOptionLabel(context);
 
-        mMinusButton.setOnClickListener(new MinusClickListener());
-        mPlusButton.setOnClickListener(new PlusClickListener());
-
-        addViewToContainer(mMinusButton);
+        addViewToContainer(mSeekBar);
         addViewToContainer(mValueLabel);
-        addViewToContainer(mPlusButton);
 
         mValueLabel.setText(restoreValueFromStorage(KEY_PARAMETER));
+        mSeekBar.setSelectedMinValue(Integer.parseInt(restoreValueFromStorage(KEY_PARAMETER)));
+        mSeekBar.setOnCenteredSeekBarChangeListener(this);
 
         getToggleButton().setHintText(R.string.widget_exposure_compensation);
     }
@@ -97,5 +80,10 @@ public class ExposureCompensationWidget extends WidgetBase {
         SettingsStorage.storeCameraSetting(mWidget.getContext(), mCamManager.getCurrentFacing(),
                 KEY_PARAMETER, valueStr);
         mValueLabel.setText(valueStr);
+    }
+
+    @Override
+    public void OnCenteredSeekBarValueChanged(CenteredSeekBar bar, Integer minValue) {
+        setExposureValue(minValue);
     }
 }
