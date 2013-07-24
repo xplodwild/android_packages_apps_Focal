@@ -67,7 +67,7 @@
     <style name="ShowcaseView">
         <item name="sv_titleTextColor">#33B5E5</item>
         <item name="sv_detailTextColor">#FFFFFF</item>
-        <item name="sv_backgroundColor">#AA333333</item>
+        <item name="sv_backgroundColor">#BB333333</item>
         <item name="sv_buttonText">@string/ok</item>
     </style>
 

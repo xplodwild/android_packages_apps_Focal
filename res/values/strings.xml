@@ -77,7 +77,7 @@
 
     <!-- PicSphere status -->
     <string name="picsphere_undo_button">UNDO</string>
-    <string name="picsphere_start_hint">Take a picture to start your sphere</string>
+    <string name="picsphere_start_hint">Take a picture to start a sphere</string>
     <string name="picsphere_already_rendering">Please wait for the current PicSphere to render</string>
     <string name="picsphere_rendering_progress">Rendering... (%d %%)</string>
     <string name="picsphere_toast_background_render">Rendering started&#8230;</string>
@@ -101,7 +101,7 @@
     <string name="showcase_panorama_title">Panorama mode</string>
     <string name="showcase_panorama_body">Tap the shutter to start your panorama,\nthen pan what you want to capture.\nOnce done, tap the shutter button again.</string>
     <string name="showcase_picsphere_title">PicSphere mode</string>
-    <string name="showcase_picsphere_body">Align your first picture where you like,\nthen tap the shutter to take each picture\nof the sphere. The blue dots are points\nof reference you can follow.</string>
+    <string name="showcase_picsphere_body">Align your first picture where you like,\nthen tap the shutter to take each picture\nof the sphere. The blue dots are points\nof reference you can follow.\nLong-press the shutter once you're done.</string>
 </resources>
 
 
