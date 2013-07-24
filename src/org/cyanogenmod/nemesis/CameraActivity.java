@@ -828,7 +828,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
      */
     public void resetPanorama() {
         mMosaicProxy.tearDown();
-        mCamManager.setRenderToTexture(null);
+        if (mCamManager != null) {
+            mCamManager.setRenderToTexture(null);
+        }
         findViewById(R.id.camera_preview_container).setVisibility(View.VISIBLE);
         findViewById(R.id.gl_renderer_container).setVisibility(View.GONE);
         findViewById(R.id.gl_renderer_container).setOnTouchListener(null);
