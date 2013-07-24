@@ -429,7 +429,6 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
     private void initCameraBillboard() {
         int texture[] = new int[1];
 
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
         GLES20.glGenTextures(1, texture, 0);
         mCameraTextureId = texture[0];
 
@@ -487,6 +486,8 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 glUnused) {
+        mCameraSurfaceTex.updateTexImage();
+
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
@@ -518,7 +519,6 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
 
         // Draw all teh things
         // First the skybox, then the marker dots, then the snapshots
-        mCameraSurfaceTex.updateTexImage();
         mSkyBox.draw();
 
         mCameraBillboard.draw();
