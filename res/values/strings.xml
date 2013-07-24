@@ -36,6 +36,12 @@
     <string name="no_video_player">Couldn\'t play the video, no player found</string>
     <string name="fullscreen_shutter_info">Tap anywhere to shoot</string>
 
+    <string name="mode_photo">Photo</string>
+    <string name="mode_video">Video</string>
+    <string name="mode_picsphere">PicSphere</string>
+    <string name="mode_panorama">Panorama</string>
+    <string name="mode_switchcam">Facing</string>
+
     <!-- Widgets hints for non-arrayed widgets -->
     <string name="widget_burstmode_count_shots">Burst %d shots</string>
     <string name="widget_burstmode_off">Disable burst mode</string>

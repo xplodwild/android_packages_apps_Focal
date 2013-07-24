@@ -21,6 +21,7 @@ package org.cyanogenmod.nemesis.ui;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -78,6 +79,9 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         public int mEventId;
         public float mLastDrawnX;
         public float mLastDrawnY;
+        public String mHintText;
+        public float mHintTextAlpha = 0.0f;
+        public boolean mHintAnimationDirection = false;
     }
 
     public SwitchRingPad(Context context, AttributeSet attrs, int defStyle) {
@@ -133,29 +137,30 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         mButtons = new PadButton[SLOT_MAX];
 
         // Camera pad button
+        Resources res = getResources();
         addRingPad(getDrawable(R.drawable.btn_ring_camera_normal),
                 getDrawable(R.drawable.btn_ring_camera_hover),
-                BUTTON_CAMERA, SLOT_LEFT);
+                BUTTON_CAMERA, SLOT_LEFT, res.getString(R.string.mode_photo));
 
         // Panorama pad button
         addRingPad(getDrawable(R.drawable.btn_ring_pano_normal),
                 getDrawable(R.drawable.btn_ring_pano_hover),
-                BUTTON_PANO, SLOT_MIDLEFT);
+                BUTTON_PANO, SLOT_MIDLEFT, res.getString(R.string.mode_panorama));
 
         // Video pad button
         addRingPad(getDrawable(R.drawable.btn_ring_video_normal),
                 getDrawable(R.drawable.btn_ring_video_hover),
-                BUTTON_VIDEO, SLOT_MID);
+                BUTTON_VIDEO, SLOT_MID, res.getString(R.string.mode_video));
 
         // PictureSphere pad button
         addRingPad(getDrawable(R.drawable.btn_ring_picsphere_normal),
                 getDrawable(R.drawable.btn_ring_picsphere_hover),
-                BUTTON_PICSPHERE, SLOT_MIDRIGHT);
+                BUTTON_PICSPHERE, SLOT_MIDRIGHT, res.getString(R.string.mode_picsphere));
 
         // Switch Cam pad button
         addRingPad(getDrawable(R.drawable.btn_ring_switchcam_normal),
                 getDrawable(R.drawable.btn_ring_switchcam_hover),
-                BUTTON_SWITCHCAM, SLOT_RIGHT);
+                BUTTON_SWITCHCAM, SLOT_RIGHT, res.getString(R.string.mode_switchcam));
     }
 
     public void setListener(RingPadListener listener) {
@@ -199,9 +204,10 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         mPaint.setColor(0x88DDDDDD);
         canvas.drawCircle(height - mEdgePadding, width / 2, ringRadius, mPaint);
 
-        mPaint.setAlpha((int) (255.0f * mOpenProgress));
         // Draw the actual pad buttons
         for (int i = 0; i < SLOT_MAX; i++) {
+            mPaint.setAlpha((int) (255.0f * mOpenProgress));
+
             PadButton button = mButtons[i];
             if (button == null) continue;
 
@@ -215,12 +221,39 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
             canvas.translate(x + button.mNormalBitmap.getWidth() / 2, y + button.mNormalBitmap.getWidth() / 2);
             canvas.rotate(mCurrentOrientation);
 
-            if (button.mIsHovering)
+            if (button.mIsHovering) {
                 canvas.drawBitmap(button.mHoverBitmap, -button.mNormalBitmap.getWidth() / 2, -button.mNormalBitmap.getWidth() / 2, mPaint);
-            else
+            } else {
                 canvas.drawBitmap(button.mNormalBitmap, -button.mNormalBitmap.getWidth() / 2, -button.mNormalBitmap.getWidth() / 2, mPaint);
-
+            }
             canvas.restore();
+
+            if (mOpenProgress == 1.0f) {
+                animateAlpha(button.mIsHovering, button);
+            } else {
+                animateAlpha(false, button);
+            }
+
+            if ((button.mIsHovering || button.mHintTextAlpha > 0.0f) && mOpenProgress == 1.0f) {
+                // Draw hint text
+                int alpha = (int) (255 * (button.mHintTextAlpha));
+
+                mPaint.setTextSize(36);
+                mPaint.setTextAlign(Paint.Align.CENTER);
+                mPaint.setShadowLayer(12, 0, 0, 0xEE333333 * ((alpha & 0xFF) << 24));
+                mPaint.setAlpha(alpha);
+
+                float measureText = mPaint.measureText(button.mHintText);
+
+                canvas.save();
+                canvas.translate(x - measureText / 2 - Util.dpToPx(getContext(), 4),
+                        y + button.mNormalBitmap.getWidth() / 2 - mPaint.getTextSize() / 2);
+                canvas.rotate(mCurrentOrientation);
+
+                canvas.drawText(button.mHintText, 0, 0, mPaint);
+
+                canvas.restore();
+            }
 
             button.mLastDrawnX = x;
             button.mLastDrawnY = y;
@@ -263,6 +296,24 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         return super.onTouchEvent(event);
     }
 
+    private void animateAlpha(boolean in, final PadButton button) {
+        if (button.mHintAnimationDirection == in) return;
+
+        button.mHintAnimationDirection = in;
+        ValueAnimator anim = new ValueAnimator();
+        anim.setDuration(200);
+        anim.setFloatValues(in ? 0 : 1, in ? 1 : 0);
+        anim.addUpdateListener(new AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator arg0) {
+                button.mHintTextAlpha = (Float) arg0.getAnimatedValue();
+                invalidate();
+            }
+        });
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.start();
+    }
+
     public void notifyOrientationChanged(float orientation) {
         mTargetOrientation = orientation;
         ValueAnimator anim = new ValueAnimator();
@@ -272,6 +323,7 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
             @Override
             public void onAnimationUpdate(ValueAnimator arg0) {
                 mCurrentOrientation = (Float) arg0.getAnimatedValue();
+                invalidate();
             }
         });
         anim.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -302,11 +354,12 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         mIsOpen = false;
     }
 
-    public void addRingPad(Bitmap iconNormal, Bitmap iconHover, int eventId, int slot) {
+    public void addRingPad(Bitmap iconNormal, Bitmap iconHover, int eventId, int slot, String hint) {
         mButtons[slot] = new PadButton();
         mButtons[slot].mNormalBitmap = iconNormal;
         mButtons[slot].mHoverBitmap = iconHover;
         mButtons[slot].mEventId = eventId;
+        mButtons[slot].mHintText = hint;
     }
 
     @Override

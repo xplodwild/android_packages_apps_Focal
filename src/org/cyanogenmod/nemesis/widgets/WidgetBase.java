@@ -540,7 +540,8 @@ public abstract class WidgetBase {
         @Override
         public boolean onLongClick(View view) {
             if (mHintText != null && mHintText.length() > 0) {
-                CameraActivity.notify(mHintText, 2000);
+                CameraActivity.notify(mHintText, 2000, Util.dpToPx(getContext(), 8) + getX() + mWidget.getX(),
+                        Util.dpToPx(getContext(), 32) + Util.dpToPx(getContext(), 4) * mHintText.length());
                 return true;
             } else {
                 return false;
