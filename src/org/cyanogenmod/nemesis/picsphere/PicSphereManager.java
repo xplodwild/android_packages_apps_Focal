@@ -267,6 +267,8 @@ public class PicSphereManager implements PicSphere.ProgressListener {
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
             mContext.setHelperText(mContext.getString(R.string.picsphere_start_hint));
         }
+
+        mCapture3DRenderer.setCamPreviewVisible(true);
     }
 
 }
