@@ -62,11 +62,11 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
     // RemoteService for a more complete example.
     private final IBinder mBinder = new LocalBinder();
 
-    public void render(final PicSphere sphere) {
+    public void render(final PicSphere sphere, final int orientation) {
         sphere.addProgressListener(this);
         new Thread() {
             public void run() {
-                if (!sphere.render()) {
+                if (!sphere.render(orientation)) {
                     mHasFailed = true;
                     mNM.notify(NOTIFICATION,
                             buildFailureNotification(getString(R.string.picsphere_failed),

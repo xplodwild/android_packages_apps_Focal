@@ -23,12 +23,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.AssetManager;
-import android.graphics.SurfaceTexture;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.TextureView;
-import android.view.View;
 import android.widget.FrameLayout;
 
 import org.cyanogenmod.nemesis.CameraActivity;
@@ -139,18 +137,18 @@ public class PicSphereManager implements PicSphere.ProgressListener {
      *
      * @param sphere The PicSphere to render
      */
-    public void startRendering(final PicSphere sphere) {
+    public void startRendering(final PicSphere sphere, final int orientation) {
         // Notify toast
         CameraActivity.notify(mContext.getString(R.string.picsphere_toast_background_render), 2500);
 
         if (mIsBound && mBoundService != null) {
             sphere.addProgressListener(this);
-            mBoundService.render(sphere);
+            mBoundService.render(sphere, orientation);
         } else {
             doBindService();
             mHandler.postDelayed(new Runnable() {
                 public void run() {
-                    startRendering(sphere);
+                    startRendering(sphere, orientation);
                 }
             }, 500);
         }
@@ -268,7 +266,9 @@ public class PicSphereManager implements PicSphere.ProgressListener {
             mContext.setHelperText(mContext.getString(R.string.picsphere_start_hint));
         }
 
-        mCapture3DRenderer.setCamPreviewVisible(true);
+        if (mCapture3DRenderer != null) {
+            mCapture3DRenderer.setCamPreviewVisible(true);
+        }
     }
 
 }

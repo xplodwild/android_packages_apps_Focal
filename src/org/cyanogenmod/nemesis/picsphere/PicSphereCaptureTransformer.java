@@ -18,11 +18,9 @@
 
 package org.cyanogenmod.nemesis.picsphere;
 
-import android.os.Handler;
 import android.util.Log;
 
 import org.cyanogenmod.nemesis.CameraActivity;
-import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SnapshotManager;
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
@@ -95,7 +93,7 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
                         .getString(R.string.picsphere_need_two_pics), 2000);
                 return;
             }
-            mPicSphereManager.startRendering(mPicSphere);
+            mPicSphereManager.startRendering(mPicSphere, mContext.getOrientation());
             mPicSphereManager.getRenderer().clearSnapshots();
             mPicSphere = null;
 

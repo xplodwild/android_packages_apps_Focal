@@ -231,6 +231,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         startShowcaseWelcome();
     }
 
+    public int getOrientation() {
+        return mOrientationCompensation;
+    }
+
     public void startShowcaseWelcome() {
         if (SettingsStorage.getAppSetting(this, "SHOWCASE_WELCOME", "0").equals("0")) {
             SettingsStorage.storeAppSetting(this, "SHOWCASE_WELCOME", "1");

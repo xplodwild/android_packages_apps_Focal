@@ -56,6 +56,7 @@ public class PicSphere {
     private String mOutputTitle;
     private List<ProgressListener> mProgressListeners;
     private int mRenderProgress = 0;
+    private int mOrientation;
     public final static int STEP_AUTOPANO = 1;
     public final static int STEP_PTCLEAN = 2;
     public final static int STEP_AUTOOPTIMISER = 3;
@@ -138,7 +139,9 @@ public class PicSphere {
     /**
      * Renders the sphere
      */
-    protected boolean render() {
+    protected boolean render(int orientation) {
+        mOrientation = (orientation + 360) % 360;
+
         for (ProgressListener listener : mProgressListeners) {
             listener.onRenderStart(this);
         }
@@ -152,10 +155,6 @@ public class PicSphere {
         mTempPath = new File(tempPathStr);
         mTempPath.mkdir();
         mProjectFile = mTempPath + "/project.pto";
-
-        mSnapManager.prepareNamerUri(100,100);
-        mOutputUri = mSnapManager.getNamerUri();
-        mOutputTitle = mSnapManager.getNamerTitle();
 
         // Wait till all images are saved and accessible
         boolean allSaved = false;
@@ -289,7 +288,7 @@ public class PicSphere {
         }
 
         run("autopano --align --bottom-is-left --ransac on --refine-by-mean " +
-                "--projection 2,"+mHorizontalAngle+" " + mProjectFile + " " + filesStr);
+                "--projection 4,"+mHorizontalAngle+" " + mProjectFile + " " + filesStr);
         consumeProcLogs();
 
         Log.d(TAG, "Autopano... done");
@@ -343,7 +342,8 @@ public class PicSphere {
     private boolean doPanoModify() throws IOException {
         Log.d(TAG, "PanoModify...");
         notifyStep(STEP_PANOMODIFY);
-        run("pano_modify -o " + mProjectFile + " --center --canvas=AUTO " + mProjectFile);
+        String canvas = "2000x1000";
+        run("pano_modify -o " + mProjectFile + " --center --canvas="+canvas+" " + mProjectFile);
         consumeProcLogs();
 
         Log.d(TAG, "PanoModify... done");
@@ -394,7 +394,11 @@ public class PicSphere {
         consumeProcLogs();
 
         // Apply PhotoSphere EXIF tags on the final jpeg
-        doExifTagging();
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mTempPath + "/final.jpg", opts);
+
+        doExifTagging(opts.outWidth, opts.outHeight);
 
 
         // Save it to gallery
@@ -423,23 +427,25 @@ public class PicSphere {
             }
         }
 
-        mSnapManager.saveImage(mOutputUri, mOutputTitle, 100, 100, 90, jpegData);
+        mSnapManager.prepareNamerUri(2000,1000);
+        mOutputUri = mSnapManager.getNamerUri();
+        mOutputTitle = mSnapManager.getNamerTitle();
+
+        Log.i(TAG, "PicSphere size: " + opts.outWidth + "x" + opts.outHeight);
+        mSnapManager.saveImage(mOutputUri, mOutputTitle, 2000, 1000, 0, jpegData);
 
         Log.d(TAG, "Enblend... done");
         return true;
     }
 
-    private boolean doExifTagging() throws IOException {
+    private boolean doExifTagging(int width, int height) throws IOException {
         Log.d(TAG, "XMP metadata tagging...");
 
         try {
-            BitmapFactory.Options opts = new BitmapFactory.Options();
-            opts.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(mTempPath + "/final.jpg", opts);
 
             XMPHelper xmp = new XMPHelper();
-            xmp.writeXmpToFile(mTempPath + "/final.jpg", generatePhotoSphereXMP(opts.outWidth,
-                    opts.outHeight, mPictures.size()));
+            xmp.writeXmpToFile(mTempPath + "/final.jpg", generatePhotoSphereXMP(width,
+                    height, mPictures.size()));
         }
         catch (Exception e) {
             Log.e(TAG, "Couldn't access final file, did rendering fail?");
@@ -458,7 +464,7 @@ public class PicSphere {
      * @param height The height of the panorama
      * @return RDF XML XMP metadata
      */
-    public static String generatePhotoSphereXMP(int width, int height, int sourceImageCount) {
+    public String generatePhotoSphereXMP(int width, int height, int sourceImageCount) {
         return "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "<rdf:Description rdf:about=\"\" xmlns:GPano=\"http://ns.google.com/photos/1.0/panorama/\">\n" +
                 "    <GPano:UsePanoramaViewer>True</GPano:UsePanoramaViewer>\n" +
@@ -468,12 +474,12 @@ public class PicSphere {
                 "    <GPano:PoseHeadingDegrees>350.0</GPano:PoseHeadingDegrees>\n" +
                 "    <GPano:InitialViewHeadingDegrees>90.0</GPano:InitialViewHeadingDegrees>\n" +
                 "    <GPano:InitialViewPitchDegrees>0.0</GPano:InitialViewPitchDegrees>\n" +
-                "    <GPano:InitialViewRollDegrees>0.0</GPano:InitialViewRollDegrees>\n" +
+                "    <GPano:InitialViewRollDegrees>"+mOrientation+"</GPano:InitialViewRollDegrees>\n" +
                 "    <GPano:InitialHorizontalFOVDegrees>75.0</GPano:InitialHorizontalFOVDegrees>\n" +
-                "    <GPano:CroppedAreaLeftPixels>10</GPano:CroppedAreaLeftPixels>\n" +
-                "    <GPano:CroppedAreaTopPixels>10</GPano:CroppedAreaTopPixels>\n" +
-                "    <GPano:CroppedAreaImageWidthPixels>"+(width-10)+"</GPano:CroppedAreaImageWidthPixels>\n" +
-                "    <GPano:CroppedAreaImageHeightPixels>"+(height-10)+"</GPano:CroppedAreaImageHeightPixels>\n" +
+                "    <GPano:CroppedAreaLeftPixels>0</GPano:CroppedAreaLeftPixels>\n" +
+                "    <GPano:CroppedAreaTopPixels>0</GPano:CroppedAreaTopPixels>\n" +
+                "    <GPano:CroppedAreaImageWidthPixels>"+(width)+"</GPano:CroppedAreaImageWidthPixels>\n" +
+                "    <GPano:CroppedAreaImageHeightPixels>"+(height)+"</GPano:CroppedAreaImageHeightPixels>\n" +
                 "    <GPano:FullPanoWidthPixels>"+width+"</GPano:FullPanoWidthPixels>\n" +
                 "    <GPano:FullPanoHeightPixels>"+height+"</GPano:FullPanoHeightPixels>\n" +
                 //"    <GPano:FirstPhotoDate>2012-11-07T21:03:13.465Z</GPano:FirstPhotoDate>\n" +

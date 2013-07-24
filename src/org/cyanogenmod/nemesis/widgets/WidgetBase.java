@@ -171,6 +171,7 @@ public abstract class WidgetBase {
      */
     public String restoreValueFromStorage(String key) {
         Camera.Parameters params = mCamManager.getParameters();
+        if (params == null) return "";
 
         String currentValue = params.get(key);
         if (currentValue != null) {

@@ -397,6 +397,10 @@ public class SnapshotManager {
     }
 
     public void prepareNamerUri(int width, int height) {
+        if (mImageNamer == null) {
+            // ImageNamer can be dead if the user exitted the app. We restart it temporarily.
+            mImageNamer = new ImageNamer();
+        }
         mImageNamer.prepareUri(mContentResolver, System.currentTimeMillis(), width, height, 0);
     }
 
