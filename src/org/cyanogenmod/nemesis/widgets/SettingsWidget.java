@@ -199,26 +199,28 @@ public class SettingsWidget extends WidgetBase {
             mCamManager.setPictureSize(resolution);
         } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
             mResolutions = cam.getParameters().getSupportedVideoSizes();
-
-            // We support a fixed set of video resolutions (pretty much like AOSP)
-            // because we need to take the CamcorderProfile (media_profiles.xml), which
-            // has a fixed set of values...
             mResolutionsName = new ArrayList<String>();
             mVideoResolutions = new ArrayList<String>();
-            for (Camera.Size size : mResolutions) {
-                if (size.width == 1920 && size.height == 1080
-                        || size.width == 1920 && size.height == 1088) {
-                    mResolutionsName.add(mContext.getString(R.string.video_res_1080p));
-                    mVideoResolutions.add("1920x1080");
-                } else if (size.width == 1280 && size.height == 720) {
-                    mResolutionsName.add(mContext.getString(R.string.video_res_720p));
-                    mVideoResolutions.add("1280x720");
-                } else if (size.width == 720 && size.height == 480) {
-                    mResolutionsName.add(mContext.getString(R.string.video_res_480p));
-                    mVideoResolutions.add("720x480");
-                } else if (size.width == 352 && size.height == 288) {
-                    mResolutionsName.add(mContext.getString(R.string.video_res_mms));
-                    mVideoResolutions.add("352x288");
+
+            if (mResolutions != null) {
+                // We support a fixed set of video resolutions (pretty much like AOSP)
+                // because we need to take the CamcorderProfile (media_profiles.xml), which
+                // has a fixed set of values...
+                for (Camera.Size size : mResolutions) {
+                    if (size.width == 1920 && size.height == 1080
+                            || size.width == 1920 && size.height == 1088) {
+                        mResolutionsName.add(mContext.getString(R.string.video_res_1080p));
+                        mVideoResolutions.add("1920x1080");
+                    } else if (size.width == 1280 && size.height == 720) {
+                        mResolutionsName.add(mContext.getString(R.string.video_res_720p));
+                        mVideoResolutions.add("1280x720");
+                    } else if (size.width == 720 && size.height == 480) {
+                        mResolutionsName.add(mContext.getString(R.string.video_res_480p));
+                        mVideoResolutions.add("720x480");
+                    } else if (size.width == 352 && size.height == 288) {
+                        mResolutionsName.add(mContext.getString(R.string.video_res_mms));
+                        mVideoResolutions.add("352x288");
+                    }
                 }
             }
         }
