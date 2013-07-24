@@ -21,7 +21,6 @@ package org.cyanogenmod.nemesis.ui;
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
@@ -67,6 +66,7 @@ public class Notifier extends LinearLayout {
     }
 
     public void notifyOrientationChanged(int orientation) {
+        mOrientation = orientation;
         if (mTextView == null) return;
 
         if (orientation % 180 != 0) {
@@ -78,8 +78,6 @@ public class Notifier extends LinearLayout {
             animate().rotation(orientation).setDuration(200).x(mTargetX)
                     .y(mTargetY).setInterpolator(new DecelerateInterpolator()).start();
         }
-
-        mOrientation = orientation;
     }
 
     /**
