@@ -21,10 +21,12 @@ package org.cyanogenmod.nemesis.widgets;
 import android.content.Context;
 import android.hardware.Camera;
 import android.view.View;
+import android.widget.SeekBar;
 
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
 import org.cyanogenmod.nemesis.SettingsStorage;
+import org.cyanogenmod.nemesis.ui.CenteredSeekBar;
 
 /**
  * Contrast/sharpness/saturation setting widget (Qualcomm)
@@ -42,36 +44,29 @@ public class EnhancementsWidget extends WidgetBase {
     private static final int ROW_SATURATION = 2;
     private static final int ROW_COUNT = 3;
 
-    private WidgetOptionButton[] mMinusButton;
-    private WidgetOptionButton[] mPlusButton;
+    private WidgetOptionSeekBar[] mSeekBar;
     private WidgetOptionLabel[] mValueLabel;
 
-
-    private class MinusClickListener implements View.OnClickListener {
+    private class SeekBarListener implements SeekBar.OnSeekBarChangeListener {
         private String mKey;
 
-        public MinusClickListener(String key) {
+        public SeekBarListener(String key) {
             mKey = key;
         }
 
         @Override
-        public void onClick(View view) {
-            setValue(mKey, Math.max(getValue(mKey) - 1, 0));
-        }
-    }
-
-    private class PlusClickListener implements View.OnClickListener {
-        private String mKey;
-        private String mMaxKey;
-
-        public PlusClickListener(String key, String maxKey) {
-            mKey = key;
-            mMaxKey = maxKey;
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            setValue(mKey, i);
         }
 
         @Override
-        public void onClick(View view) {
-            setValue(mKey, Math.min(getValue(mKey) + 1, getValue(mMaxKey)));
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
         }
     }
 
@@ -79,40 +74,50 @@ public class EnhancementsWidget extends WidgetBase {
         super(cam, context, R.drawable.ic_widget_contrast);
 
         // Add views in the widget
-        mMinusButton = new WidgetOptionButton[ROW_COUNT];
-        mPlusButton = new WidgetOptionButton[ROW_COUNT];
+        mSeekBar = new WidgetOptionSeekBar[ROW_COUNT];
         mValueLabel = new WidgetOptionLabel[ROW_COUNT];
 
         for (int i = 0; i < ROW_COUNT; i++) {
-            mMinusButton[i] = new WidgetOptionButton(R.drawable.ic_widget_timer_minus, context); // TODO icon
-            mPlusButton[i] = new WidgetOptionButton(R.drawable.ic_widget_timer_plus, context); // TODO icon
-            mValueLabel[i] = new WidgetOptionLabel(context);
+            int max = 0, val = 0;
 
-            setViewAt(0, i, mPlusButton[i]);
-            setViewAt(1, i, mValueLabel[i]);
-            setViewAt(2, i, mMinusButton[i]);
+            switch (i) {
+                case ROW_CONTRAST:
+                    max = getValue(KEY_MAX_CONTRAST_PARAMETER);
+                    val = getValue(KEY_CONTRAST_PARAMETER);
+                    break;
+
+                case ROW_SATURATION:
+                    max = getValue(KEY_MAX_SATURATION_PARAMETER);
+                    val = getValue(KEY_SATURATION_PARAMETER);
+                    break;
+
+                case ROW_SHARPNESS:
+                    max = getValue(KEY_MAX_SHARPNESS_PARAMETER);
+                    val = getValue(KEY_SHARPNESS_PARAMETER);
+                    break;
+            }
+
+            mSeekBar[i] = new WidgetOptionSeekBar(context);
+            mValueLabel[i] = new WidgetOptionLabel(context);
+            mSeekBar[i].setMax(max);
+            mSeekBar[i].setProgress(val);
+
+            setViewAt(i, 2, 1, 3, mSeekBar[i]);
+            setViewAt(i, 1, 1, 1, mValueLabel[i]);
 
             if (i == ROW_CONTRAST) {
-                setViewAt(3, i, new WidgetOptionImage(R.drawable.ic_widget_contrast, context));
+                setViewAt(i, 0, 1, 1, new WidgetOptionImage(R.drawable.ic_widget_contrast, context));
             } else if (i == ROW_SATURATION) {
-                setViewAt(3, i, new WidgetOptionImage(R.drawable.ic_widget_saturation, context));
+                setViewAt(i, 0, 1, 1, new WidgetOptionImage(R.drawable.ic_widget_saturation, context));
             } else if (i == ROW_SHARPNESS) {
-                setViewAt(3, i, new WidgetOptionImage(R.drawable.ic_widget_sharpness, context));
+                setViewAt(i, 0, 1, 1, new WidgetOptionImage(R.drawable.ic_widget_sharpness, context));
             }
 
         }
 
-        mMinusButton[ROW_CONTRAST].setOnClickListener(new MinusClickListener(KEY_CONTRAST_PARAMETER));
-        mMinusButton[ROW_SHARPNESS].setOnClickListener(new MinusClickListener(KEY_SHARPNESS_PARAMETER));
-        mMinusButton[ROW_SATURATION].setOnClickListener(new MinusClickListener(KEY_SATURATION_PARAMETER));
-
-        mPlusButton[ROW_CONTRAST].setOnClickListener(new PlusClickListener(KEY_CONTRAST_PARAMETER,
-                KEY_MAX_CONTRAST_PARAMETER));
-        mPlusButton[ROW_SHARPNESS].setOnClickListener(new PlusClickListener(KEY_SHARPNESS_PARAMETER,
-                KEY_MAX_SHARPNESS_PARAMETER));
-        mPlusButton[ROW_SATURATION].setOnClickListener(new PlusClickListener(KEY_SATURATION_PARAMETER,
-                KEY_MAX_SATURATION_PARAMETER));
-
+        mSeekBar[ROW_CONTRAST].setOnSeekBarChangeListener(new SeekBarListener(KEY_CONTRAST_PARAMETER));
+        mSeekBar[ROW_SHARPNESS].setOnSeekBarChangeListener(new SeekBarListener(KEY_SHARPNESS_PARAMETER));
+        mSeekBar[ROW_SATURATION].setOnSeekBarChangeListener(new SeekBarListener(KEY_SATURATION_PARAMETER));
 
         mValueLabel[ROW_CONTRAST].setText(restoreValueFromStorage(KEY_CONTRAST_PARAMETER));
         mValueLabel[ROW_SHARPNESS].setText(restoreValueFromStorage(KEY_SHARPNESS_PARAMETER));

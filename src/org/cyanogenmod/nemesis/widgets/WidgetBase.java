@@ -34,6 +34,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import org.cyanogenmod.nemesis.BitmapFilter;
@@ -142,16 +143,23 @@ public abstract class WidgetBase {
      * @param column
      * @param v
      */
-    public void setViewAt(int row, int column, View v) {
+    public void setViewAt(int row, int column, int rowSpan, int colSpan, View v) {
         // Do some safety checks first
-        if (mWidget.getRowCount() < row + 1) {
-            mWidget.setRowCount(row + 1);
+        if (mWidget.getRowCount() < row + rowSpan) {
+            mWidget.setRowCount(row + rowSpan);
         }
-        if (mWidget.getColumnCount() < column + 1) {
-            mWidget.setColumnCount(column + 1);
+        if (mWidget.getColumnCount() < column + colSpan) {
+            mWidget.setColumnCount(column + colSpan);
         }
 
-        mWidget.addView(v, row * mWidget.getColumnCount() + column);
+        mWidget.addView(v);
+
+        GridLayout.LayoutParams layoutParams = (GridLayout.LayoutParams) v.getLayoutParams();
+        layoutParams.columnSpec = GridLayout.spec(column, colSpan);
+        layoutParams.rowSpec = GridLayout.spec(row, rowSpan);
+        layoutParams.setGravity(Gravity.FILL);
+        layoutParams.width = colSpan * v.getResources().getDimensionPixelSize(R.dimen.widget_option_button_size);
+        mWidget.setLayoutParams(layoutParams);
     }
 
     public WidgetToggleButton getToggleButton() {
@@ -625,6 +633,48 @@ public abstract class WidgetBase {
     }
 
     /**
+     * Represents a normal seek bar put inside
+     * a {@link WidgetContainer}.
+     */
+    public class WidgetOptionSeekBar extends SeekBar implements WidgetOption {
+
+        public WidgetOptionSeekBar(Context context, AttributeSet attrs) {
+            super(context, attrs);
+            initialize();
+        }
+
+        public WidgetOptionSeekBar(Context context) {
+            super(context);
+            initialize();
+        }
+
+        private void initialize() {
+            // Set padding
+            int pad = getResources().getDimensionPixelSize(R.dimen.widget_container_padding) * 2;
+            this.setPadding(pad, pad, pad, pad);
+            this.setMinimumWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size) * 3);
+        }
+
+        @Override
+        public void onFinishInflate() {
+            super.onFinishInflate();
+            GridLayout.LayoutParams params = (GridLayout.LayoutParams) this.getLayoutParams();
+            params.setMargins(120, 120, 120, 120);
+            this.setLayoutParams(params);
+        }
+
+        @Override
+        public int getColSpan() {
+            return 3;
+        }
+
+        @Override
+        public void notifyOrientationChanged(int orientation) {
+
+        }
+    }
+
+    /**
      * Represents the floating window of a widget.
      */
     public class WidgetContainer extends GridLayout {
@@ -773,6 +823,7 @@ public abstract class WidgetBase {
 
                 // Don't rotate seekbars
                 if (child instanceof WidgetOptionCenteredSeekBar) continue;
+                if (child instanceof WidgetOptionSeekBar) continue;
 
                 option.notifyOrientationChanged(orientation);
 
