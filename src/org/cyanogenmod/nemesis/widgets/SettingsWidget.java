@@ -287,7 +287,7 @@ public class SettingsWidget extends WidgetBase {
         // Toggle rule of thirds
         mToggleRuleOfThirds = new WidgetOptionButton(R.drawable.ic_enhancing, context);
         mToggleRuleOfThirds.setOnClickListener(mRuleOfThirdsClickListener);
-        mToggleRuleOfThirds.setHintText(mContext.getString(R.string.widget_settings_autoenhance));
+        mToggleRuleOfThirds.setHintText(mContext.getString(R.string.widget_settings_ruleofthirds));
 
         // Restore rule of thirds visibility state
         if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_RULE_OF_THIRDS, "0").equals("1")) {
