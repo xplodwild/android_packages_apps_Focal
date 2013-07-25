@@ -116,7 +116,7 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
                 setButtonActivated(button, value);
             }
         } else {
-            Log.w(TAG, "Device doesn't support " + value + " for setting " + mKey);
+            Log.v(TAG, "Device doesn't support " + value + " for setting " + mKey);
         }
     }
 

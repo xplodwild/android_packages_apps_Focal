@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2013 The CyanogenMod Project
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+<resources>
+
+    <string name="app_name">Focal</string>
+    <string name="shutter_button">Déclencheur</string>
+    <string name="cannot_connect_hal">Impossible de lancer la caméra</string>
+    <string name="recording">Enregistrement</string>
+    <string name="double_tap_to_snapshot">Tapez deux fois pour prendre une photo</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">OK</string>
+    <string name="no_gles20_support">Votre matériel n\'est pas\ncompatible OpenGLES 2.0</string>
+    <string name="no_gyroscope">Votre matériel n\'a pas de gyroscope</string>
+    <string name="ps_long_press_to_stop">Restez appuyé sur le déclencheur\npour finir la sphère.</string>
+    <string name="disabled">Désactivé</string>
+    <string name="enabled">Activé</string>
+    <string name="no_video_player">Impossible de lire la vidéo</string>
+    <string name="fullscreen_shutter_info">Appuyez n\'importe où pour capturer</string>
+
+    <string name="mode_photo">Photo</string>
+    <string name="mode_video">Vidéo</string>
+    <string name="mode_picsphere">PicSphere</string>
+    <string name="mode_panorama">Panorama</string>
+    <string name="mode_switchcam">Direction</string>
+
+    <!-- Widgets hints for non-arrayed widgets -->
+    <string name="widget_burstmode_count_shots">Rafale %d images</string>
+    <string name="widget_burstmode_off">Sans mode rafale</string>
+    <string name="widget_burstmode_infinite">Rafale infinie</string>
+
+    <string name="widget_hdr_aebracket">Auto bracketing</string>
+
+    <string name="widget_settings_choose_widgets">Widgets à afficher</string>
+    <string name="widget_settings_choose_widgets_button">Widgets à afficher</string>
+    <string name="widget_settings_picture_size">Taille de l\'image</string>
+    <string name="widget_settings_exposure_ring">Bague d\'exposition</string>
+    <string name="widget_settings_autoenhance">Auto-amélioration</string>
+
+
+    <string name="widget_autoexposure">Mode de mesure d\'exposition</string>
+    <string name="widget_burstmode">Mode rafale</string>
+    <string name="widget_effect">Effets de couleur</string>
+    <string name="widget_enhancements">Réglage des couleurs</string>
+    <string name="widget_exposure_compensation">Exposition</string>
+    <string name="widget_flash">Mode de flash</string>
+    <string name="widget_hdr">High Dynamic Range</string>
+    <string name="widget_iso">Sensibilité ISO</string>
+    <string name="widget_scenemode">Mode scène</string>
+    <string name="widget_settings">Paramètres</string>
+    <string name="widget_shutter_speed">Vitesse d\'obturateur</string>
+    <string name="widget_skintone">Amélioration de la peau</string>
+    <string name="widget_softwarehdr">High Dynamic Range</string>
+    <string name="widget_timermode">Retardateur</string>
+    <string name="widget_videofr">Vitesse vidéo</string>
+    <string name="widget_videohdr">High Dynamic Range vidéo</string>
+    <string name="widget_whitebalance">Balance des blancs</string>
+
+    <!-- Panorama mode -->
+    <string name="pano_panorama_rendering_failed">Le rendu a échoué.\nEssayez d\'en prendre un plus court.</string>
+    <string name="pano_panorama_rendering">Rendu du panorama&#8230;</string>
+
+    <!-- PicSphere status -->
+    <string name="picsphere_undo_button">ANNULER</string>
+    <string name="picsphere_start_hint">Prenez une photo pour démarrer</string>
+    <string name="picsphere_already_rendering">Veuillez attendre le rendu de\nla sphère précédente</string>
+    <string name="picsphere_rendering_progress">Rendu en cours... (%d %%)</string>
+    <string name="picsphere_toast_background_render">Rendu de la PicSphere&#8230;</string>
+    <string name="picsphere_notif_title">Rendu de la PicSphere&#8230;</string>
+    <string name="picsphere_failed">Rendu de la PicSphere échoué</string>
+    <string name="picsphere_failed_details">Les images ne doivent se superposer que sur les bords.</string>
+    <string name="picsphere_need_two_pics">Il faut au moins deux images.</string>
+    <string name="picsphere_step_preparing">Préparation&#8230;</string>
+    <string name="picsphere_step_autopano">Etablissement de la correspondance&#8230;</string>
+    <string name="picsphere_step_autooptimiser">Optimisation des correspondances&#8230;</string>
+    <string name="picsphere_step_ptclean">Nettoyage des points&#8230;</string>
+    <string name="picsphere_step_panomodify">Rognage des coins&#8230;</string>
+    <string name="picsphere_step_nona">Déformation des images&#8230;</string>
+    <string name="picsphere_step_enblend">Finalisation de l\'image&#8230;</string>
+
+    <!-- Showcase text -->
+    <string name="showcase_welcome_1_title">Bienvenue!</string>
+    <string name="showcase_welcome_1_body">Les paramètres sont dans la\nbarre latérale.</string>
+    <string name="showcase_welcome_2_title">Déclencheur</string>
+    <string name="showcase_welcome_2_body">Appuyez sur le déclencheur pour\nprendre une photo.\nFaites-le glisser pour changer de mode.</string>
+    <string name="showcase_panorama_title">Mode Panorama</string>
+    <string name="showcase_panorama_body">Appuyez sur le déclencheur pour démarrer,\npuis orientez simplement le téléphone.\nUne fois fini, rappuyez sur le déclencheur.</string>
+    <string name="showcase_picsphere_title">Mode PicSphere</string>
+    <string name="showcase_picsphere_body">Alignez la première photo où vous souhaitez,\npuis prenez chaque photo de votre sphère.\nVous pouvez utilisez les points bleus\ncomme orientation idéale.\nRestez appuyé sur le déclencheur pour finir.</string>
+</resources>
+
+
+

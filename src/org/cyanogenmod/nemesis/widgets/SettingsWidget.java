@@ -45,12 +45,15 @@ import java.util.List;
 public class SettingsWidget extends WidgetBase {
     private static final String DRAWABLE_KEY_EXPO_RING = "_Nemesis_ExposureRing=true";
     private static final String DRAWABLE_KEY_AUTO_ENHANCE = "_Nemesis_AutoEnhance=true";
+    private static final String DRAWABLE_KEY_RULE_OF_THIRDS = "_Nemesis_RuleOfThirds=true";
     private static final String KEY_SHOW_EXPOSURE_RING = "ShowExposureRing";
     private static final String KEY_ENABLE_AUTO_ENHANCE = "AutoEnhanceEnabled";
+    private static final String KEY_ENABLE_RULE_OF_THIRDS = "RuleOfThirdsEnabled";
     private WidgetOptionButton mResolutionButton;
     private WidgetOptionButton mToggleExposureRing;
     private WidgetOptionButton mToggleAutoEnhancer;
     private WidgetOptionButton mToggleWidgetsButton;
+    private WidgetOptionButton mToggleRuleOfThirds;
     private CameraActivity mContext;
     private CameraCapabilities mCapabilities;
     private List<String> mResolutionsName;
@@ -85,6 +88,24 @@ public class SettingsWidget extends WidgetBase {
 
             SettingsStorage.storeAppSetting(mContext, KEY_SHOW_EXPOSURE_RING,
                     mContext.isExposureRingVisible() ? "1" : "0");
+        }
+    };
+
+    private View.OnClickListener mRuleOfThirdsClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            View rot = mContext.findViewById(R.id.rule_of_thirds);
+
+            if (rot.getVisibility() == View.GONE) {
+                mToggleRuleOfThirds.setActiveDrawable(DRAWABLE_KEY_RULE_OF_THIRDS);
+                rot.setVisibility(View.VISIBLE);
+            } else {
+                mToggleRuleOfThirds.resetImage();
+                rot.setVisibility(View.GONE);
+            }
+
+            SettingsStorage.storeAppSetting(mContext, KEY_ENABLE_RULE_OF_THIRDS,
+                    rot.getVisibility() == View.GONE ? "0" : "1");
         }
     };
 
@@ -262,6 +283,22 @@ public class SettingsWidget extends WidgetBase {
         }
 
         addViewToContainer(mToggleAutoEnhancer);
+
+        // Toggle rule of thirds
+        mToggleRuleOfThirds = new WidgetOptionButton(R.drawable.ic_enhancing, context);
+        mToggleRuleOfThirds.setOnClickListener(mRuleOfThirdsClickListener);
+        mToggleRuleOfThirds.setHintText(mContext.getString(R.string.widget_settings_autoenhance));
+
+        // Restore rule of thirds visibility state
+        if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_RULE_OF_THIRDS, "0").equals("1")) {
+            mContext.findViewById(R.id.rule_of_thirds).setVisibility(View.VISIBLE);
+            mToggleRuleOfThirds.setActiveDrawable(KEY_ENABLE_RULE_OF_THIRDS);
+        } else {
+            mContext.findViewById(R.id.rule_of_thirds).setVisibility(View.GONE);
+            mToggleRuleOfThirds.resetImage();
+        }
+
+        addViewToContainer(mToggleRuleOfThirds);
 
         // Choose widgets to appear
         mToggleWidgetsButton = new WidgetOptionButton(R.drawable.ic_widget_settings_widgets, context);
