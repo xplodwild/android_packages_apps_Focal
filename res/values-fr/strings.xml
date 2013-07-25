@@ -19,6 +19,7 @@
 <resources>
 
     <string name="app_name">Focal</string>
+    <string name="launch_app">Lancer Focal</string>
     <string name="shutter_button">Déclencheur</string>
     <string name="cannot_connect_hal">Impossible de lancer la caméra</string>
     <string name="recording">Enregistrement</string>
