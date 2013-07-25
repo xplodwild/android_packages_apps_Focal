@@ -606,7 +606,13 @@ public class CameraManager {
                     mCamera.setParameters(params);
                     mParameters = mCamera.getParameters();
                     try {
-                        mCamera.startPreview();
+                        // PicSphere and Pano renders to a texture, so the preview will be started
+                        // once the SurfaceTexture is ready to receive frames
+                        if (mode != CameraActivity.CAMERA_MODE_PICSPHERE
+                                && mode != CameraActivity.CAMERA_MODE_PANO) {
+                            mCamera.startPreview();
+                        }
+
                         mPreview.notifyPreviewSize(mTargetSize.x, mTargetSize.y);
                     } catch (RuntimeException e) {
                         Log.e(TAG, "Unable to start preview", e);
