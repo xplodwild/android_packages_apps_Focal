@@ -237,6 +237,7 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
             if ((button.mIsHovering || button.mHintTextAlpha > 0.0f) && mOpenProgress == 1.0f) {
                 // Draw hint text
                 int alpha = (int) (255 * (button.mHintTextAlpha));
+                mPaint.setStyle(Paint.Style.FILL);
 
                 mPaint.setTextSize(36);
                 mPaint.setTextAlign(Paint.Align.CENTER);
