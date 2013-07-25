@@ -118,6 +118,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private boolean mIsFullscreenShutter;
     private int mShowcaseIndex;
     private boolean mIsCamSwitching;
+    private CameraPreviewListener mCamPreviewListener;
 
     private final static int SHOWCASE_INDEX_WELCOME_1 = 0;
     private final static int SHOWCASE_INDEX_WELCOME_2 = 1;
@@ -327,7 +328,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mPaused = false;
 
         if (mCamManager != null) {
-            //setCameraMode(CAMERA_MODE_PHOTO);
             mCamManager.resume();
         }
 
@@ -433,6 +433,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     setCameraMode(newMode);
                 }
             });
+        }
+
+        if (mCamPreviewListener != null) {
+            mCamPreviewListener.onPreviewPause();
         }
 
         setHelperText("");
@@ -605,7 +609,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         params.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 
         mCamManager.getPreviewSurface().setLayoutParams(params);
-        mCamManager.setPreviewPauseListener(new CameraPreviewListener());
+        mCamPreviewListener = new CameraPreviewListener();
+        mCamManager.setPreviewPauseListener(mCamPreviewListener);
         mCamManager.setCameraReadyListener(this);
 
         mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK);
@@ -978,40 +983,24 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         @Override
         public void onPreviewPause() {
+            final PreviewFrameLayout container = (PreviewFrameLayout)
+                    findViewById(R.id.camera_preview_overlay_container);
+            final ImageView iv = (ImageView) findViewById(R.id.camera_preview_overlay);
+
+            if (iv.getAlpha() == 1.0f) return;
+
             final Bitmap preview = mCamManager.getLastPreviewFrame();
 
             if (preview == null) {
                 return;
             }
 
-            final PreviewFrameLayout container = (PreviewFrameLayout)
-                    findViewById(R.id.camera_preview_overlay_container);
+            container.setAspectRatio((float) preview.getWidth() / preview.getHeight());
+            container.setPreviewSize(preview.getWidth(), preview.getHeight());
+            iv.setImageBitmap(preview);
+            iv.setAlpha(1.0f);
 
-            final ImageView iv = (ImageView) findViewById(R.id.camera_preview_overlay);
-
-            new Thread() {
-                public void run() {
-                    long time = System.currentTimeMillis();
-                    try {
-                        final Bitmap blurredPreview = BitmapFilter.getSingleton()
-                                .getBlur(CameraActivity.this, preview, 16);
-                        long elapsed = System.currentTimeMillis() - time;
-
-                        Log.v(TAG, "Took " + elapsed + "ms to blur");
-
-                        runOnUiThread(new Runnable() {
-                            public void run() {
-                                container.setAspectRatio((float) preview.getWidth() / preview.getHeight());
-                                container.setPreviewSize(preview.getWidth(), preview.getHeight());
-                                iv.setImageBitmap(blurredPreview);
-                                iv.setAlpha(1.0f);
-
-                                findViewById(R.id.camera_preview_container).setAlpha(0.0f);
-                            }
-                        });
-                    } catch (Exception e) { }
-                }
-            }.start();
+            findViewById(R.id.camera_preview_container).setAlpha(0.0f);
         }
 
         @Override

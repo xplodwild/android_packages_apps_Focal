@@ -356,7 +356,7 @@ public class CameraManager {
      * @param lock true to lock, false to unlock
      */
     public void setLockSetup(boolean lock) {
-        Camera.Parameters params = getParameters();
+        final Camera.Parameters params = getParameters();
 
         if (params == null) {
             // Params might be null if we pressed or swipe the shutter button
@@ -372,12 +372,17 @@ public class CameraManager {
             params.setAutoWhiteBalanceLock(lock);
         }
 
+        new Thread() {
+            public void run() {
+                synchronized (mParametersThread) {
+                    try {
+                        mCamera.setParameters(params);
+                    } catch (RuntimeException e) {
 
-        try {
-            mCamera.setParameters(params);
-        } catch (RuntimeException e) {
-
-        }
+                    }
+                }
+            }
+        }.start();
     }
 
     /**
@@ -560,14 +565,6 @@ public class CameraManager {
 
         new Thread() {
             public void run() {
-                // We voluntarily sleep the thread here for the animation being done
-                // in the CameraActivity
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
                 mIsModeSwitching = true;
                 synchronized (mParametersThread) {
                     Camera.Parameters params = getParameters();
