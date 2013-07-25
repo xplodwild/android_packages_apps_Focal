@@ -348,7 +348,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-
+                setCameraMode(CAMERA_MODE_PHOTO);
             }
         });
     }
@@ -637,7 +637,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 Camera.Size picSize = mCamManager.getParameters().getPictureSize();
 
                 Camera.Size sz = Util.getOptimalPreviewSize(CameraActivity.this, params.getSupportedPreviewSizes(),
-                        (float) ((float) picSize.width / (float) picSize.height));
+                        ((float) picSize.width / (float) picSize.height));
                 if (sz == null) {
                     Log.e(TAG, "No preview size!! Something terribly wrong with camera!");
                     return;
