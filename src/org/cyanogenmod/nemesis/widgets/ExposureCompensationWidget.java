@@ -20,7 +20,6 @@ package org.cyanogenmod.nemesis.widgets;
 
 import android.content.Context;
 import android.hardware.Camera;
-import android.view.View;
 
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
@@ -74,6 +73,8 @@ public class ExposureCompensationWidget extends WidgetBase implements CenteredSe
     }
 
     public void setExposureValue(int value) {
+        if (getExposureValue() == value) return;
+
         String valueStr = Integer.toString(value);
 
         mCamManager.setParameterAsync(KEY_PARAMETER, valueStr);

@@ -20,7 +20,6 @@ package org.cyanogenmod.nemesis.widgets;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
-import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
@@ -407,7 +406,7 @@ public abstract class WidgetBase {
             setPadding(padding, padding, padding, padding);
             setGravity(Gravity.CENTER);
 
-            setTextSize(getResources().getDimension(R.dimen.widget_option_label_font_size));
+            setTextSize(getResources().getInteger(R.integer.widget_option_label_font_size));
         }
 
         @Override
@@ -419,9 +418,9 @@ public abstract class WidgetBase {
 
         public void setSmall(boolean small) {
             if (small) {
-                setTextSize(getResources().getDimension(R.dimen.widget_option_label_font_size_small));
+                setTextSize(getResources().getInteger(R.integer.widget_option_label_font_size_small));
             } else {
-                setTextSize(getResources().getDimension(R.dimen.widget_option_label_font_size));
+                setTextSize(getResources().getInteger(R.integer.widget_option_label_font_size));
             }
         }
 
