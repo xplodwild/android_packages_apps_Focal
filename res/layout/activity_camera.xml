@@ -116,7 +116,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:translationX="120dp"/>
+                android:translationX="120dp"
+                android:visibility="gone"/>
 
     </FrameLayout>
 

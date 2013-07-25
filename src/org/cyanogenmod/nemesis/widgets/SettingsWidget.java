@@ -231,18 +231,20 @@ public class SettingsWidget extends WidgetBase {
         mResolutionButton.setHintText(mContext.getString(R.string.widget_settings_picture_size));
         addViewToContainer(mResolutionButton);
 
-        mToggleExposureRing = new WidgetOptionButton(R.drawable.ic_widget_settings_exposurering, context);
-        mToggleExposureRing.setHintText(mContext.getString(R.string.widget_settings_exposure_ring));
-        mToggleExposureRing.setOnClickListener(mExpoRingClickListener);
+        if (mCamManager.isExposureAreaSupported()) {
+            mToggleExposureRing = new WidgetOptionButton(R.drawable.ic_widget_settings_exposurering, context);
+            mToggleExposureRing.setHintText(mContext.getString(R.string.widget_settings_exposure_ring));
+            mToggleExposureRing.setOnClickListener(mExpoRingClickListener);
 
-        // Restore exposure ring state
-        if (SettingsStorage.getAppSetting(mContext, KEY_SHOW_EXPOSURE_RING, "0").equals("1")) {
-            mContext.setExposureRingVisible(true);
-            mToggleExposureRing.setActiveDrawable(DRAWABLE_KEY_EXPO_RING);
-        } else {
-            mContext.setExposureRingVisible(false);
+            // Restore exposure ring state
+            if (SettingsStorage.getAppSetting(mContext, KEY_SHOW_EXPOSURE_RING, "0").equals("1")) {
+                mContext.setExposureRingVisible(true);
+                mToggleExposureRing.setActiveDrawable(DRAWABLE_KEY_EXPO_RING);
+            } else {
+                mContext.setExposureRingVisible(false);
+            }
+            addViewToContainer(mToggleExposureRing);
         }
-        addViewToContainer(mToggleExposureRing);
 
         // Toggle auto enhancer
         mToggleAutoEnhancer = new WidgetOptionButton(R.drawable.ic_enhancing, context);

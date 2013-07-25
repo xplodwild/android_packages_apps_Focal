@@ -19,6 +19,7 @@
 package org.cyanogenmod.nemesis.widgets;
 
 import android.content.Context;
+import android.hardware.Camera;
 
 import org.cyanogenmod.nemesis.CameraManager;
 import org.cyanogenmod.nemesis.R;
@@ -35,5 +36,10 @@ public class AutoExposureWidget extends SimpleToggleWidget {
                 R.array.widget_autoexposure_hints);
         getToggleButton().setHintText(R.string.widget_autoexposure);
         restoreValueFromStorage(KEY_AUTOEXPOSURE);
+    }
+
+    @Override
+    public boolean isSupported(Camera.Parameters params) {
+        return super.isSupported(params) && mCamManager.isExposureAreaSupported();
     }
 }
