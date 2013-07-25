@@ -319,7 +319,6 @@ public class CameraManager {
                         mPreview.notifyPreviewSize(width, height);
 
                         if (mIsResuming) {
-                            Log.e(TAG, "Start preview because resume");
                             mCamera.startPreview();
                             mIsResuming = false;
                         }
@@ -907,7 +906,6 @@ public class CameraManager {
             synchronized (mParametersThread) {
                 if (mCamera != null) {
                     if (startPreview) {
-                        Log.e(TAG, "STOP PREVIEW LINE 915");
                         mCamera.stopPreview();
                     }
 
@@ -962,7 +960,6 @@ public class CameraManager {
             // stop preview before making changes
             synchronized (mParametersThread) {
                 try {
-                    Log.e(TAG, "STOP PREVIEW LINE 970");
                     mCamera.stopPreview();
                 } catch (Exception e) {
                     // ignore: tried to stop a non-existent preview

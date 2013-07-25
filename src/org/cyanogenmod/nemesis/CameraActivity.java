@@ -321,7 +321,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     protected void onResume() {
         super.onResume();
 
-        Log.e(TAG, "Was paused? " + mPaused);
         if (!mPaused) return;
 
         // Restore the camera preview
