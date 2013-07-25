@@ -35,7 +35,7 @@ import org.cyanogenmod.nemesis.widgets.WidgetBase;
 public class SideBar extends HorizontalScrollView {
     public final static String TAG = "SideBar";
     public final static int SLIDE_ANIMATION_DURATION_MS = 300;
-    private final static float BAR_MARGIN = 6;
+    private final static float BAR_MARGIN = 0;
     private CameraCapabilities mCapabilities;
     private ViewGroup mToggleContainer;
     private boolean mIsOpen;
