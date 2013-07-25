@@ -23,9 +23,9 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
+import org.cyanogenmod.nemesis.Util;
 
 /**
  * A layout which handles the preview aspect ratio.
@@ -75,8 +75,8 @@ public class PreviewFrameLayout extends RelativeLayout {
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
         // Scale the preview while keeping the aspect ratio
-        int fullWidth = MeasureSpec.getSize(widthSpec);
-        int fullHeight = MeasureSpec.getSize(heightSpec);
+        int fullWidth = Util.getScreenSize(null).x;
+        int fullHeight = Util.getScreenSize(null).y;
 
         // Ask children to follow the new preview dimension.
         super.onMeasure(MeasureSpec.makeMeasureSpec(fullWidth, MeasureSpec.EXACTLY),

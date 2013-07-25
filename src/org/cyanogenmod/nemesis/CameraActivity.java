@@ -40,7 +40,6 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -650,9 +649,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 }
 
                 final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
-                layout.setAspectRatio((double) sz.width / sz.height);
                 layout.setPreviewSize(sz.width, sz.height);
-                layout.requestLayout();
 
                 if (mFocusManager == null) {
                     mFocusManager = new FocusManager(mCamManager);
