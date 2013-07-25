@@ -68,6 +68,7 @@ public class CameraManager {
     private long mLastPreviewFrameTime;
     private boolean mIsModeSwitching;
     private List<NameValuePair> mPendingParameters;
+    private boolean mIsResuming;
 
     public interface PreviewPauseListener {
         /**
@@ -148,6 +149,7 @@ public class CameraManager {
         mContext = context;
         mPendingParameters = new ArrayList<NameValuePair>();
         mParametersThread.start();
+        mIsResuming = false;
     }
 
     /**
@@ -189,14 +191,9 @@ public class CameraManager {
                         params = params.substring(step);
                     }
 
-                    if (mTargetSize != null) {
-                        setPreviewSize(mTargetSize.x, mTargetSize.y);
-                    }
-
-                    if (mAutoFocusMoveCallback != null)
+                    if (mAutoFocusMoveCallback != null) {
                         mCamera.setAutoFocusMoveCallback(mAutoFocusMoveCallback);
-
-                    // Default focus mode to continuous
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "Error while opening cameras: " + e.getMessage(), e);
 
@@ -282,6 +279,7 @@ public class CameraManager {
     }
 
     public void resume() {
+        mIsResuming = true;
         reconnectToCamera();
         //mParametersThread.start();
     }
@@ -319,7 +317,12 @@ public class CameraManager {
                         mParameters = params;
                         mCamera.setParameters(mParameters);
                         mPreview.notifyPreviewSize(width, height);
-                        mCamera.startPreview();
+
+                        if (mIsResuming) {
+                            Log.e(TAG, "Start preview because resume");
+                            mCamera.startPreview();
+                            mIsResuming = false;
+                        }
 
                         mPreview.setPauseCopyFrame(false);
                     } catch (RuntimeException ex) {
@@ -535,10 +538,13 @@ public class CameraManager {
     public void restartPreviewIfNeeded() {
         new Thread() {
             public void run() {
-                try {
-                    mCamera.startPreview();
-                } catch (Exception e) {
-                    // ignore
+                synchronized (mParametersThread) {
+                    try {
+                        mCamera.startPreview();
+                        mPreview.setPauseCopyFrame(false);
+                    } catch (Exception e) {
+                        // ignore
+                    }
                 }
             }
         }.start();
@@ -619,7 +625,7 @@ public class CameraManager {
                     }
                 }
 
-                mPreview.postCallbackBuffer();
+                mPreview.setPauseCopyFrame(false);
                 mIsModeSwitching = false;
 
                 if (mPreviewPauseListener != null) {
@@ -878,8 +884,6 @@ public class CameraManager {
         }
 
         public void setPauseCopyFrame(boolean pause) {
-            if (mPauseCopyFrame == pause) return;
-
             mPauseCopyFrame = pause;
 
             if (!pause && mCamera != null) {
@@ -903,6 +907,7 @@ public class CameraManager {
             synchronized (mParametersThread) {
                 if (mCamera != null) {
                     if (startPreview) {
+                        Log.e(TAG, "STOP PREVIEW LINE 915");
                         mCamera.stopPreview();
                     }
 
@@ -957,6 +962,7 @@ public class CameraManager {
             // stop preview before making changes
             synchronized (mParametersThread) {
                 try {
+                    Log.e(TAG, "STOP PREVIEW LINE 970");
                     mCamera.stopPreview();
                 } catch (Exception e) {
                     // ignore: tried to stop a non-existent preview

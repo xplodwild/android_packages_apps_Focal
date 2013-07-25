@@ -117,6 +117,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private boolean mUserWantsExposureRing;
     private boolean mIsFullscreenShutter;
     private int mShowcaseIndex;
+    private boolean mIsCamSwitching;
 
     private final static int SHOWCASE_INDEX_WELCOME_1 = 0;
     private final static int SHOWCASE_INDEX_WELCOME_2 = 1;
@@ -147,6 +148,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     };
 
 
+
     /**
      * Event: Activity created
      */
@@ -156,6 +158,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         setContentView(R.layout.activity_camera);
 
         mPaused = false;
+        mIsCamSwitching = false;
 
         getWindow().getDecorView()
                 .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
@@ -316,10 +319,16 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
     @Override
     protected void onResume() {
+        super.onResume();
+
+        Log.e(TAG, "Was paused? " + mPaused);
+        if (!mPaused) return;
+
         // Restore the camera preview
         mPaused = false;
 
         if (mCamManager != null) {
+            //setCameraMode(CAMERA_MODE_PHOTO);
             mCamManager.resume();
         }
 
@@ -333,14 +342,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         mOrientationListener.enable();
 
-        super.onResume();
+
         mReviewDrawer.close();
 
         // Reset to photo
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                setCameraMode(CAMERA_MODE_PHOTO);
+
             }
         });
     }
@@ -600,7 +609,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mCamManager.setPreviewPauseListener(new CameraPreviewListener());
         mCamManager.setCameraReadyListener(this);
 
-
         mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK);
     }
 
@@ -621,12 +629,22 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     }, 20);
                     return;
                 }
-                Camera.Size sz = Util.getOptimalPreviewSize(CameraActivity.this, params.getSupportedPreviewSizes(), 1.33f);
+
+                Camera.Size picSize = mCamManager.getParameters().getPictureSize();
+
+                Camera.Size sz = Util.getOptimalPreviewSize(CameraActivity.this, params.getSupportedPreviewSizes(),
+                        (float) ((float) picSize.width / (float) picSize.height));
                 if (sz == null) {
                     Log.e(TAG, "No preview size!! Something terribly wrong with camera!");
                     return;
                 }
                 mCamManager.setPreviewSize(sz.width, sz.height);
+
+                if (mIsCamSwitching) {
+                    mCamManager.restartPreviewIfNeeded();
+                    mIsCamSwitching = false;
+                }
+
 
                 final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
                 layout.setAspectRatio((double) sz.width / sz.height);
@@ -1035,11 +1053,13 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     break;
 
                 case SwitchRingPad.BUTTON_SWITCHCAM:
+                    mIsCamSwitching = true;
                     if (mCamManager.getCurrentFacing() == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                         mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK);
                     } else {
                         mCamManager.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
                     }
+
                     updateCapabilities();
                     break;
 
