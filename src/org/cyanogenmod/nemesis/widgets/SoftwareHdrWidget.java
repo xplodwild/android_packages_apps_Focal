@@ -66,6 +66,7 @@ public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListene
     public boolean isSupported(Camera.Parameters params) {
         // Software HDR only in photo mode!
         if (CameraActivity.getCameraMode() != CameraActivity.CAMERA_MODE_PHOTO) {
+            mTransformer.tearDown();
             return false;
         }
 
@@ -73,12 +74,14 @@ public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListene
         // hdr setting key defined
         List<String> sceneModes = params.getSupportedSceneModes();
         if (sceneModes != null && sceneModes.contains("hdr")) {
+            mTransformer.tearDown();
             return false;
         }
 
         String[] keys = mContext.getResources().getStringArray(R.array.hardware_hdr_keys);
         for (String key : keys) {
             if (params.get(key) != null) {
+                mTransformer.tearDown();
                 return false;
             }
         }

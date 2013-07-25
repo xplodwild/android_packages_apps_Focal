@@ -30,7 +30,6 @@ import android.util.Log;
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.SnapshotManager;
 import org.cyanogenmod.nemesis.Util;
-import org.cyanogenmod.nemesis.picsphere.PicSphereRenderingService;
 import org.cyanogenmod.nemesis.ui.ShutterButton;
 
 import java.io.File;
@@ -50,10 +49,10 @@ public class SoftwareHdrCapture extends CaptureTransformer {
     private CameraActivity mActivity;
     private List<Uri> mPictures;
     private List<Uri> mPicturesUri;
-    private SoftwareHdrRenderingService mBoundService;
-    private boolean mIsBound;
+    private static SoftwareHdrRenderingService mBoundService;
+    private static boolean mIsBound;
 
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
+    private static ServiceConnection mServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             // This is called when the connection with the service has been
             // established, giving us the service object we can use to
@@ -79,6 +78,14 @@ public class SoftwareHdrCapture extends CaptureTransformer {
         mPicturesUri = new ArrayList<Uri>();
         mActivity = activity;
         doBindService();
+    }
+
+    public static ServiceConnection getServiceConnection() {
+        return mServiceConnection;
+    }
+
+    public static boolean isServiceBound() {
+        return mIsBound;
     }
 
     void doBindService() {

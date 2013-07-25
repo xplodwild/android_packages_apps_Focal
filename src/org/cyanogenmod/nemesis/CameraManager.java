@@ -66,6 +66,7 @@ public class CameraManager {
     private Handler mHandler;
     private Context mContext;
     private long mLastPreviewFrameTime;
+    private boolean mCameraOpen;
     private boolean mIsModeSwitching;
     private List<NameValuePair> mPendingParameters;
     private boolean mIsResuming;
@@ -150,6 +151,7 @@ public class CameraManager {
         mPendingParameters = new ArrayList<NameValuePair>();
         mParametersThread.start();
         mIsResuming = false;
+        mCameraOpen = false;
     }
 
     /**
@@ -179,6 +181,9 @@ public class CameraManager {
                         return;
                     }
                     mCamera = Camera.open(cameraId);
+                    mCameraOpen = true;
+                    Log.v(TAG, "Camera is open");
+
                     mCamera.enableShutterSound(false);
                     mCamera.setPreviewCallback(mPreview);
                     mCurrentFacing = cameraId;
@@ -288,6 +293,7 @@ public class CameraManager {
         if (mCamera != null && mCameraReady) {
             Log.v(TAG, "Releasing camera facing " + mCurrentFacing);
             mCamera.release();
+            mCameraOpen = false;
             mCamera = null;
             mParameters = null;
             mPreview.notifyCameraChanged(false);
@@ -298,6 +304,8 @@ public class CameraManager {
     private void reconnectToCamera() {
         if (mCameraReady) {
             open(mCurrentFacing);
+        } else {
+            Log.e(TAG, "reconnectToCamera but camera not ready!");
         }
     }
 
@@ -948,18 +956,29 @@ public class CameraManager {
             // empty. Take care of releasing the Camera preview in your activity.
         }
 
-        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+        public void surfaceChanged(final SurfaceHolder holder, final int format, final int w, final int h) {
             if (mHolder.getSurface() == null) {
                 // preview surface does not exist
                 return;
             }
 
             // stop preview before making changes
-            synchronized (mParametersThread) {
+            synchronized (this) {
                 try {
                     mCamera.stopPreview();
                 } catch (Exception e) {
                     // ignore: tried to stop a non-existent preview
+                }
+
+                if (!mCameraOpen) {
+                    Log.w(TAG, "Camera not open yet, delaying surface update");
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            surfaceChanged(holder, format, w, h);
+                        }
+                    });
+                    return;
                 }
 
                 setupCamera();
@@ -1007,6 +1026,7 @@ public class CameraManager {
                 postCallbackBuffer();
             } catch (Exception e) {
                 Log.e(TAG, "Could not set device specifics");
+
             }
         }
 

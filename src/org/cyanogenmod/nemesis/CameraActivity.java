@@ -49,6 +49,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.cyanogenmod.nemesis.feats.CaptureTransformer;
+import org.cyanogenmod.nemesis.feats.SoftwareHdrCapture;
 import org.cyanogenmod.nemesis.pano.MosaicProxy;
 import org.cyanogenmod.nemesis.picsphere.PicSphereCaptureTransformer;
 import org.cyanogenmod.nemesis.picsphere.PicSphereManager;
@@ -314,21 +315,23 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mPicSphereManager.onPause();
         }
 
+        if (SoftwareHdrCapture.isServiceBound()) {
+            unbindService(SoftwareHdrCapture.getServiceConnection());
+        }
+
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        super.onResume();
-
-        if (!mPaused) return;
-
         // Restore the camera preview
         mPaused = false;
 
         if (mCamManager != null) {
             mCamManager.resume();
         }
+
+        super.onResume();
 
         if (mSnapshotManager != null) {
             mSnapshotManager.onResume();
@@ -339,7 +342,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         }
 
         mOrientationListener.enable();
-
 
         mReviewDrawer.close();
 
