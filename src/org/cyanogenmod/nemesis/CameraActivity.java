@@ -649,10 +649,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     mIsCamSwitching = false;
                 }
 
-
                 final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
                 layout.setAspectRatio((double) sz.width / sz.height);
                 layout.setPreviewSize(sz.width, sz.height);
+                layout.requestLayout();
 
                 if (mFocusManager == null) {
                     mFocusManager = new FocusManager(mCamManager);

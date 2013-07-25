@@ -21,7 +21,10 @@ package org.cyanogenmod.nemesis.ui;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 /**
@@ -71,27 +74,33 @@ public class PreviewFrameLayout extends RelativeLayout {
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        int previewWidth = mPreviewWidth;
-        int previewHeight = mPreviewHeight;
-
         // Scale the preview while keeping the aspect ratio
         int fullWidth = MeasureSpec.getSize(widthSpec);
         int fullHeight = MeasureSpec.getSize(heightSpec);
 
-        float widthRatio = (float) fullWidth / previewWidth;
-        float heightRatio = (float) fullHeight / previewHeight;
-
-        if (widthRatio > heightRatio) {
-            previewWidth *= widthRatio;
-            previewHeight *= widthRatio;
-        } else {
-            previewWidth *= heightRatio;
-            previewHeight *= heightRatio;
-        }
-
         // Ask children to follow the new preview dimension.
-        super.onMeasure(MeasureSpec.makeMeasureSpec(previewWidth, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(previewHeight, MeasureSpec.EXACTLY));
+        super.onMeasure(MeasureSpec.makeMeasureSpec(fullWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(fullHeight, MeasureSpec.EXACTLY));
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        int previewWidth = mPreviewWidth;
+        int previewHeight = mPreviewHeight;
+
+        // Scale the preview while keeping the aspect ratio
+        int fullWidth = getWidth();
+        int fullHeight = getHeight();
+
+        float ratio = Math.min((float) fullWidth / (float) previewWidth, (float) fullHeight / (float) previewHeight);
+        previewWidth *= ratio;
+        previewHeight *= ratio;
+
+        canvas.save();
+        canvas.scale(ratio, ratio);
+
+        super.onDraw(canvas);
+        canvas.restore();
     }
 
     public void setOnSizeChangedListener(OnSizeChangedListener listener) {
