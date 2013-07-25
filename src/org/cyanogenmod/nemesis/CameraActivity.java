@@ -206,6 +206,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         MainShutterClickListener shutterClickListener = new MainShutterClickListener();
         mShutterButton.setOnClickListener(shutterClickListener);
         mShutterButton.setOnLongClickListener(shutterClickListener);
+        mShutterButton.setOnTouchListener(shutterClickListener);
         mShutterButton.setSlideListener(new MainShutterSlideListener());
 
         // Setup gesture detection
@@ -1087,7 +1088,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     /**
      * When the shutter button is pressed
      */
-    public class MainShutterClickListener implements OnClickListener, View.OnLongClickListener {
+    public class MainShutterClickListener implements OnClickListener, View.OnLongClickListener, View.OnTouchListener {
+        boolean mIsLongClicked = false;
+
         @Override
         public void onClick(View v) {
             mHandler.postDelayed(new Runnable() {
@@ -1118,8 +1121,23 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         public boolean onLongClick(View view) {
             if (mCaptureTransformer != null) {
                 mCaptureTransformer.onShutterButtonLongPressed(mShutterButton);
+            } else {
+                mIsLongClicked = true;
+                mFocusManager.checkFocus();
             }
             return true;
+        }
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            // If we long-press the shutter button and no capture transformer handles it, we
+            // will just have nothing happening. We register the long click event in here, and
+            // trigger a snapshot once it's released.
+            if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP && mIsLongClicked) {
+                mIsLongClicked = false;
+                onClick(view);
+            }
+            return view.onTouchEvent(motionEvent);
         }
     }
 
