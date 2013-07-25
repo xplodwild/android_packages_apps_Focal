@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2013 The CyanogenMod Project
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+
+<resources>
+
+    <!-- Voice shutter trigger commands -->
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whisky</item>
+        <item>whiskey</item>
+        <item>cheese</item>
+        <item>ok cid, take a picture</item>
+    </string-array>
+
+
+    <string-array name="widget_flash_hints">
+        <item>Auto</item>
+        <item>Disabled</item>
+        <item>Enabled</item>
+        <item>Torch</item>
+        <item>Red-eye reduction</item>
+    </string-array>
+
+
+    <string-array name="widget_effects_hints">
+        <item>Disabled</item>
+        <item>Black &amp; White</item>
+        <item>Negative</item>
+        <item>Solarize</item>
+        <item>Sepia</item>
+        <item>Posterize</item>
+        <item>Blackboard</item>
+        <item>Whiteboard</item>
+        <item>Aqua</item>
+        <item>Emboss</item>
+        <item>Sketch</item>
+        <item>Neon</item>
+    </string-array>
+
+    <string-array name="widget_iso_hints">
+        <item>Automatic ISO</item>
+        <item>Hands-Jitter Reduction ISO</item>
+        <item>100 ISO</item>
+        <item>200 ISO</item>
+        <item>400 ISO</item>
+        <item>800 ISO</item>
+        <item>1600 ISO</item>
+    </string-array>
+
+
+    <string-array name="widget_scenemode_hints">
+        <item>Automatic</item>
+        <item>Motion Blur Reduction</item>
+        <item>Augmented Reality</item>
+        <item>Best Shot</item>
+        <item>Baby</item>
+        <item>Backlight</item>
+        <item>Portrait Backlight</item>
+        <item>Barcode</item>
+        <item>Beach</item>
+        <item>Candlelight</item>
+        <item>Dark</item>
+        <item>Dish</item>
+        <item>Document</item>
+        <item>Fireworks</item>
+        <item>Flowers</item>
+        <item>Handheld Twilight</item>
+        <item>HDR</item>
+        <item>High sensitivity</item>
+        <item>Landscape</item>
+        <item>Night</item>
+        <item>Night portrait</item>
+        <item>Night portrait</item>
+        <item>Party</item>
+        <item>Pet</item>
+        <item>Portrait</item>
+        <item>Snow</item>
+        <item>Soft skin</item>
+        <item>Sports</item>
+        <item>Spotlight</item>
+        <item>Steady photo</item>
+        <item>Sunset</item>
+        <item>Sweep stitch</item>
+        <item>Theatre</item>
+    </string-array>
+
+    <string-array name="widget_whitebalance_hints">
+        <item>Automatic</item>
+        <item>Cloudy</item>
+        <item>Incandescent</item>
+        <item>Fluorescent</item>
+        <item>Daylight</item>
+        <item>Cloudy Daylight</item>
+    </string-array>
+
+    <string-array name="widget_autoexposure_hints">
+        <item>Frame average</item>
+        <item>Center weighted</item>
+        <item>Spot metering</item>
+    </string-array>
+
+</resources>
