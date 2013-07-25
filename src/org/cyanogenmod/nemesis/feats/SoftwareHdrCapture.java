@@ -18,13 +18,19 @@
 
 package org.cyanogenmod.nemesis.feats;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 
 import org.cyanogenmod.nemesis.CameraActivity;
 import org.cyanogenmod.nemesis.SnapshotManager;
 import org.cyanogenmod.nemesis.Util;
+import org.cyanogenmod.nemesis.picsphere.PicSphereRenderingService;
 import org.cyanogenmod.nemesis.ui.ShutterButton;
 
 import java.io.File;
@@ -43,12 +49,47 @@ public class SoftwareHdrCapture extends CaptureTransformer {
     private Handler mHandler;
     private CameraActivity mActivity;
     private List<Uri> mPictures;
+    private List<Uri> mPicturesUri;
+    private SoftwareHdrRenderingService mBoundService;
+    private boolean mIsBound;
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service.  Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+            mBoundService = ((SoftwareHdrRenderingService.LocalBinder)service).getService();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            // Because it is running in our same process, we should never
+            // see this happen.
+            mBoundService = null;
+        }
+    };
 
     public SoftwareHdrCapture(CameraActivity activity) {
         super(activity.getCamManager(), activity.getSnapManager());
         mHandler = new Handler();
         mPictures = new ArrayList<Uri>();
+        mPicturesUri = new ArrayList<Uri>();
         mActivity = activity;
+        doBindService();
+    }
+
+    void doBindService() {
+        // Establish a connection with the service.  We use an explicit
+        // class name because we want a specific service implementation that
+        // we know will be running in our own process (and thus won't be
+        // supporting component replacement by other applications).
+        Log.v(TAG, "Binding Software HDR rendering service");
+        mActivity.bindService(new Intent(mActivity, SoftwareHdrRenderingService.class),
+                mServiceConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
     }
 
     public int getShotExposure(int shotId) {
@@ -111,6 +152,7 @@ public class SoftwareHdrCapture extends CaptureTransformer {
         if (!mBurstInProgress) return;
 
         mPictures.add(Uri.fromFile(new File(Util.getRealPathFromURI(mActivity, info.mUri))));
+        mPicturesUri.add(info.mUri);
 
         mShotsDone++;
         Log.v(TAG, "Done " + mShotsDone + " shots");
@@ -121,16 +163,11 @@ public class SoftwareHdrCapture extends CaptureTransformer {
             // Reset exposure
             mCamManager.getParameters().setExposureCompensation(0);
 
-            // Process
-            SoftwareHdrProcessor processor = new SoftwareHdrProcessor(mActivity, mSnapManager);
-            processor.setPictures(mPictures);
-            try {
-                processor.render();
-            } catch (Exception e) {
-                // TODO: Unable to render, keep files
-            } finally {
-                // TODO: Delete source files
-            }
+            // Render
+            int orientation = (360 - mActivity.getOrientation()) % 360;
+            mBoundService.render(mPictures, mPicturesUri, mActivity.getSnapManager(), orientation);
+
+            mShotsDone = 0;
         }
     }
 
@@ -152,5 +189,13 @@ public class SoftwareHdrCapture extends CaptureTransformer {
     @Override
     public void onVideoRecordingStop() {
 
+    }
+
+    public void tearDown() {
+        if (mIsBound) {
+            // Detach our existing connection.
+            mActivity.unbindService(mServiceConnection);
+            mIsBound = false;
+        }
     }
 }

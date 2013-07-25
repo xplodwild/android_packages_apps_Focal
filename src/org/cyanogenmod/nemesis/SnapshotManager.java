@@ -405,10 +405,18 @@ public class SnapshotManager {
     }
 
     public Uri getNamerUri() {
+        if (mImageNamer == null) {
+            // ImageNamer can be dead if the user exitted the app. We restart it temporarily.
+            mImageNamer = new ImageNamer();
+        }
         return mImageNamer.getUri();
     }
 
     public String getNamerTitle() {
+        if (mImageNamer == null) {
+            // ImageNamer can be dead if the user exitted the app. We restart it temporarily.
+            mImageNamer = new ImageNamer();
+        }
         return mImageNamer.getTitle();
     }
 

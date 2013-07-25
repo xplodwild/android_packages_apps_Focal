@@ -23,6 +23,7 @@
             android:theme="@style/AppTheme"
             android:largeHeap="true">
         <service android:name="org.cyanogenmod.nemesis.picsphere.PicSphereRenderingService" />
+        <service android:name="org.cyanogenmod.nemesis.feats.SoftwareHdrRenderingService" />
         <activity
                 android:name="org.cyanogenmod.nemesis.CameraActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"

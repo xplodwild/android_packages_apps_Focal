@@ -50,6 +50,10 @@ public class SoftwareHdrProcessor {
         mPictures = pictures;
     }
 
+    public File getTempPath() {
+        return mTempPath;
+    }
+
     private void run(String command) throws IOException {
         Runtime rt = Runtime.getRuntime();
         Process proc = rt.exec(command, new String[]{"PATH="+mPathPrefix+":/system/bin",
@@ -66,24 +70,22 @@ public class SoftwareHdrProcessor {
         }
     }
 
-    public void render() {
+    public boolean render(final int orientation) {
         mOutputLogger.start();
 
         // Prepare a temporary directory
-        Log.d(TAG, "Preparing temp dir for PicSphere rendering...");
+        Log.d(TAG, "Preparing temp dir for Software HDR rendering...");
         File appFilesDir = mContext.getFilesDir();
         mPathPrefix = appFilesDir.getAbsolutePath() + "/";
         String tempPathStr = appFilesDir.getAbsolutePath() + "/" + System.currentTimeMillis();
         mTempPath = new File(tempPathStr);
         mTempPath.mkdir();
 
-        mSnapManager.prepareNamerUri(100,100);
-
 
         // Process our images
         try {
-            doAlignImageStack();
-            doEnfuse();
+            if (!doAlignImageStack()) return false;
+            if (!doEnfuse()) return false;
 
             // Save it to gallery
             // XXX: This needs opening the output byte array... Isn't there any way to update
@@ -104,12 +106,16 @@ public class SoftwareHdrProcessor {
                 f.close();
             }
 
+            mSnapManager.prepareNamerUri(100,100);
             mOutputUri = mSnapManager.getNamerUri();
             mOutputTitle = mSnapManager.getNamerTitle();
-            mSnapManager.saveImage(mOutputUri, mOutputTitle, 100, 100, 0, jpegData);
+            mSnapManager.saveImage(mOutputUri, mOutputTitle, 100, 100, orientation, jpegData);
         } catch (IOException ex) {
             Log.e(TAG, "Unable to process: ", ex);
+            return false;
         }
+
+        return true;
     }
 
     private void consumeProcLogs() {
@@ -136,10 +142,12 @@ public class SoftwareHdrProcessor {
 
         String filesStr = "";
         for (Uri picture : mPictures) {
-            filesStr += " " + picture.getPath();
+            if (new File(picture.getPath()).exists()) {
+                filesStr += " " + picture.getPath();
+            }
         }
 
-        run("align_image_stack -v -v -v -a "+mTempPath+"/project " + filesStr);
+        run("align_image_stack -v -v -v -C -g 4 -a "+mTempPath+"/project " + filesStr);
         consumeProcLogs();
 
         Log.d(TAG, "Align Image Stack... done");

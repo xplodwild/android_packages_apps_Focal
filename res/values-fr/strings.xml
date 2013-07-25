@@ -36,6 +36,7 @@
     <string name="enabled">Activé</string>
     <string name="no_video_player">Impossible de lire la vidéo</string>
     <string name="fullscreen_shutter_info">Appuyez n\'importe où pour capturer</string>
+    <string name="please_wait">Veuillez patienter&#8230;</string>
 
     <string name="mode_photo">Photo</string>
     <string name="mode_video">Vidéo</string>
@@ -97,6 +98,11 @@
     <string name="picsphere_step_panomodify">Rognage des coins&#8230;</string>
     <string name="picsphere_step_nona">Déformation des images&#8230;</string>
     <string name="picsphere_step_enblend">Finalisation de l\'image&#8230;</string>
+
+    <!-- Software HDR status -->
+    <string name="software_hdr_notif_title">Rendu HDR en cours&#8230;</string>
+    <string name="software_hdr_failed">Echec du rendu HDR</string>
+    <string name="software_hdr_failed_details">Les images originales ont été conservées.</string>
 
     <!-- Showcase text -->
     <string name="showcase_welcome_1_title">Bienvenue!</string>
