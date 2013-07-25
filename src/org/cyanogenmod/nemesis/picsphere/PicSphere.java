@@ -191,6 +191,7 @@ public class PicSphere {
             for (ProgressListener listener : mProgressListeners) {
                 listener.onRenderDone(this);
             }
+            removeTempFiles();
             return false;
         }
 
@@ -198,6 +199,13 @@ public class PicSphere {
             listener.onRenderDone(this);
         }
 
+        removeTempFiles();
+
+        mRenderProgress = -1;
+        return true;
+    }
+
+    private void removeTempFiles() {
         // Remove source pictures and temporary path
         for (Uri uri : mPicturesUri) {
             List<String> segments = uri.getPathSegments();
@@ -205,9 +213,6 @@ public class PicSphere {
         }
 
         mTempPath.delete();
-
-        mRenderProgress = -1;
-        return true;
     }
 
     private void run(String command) throws IOException {
