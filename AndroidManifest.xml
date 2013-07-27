@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.cyanogenmod.nemesis"
+          package="org.cyanogenmod.focal"
           android:versionCode="1"
           android:versionName="1.0">
 
@@ -22,10 +22,10 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme"
             android:largeHeap="true">
-        <service android:name="org.cyanogenmod.nemesis.picsphere.PicSphereRenderingService" />
-        <service android:name="org.cyanogenmod.nemesis.feats.SoftwareHdrRenderingService" />
+        <service android:name="org.cyanogenmod.focal.picsphere.PicSphereRenderingService" />
+        <service android:name="org.cyanogenmod.focal.feats.SoftwareHdrRenderingService" />
         <activity
-                android:name="org.cyanogenmod.nemesis.CameraActivity"
+                android:name="org.cyanogenmod.focal.CameraActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"
                 android:label="@string/app_name"
                 android:theme="@style/AppTheme"
@@ -37,7 +37,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <receiver android:name="org.cyanogenmod.nemesis.CameraButtonIntentReceiver">
+        <receiver android:name="org.cyanogenmod.focal.CameraButtonIntentReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.CAMERA_BUTTON"/>
             </intent-filter>

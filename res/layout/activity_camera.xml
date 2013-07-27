@@ -23,14 +23,14 @@
              android:background="#333"
              tools:context=".CameraActivity">
 
-    <org.cyanogenmod.nemesis.ui.PreviewFrameLayout
+    <org.cyanogenmod.focal.ui.PreviewFrameLayout
             android:id="@+id/camera_preview_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="visible">
 
-    </org.cyanogenmod.nemesis.ui.PreviewFrameLayout>
+    </org.cyanogenmod.focal.ui.PreviewFrameLayout>
 
     <FrameLayout
             android:id="@+id/gl_renderer_container"
@@ -39,14 +39,14 @@
 
     </FrameLayout>
 
-    <org.cyanogenmod.nemesis.ui.RuleOfThirds
+    <org.cyanogenmod.focal.ui.RuleOfThirds
             android:id="@+id/rule_of_thirds"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:visibility="gone"
             />
 
-    <org.cyanogenmod.nemesis.ui.PreviewFrameLayout
+    <org.cyanogenmod.focal.ui.PreviewFrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="visible"
@@ -60,9 +60,9 @@
                 android:scaleType="fitXY"
                 android:alpha="0.0"
                 android:id="@+id/camera_preview_overlay"/>
-    </org.cyanogenmod.nemesis.ui.PreviewFrameLayout>
+    </org.cyanogenmod.focal.ui.PreviewFrameLayout>
 
-    <org.cyanogenmod.nemesis.ui.Notifier
+    <org.cyanogenmod.focal.ui.Notifier
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="4dp"
@@ -81,7 +81,7 @@
                 android:textColor="#FFFFFFFF"
                 android:gravity="left"
                 android:id="@+id/notifier_text"/>
-    </org.cyanogenmod.nemesis.ui.Notifier>
+    </org.cyanogenmod.focal.ui.Notifier>
 
     <LinearLayout
             android:layout_width="wrap_content"
@@ -112,13 +112,13 @@
             android:layout_height="fill_parent"
             android:id="@+id/hud_container">
 
-        <org.cyanogenmod.nemesis.ui.FocusHudRing
+        <org.cyanogenmod.focal.ui.FocusHudRing
                 android:id="@+id/hud_ring_focus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|center_horizontal"/>
 
-        <org.cyanogenmod.nemesis.ui.ExposureHudRing
+        <org.cyanogenmod.focal.ui.ExposureHudRing
                 android:id="@+id/hud_ring_exposure"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -128,7 +128,7 @@
 
     </FrameLayout>
 
-    <org.cyanogenmod.nemesis.ui.SideBar
+    <org.cyanogenmod.focal.ui.SideBar
             android:id="@+id/sidebar_scroller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -144,9 +144,9 @@
 
         </LinearLayout>
 
-    </org.cyanogenmod.nemesis.ui.SideBar>
+    </org.cyanogenmod.focal.ui.SideBar>
 
-    <org.cyanogenmod.nemesis.ui.WidgetRenderer
+    <org.cyanogenmod.focal.ui.WidgetRenderer
             android:id="@+id/widgets_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -154,23 +154,23 @@
             android:layout_marginBottom="64dp"
             android:orientation="horizontal">
 
-    </org.cyanogenmod.nemesis.ui.WidgetRenderer>
+    </org.cyanogenmod.focal.ui.WidgetRenderer>
 
-    <org.cyanogenmod.nemesis.ui.CircleTimerView
+    <org.cyanogenmod.focal.ui.CircleTimerView
             android:id="@+id/timer_view"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="2dp"/>
 
-    <org.cyanogenmod.nemesis.ui.SavePinger
+    <org.cyanogenmod.focal.ui.SavePinger
             android:id="@+id/save_pinger"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="2dp"/>
 
-    <org.cyanogenmod.nemesis.ui.PanoProgressBar
+    <org.cyanogenmod.focal.ui.PanoProgressBar
             android:id="@+id/panorama_progress_bar"
             android:visibility="gone"
             android:layout_width="128dp"
@@ -194,13 +194,13 @@
             android:layout_height="wrap_content"
             >
 
-        <org.cyanogenmod.nemesis.ui.SwitchRingPad
+        <org.cyanogenmod.focal.ui.SwitchRingPad
                 android:id="@+id/switch_ring_pad"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"/>
 
-        <org.cyanogenmod.nemesis.ui.ShutterButton
+        <org.cyanogenmod.focal.ui.ShutterButton
                 android:id="@+id/btn_shutter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -212,7 +212,7 @@
 
     </FrameLayout>
 
-    <org.cyanogenmod.nemesis.ui.ReviewDrawer
+    <org.cyanogenmod.focal.ui.ReviewDrawer
             android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -260,7 +260,7 @@
                 android:layout_weight="0"
                 />
 
-    </org.cyanogenmod.nemesis.ui.ReviewDrawer>
+    </org.cyanogenmod.focal.ui.ReviewDrawer>
 
     <Button
             android:layout_width="wrap_content"
