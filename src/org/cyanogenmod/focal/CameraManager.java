@@ -258,12 +258,12 @@ public class CameraManager {
      * @return Camera.Parameters
      */
     public Camera.Parameters getParameters() {
-        if (mCamera == null) {
-            Log.w(TAG, "getParameters when camera is null");
-            return null;
-        }
-
         synchronized (mParametersThread) {
+            if (mCamera == null) {
+                Log.w(TAG, "getParameters when camera is null");
+                return null;
+            }
+
             if (mParameters == null) {
                 try {
                     mParameters = mCamera.getParameters();

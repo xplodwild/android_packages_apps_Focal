@@ -181,7 +181,7 @@ public class PicSphere {
         // Process our images
         try {
             if (!doAutopano()) return false;
-            if (!doPtclean()) return false;
+            //if (!doPtclean()) return false; ptclean seems to hang sometimes.. let's just skip it
             if (!doAutoOptimiser()) return false;
             if (!doPanoModify()) return false;
             if (!doNona()) return false;
@@ -432,12 +432,12 @@ public class PicSphere {
             }
         }
 
-        mSnapManager.prepareNamerUri(2000,1000);
+        mSnapManager.prepareNamerUri(3000,1500);
         mOutputUri = mSnapManager.getNamerUri();
         mOutputTitle = mSnapManager.getNamerTitle();
 
         Log.i(TAG, "PicSphere size: " + opts.outWidth + "x" + opts.outHeight);
-        mSnapManager.saveImage(mOutputUri, mOutputTitle, 2000, 1000, 0, jpegData);
+        mSnapManager.saveImage(mOutputUri, mOutputTitle, 3000, 1500, 0, jpegData);
 
         Log.d(TAG, "Enblend... done");
         return true;

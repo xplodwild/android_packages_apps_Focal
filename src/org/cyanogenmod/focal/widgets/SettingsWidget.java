@@ -165,11 +165,18 @@ public class SettingsWidget extends WidgetBase {
                     mInitialOrientation = -1;
                     Camera.Size size = mResolutions.get(mNumberPicker.getValue());
 
-                    if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
+                    if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO ||
+                            CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
                         // Set picture size
                         mCamManager.setPictureSize(size);
-                        SettingsStorage.storeCameraSetting(mContext, mCamManager.getCurrentFacing(),
-                                "picture-size", ""+size.width+"x"+size.height);
+
+                        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
+                            SettingsStorage.storeCameraSetting(mContext, mCamManager.getCurrentFacing(),
+                                    "picture-size", ""+size.width+"x"+size.height);
+                        } else {
+                            SettingsStorage.storeCameraSetting(mContext, mCamManager.getCurrentFacing(),
+                                    "picsphere-picture-size", ""+size.width+"x"+size.height);
+                        }
                     } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
                         // Set video size
                         applyVideoResolution(mVideoResolutions.get(mNumberPicker.getValue()));
@@ -195,7 +202,8 @@ public class SettingsWidget extends WidgetBase {
 
         getToggleButton().setHintText(R.string.widget_settings);
 
-        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO
+                || CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
             // Get the available photo size. Unlike AOSP app, we don't
             // store manually each resolution in an XML, but we calculate it directly
             // from the width and height of the picture size.
@@ -215,8 +223,14 @@ public class SettingsWidget extends WidgetBase {
             }
 
             // Restore picture size if we have any
-            String resolution = SettingsStorage.getCameraSetting(context, mCamManager.getCurrentFacing(),
-                    "picture-size", ""+mResolutions.get(0).width+"x"+mResolutions.get(0).height);
+            String resolution = "";
+            if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
+                resolution = SettingsStorage.getCameraSetting(context, mCamManager.getCurrentFacing(),
+                        "picture-size", ""+mResolutions.get(0).width+"x"+mResolutions.get(0).height);
+            } else {
+                resolution = SettingsStorage.getCameraSetting(context, mCamManager.getCurrentFacing(),
+                        "picsphere-picture-size", "640x480");
+            }
             mCamManager.setPictureSize(resolution);
         } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
             mResolutions = cam.getParameters().getSupportedVideoSizes();
@@ -252,7 +266,8 @@ public class SettingsWidget extends WidgetBase {
         mResolutionButton.setHintText(mContext.getString(R.string.widget_settings_picture_size));
         addViewToContainer(mResolutionButton);
 
-        if (mCamManager.isExposureAreaSupported()) {
+        if (mCamManager.isExposureAreaSupported()
+                && CameraActivity.getCameraMode() != CameraActivity.CAMERA_MODE_PICSPHERE) {
             mToggleExposureRing = new WidgetOptionButton(R.drawable.ic_widget_settings_exposurering, context);
             mToggleExposureRing.setHintText(mContext.getString(R.string.widget_settings_exposure_ring));
             mToggleExposureRing.setOnClickListener(mExpoRingClickListener);
@@ -268,37 +283,40 @@ public class SettingsWidget extends WidgetBase {
         }
 
         // Toggle auto enhancer
-        mToggleAutoEnhancer = new WidgetOptionButton(R.drawable.ic_enhancing, context);
-        mToggleAutoEnhancer.setOnClickListener(mAutoEnhanceClickListener);
-        mToggleAutoEnhancer.setHintText(mContext.getString(R.string.widget_settings_autoenhance));
+        if (CameraActivity.getCameraMode() != CameraActivity.CAMERA_MODE_PICSPHERE) {
+            mToggleAutoEnhancer = new WidgetOptionButton(R.drawable.ic_enhancing, context);
+            mToggleAutoEnhancer.setOnClickListener(mAutoEnhanceClickListener);
+            mToggleAutoEnhancer.setHintText(mContext.getString(R.string.widget_settings_autoenhance));
 
-        // Restore auto enhancer state
-        if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_AUTO_ENHANCE, "0").equals("1")) {
-            mContext.getSnapManager().setAutoEnhance(true);
-            mToggleAutoEnhancer.setActiveDrawable(DRAWABLE_KEY_AUTO_ENHANCE);
-        } else {
-            if (mContext.getSnapManager() != null) {
-                mContext.getSnapManager().setAutoEnhance(false);
+            // Restore auto enhancer state
+            if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_AUTO_ENHANCE, "0").equals("1")) {
+                mContext.getSnapManager().setAutoEnhance(true);
+                mToggleAutoEnhancer.setActiveDrawable(DRAWABLE_KEY_AUTO_ENHANCE);
+            } else {
+                if (mContext.getSnapManager() != null) {
+                    mContext.getSnapManager().setAutoEnhance(false);
+                }
             }
+
+            addViewToContainer(mToggleAutoEnhancer);
+
+
+            // Toggle rule of thirds
+            mToggleRuleOfThirds = new WidgetOptionButton(R.drawable.ic_widget_settings_rulethirds, context);
+            mToggleRuleOfThirds.setOnClickListener(mRuleOfThirdsClickListener);
+            mToggleRuleOfThirds.setHintText(mContext.getString(R.string.widget_settings_ruleofthirds));
+
+            // Restore rule of thirds visibility state
+            if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_RULE_OF_THIRDS, "0").equals("1")) {
+                mContext.findViewById(R.id.rule_of_thirds).setVisibility(View.VISIBLE);
+                mToggleRuleOfThirds.setActiveDrawable(KEY_ENABLE_RULE_OF_THIRDS);
+            } else {
+                mContext.findViewById(R.id.rule_of_thirds).setVisibility(View.GONE);
+                mToggleRuleOfThirds.resetImage();
+            }
+
+            addViewToContainer(mToggleRuleOfThirds);
         }
-
-        addViewToContainer(mToggleAutoEnhancer);
-
-        // Toggle rule of thirds
-        mToggleRuleOfThirds = new WidgetOptionButton(R.drawable.ic_widget_settings_rulethirds, context);
-        mToggleRuleOfThirds.setOnClickListener(mRuleOfThirdsClickListener);
-        mToggleRuleOfThirds.setHintText(mContext.getString(R.string.widget_settings_ruleofthirds));
-
-        // Restore rule of thirds visibility state
-        if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_RULE_OF_THIRDS, "0").equals("1")) {
-            mContext.findViewById(R.id.rule_of_thirds).setVisibility(View.VISIBLE);
-            mToggleRuleOfThirds.setActiveDrawable(KEY_ENABLE_RULE_OF_THIRDS);
-        } else {
-            mContext.findViewById(R.id.rule_of_thirds).setVisibility(View.GONE);
-            mToggleRuleOfThirds.resetImage();
-        }
-
-        addViewToContainer(mToggleRuleOfThirds);
 
         // Choose widgets to appear
         mToggleWidgetsButton = new WidgetOptionButton(R.drawable.ic_widget_settings_widgets, context);
@@ -316,7 +334,8 @@ public class SettingsWidget extends WidgetBase {
     public boolean isSupported(Camera.Parameters params) {
         int mode = CameraActivity.getCameraMode();
 
-        return (mode == CameraActivity.CAMERA_MODE_PHOTO || mode == CameraActivity.CAMERA_MODE_VIDEO);
+        return (mode == CameraActivity.CAMERA_MODE_PHOTO || mode == CameraActivity.CAMERA_MODE_VIDEO
+                || mode == CameraActivity.CAMERA_MODE_PICSPHERE);
     }
 
     @Override
