@@ -897,6 +897,7 @@ public class CameraManager {
 
         public void notifyPreviewSize(int width, int height) {
             mLastFrameBytes = new byte[(int) (width * height * 1.5 + 0.5)];
+            requestLayout();
         }
 
         public byte[] getLastFrameBytes() {
@@ -994,6 +995,7 @@ public class CameraManager {
 
                     mParameters = mCamera.getParameters();
                     postCallbackBuffer();
+                    requestLayout();
                 } catch (Exception e) {
                     Log.d(TAG, "Error starting camera preview: " + e.getMessage());
                 }

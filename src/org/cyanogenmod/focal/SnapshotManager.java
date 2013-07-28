@@ -464,7 +464,7 @@ public class SnapshotManager {
         info.mBypassProcessing = mBypassProcessing;
 
         Camera.Parameters params = mCameraManager.getParameters();
-        if (params.getExposureCompensation() != exposureCompensation) {
+        if (params != null && params.getExposureCompensation() != exposureCompensation) {
             mCameraManager.setParameterAsync("exposure-compensation", Integer.toString(exposureCompensation));
             mWaitExposureSettle = true;
         }

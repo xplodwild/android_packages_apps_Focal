@@ -635,7 +635,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     return;
                 }
 
-                Camera.Size picSize = mCamManager.getParameters().getPictureSize();
+                Camera.Size picSize = params.getPictureSize();
 
                 Camera.Size sz = Util.getOptimalPreviewSize(CameraActivity.this, params.getSupportedPreviewSizes(),
                         ((float) picSize.width / (float) picSize.height));

@@ -44,8 +44,6 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
-import org.cyanogenmod.focal.pano.MosaicProxy;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -141,7 +139,7 @@ public class Util {
     public static Size getOptimalPreviewSize(Activity currentActivity,
                                              List<Size> sizes, double targetRatio) {
         // Use a very small tolerance because we want an exact match.
-        final double ASPECT_TOLERANCE = 0.001;
+        final double ASPECT_TOLERANCE = 0.01;
         if (sizes == null) return null;
 
         Size optimalSize = null;

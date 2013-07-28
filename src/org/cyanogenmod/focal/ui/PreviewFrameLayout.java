@@ -21,8 +21,9 @@ package org.cyanogenmod.focal.ui;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.View;
 import android.widget.RelativeLayout;
 
 import org.cyanogenmod.focal.Util;
@@ -78,29 +79,52 @@ public class PreviewFrameLayout extends RelativeLayout {
         int fullWidth = Util.getScreenSize(null).x;
         int fullHeight = Util.getScreenSize(null).y;
 
+        if (fullWidth == 0 || mPreviewWidth == 0) {
+            setMeasuredDimension(fullWidth, fullHeight);
+            return;
+        }
+
+        float ratio = Math.min((float) fullHeight / (float) mPreviewHeight, (float) fullWidth / (float) mPreviewWidth);
+        float width = mPreviewWidth * ratio;
+        float height = mPreviewHeight * ratio;
+
         // Ask children to follow the new preview dimension.
-        super.onMeasure(MeasureSpec.makeMeasureSpec(fullWidth, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(fullHeight, MeasureSpec.EXACTLY));
+        super.onMeasure(MeasureSpec.makeMeasureSpec((int) fullWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec((int) fullHeight, MeasureSpec.EXACTLY));
     }
 
+    /**
+     * Called when this view should assign a size and position to all of its children.
+     * @param changed
+     * @param l
+     * @param t
+     * @param r
+     * @param b
+     */
     @Override
-    protected void onDraw(Canvas canvas) {
-        int previewWidth = mPreviewWidth;
-        int previewHeight = mPreviewHeight;
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        if(changed && getChildCount() > 0) {
+            final View child = getChildAt(0);
 
-        // Scale the preview while keeping the aspect ratio
-        int fullWidth = getWidth();
-        int fullHeight = getHeight();
+            // Scale the preview while keeping the aspect ratio
+            int fullWidth = Util.getScreenSize(null).x;
+            int fullHeight = Util.getScreenSize(null).y;
 
-        float ratio = Math.min((float) fullWidth / (float) previewWidth, (float) fullHeight / (float) previewHeight);
-        previewWidth *= ratio;
-        previewHeight *= ratio;
+            if (fullWidth == 0 || mPreviewWidth == 0) {
+                setMeasuredDimension(fullWidth, fullHeight);
+                return;
+            }
 
-        canvas.save();
-        canvas.scale(ratio, ratio);
+            float ratio = Math.min((float) fullHeight / (float) mPreviewHeight, (float) fullWidth / (float) mPreviewWidth);
+            float width = mPreviewWidth * ratio;
+            float height = mPreviewHeight * ratio;
 
-        super.onDraw(canvas);
-        canvas.restore();
+            // Center the child SurfaceView within the parent.
+            if (child != null) {
+                Log.v(TAG, "Layout: (" + (int) ((fullWidth - width)) / 2 + ", " + (int) ((fullHeight - height)) / 2 + ", " + (int) ((fullWidth + width)) / 2 + ", " + (int) ((fullHeight + height)) / 2 + ")");
+                child.layout((int) ((fullWidth - width)) / 2, (int) ((fullHeight - height)) / 2, (int) ((fullWidth + width)) / 2, (int) ((fullHeight + height)) / 2);
+            }
+        }
     }
 
     public void setOnSizeChangedListener(OnSizeChangedListener listener) {
