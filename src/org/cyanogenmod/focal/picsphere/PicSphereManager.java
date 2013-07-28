@@ -171,6 +171,8 @@ public class PicSphereManager implements PicSphere.ProgressListener {
             mCapture3DRenderer = null;
         }
 
+        mPicSpheres.clear();
+
         if (mIsBound) {
             // Detach our existing connection.
             mContext.unbindService(mServiceConnection);
