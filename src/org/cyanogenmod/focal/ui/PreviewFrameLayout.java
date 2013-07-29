@@ -80,13 +80,11 @@ public class PreviewFrameLayout extends RelativeLayout {
         int fullHeight = Util.getScreenSize(null).y;
 
         if (fullWidth == 0 || mPreviewWidth == 0) {
-            setMeasuredDimension(fullWidth, fullHeight);
+            setMeasuredDimension(mPreviewWidth, mPreviewHeight);
             return;
         }
 
-        float ratio = Math.min((float) fullHeight / (float) mPreviewHeight, (float) fullWidth / (float) mPreviewWidth);
-        float width = mPreviewWidth * ratio;
-        float height = mPreviewHeight * ratio;
+        setMeasuredDimension(fullWidth, fullHeight);
 
         // Ask children to follow the new preview dimension.
         super.onMeasure(MeasureSpec.makeMeasureSpec((int) fullWidth, MeasureSpec.EXACTLY),

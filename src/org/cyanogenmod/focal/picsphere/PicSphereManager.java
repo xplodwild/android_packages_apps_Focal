@@ -184,6 +184,8 @@ public class PicSphereManager implements PicSphere.ProgressListener {
         if (mCapture3DRenderer != null) {
             mCapture3DRenderer.onPause();
         }
+
+        mPicSpheres.clear();
     }
 
     public void onResume() {
