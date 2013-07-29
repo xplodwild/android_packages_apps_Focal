@@ -4,7 +4,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_PACKAGE_NAME := Nemesis
+LOCAL_PACKAGE_NAME := Focal
 
 # Change this to LOCAL_JNI_SHARED_LIBRARIES to include
 # the binaries in the apk
@@ -43,4 +43,4 @@ include $(CLEAR_VARS)
 LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := metadata-extractor:libs/metadata-extractor-2.6.4.jar xmpcore:libs/xmpcore.jar
 include $(BUILD_MULTI_PREBUILT)
 
-include $(call all-makefiles-under, $(ANDROID_BUILD_TOP)/external/Nemesis)
+include $(call all-makefiles-under, $(ANDROID_BUILD_TOP)/external/Focal)
