@@ -36,6 +36,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
+                <action android:name="android.media.action.STILL_IMAGE_CAMERA_SECURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="com.android.keyguard.layout"
+                    android:resource="@layout/keyguard_widget" />
         </activity>
         <receiver android:name="org.cyanogenmod.focal.CameraButtonIntentReceiver">
             <intent-filter>
