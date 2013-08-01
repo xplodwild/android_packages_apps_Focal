@@ -32,7 +32,6 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.DisplayInfo;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -1322,11 +1321,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             if (orientation == ORIENTATION_UNKNOWN) return;
             mOrientation = Util.roundOrientation(orientation, mOrientation);
 
-            DisplayInfo displayInfo = new DisplayInfo();
-            getWindowManager().getDefaultDisplay().getDisplayInfo(displayInfo);
-
-            int orientationCompensation = mOrientation + (displayInfo.getNaturalHeight() >
-                    displayInfo.getNaturalWidth() ? 90 : 0);
+            int orientationCompensation = mOrientation + 90;
             if (orientationCompensation == 90)
                 orientationCompensation += 180;
             else if (orientationCompensation == 270)
