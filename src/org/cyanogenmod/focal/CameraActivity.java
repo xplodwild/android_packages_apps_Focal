@@ -219,7 +219,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mGestureDetector = new GestureDetector(this, new GestureListener());
         mZoomGestureDetector = new ScaleGestureDetector(this, new ZoomGestureListener());
 
-        mCamManager.getPreviewSurface().setOnTouchListener(mPreviewTouchListener);
+        findViewById(R.id.camera_preview_container).setOnTouchListener(mPreviewTouchListener);
 
         // Use SavePinger to animate a bit while we open the camera device
         mSavePinger.setPingMode(SavePinger.PING_MODE_SIMPLE);
