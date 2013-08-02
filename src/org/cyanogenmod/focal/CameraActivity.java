@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.hardware.Camera;
@@ -37,6 +38,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.ScaleGestureDetector;
+import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -1321,7 +1323,19 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             if (orientation == ORIENTATION_UNKNOWN) return;
             mOrientation = Util.roundOrientation(orientation, mOrientation);
 
-            int orientationCompensation = mOrientation + 90;
+            // Adjust orientationCompensation for the native orientation of the device.
+            Configuration config = getResources().getConfiguration();
+            int rotation = getWindowManager().getDefaultDisplay().getRotation();
+            boolean nativeLandscape = false;
+
+            if (((rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) &&
+                    config.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                    || ((rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) &&
+                    config.orientation == Configuration.ORIENTATION_PORTRAIT)) {
+                nativeLandscape = true;
+            }
+
+            int orientationCompensation = mOrientation + (nativeLandscape ? 0 : 90);
             if (orientationCompensation == 90)
                 orientationCompensation += 180;
             else if (orientationCompensation == 270)
