@@ -197,7 +197,7 @@ public class CameraManager {
                     }
 
                     if (mAutoFocusMoveCallback != null) {
-                        mCamera.setAutoFocusMoveCallback(mAutoFocusMoveCallback);
+                        setAutoFocusMoveCallback(mAutoFocusMoveCallback);
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "Error while opening cameras: " + e.getMessage(), e);
@@ -803,8 +803,10 @@ public class CameraManager {
     public void setAutoFocusMoveCallback(AutoFocusMoveCallback cb) {
         mAutoFocusMoveCallback = cb;
 
-        if (mCamera != null)
+        if (mCamera != null && mParameters.getSupportedFocusModes().contains(
+                Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             mCamera.setAutoFocusMoveCallback(cb);
+        }
     }
 
     /**
