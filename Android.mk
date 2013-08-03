@@ -1,3 +1,5 @@
+ifneq ($(USE_CAMERA_STUB),true)
+
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
@@ -44,3 +46,5 @@ LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := metadata-extractor:libs/metadata-extract
 include $(BUILD_MULTI_PREBUILT)
 
 include $(call all-makefiles-under, $(ANDROID_BUILD_TOP)/external/Focal)
+
+endif # ifneq ($(USE_CAMERA_STUB),true)
