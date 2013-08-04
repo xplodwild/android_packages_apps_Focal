@@ -44,6 +44,7 @@ import com.drew.metadata.Tag;
 
 import org.cyanogenmod.focal.feats.AutoPictureEnhancer;
 import org.cyanogenmod.focal.feats.PixelBuffer;
+import org.cyanogenmod.focal.widgets.SimpleToggleWidget;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -188,7 +189,8 @@ public class SnapshotManager {
             }
 
             // If we used Samsung HDR, reset exposure
-            if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR)) {
+            if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR) &&
+                SimpleToggleWidget.isWidgetEnabled(mContext, mCameraManager, "scene-mode", "hdr")) {
                 mCameraManager.setParameterAsync("exposure-compensation", Integer.toString(mResetExposure));
             }
         }
@@ -209,7 +211,8 @@ public class SnapshotManager {
             final SnapshotInfo snap = mSnapshotsQueue.get(0);
 
             // If we have a Samsung HDR, convert from YUV422 to JPEG first
-            if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR)) {
+            if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR) &&
+                SimpleToggleWidget.isWidgetEnabled(mContext, mCameraManager, "scene-mode", "hdr")) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 Bitmap bm = Util.decodeYUV422P(jpegData, s.width, s.height);
                 // TODO: Replace 90 with real JPEG compression level when we'll have that setting
@@ -452,7 +455,8 @@ public class SnapshotManager {
         if (mSnapshotsQueue.size() == 2) return; // No more than 2 shots at a time
 
         // If we use Samsung HDR, we must set exposure level, as it corresponds to the HDR bracket
-        if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR)) {
+        if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR) &&
+            SimpleToggleWidget.isWidgetEnabled(mContext, mCameraManager, "scene-mode", "hdr")) {
             exposureCompensation = mCameraManager.getParameters().getMaxExposureCompensation();
             mResetExposure = mCameraManager.getParameters().getExposureCompensation();
         }

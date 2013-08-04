@@ -1022,6 +1022,9 @@ public class CameraManager {
                 Camera.Parameters params = mCamera.getParameters();
 
                 if (getResources().getBoolean(R.bool.config_qualcommZslCameraMode)) {
+                    if (getResources().getBoolean(R.bool.config_useSamsungZSL)) {
+                        mCamera.sendRawCommand(1508, 0, 0);
+                    }
                     params.set("camera-mode", 1);
                 }
 

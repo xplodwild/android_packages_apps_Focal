@@ -257,4 +257,17 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
     public void onValueSet(String value) {
 
     }
+
+    /*
+     * this checks if the widget
+     * this is basically a hash (key, value pair)
+     * @return  true if it enabled
+     */
+    public static boolean isWidgetEnabled(Context context,
+                                   CameraManager mCamManager,
+                                   String selectedKey, String value){
+        String out = SettingsStorage.getCameraSetting(context,
+                        mCamManager.getCurrentFacing(), selectedKey, "null");
+        return out.equals(value);
+    }
 }
