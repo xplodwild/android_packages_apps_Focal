@@ -67,7 +67,7 @@ public class ThumbnailFlinger extends ImageView {
             @Override
             public void onAnimationEnd(Animator animator) {
                 // Second step: fade out and scale and slide
-                animate().alpha(0.0f).scaleY(0.7f).scaleX(0.7f).translationXBy(-getWidth()*1.5f).setStartDelay(100)
+                animate().alpha(0.0f).scaleY(0.7f).scaleX(0.7f).translationYBy(-getHeight()*1.5f).setStartDelay(100)
                         .setDuration(FADE_OUT_DURATION_MS).setListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animator) {

@@ -96,12 +96,14 @@ public class ReviewDrawer extends LinearLayout {
         mImages = new ArrayList<Integer>();
         mThumbnailSize = getContext().getResources().getDimensionPixelSize(R.dimen.review_drawer_thumb_size);
 
+        setOrientation(LinearLayout.VERTICAL);
+
         // Default hidden
         setAlpha(0.0f);
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                setTranslationX(-getMeasuredWidth());
+                setTranslationY(-getMeasuredHeight());
             }
         });
 
@@ -131,7 +133,7 @@ public class ReviewDrawer extends LinearLayout {
         }
 
         // Make sure drawer is initially closed
-        setTranslationX(-99999);
+        setTranslationY(-99999);
 
         // Setup gesture detection
         mGestureDetector = new GestureDetector(getContext(), new ReviewedGestureListener());
@@ -351,7 +353,7 @@ public class ReviewDrawer extends LinearLayout {
         mIsOpen = true;
         setVisibility(View.VISIBLE);
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new AccelerateInterpolator())
-                .translationX(0.0f).setListener(null).alpha(alpha).start();
+                .translationY(0.0f).setListener(null).alpha(alpha).start();
     }
 
     /**
@@ -360,7 +362,7 @@ public class ReviewDrawer extends LinearLayout {
     public void close() {
         mIsOpen = false;
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new DecelerateInterpolator())
-                .translationX(-getMeasuredWidth()).alpha(0.0f).setListener(new Animator.AnimatorListener() {
+                .translationY(-getMeasuredHeight()).alpha(0.0f).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
 
@@ -393,10 +395,10 @@ public class ReviewDrawer extends LinearLayout {
             mReviewedImage.setVisibility(View.VISIBLE);
         }
 
-        float finalPos = getTranslationX() + distance;
+        float finalPos = getTranslationY() + distance;
         if (finalPos > 0) finalPos = 0;
 
-        setTranslationX(finalPos);
+        setTranslationY(finalPos);
 
         if (getAlpha() == 0.0f) {
             setVisibility(View.VISIBLE);
@@ -405,7 +407,7 @@ public class ReviewDrawer extends LinearLayout {
     }
 
     public void clampSliding() {
-        if (getTranslationX() < -getMeasuredWidth() / 2) {
+        if (getTranslationY() < -getMeasuredHeight() / 2) {
             close();
         } else {
             openImpl(getAlpha());

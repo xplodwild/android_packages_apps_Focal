@@ -29,6 +29,7 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -52,11 +53,11 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
     public final static int BUTTON_PICSPHERE = 4;
     public final static int BUTTON_SWITCHCAM = 5;
 
-    private final static int SLOT_RIGHT = 0;
-    private final static int SLOT_MIDRIGHT = 1;
+    private final static int SLOT_RIGHT = 4;
+    private final static int SLOT_MIDRIGHT = 3;
     private final static int SLOT_MID = 2;
-    private final static int SLOT_MIDLEFT = 3;
-    private final static int SLOT_LEFT = 4;
+    private final static int SLOT_MIDLEFT = 1;
+    private final static int SLOT_LEFT = 0;
     private final static int SLOT_MAX = 5;
 
     private final static int RING_ANIMATION_DURATION_MS = 150;
@@ -182,27 +183,27 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         final int width = Math.min(screenSize.x, screenSize.y);
         final int height = Math.max(screenSize.x, screenSize.y);
 
-
+        // Draw the ping animation
         final float buttonOffset = Util.dpToPx(getContext(), 12);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(4.0f);
         mPaint.setARGB((int) (255.0f - 255.0f * mHintProgress), 255, 255, 255);
-        canvas.drawCircle(height - mEdgePadding + buttonOffset, width / 2, mHintProgress * mRingRadius, mPaint);
-        canvas.drawCircle(height - mEdgePadding + buttonOffset, width / 2, mHintProgress * mRingRadius * 0.66f, mPaint);
-        canvas.drawCircle(height - mEdgePadding + buttonOffset, width / 2, mHintProgress * mRingRadius * 0.33f, mPaint);
+        canvas.drawCircle(width / 2, height - mEdgePadding + buttonOffset, mHintProgress * mRingRadius, mPaint);
+        canvas.drawCircle(width / 2, height - mEdgePadding + buttonOffset, mHintProgress * mRingRadius * 0.66f, mPaint);
+        canvas.drawCircle(width / 2, height - mEdgePadding + buttonOffset, mHintProgress * mRingRadius * 0.33f, mPaint);
 
-        final float ringRadius = (float) mRingRadius * mOpenProgress;
+        final float ringRadius = mRingRadius * mOpenProgress;
 
         // Draw the inner circle (dark)
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(0x88888888);
-        canvas.drawCircle(height - mEdgePadding, width / 2, ringRadius, mPaint);
+        canvas.drawCircle(width / 2, height - mEdgePadding, ringRadius, mPaint);
 
         // Draw the outline stroke
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(4.0f);
         mPaint.setColor(0x88DDDDDD);
-        canvas.drawCircle(height - mEdgePadding, width / 2, ringRadius, mPaint);
+        canvas.drawCircle(width / 2, height - mEdgePadding, ringRadius, mPaint);
 
         // Draw the actual pad buttons
         for (int i = 0; i < SLOT_MAX; i++) {
@@ -211,11 +212,11 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
             PadButton button = mButtons[i];
             if (button == null) continue;
 
-            final float radAngle = (float) ((float) (i * (180.0f / 4.0f) + 90.0f) * Math.PI / 180.0f);
+            final float radAngle = (float) ((i * (180.0f / 4.0f) + 90.0f) * Math.PI / 180.0f);
 
-            final float x = (float) (height + ringRadius * Math.cos(radAngle) - mButtonSize);
+            final float y = (float) (height + ringRadius * Math.cos(radAngle) - mButtonSize);
             // We remove the button edge
-            final float y = (float) (width / 2 - button.mNormalBitmap.getWidth() / 2 - ringRadius * Math.sin(radAngle));
+            final float x = (float) (width / 2 - button.mNormalBitmap.getWidth() / 2 - ringRadius * Math.sin(radAngle));
 
             canvas.save();
             canvas.translate(x + button.mNormalBitmap.getWidth() / 2, y + button.mNormalBitmap.getWidth() / 2);
@@ -247,8 +248,8 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
                 float measureText = mPaint.measureText(button.mHintText);
 
                 canvas.save();
-                canvas.translate(x - measureText / 2 - Util.dpToPx(getContext(), 4),
-                        y + button.mNormalBitmap.getWidth() / 2 - mPaint.getTextSize() / 2);
+                canvas.translate(x + button.mNormalBitmap.getWidth() / 2 - mPaint.getTextSize() / 2,
+                        y - measureText / 2 - Util.dpToPx(getContext(), 4));
                 canvas.rotate(mCurrentOrientation);
 
                 canvas.drawText(button.mHintText, 0, 0, mPaint);

@@ -37,7 +37,7 @@ public class WidgetRenderer extends FrameLayout {
     private final static float WIDGETS_MARGIN = 80.0f;
 
     private List<WidgetBase.WidgetContainer> mOpenWidgets;
-    private float mTotalWidth;
+    private float mTotalHeight;
     private float mSpacing;
     private int mOrientation;
     private float mWidgetDragStartPoint;
@@ -60,7 +60,7 @@ public class WidgetRenderer extends FrameLayout {
 
     private void initialize() {
         mOpenWidgets = new ArrayList<WidgetBase.WidgetContainer>();
-        mTotalWidth = WIDGETS_MARGIN;
+        mTotalHeight = WIDGETS_MARGIN;
         mSpacing = getResources().getDimension(R.dimen.widget_spacing);
     }
 
@@ -84,7 +84,7 @@ public class WidgetRenderer extends FrameLayout {
      * @param widget The widget that has been pressed
      */
     public void widgetPressed(WidgetBase.WidgetContainer widget) {
-        mWidgetDragStartPoint = widget.getFinalX();
+        mWidgetDragStartPoint = widget.getFinalY();
     }
 
     /**
@@ -95,7 +95,7 @@ public class WidgetRenderer extends FrameLayout {
      */
     public void widgetMoved(WidgetBase.WidgetContainer widget) {
         // Don't move widget if it was just a small tap
-        if (Math.abs(widget.getX() - mWidgetDragStartPoint) < 40.0f) return;
+        if (Math.abs(widget.getY() - mWidgetDragStartPoint) < 40.0f) return;
         if (mOpenWidgets.size() == 0) return;
 
         boolean isFirst = (mOpenWidgets.get(0) == widget);
@@ -106,9 +106,9 @@ public class WidgetRenderer extends FrameLayout {
 
             if (tested == widget) continue;
 
-            if (widget.getX() < tested.getFinalX() + tested.getWidth()) {
+            if (widget.getY() < tested.getFinalY() + tested.getMeasuredHeight()) {
                 // Don't try to go before the first if we're already it
-                if (isFirst && widget.getX() + widget.getWidth() < tested.getFinalX() - tested.getWidth() / 2)
+                if (isFirst && widget.getY() + widget.getHeight() < tested.getFinalY() - tested.getHeight() / 2)
                     break;
 
                 // Move the widget in our list
@@ -132,15 +132,15 @@ public class WidgetRenderer extends FrameLayout {
     }
 
     public void reorderWidgets(WidgetBase.WidgetContainer ignore) {
-        mTotalWidth = WIDGETS_MARGIN;
+        mTotalHeight = WIDGETS_MARGIN;
 
         for (int i = 0; i < mOpenWidgets.size(); i++) {
             WidgetBase.WidgetContainer widget = mOpenWidgets.get(i);
 
             if (widget != ignore)
-                widget.setXSmooth(mTotalWidth);
+                widget.setYSmooth(mTotalHeight);
 
-            mTotalWidth += widget.getWidth() + mSpacing;
+            mTotalHeight += widget.getMeasuredHeight() + mSpacing;
         }
     }
 
@@ -162,9 +162,9 @@ public class WidgetRenderer extends FrameLayout {
         widget.notifyOrientationChanged(mOrientation, true);
 
         // position it properly
-        widget.forceFinalX(mTotalWidth - WIDGETS_MARGIN);
-        widget.setX(mTotalWidth - WIDGETS_MARGIN);
-        mTotalWidth += widget.getMeasuredWidth() + mSpacing;
+        widget.forceFinalY(mTotalHeight - WIDGETS_MARGIN);
+        widget.setY(mTotalHeight - WIDGETS_MARGIN);
+        mTotalHeight += widget.getMeasuredHeight() + mSpacing;
     }
 
     /**
@@ -190,24 +190,26 @@ public class WidgetRenderer extends FrameLayout {
     }
 
     public void notifySidebarSlideStatus(float distance) {
-        float finalY = getTranslationY() + distance;
+        float finalX = getTranslationX() + distance;
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
 
-        if (finalY > params.bottomMargin)
-            finalY = params.bottomMargin;
-        else if (finalY < 0)
-            finalY = 0;
+        if (finalX > params.leftMargin) {
+            finalX = params.leftMargin;
+        } else if (finalX < -params.leftMargin) {
+            finalX = -params.leftMargin;
+        }
 
-        setTranslationY(finalY);
+        setTranslationX(finalX);
     }
 
     public void notifySidebarSlideClose() {
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
-        animate().translationY(params.bottomMargin).setDuration(SideBar.SLIDE_ANIMATION_DURATION_MS).start();
+        animate().translationX(-params.leftMargin).setDuration(SideBar.SLIDE_ANIMATION_DURATION_MS).start();
     }
 
     public void notifySidebarSlideOpen() {
-        animate().translationY(0).setDuration(SideBar.SLIDE_ANIMATION_DURATION_MS).start();
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
+        animate().translationX(params.leftMargin).setDuration(SideBar.SLIDE_ANIMATION_DURATION_MS).start();
     }
 
     public void hideWidgets() {
@@ -215,7 +217,7 @@ public class WidgetRenderer extends FrameLayout {
 
         for (int i = 0; i < mOpenWidgets.size(); i++) {
             WidgetBase.WidgetContainer widget = mOpenWidgets.get(i);
-            widget.animate().translationYBy(widget.getHeight()).setDuration(300).alpha(0)
+            widget.animate().translationXBy(-widget.getWidth()).setDuration(300).alpha(0)
                     .setInterpolator(new AccelerateInterpolator()).start();
         }
     }
@@ -225,7 +227,7 @@ public class WidgetRenderer extends FrameLayout {
 
         for (int i = 0; i < mOpenWidgets.size(); i++) {
             WidgetBase.WidgetContainer widget = mOpenWidgets.get(i);
-            widget.animate().translationYBy(-widget.getHeight()).setDuration(300).alpha(1)
+            widget.animate().translationXBy(widget.getWidth()).setDuration(300).alpha(1)
                     .setInterpolator(new DecelerateInterpolator()).start();
         }
     }
