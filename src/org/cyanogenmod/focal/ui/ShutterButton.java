@@ -20,6 +20,7 @@ package org.cyanogenmod.focal.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
@@ -67,7 +68,7 @@ public class ShutterButton extends ImageView {
             mDownY = event.getRawY();
             mListener.onShutterButtonPressed();
         } else if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-            if ((event.getRawX() - mDownX < -getWidth() / 2 || Math.abs(event.getRawY() - mDownY) > getHeight() / 2) && mListener != null) {
+            if ((event.getRawY() - mDownY < -getHeight() / 2 || Math.abs(event.getRawX() - mDownX) > getWidth() / 2) && mListener != null) {
                 if (!mSlideOpen) {
                     mListener.onSlideOpen();
                     mSlideOpen = true;
