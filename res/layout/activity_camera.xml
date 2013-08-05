@@ -87,11 +87,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/recording_timer_container"
-            android:layout_marginTop="18dp"
-            android:layout_marginLeft="32dp"
             android:padding="4dp"
             android:background="#88000000"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:layout_margin="16dp"
+            android:layout_gravity="right">
 
         <ImageView
                 android:layout_width="wrap_content"
@@ -130,17 +130,17 @@
 
     <org.cyanogenmod.focal.ui.SideBar
             android:id="@+id/sidebar_scroller"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp">
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp">
 
         <LinearLayout
                 android:id="@+id/sidebar_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
         </LinearLayout>
 
@@ -149,10 +149,11 @@
     <org.cyanogenmod.focal.ui.WidgetRenderer
             android:id="@+id/widgets_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:orientation="horizontal"
             android:layout_marginBottom="64dp"
-            android:orientation="horizontal">
+            android:layout_marginLeft="48dp">
 
     </org.cyanogenmod.focal.ui.WidgetRenderer>
 
@@ -160,25 +161,24 @@
             android:id="@+id/timer_view"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="2dp"/>
+            android:layout_gravity="right"
+            android:layout_margin="2dp"/>
 
     <org.cyanogenmod.focal.ui.SavePinger
             android:id="@+id/save_pinger"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="2dp"/>
+            android:layout_gravity="right"
+            android:layout_margin="2dp"/>
 
     <org.cyanogenmod.focal.ui.PanoProgressBar
             android:id="@+id/panorama_progress_bar"
             android:visibility="gone"
             android:layout_width="128dp"
             android:layout_height="32dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="72dp"
-            android:layout_gravity="left|top"
-            />
+            android:layout_gravity="right|top"
+            android:layout_marginRight="72dp"
+            android:layout_marginTop="8dp"/>
 
     <FrameLayout
             android:layout_width="fill_parent"
@@ -196,52 +196,55 @@
 
         <org.cyanogenmod.focal.ui.SwitchRingPad
                 android:id="@+id/switch_ring_pad"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal|bottom"
+                android:visibility="visible"/>
 
         <org.cyanogenmod.focal.ui.ShutterButton
                 android:id="@+id/btn_shutter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right|center_vertical"
-                android:layout_marginRight="-24dp"
+                android:layout_gravity="center_horizontal|bottom"
                 android:clickable="true"
                 android:contentDescription="@string/shutter_button"
-                android:src="@drawable/btn_shutter_photo"/>
+                android:src="@drawable/btn_shutter_photo"
+                android:layout_marginBottom="-24dp"/>
 
     </FrameLayout>
 
     <org.cyanogenmod.focal.ui.ReviewDrawer
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="left|center_vertical"
+            android:layout_gravity="top|center_horizontal"
             android:id="@+id/review_drawer"
             android:background="#CC000000"
-            android:layout_marginRight="72dp">
+            android:layout_marginBottom="72dp">
 
         <ListView
-                android:layout_width="@dimen/review_drawer_thumb_size"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/review_drawer_thumb_size"
                 android:id="@+id/list_reviewed_images"
                 android:padding="8dp"
                 android:requiresFadingEdge="vertical"
                 android:fadingEdge="vertical"
                 android:fadingEdgeLength="32dp"
                 android:background="#AA333333"
-                android:layout_weight="2"/>
+                android:layout_weight="1"
+                />
 
         <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:id="@+id/reviewed_image_container"
+                android:layout_weight="1"
                 android:clickable="true">
 
             <ImageView
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="0dip"
                     android:id="@+id/reviewed_image"
                     android:layout_weight="1"
                     android:padding="8dp"
@@ -252,13 +255,12 @@
 
 
         <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/drawer_border"
-                android:width="8dp"
-                android:background="#888888"
+                android:background="#FF888888"
                 android:layout_weight="0"
-                />
+                android:minHeight="8dp"/>
 
     </org.cyanogenmod.focal.ui.ReviewDrawer>
 
@@ -284,9 +286,9 @@
             android:shadowRadius="12"
             android:shadowDx="0"
             android:shadowDy="0"
-            android:layout_gravity="center_vertical|left"
-            android:layout_marginLeft="18dp"
-            android:textStyle="bold"/>
+            android:layout_gravity="center_horizontal"
+            android:textStyle="bold"
+            android:layout_marginTop="18dp"/>
 
 
 </FrameLayout>

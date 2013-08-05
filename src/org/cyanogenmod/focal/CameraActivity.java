@@ -520,6 +520,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mSwitchRingPad.notifyOrientationChanged(mOrientationCompensation);
         mSavePinger.notifyOrientationChanged(mOrientationCompensation);
         mReviewDrawer.notifyOrientationChanged(mOrientationCompensation);
+
         if (mShowcaseView != null) mShowcaseView.notifyOrientationChanged(mOrientationCompensation);
     }
 
@@ -1220,10 +1221,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 @Override
                 public void run() {
                     layout.addView(flinger);
+                    flinger.setRotation(mOrientationCompensation+90);
                     flinger.setImageBitmap(info.mThumbnail);
                     flinger.doAnimation();
                 }
             });
+
 
 
             // Unlock camera auto settings
@@ -1335,7 +1338,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 nativeLandscape = true;
             }
 
-            int orientationCompensation = mOrientation + (nativeLandscape ? 0 : 90);
+            int orientationCompensation = mOrientation; // + (nativeLandscape ? 0 : 90);
             if (orientationCompensation == 90)
                 orientationCompensation += 180;
             else if (orientationCompensation == 270)
@@ -1462,20 +1465,20 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             if (e1 == null || e2 == null) return false;
 
             // Detect drag of the side bar or review drawer
-            if (Math.abs(e1.getX() - e2.getX()) < SWIPE_MAX_OFF_PATH) {
-                if (e1.getRawY() > Util.getScreenSize(CameraActivity.this).y / SIDEBAR_THRESHOLD_FACTOR) {
-                    if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE ||
-                            e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE) {
-                        mSideBar.slide(-distanceY);
-                        mWidgetRenderer.notifySidebarSlideStatus(-distanceY);
+            if (Math.abs(e1.getY() - e2.getY()) < SWIPE_MAX_OFF_PATH) {
+                if (e1.getRawX() < Util.getScreenSize(CameraActivity.this).x / SIDEBAR_THRESHOLD_FACTOR) {
+                    if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE ||
+                            e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE) {
+                        mSideBar.slide(-distanceX);
+                        mWidgetRenderer.notifySidebarSlideStatus(-distanceX);
                         mCancelSwipe = true;
                         mCancelSideBarClose = true;
                     }
 
                     return true;
                 }
-            } else if (Math.abs(e1.getX() - e2.getX()) > DRAG_MIN_DISTANCE) {
-                mReviewDrawer.slide(-distanceX);
+            } else if (Math.abs(e1.getY() - e2.getY()) > DRAG_MIN_DISTANCE) {
+                mReviewDrawer.slide(-distanceY);
             }
 
             return true;
@@ -1484,10 +1487,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             try {
-                if (Math.abs(e1.getX() - e2.getX()) < SWIPE_MAX_OFF_PATH) {
+                if (Math.abs(e1.getY() - e2.getY()) < SWIPE_MAX_OFF_PATH) {
                     // swipes to open/close the sidebar and/or hide/restore the widgets
-                    if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
-                            && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                    if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+                            && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                         if (mWidgetRenderer.isHidden() && mWidgetRenderer.getWidgetsCount() > 0) {
                             mWidgetRenderer.restoreWidgets();
                         } else {
@@ -1495,8 +1498,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                             mWidgetRenderer.notifySidebarSlideOpen();
                             mCancelSideBarClose = true;
                         }
-                    } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
-                            && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                    } else if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
+                            && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                         if (mSideBar.isOpen()) {
                             mSideBar.slideClose();
                             mWidgetRenderer.notifySidebarSlideClose();
@@ -1509,11 +1512,11 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     }
                 }
 
-                if (Math.abs(e1.getY() - e2.getY()) < SWIPE_MAX_OFF_PATH) {
+                if (Math.abs(e1.getX() - e2.getX()) < SWIPE_MAX_OFF_PATH) {
                     // swipes up/down to open/close the review drawer
-                    if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                         mReviewDrawer.close();
-                    } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                         mReviewDrawer.open();
                     }
                 }
@@ -1522,8 +1525,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             }
 
             mCancelSwipe = false;
-
-            return false;
+            return true;
         }
     }
 

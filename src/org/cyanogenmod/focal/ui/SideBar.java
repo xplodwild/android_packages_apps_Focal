@@ -132,14 +132,14 @@ public class SideBar extends HorizontalScrollView {
      * @param distance The distance to translate the bar
      */
     public void slide(float distance) {
-        float finalY = this.getTranslationY() + distance;
+        float finalX = this.getTranslationX() + distance;
 
-        if (finalY > this.getHeight()-BAR_MARGIN)
-            finalY = this.getHeight()-BAR_MARGIN;
-        else if (finalY < 0)
-            finalY = 0;
+        if (finalX > 0)
+            finalX = 0;
+        else if (finalX < -getWidth())
+            finalX = -getWidth();
 
-        this.setTranslationY(finalY);
+        this.setTranslationX(finalX);
     }
 
     /**
@@ -148,10 +148,11 @@ public class SideBar extends HorizontalScrollView {
      * and vice-versa.
      */
     public void clampSliding() {
-        if (this.getTranslationY() > this.getHeight() / 2)
+        if (this.getTranslationX() < 0) {
             slideClose();
-        else
+        } else {
             slideOpen();
+        }
     }
 
     /**
@@ -165,7 +166,7 @@ public class SideBar extends HorizontalScrollView {
      * Smoothly close the sidebar
      */
     public void slideClose() {
-        this.animate().translationY(this.getHeight()-BAR_MARGIN)
+        this.animate().translationX(-this.getWidth())
                 .setDuration(SLIDE_ANIMATION_DURATION_MS).start();
 
         mIsOpen = false;
@@ -175,7 +176,7 @@ public class SideBar extends HorizontalScrollView {
      * Smoothly open the sidebar
      */
     public void slideOpen() {
-        this.animate().translationY(0)
+        this.animate().translationX(0)
                 .setDuration(SLIDE_ANIMATION_DURATION_MS).start();
 
         mIsOpen = true;

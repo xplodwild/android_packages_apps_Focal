@@ -468,18 +468,17 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height);
 
         // We use here a field of view of 40, which is mostly fine for a camera app representation
-        final float vfov = 90f;
-        final float hfov = (float) Math.atan(Math.tan(vfov/2.0f)*(4.0f/3.0f))*2.0f;
+        final float hfov = 90f;
 
         // Create a new perspective projection matrix. The height will stay the same
         // while the width will vary as per aspect ratio.
         final float ratio = 640.0f / 480.0f;
         final float near = 0.1f;
         final float far = 1500.0f;
-        final float bottom = (float) Math.tan(vfov * Math.PI / 360.0f) * near;
-        final float top = -bottom;
-        final float right = ratio * bottom / 1.0f;
-        final float left = ratio * top / 1.0f;
+        final float left = (float) Math.tan(hfov * Math.PI / 360.0f) * near;
+        final float right = -left;
+        final float bottom = ratio * right / 1.0f;
+        final float top = ratio * left / 1.0f;
 
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
     }
@@ -502,16 +501,17 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         float rZ = (float) (orientation[2] * 180.0f/Math.PI);
 
         // Update quaternion from euler angles out of orientation
-        mCameraQuat.fromEuler( rX, 270.0f-rZ, rY);
+        mCameraQuat.fromEuler( rX, 180.0f-rZ, rY);
         mCameraQuat = mCameraQuat.getConjugate();
         mCameraQuat.normalise();
         mViewMatrix = mCameraQuat.getMatrix();
 
         // Update camera billboard
-        mCameraBillboard.mModelMatrix = Arrays.copyOf(mViewMatrix, mViewMatrix.length);
+        mCameraBillboard.mModelMatrix = mCameraQuat.getMatrix();
 
         Matrix.invertM(mCameraBillboard.mModelMatrix, 0, mCameraBillboard.mModelMatrix, 0);
         Matrix.translateM(mCameraBillboard.mModelMatrix, 0, 0.0f, 0.0f, -DISTANCE);
+        Matrix.rotateM(mCameraBillboard.mModelMatrix, 0, -90, 0, 0, 1);
 
         mViewfinderBillboard.mModelMatrix = Arrays.copyOf(mCameraBillboard.mModelMatrix,
                 mCameraBillboard.mModelMatrix.length);
@@ -613,6 +613,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
 
         Matrix.invertM(snap.mModelMatrix, 0, snap.mModelMatrix, 0);
         Matrix.translateM(snap.mModelMatrix, 0, 0.0f, 0.0f, -DISTANCE);
+        Matrix.rotateM(snap.mModelMatrix, 0, -90, 0, 0, 1);
 
         snap.setTexture(image);
 

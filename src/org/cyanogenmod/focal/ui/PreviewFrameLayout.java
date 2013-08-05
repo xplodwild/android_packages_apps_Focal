@@ -56,10 +56,7 @@ public class PreviewFrameLayout extends RelativeLayout {
     public void setAspectRatio(double ratio) {
         if (ratio <= 0.0) throw new IllegalArgumentException();
 
-        if (getResources().getConfiguration().orientation
-                == Configuration.ORIENTATION_PORTRAIT) {
-            ratio = 1 / ratio;
-        }
+        ratio = 1 / ratio;
 
         if (mAspectRatio != ratio) {
             mAspectRatio = ratio;
@@ -68,8 +65,8 @@ public class PreviewFrameLayout extends RelativeLayout {
     }
 
     public void setPreviewSize(int width, int height) {
-        mPreviewWidth = width;
-        mPreviewHeight = height;
+        mPreviewWidth = height;
+        mPreviewHeight = width;
         requestLayout();
     }
 

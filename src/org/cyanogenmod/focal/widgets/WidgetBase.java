@@ -49,13 +49,6 @@ import org.cyanogenmod.focal.ui.WidgetRenderer;
 /**
  * Base class for settings widget. Each setting widget
  * will extend this class.
- * <p/>
- * Remember that we are working in landscape, so the GridLayout
- * column count is the width of the widget when looking landscape,
- * and become the height when looking portrait.
- * <p/>
- * What we call the "MaxWidgetWidth" is the number of ROWS in landscape,
- * that looks like COLUMNS in portrait.
  */
 public abstract class WidgetBase {
     public final static String TAG = "WidgetBase";
@@ -78,8 +71,8 @@ public abstract class WidgetBase {
         mIsOpen = false;
 
         // Setup the container
-        mWidget.setColumnCount(1);
-        mWidget.setRowCount(0);
+        mWidget.setColumnCount(0);
+        mWidget.setRowCount(1);
         mWidget.setAlpha(0.0f);
 
         // Setup the toggle button
@@ -110,11 +103,11 @@ public abstract class WidgetBase {
      */
     public void addViewToContainer(View v) {
         if (mWidget.getRowCount() * mWidget.getColumnCount() < mWidget.getChildCount() + 1) {
-            if (mWidget.getRowCount() == mWidgetMaxWidth) {
-                // Add a new column instead of a line to fit the max width
-                mWidget.setColumnCount(mWidget.getColumnCount() + 1);
-            } else if (mWidget.getRowCount() < mWidgetMaxWidth) {
+            if (mWidget.getColumnCount() == mWidgetMaxWidth) {
+                // Add a new line instead of a column to fit the max width
                 mWidget.setRowCount(mWidget.getRowCount() + 1);
+            } else {
+                mWidget.setColumnCount(mWidget.getColumnCount() + 1);
             }
         }
 
@@ -221,7 +214,7 @@ public abstract class WidgetBase {
 
         parent.widgetOpened(mWidget);
 
-        mWidget.animate().alpha(1.0f).translationXBy(WIDGET_ANIM_TRANSLATE)
+        mWidget.animate().alpha(1.0f).translationYBy(WIDGET_ANIM_TRANSLATE)
                 .setDuration(WIDGET_FADE_DURATION_MS).start();
     }
 
@@ -229,7 +222,7 @@ public abstract class WidgetBase {
         WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
         parent.widgetClosed(mWidget);
 
-        mWidget.animate().alpha(0.0f).translationXBy(-WIDGET_ANIM_TRANSLATE)
+        mWidget.animate().alpha(0.0f).translationYBy(-WIDGET_ANIM_TRANSLATE)
                 .setDuration(WIDGET_FADE_DURATION_MS).start();
 
         mIsOpen = false;
@@ -523,15 +516,15 @@ public abstract class WidgetBase {
 
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
-                mTouchOffset = mWidget.getX() - event.getRawX();
+                mTouchOffset = mWidget.getY() - event.getRawY();
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 parent.widgetPressed(mWidget);
                 this.setBackgroundColor(getResources().getColor(R.color.widget_toggle_pressed));
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
-                mWidget.setX(event.getRawX() + mTouchOffset);
+                mWidget.setY(event.getRawY() + mTouchOffset);
                 parent.widgetMoved(mWidget);
-                mWidget.forceFinalX(getX());
+                mWidget.forceFinalY(getY());
                 handle = true;
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
@@ -651,7 +644,7 @@ public abstract class WidgetBase {
             // Set padding
             int pad = getResources().getDimensionPixelSize(R.dimen.widget_container_padding) * 2;
             this.setPadding(pad, pad, pad, pad);
-            this.setMinimumWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size) * 3);
+            this.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size) * 3);
         }
 
         @Override
@@ -678,7 +671,7 @@ public abstract class WidgetBase {
      */
     public class WidgetContainer extends GridLayout {
         private float mTouchOffset = 0.0f;
-        private float mTargetX = 0.0f;
+        private float mTargetY = 0.0f;
 
         public WidgetContainer(Context context, AttributeSet attrs,
                                int defStyle) {
@@ -699,13 +692,13 @@ public abstract class WidgetBase {
         /**
          * Animate the movement on X
          *
-         * @param x
+         * @param y
          */
-        public void setXSmooth(float x) {
-            if (mTargetX != x) {
+        public void setYSmooth(float y) {
+            if (mTargetY != y) {
                 this.animate().cancel();
-                this.animate().x(x).setDuration(100).start();
-                mTargetX = x;
+                this.animate().y(y).setDuration(100).start();
+                mTargetY = y;
             }
         }
 
@@ -714,12 +707,12 @@ public abstract class WidgetBase {
          *
          * @return final X position
          */
-        public float getFinalX() {
-            return mTargetX;
+        public float getFinalY() {
+            return mTargetY;
         }
 
-        public void forceFinalX(float x) {
-            mTargetX = x;
+        public void forceFinalY(float y) {
+            mTargetY = y;
         }
 
         public WidgetBase getWidgetBase() {
@@ -735,14 +728,14 @@ public abstract class WidgetBase {
 
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
-                mTouchOffset = getX() - event.getRawX();
+                mTouchOffset = getY() - event.getRawY();
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 parent.widgetPressed(mWidget);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                setX(event.getRawX() + mTouchOffset);
+                setY(event.getRawY() + mTouchOffset);
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 parent.widgetMoved(mWidget);
-                forceFinalX(getX());
+                forceFinalY(getY());
                 handle = true;
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
@@ -762,6 +755,7 @@ public abstract class WidgetBase {
 
             FrameLayout.LayoutParams layoutParam = (FrameLayout.LayoutParams) this.getLayoutParams();
             layoutParam.width = FrameLayout.LayoutParams.WRAP_CONTENT;
+            layoutParam.height = FrameLayout.LayoutParams.WRAP_CONTENT;
         }
 
         private void initialize() {
@@ -771,8 +765,9 @@ public abstract class WidgetBase {
             // We default the window invisible, so we must respect the status
             // obtained after the "close" animation
             setAlpha(0.0f);
-            setTranslationX(-WIDGET_ANIM_TRANSLATE);
+            setTranslationY(-WIDGET_ANIM_TRANSLATE);
             setVisibility(View.VISIBLE);
+
 
             // Set padding
             int pad = getResources().getDimensionPixelSize(R.dimen.widget_container_padding);
@@ -851,18 +846,18 @@ public abstract class WidgetBase {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             try {
-                if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH)
+                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
                     return false;
 
                 // swipe top to close the widget
 
                 // Somehow, GestureDetector takes the screen orientation into account, even if our
                 // activity is locked in landscape.
-                float distance = e2.getY() - e1.getY();
+                float distance = e2.getX() - e1.getX();
                 if (distance <= 0.1f)
-                    distance = e2.getX() - e1.getX();
+                    distance = e2.getY() - e1.getY();
 
-                if (distance > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                if (distance > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                     final SideBar sb = (SideBar) mToggleButton.getParent().getParent();
                     final WidgetRenderer wr = (WidgetRenderer) mWidget.getParent();
                     sb.toggleWidgetVisibility(WidgetBase.this, true);
