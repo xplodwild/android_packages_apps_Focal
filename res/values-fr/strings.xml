@@ -37,6 +37,8 @@
     <string name="no_video_player">Impossible de lire la vidéo</string>
     <string name="fullscreen_shutter_info">Appuyez n\'importe où pour capturer</string>
     <string name="please_wait">Veuillez patienter&#8230;</string>
+    <string name="retouch">RETOUCHER</string>
+    <string name="open_in_gallery">GALLERIE</string>
 
     <string name="mode_photo">Photo</string>
     <string name="mode_video">Vidéo</string>

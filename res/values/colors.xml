@@ -28,4 +28,6 @@
     <color name="pano_progress_indication_fast">#FFFF2222</color>
     <color name="pano_saving_done">#FF5E5233</color>
     <color name="pano_saving_indication">#FF99CC00</color>
+    <color name="review_drawer_button_bg">#88333333</color>
+    <color name="review_drawer_button_pressed">#8833B5E5</color>
 </resources>

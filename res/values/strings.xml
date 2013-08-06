@@ -37,6 +37,8 @@
     <string name="no_video_player">Couldn\'t play the video, no player found</string>
     <string name="fullscreen_shutter_info">Tap anywhere to shoot</string>
     <string name="please_wait">Please wait&#8230;</string>
+    <string name="retouch">RETOUCH</string>
+    <string name="open_in_gallery">GALLERY</string>
 
     <string name="mode_photo">Photo</string>
     <string name="mode_video">Video</string>
@@ -116,6 +118,7 @@
     <string name="showcase_panorama_body">Tap the shutter to start your panorama,\nthen pan what you want to capture.\nOnce done, tap the shutter button again.</string>
     <string name="showcase_picsphere_title">PicSphere mode</string>
     <string name="showcase_picsphere_body">Align your first picture where you like,\nthen tap the shutter to take each picture\nof the sphere. The blue dots are points\nof reference you can follow.\nLong-press the shutter once you\'re done.</string>
+
 </resources>
 
 

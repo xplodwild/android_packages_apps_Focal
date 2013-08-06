@@ -1257,7 +1257,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             int originalImageId = Integer.parseInt(uriStr.substring(uriStr.lastIndexOf("/") + 1, uriStr.length()));
             Log.v(TAG, "Adding snapshot to gallery: " + originalImageId);
             mReviewDrawer.addImageToList(originalImageId);
-            mReviewDrawer.setPreviewedImage(originalImageId);
         }
 
         @Override

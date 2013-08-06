@@ -214,7 +214,6 @@
     </FrameLayout>
 
     <org.cyanogenmod.focal.ui.ReviewDrawer
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="top|center_horizontal"
@@ -222,47 +221,59 @@
             android:background="#CC000000"
             android:layout_marginBottom="72dp">
 
-        <ListView
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/review_drawer_thumb_size"
-                android:id="@+id/list_reviewed_images"
+
+        <android.support.v4.view.ViewPager
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/reviewed_image"
+                android:layout_weight="1"
                 android:padding="8dp"
-                android:requiresFadingEdge="vertical"
-                android:fadingEdge="vertical"
-                android:fadingEdgeLength="32dp"
-                android:background="#AA333333"
-                android:layout_weight="1"
-                />
+                android:clickable="false"
+                android:minHeight="400dp"
+                android:contentDescription="@string/app_name"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentLeft="true"
+                android:layout_above="@+id/drawer_border"
+                android:layout_alignParentTop="true"/>
 
-        <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:id="@+id/reviewed_image_container"
-                android:layout_weight="1"
-                android:clickable="true">
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/button_retouch"
+                android:id="@+id/button_open_in_gallery"
+                style="@android:style/Widget.DeviceDefault.Light.Button.Borderless.Small"
+                android:src="@drawable/ic_gallery"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/review_drawer_button"
+                android:layout_marginTop="8dp"/>
 
-            <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dip"
-                    android:id="@+id/reviewed_image"
-                    android:layout_weight="1"
-                    android:padding="8dp"
-                    android:clickable="false"
-                    android:minWidth="400dp"
-                    android:contentDescription="@string/app_name"/>
-        </LinearLayout>
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_retouch"
+                android:textColor="@color/clock_white"
+                style="@android:style/Widget.DeviceDefault.Button.Borderless.Small"
+                android:src="@drawable/ic_retouch"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/review_drawer_button"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="8dp"/>
 
 
         <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="4dp"
+                android:layout_alignParentBottom="true"
                 android:id="@+id/drawer_border"
-                android:background="#FF888888"
+                android:background="#FF0099cc"
                 android:layout_weight="0"
-                android:minHeight="8dp"/>
+                />
 
-    </org.cyanogenmod.focal.ui.ReviewDrawer>
+    </org.cyanogenmod.focal.ui.ReviewDrawer
+            >
+
 
     <Button
             android:layout_width="wrap_content"
