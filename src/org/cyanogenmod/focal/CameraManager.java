@@ -117,6 +117,10 @@ public class CameraManager {
                         String val = pair.getValue();
                         Log.v(TAG, "Asynchronously setting parameter " + key+ " to " + val);
                         Camera.Parameters params = getParameters();
+                        if (params == null) {
+                            // The camera died, just forget about these settings
+                            return;
+                        }
                         String workingValue = params.get(key);
                         params.set(key, val);
 
