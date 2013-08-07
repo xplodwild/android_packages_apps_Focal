@@ -18,3 +18,4 @@ bin/
 /obj
 /res\drawable-xxhdpi/Thumbs.db
 /jni
+/libs/android-support-v4.jar

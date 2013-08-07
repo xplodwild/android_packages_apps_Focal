@@ -109,7 +109,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private static Notifier mNotifier;
     private ReviewDrawer mReviewDrawer;
     private ScaleGestureDetector mZoomGestureDetector;
-    private GLSurfaceView mPicSphere3DView;
     private TextView mHelperText;
     private ShowcaseView mShowcaseView;
     private boolean mHasPinchZoomed;
@@ -121,6 +120,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private int mShowcaseIndex;
     private boolean mIsCamSwitching;
     private CameraPreviewListener mCamPreviewListener;
+    private GLSurfaceView mGLSurfaceView;
 
     private final static int SHOWCASE_INDEX_WELCOME_1 = 0;
     private final static int SHOWCASE_INDEX_WELCOME_2 = 1;
@@ -220,7 +220,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mGestureDetector = new GestureDetector(this, new GestureListener());
         mZoomGestureDetector = new ScaleGestureDetector(this, new ZoomGestureListener());
 
-        findViewById(R.id.camera_preview_container).setOnTouchListener(mPreviewTouchListener);
+        findViewById(R.id.gl_renderer_container).setOnTouchListener(mPreviewTouchListener);
 
         // Use SavePinger to animate a bit while we open the camera device
         mSavePinger.setPingMode(SavePinger.PING_MODE_SIMPLE);
@@ -346,14 +346,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mOrientationListener.enable();
 
         mReviewDrawer.close();
-
-        // Reset to photo
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                setCameraMode(CAMERA_MODE_PHOTO);
-            }
-        });
     }
 
     @Override
@@ -594,30 +586,17 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     }
 
     protected void setupCamera() {
-        // Setup the Camera hardware and preview surface
+        // Setup the Camera hardware and preview
         mCamManager = new CameraManager(this);
 
-        // Add the preview surface to its container
-        final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
+        setGLRenderer(mCamManager.getRenderer());
 
-        // if we resumed the activity, the preview surface will already be attached
-        if (mCamManager.getPreviewSurface().getParent() != null) {
-            ((ViewGroup) mCamManager.getPreviewSurface().getParent())
-                    .removeView(mCamManager.getPreviewSurface());
-        }
-
-        layout.addView(mCamManager.getPreviewSurface());
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mCamManager.getPreviewSurface().getLayoutParams();
-        params.addRule(RelativeLayout.CENTER_IN_PARENT);
-        params.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
-        params.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-
-        mCamManager.getPreviewSurface().setLayoutParams(params);
         mCamPreviewListener = new CameraPreviewListener();
         mCamManager.setPreviewPauseListener(mCamPreviewListener);
         mCamManager.setCameraReadyListener(this);
 
         mCamManager.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+
     }
 
     @Override
@@ -652,10 +631,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     mCamManager.restartPreviewIfNeeded();
                     mIsCamSwitching = false;
                 }
-
-                final PreviewFrameLayout layout = (PreviewFrameLayout) findViewById(R.id.camera_preview_container);
-                layout.setPreviewSize(sz.width, sz.height);
-                layout.requestLayout();
 
                 if (mFocusManager == null) {
                     mFocusManager = new FocusManager(mCamManager);
@@ -778,23 +753,11 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mSideBar.slideClose();
         mWidgetRenderer.closeAllWidgets();
 
-        // Hide cam preview and turn on GL surface
-        findViewById(R.id.camera_preview_container).setVisibility(View.GONE);
-        mCamManager.getPreviewSurface().setVisibility(View.GONE);
-        findViewById(R.id.gl_renderer_container).setOnTouchListener(mPreviewTouchListener);
-        findViewById(R.id.gl_renderer_container).setVisibility(View.VISIBLE);
-
         // Setup the 3D rendering
         if (mPicSphereManager == null) {
             mPicSphereManager = new PicSphereManager(this, mSnapshotManager);
         }
-
-        mPicSphere3DView = new GLSurfaceView(this);
-        mPicSphere3DView.setEGLContextClientVersion(2);
-        mPicSphere3DView.setRenderer(mPicSphereManager.getRenderer());
-        ViewGroup picsphereContainer = ((ViewGroup) findViewById(R.id.gl_renderer_container));
-        picsphereContainer.addView(mPicSphere3DView);
-
+        setGLRenderer(mPicSphereManager.getRenderer());
 
         // Setup the capture transformer
         final PicSphereCaptureTransformer transformer =
@@ -814,18 +777,15 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         setHelperText(getString(R.string.picsphere_start_hint));
     }
 
-
+    /**
+     * Tear down the PicSphere mode and set the default renderer back on the preview
+     * GL surface.
+     */
     public void resetPicSphere() {
-        ViewGroup picsphereContainer = ((ViewGroup) findViewById(R.id.gl_renderer_container));
-        if (picsphereContainer != null) {
-            picsphereContainer.removeView(mPicSphere3DView);
-            picsphereContainer.setVisibility(View.GONE);
-        }
+        // Reset the normal renderer
+        setGLRenderer(mCamManager.getRenderer());
 
-        mCamManager.setRenderToTexture(null);
-        findViewById(R.id.camera_preview_container).setVisibility(View.VISIBLE);
-        mCamManager.getPreviewSurface().setVisibility(View.VISIBLE);
-
+        // Tear down PicSphere capture system
         if (mPicSphereManager != null) {
             mPicSphereManager.tearDown();
         }
@@ -834,8 +794,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         if (mPicSphereUndo != null) {
             mPicSphereUndo.setVisibility(View.GONE);
         }
-
-        mPicSphere3DView = null;
     }
 
     /**
@@ -843,9 +801,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
      */
     public void initializePanorama() {
         mMosaicProxy = new MosaicProxy(this);
-        findViewById(R.id.camera_preview_container).setVisibility(View.GONE);
-        findViewById(R.id.gl_renderer_container).setOnTouchListener(mPreviewTouchListener);
-        findViewById(R.id.gl_renderer_container).setVisibility(View.VISIBLE);
         setCaptureTransformer(mMosaicProxy);
         updateRingsVisibility();
     }
@@ -855,12 +810,23 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
      */
     public void resetPanorama() {
         mMosaicProxy.tearDown();
-        if (mCamManager != null) {
-            mCamManager.setRenderToTexture(null);
+        setGLRenderer(mCamManager.getRenderer());
+    }
+
+    public void setGLRenderer(GLSurfaceView.Renderer renderer) {
+        final ViewGroup container = ((ViewGroup) findViewById(R.id.gl_renderer_container));
+        // Delete the previous GL Surface View (if any)
+        if (mGLSurfaceView != null) {
+            container.removeView(mGLSurfaceView);
+            mGLSurfaceView = null;
         }
-        findViewById(R.id.camera_preview_container).setVisibility(View.VISIBLE);
-        findViewById(R.id.gl_renderer_container).setVisibility(View.GONE);
-        findViewById(R.id.gl_renderer_container).setOnTouchListener(null);
+
+        // Make a new GL view using the provided renderer
+        mGLSurfaceView = new GLSurfaceView(this);
+        mGLSurfaceView.setEGLContextClientVersion(2);
+        mGLSurfaceView.setRenderer(renderer);
+
+        container.addView(mGLSurfaceView);
     }
 
     /**
@@ -869,10 +835,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     public void toggleFullscreenShutter() {
         if (mIsFullscreenShutter) {
             mIsFullscreenShutter = false;
-            mShutterButton.animate().translationX(0).setDuration(400).start();
+            mShutterButton.animate().translationY(0).setDuration(400).start();
         } else {
             mIsFullscreenShutter = true;
-            mShutterButton.animate().translationX(mShutterButton.getWidth()).setDuration(400).start();
+            mShutterButton.animate().translationY(mShutterButton.getHeight()).setDuration(400).start();
             notify(getString(R.string.fullscreen_shutter_info), 2000);
         }
         updateRingsVisibility();
@@ -998,12 +964,14 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 return;
             }
 
-            container.setAspectRatio((float) preview.getWidth() / preview.getHeight());
-            container.setPreviewSize(preview.getWidth(), preview.getHeight());
-            iv.setImageBitmap(preview);
-            iv.setAlpha(1.0f);
-
-            findViewById(R.id.camera_preview_container).setAlpha(0.0f);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    container.setPreviewSize(preview.getWidth(), preview.getHeight());
+                    iv.setImageBitmap(preview);
+                    iv.setAlpha(1.0f);
+                }
+            });
         }
 
         @Override
@@ -1011,7 +979,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    findViewById(R.id.camera_preview_container).setAlpha(1.0f);
+                    findViewById(R.id.gl_renderer_container).setAlpha(1.0f);
                     ImageView iv = (ImageView) findViewById(R.id.camera_preview_overlay);
                     iv.animate().setDuration(300).alpha(0.0f).start();
                 }
@@ -1221,13 +1189,11 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 @Override
                 public void run() {
                     layout.addView(flinger);
-                    flinger.setRotation(mOrientationCompensation+90);
+                    flinger.setRotation(90);
                     flinger.setImageBitmap(info.mThumbnail);
                     flinger.doAnimation();
                 }
             });
-
-
 
             // Unlock camera auto settings
             mCamManager.setLockSetup(false);
@@ -1257,6 +1223,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             int originalImageId = Integer.parseInt(uriStr.substring(uriStr.lastIndexOf("/") + 1, uriStr.length()));
             Log.v(TAG, "Adding snapshot to gallery: " + originalImageId);
             mReviewDrawer.addImageToList(originalImageId);
+            mReviewDrawer.scrollToLatestImage();
         }
 
         @Override
@@ -1352,61 +1319,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 mOrientationCompensation = orientationCompensation;
                 updateInterfaceOrientation();
             }
-        }
-    }
-
-    private class CameraSensorListener implements SensorEventListener {
-        public final static int SHAKE_CLOSE_THRESHOLD = 15;
-        public final static int SHAKE_OPEN_THRESHOLD = -15;
-
-        private float mGravity[] = new float[3];
-        private float mAccel[] = new float[3];
-
-        private long mLastShakeTimestamp = 0;
-
-        @Override
-        public void onSensorChanged(SensorEvent sensorEvent) {
-            // alpha is calculated as t / (t + dT)
-            // with t, the low-pass filter's time-constant
-            // and dT, the event delivery rate
-            final float alpha = 0.8f;
-
-            mGravity[0] = alpha * mGravity[0] + (1 - alpha) * sensorEvent.values[0];
-            mGravity[1] = alpha * mGravity[1] + (1 - alpha) * sensorEvent.values[1];
-            mGravity[2] = alpha * mGravity[2] + (1 - alpha) * sensorEvent.values[2];
-
-            mAccel[0] = sensorEvent.values[0] - mGravity[0];
-            mAccel[1] = sensorEvent.values[1] - mGravity[1];
-            mAccel[2] = sensorEvent.values[2] - mGravity[2];
-
-            // If we aren't just opening the sidebar
-            if ((System.currentTimeMillis() - mLastShakeTimestamp) < 1000) {
-                return;
-            }
-
-            if (mAccel[0] > SHAKE_CLOSE_THRESHOLD && mSideBar.isOpen()) {
-                mSideBar.slideClose();
-
-                if (mWidgetRenderer.getWidgetsCount() > 0) {
-                    mWidgetRenderer.hideWidgets();
-                }
-
-                mLastShakeTimestamp = System.currentTimeMillis();
-            } else if (mAccel[0] < SHAKE_OPEN_THRESHOLD && !mSideBar.isOpen()) {
-                mSideBar.slideOpen();
-
-                if (mWidgetRenderer.getWidgetsCount() > 0) {
-                    mWidgetRenderer.restoreWidgets();
-                }
-
-                mLastShakeTimestamp = System.currentTimeMillis();
-            }
-
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int i) {
-
         }
     }
 

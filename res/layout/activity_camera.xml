@@ -23,15 +23,6 @@
              android:background="#000000"
              tools:context=".CameraActivity">
 
-    <org.cyanogenmod.focal.ui.PreviewFrameLayout
-            android:id="@+id/camera_preview_container"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:visibility="visible"
-            android:layout_gravity="center">
-
-    </org.cyanogenmod.focal.ui.PreviewFrameLayout>
-
     <FrameLayout
             android:id="@+id/gl_renderer_container"
             android:layout_width="wrap_content"
@@ -61,27 +52,6 @@
                 android:alpha="0.0"
                 android:id="@+id/camera_preview_overlay"/>
     </org.cyanogenmod.focal.ui.PreviewFrameLayout>
-
-    <org.cyanogenmod.focal.ui.Notifier
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:background="#99333333"
-            android:focusableInTouchMode="false"
-            android:id="@+id/notifier_container"
-            android:alpha="0"
-            android:gravity="left"
-            android:layout_margin="8dp"
-            android:layout_gravity="left|bottom">
-
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#FFFFFFFF"
-                android:gravity="left"
-                android:id="@+id/notifier_text"/>
-    </org.cyanogenmod.focal.ui.Notifier>
 
     <LinearLayout
             android:layout_width="wrap_content"
@@ -210,6 +180,27 @@
                 android:contentDescription="@string/shutter_button"
                 android:src="@drawable/btn_shutter_photo"
                 android:layout_marginBottom="-24dp"/>
+
+        <org.cyanogenmod.focal.ui.Notifier
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:background="#99333333"
+                android:focusableInTouchMode="false"
+                android:id="@+id/notifier_container"
+                android:alpha="0"
+                android:gravity="left|top"
+                android:layout_margin="8dp"
+                android:layout_gravity="left|top">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#FFFFFFFF"
+                    android:gravity="left"
+                    android:id="@+id/notifier_text"/>
+        </org.cyanogenmod.focal.ui.Notifier>
 
     </FrameLayout>
 

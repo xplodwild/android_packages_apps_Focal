@@ -46,7 +46,9 @@ import org.cyanogenmod.focal.R;
 import org.cyanogenmod.focal.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class handles the review drawer that can be opened by swiping down
@@ -55,14 +57,11 @@ public class ReviewDrawer extends RelativeLayout {
     public final static String TAG = "ReviewDrawer";
 
     private final static long DRAWER_TOGGLE_DURATION = 400;
-    private final static int DRAWER_QUICK_REVIEW_SIZE_DP = 120;
     private final static String GALLERY_CAMERA_BUCKET = "Camera";
-    private int mThumbnailSize;
 
     private List<Integer> mImages;
 
     private Handler mHandler;
-    private int mReviewedImageOrientation;
     private ImageListAdapter mImagesListAdapter;
     private int mReviewedImageId;
     private int mCurrentOrientation;
@@ -87,7 +86,6 @@ public class ReviewDrawer extends RelativeLayout {
     private void initialize() {
         mHandler = new Handler();
         mImages = new ArrayList<Integer>();
-        mThumbnailSize = getContext().getResources().getDimensionPixelSize(R.dimen.review_drawer_thumb_size);
 
         // Default hidden
         setAlpha(0.0f);
@@ -176,7 +174,12 @@ public class ReviewDrawer extends RelativeLayout {
      */
     public void updateFromGallerySynchronous(final boolean images) {
         mImages.clear();
-        mImagesListAdapter.notifyDataSetChanged();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mImagesListAdapter.notifyDataSetChanged();
+            }
+        });
 
         String[] columns = null;
         String orderBy = null;
@@ -221,6 +224,9 @@ public class ReviewDrawer extends RelativeLayout {
                     finalCursor.moveToPosition(i);
 
                     int id = finalCursor.getInt(imageColumnIndex);
+                    if (mReviewedImageId <= 0) {
+                        mReviewedImageId = id;
+                    }
                     addImageToList(id);
                 }
             }
@@ -258,6 +264,21 @@ public class ReviewDrawer extends RelativeLayout {
      */
     public void addImageToList(final int id) {
         mImagesListAdapter.addImage(id);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mImagesListAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public void scrollToLatestImage() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mViewPager.setCurrentItem(0);
+            }
+        });
     }
 
     public void notifyOrientationChanged(final int orientation) {
@@ -372,10 +393,6 @@ public class ReviewDrawer extends RelativeLayout {
      * @param distance
      */
     public void slide(final float distance) {
-        if (distance > 1) {
-            //mReviewedImage.setVisibility(View.VISIBLE);
-        }
-
         float finalPos = getTranslationY() + distance;
         if (finalPos > 0) finalPos = 0;
 
@@ -440,28 +457,26 @@ public class ReviewDrawer extends RelativeLayout {
      * Adapter responsible for showing the images in the list of the review drawer
      */
     private class ImageListAdapter extends android.support.v4.view.PagerAdapter {
-        public ImageListAdapter() {
+        private Map<ImageView, Integer> mViewsToId;
 
+        public ImageListAdapter() {
+            mViewsToId = new HashMap<ImageView, Integer>();
         }
 
         public void addImage(int id) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ImageListAdapter.this.startUpdate(mViewPager);
-                }
-            });
-
             mImages.add(0, id);
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ImageListAdapter.this.notifyDataSetChanged();
-                    ImageListAdapter.this.finishUpdate(mViewPager);
-                }
-            });
         }
 
+        @Override
+        public int getItemPosition(Object object) {
+            ImageView img = (ImageView) object;
+
+            if (mImages.indexOf(mViewsToId.get(img)) >= 0) {
+                return mImages.indexOf(mViewsToId.get(img));
+            } else {
+                return POSITION_NONE;
+            }
+        }
 
         @Override
         public int getCount() {
@@ -474,20 +489,32 @@ public class ReviewDrawer extends RelativeLayout {
         }
 
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(ViewGroup container, final int position) {
             final ImageView imageView = new ImageView(getContext());
             container.addView(imageView);
 
-            final Bitmap thumbnail = CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO ?
-                    (MediaStore.Video.Thumbnails.getThumbnail(
-                            getContext().getContentResolver(), mImages.get(position),
-                            MediaStore.Video.Thumbnails.MINI_KIND, null)) :
-                    (MediaStore.Images.Thumbnails.getThumbnail(
-                            getContext().getContentResolver(), mImages.get(position),
-                            MediaStore.Images.Thumbnails.MINI_KIND, null));
-
-            imageView.setImageBitmap(thumbnail);
             imageView.setOnTouchListener(new ThumbnailTouchListener(imageView));
+
+            new Thread() {
+                public void run() {
+                    mViewsToId.put(imageView, mImages.get(position));
+                    final Bitmap thumbnail = CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO ?
+                            (MediaStore.Video.Thumbnails.getThumbnail(
+                                    getContext().getContentResolver(), mImages.get(position),
+                                    MediaStore.Video.Thumbnails.MINI_KIND, null)) :
+                            (MediaStore.Images.Thumbnails.getThumbnail(
+                                    getContext().getContentResolver(), mImages.get(position),
+                                    MediaStore.Images.Thumbnails.MINI_KIND, null));
+
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            imageView.setImageBitmap(thumbnail);
+                        }
+                    });
+                }
+            }.start();
 
             return imageView;
         }

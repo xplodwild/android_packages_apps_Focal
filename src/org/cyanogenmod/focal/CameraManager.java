@@ -19,6 +19,7 @@
 package org.cyanogenmod.focal;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -29,17 +30,26 @@ import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.AutoFocusMoveCallback;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.opengl.GLES11Ext;
+import android.opengl.GLES20;
+import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.util.Log;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 /**
  * This class is responsible for interacting with the Camera HAL.
@@ -65,11 +75,11 @@ public class CameraManager {
     private CameraReadyListener mCameraReadyListener;
     private Handler mHandler;
     private Context mContext;
-    private long mLastPreviewFrameTime;
     private boolean mCameraOpen;
     private boolean mIsModeSwitching;
     private List<NameValuePair> mPendingParameters;
     private boolean mIsResuming;
+    private CameraRenderer mRenderer;
 
     public interface PreviewPauseListener {
         /**
@@ -156,12 +166,13 @@ public class CameraManager {
         mParametersThread.start();
         mIsResuming = false;
         mCameraOpen = false;
+        mRenderer = new CameraRenderer();
     }
 
     /**
      * Opens the camera and show its preview in the preview
      *
-     * @param cameraId
+     * @param cameraId The facing of the camera
      * @return true if the operation succeeded, false otherwise
      */
     public boolean open(final int cameraId) {
@@ -247,6 +258,13 @@ public class CameraManager {
      */
     public CameraPreview getPreviewSurface() {
         return mPreview;
+    }
+
+    /**
+     * @return The GLES20-compatible renderer for the camera preview
+     */
+    public CameraRenderer getRenderer() {
+        return mRenderer;
     }
 
     /**
@@ -353,7 +371,7 @@ public class CameraManager {
 
     /**
      * Sets a parameters class in a synchronous way. Use with caution, prefer setParameterAsync.
-     * @param params
+     * @param params Parameters
      */
     public void setParameters(Camera.Parameters params) {
         synchronized (mParametersThread) {
@@ -390,7 +408,7 @@ public class CameraManager {
                     try {
                         mCamera.setParameters(params);
                     } catch (RuntimeException e) {
-
+                        // Do nothing
                     }
                 }
             }
@@ -436,15 +454,6 @@ public class CameraManager {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Returns the system time of when the last preview frame was received
-     *
-     * @return long
-     */
-    public long getLastPreviewFrameTime() {
-        return mLastPreviewFrameTime;
     }
 
     public Context getContext() {
@@ -509,7 +518,7 @@ public class CameraManager {
         mMediaRecorder.setMaxDuration(0); // infinite
 
 
-        mMediaRecorder.setPreviewDisplay(mPreview.getSurfaceHolder().getSurface());
+        //mMediaRecorder.setPreviewDisplay(mPreview.getSurfaceHolder().getSurface());
 
         try {
             mMediaRecorder.prepare();
@@ -532,16 +541,16 @@ public class CameraManager {
         Log.v(TAG, "stopVideoRecording");
         try {
             mMediaRecorder.stop();
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            Log.e(TAG, "Cannot stop MediaRecorder", e);
+        }
         mCamera.lock();
         mMediaRecorder.reset();
         mPreview.postCallbackBuffer();
     }
 
     /**
-     * Returns the orientation of the device
-     *
-     * @return
+     * @return The orientation of the device
      */
     public int getOrientation() {
         return mOrientation;
@@ -558,7 +567,7 @@ public class CameraManager {
         Camera.CameraInfo info =
                 new android.hardware.Camera.CameraInfo();
         Camera.getCameraInfo(mCurrentFacing, info);
-        orientation = (orientation + 45) / 90 * 90;
+        orientation = (360 - orientation + 45) / 90 * 90;
         int rotation = 0;
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             rotation = (info.orientation - orientation + 360) % 360;
@@ -635,6 +644,21 @@ public class CameraManager {
                         params.setPreviewSize(mTargetSize.x, mTargetSize.y);
                     }
 
+                    // Rotate the display to 90 degrees
+                    android.hardware.Camera.CameraInfo info =
+                            new android.hardware.Camera.CameraInfo();
+                    android.hardware.Camera.getCameraInfo(mCurrentFacing, info);
+                    int degrees = 90;
+
+                    int result;
+                    if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                        result = (info.orientation + degrees) % 360;
+                        result = (360 - result) % 360;  // compensate the mirror
+                    } else {  // back-facing
+                        result = (info.orientation - degrees + 360) % 360;
+                    }
+                    mCamera.setDisplayOrientation(result);
+
                     mCamera.setParameters(params);
                     mParameters = mCamera.getParameters();
                     try {
@@ -677,17 +701,14 @@ public class CameraManager {
         parameters.setPreviewSize(previewSize.x, previewSize.y);
         mTargetSize = previewSize;
 
-        List<Camera.Size> supportedPicSizes = parameters.getSupportedPictureSizes();
-        if (supportedPicSizes.contains(mTargetSize)) {
-            parameters.setPictureSize(mTargetSize.x, mTargetSize.y);
-        }
-
         List<int[]> frameRates = parameters.getSupportedPreviewFpsRange();
-        int last = frameRates.size() - 1;
-        int minFps = (frameRates.get(last))[Camera.Parameters.PREVIEW_FPS_MIN_INDEX];
-        int maxFps = (frameRates.get(last))[Camera.Parameters.PREVIEW_FPS_MAX_INDEX];
-        parameters.setPreviewFpsRange(minFps, maxFps);
-        Log.v(TAG, "preview fps: " + minFps + ", " + maxFps);
+        if (frameRates != null) {
+            int last = frameRates.size() - 1;
+            int minFps = (frameRates.get(last))[Camera.Parameters.PREVIEW_FPS_MIN_INDEX];
+            int maxFps = (frameRates.get(last))[Camera.Parameters.PREVIEW_FPS_MAX_INDEX];
+            parameters.setPreviewFpsRange(minFps, maxFps);
+            Log.v(TAG, "preview fps: " + minFps + ", " + maxFps);
+        }
 
         setInfinityFocus(parameters);
 
@@ -697,7 +718,8 @@ public class CameraManager {
 
     private void setInfinityFocus(Camera.Parameters parameters) {
         List<String> supportedFocusModes = parameters.getSupportedFocusModes();
-        if (supportedFocusModes.indexOf(Camera.Parameters.FOCUS_MODE_INFINITY) >= 0) {
+        if (supportedFocusModes != null
+                && supportedFocusModes.indexOf(Camera.Parameters.FOCUS_MODE_INFINITY) >= 0) {
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_INFINITY);
         } else {
             // Use the default focus mode and log a message
@@ -725,7 +747,9 @@ public class CameraManager {
                     public void run() {
                         try {
                             mCamera.autoFocus(cb);
-                        } catch (Exception e) { }
+                        } catch (Exception e) {
+                            // Do nothing
+                        }
                     }
                 });
 
@@ -825,7 +849,8 @@ public class CameraManager {
     public void setAutoFocusMoveCallback(AutoFocusMoveCallback cb) {
         mAutoFocusMoveCallback = cb;
 
-        if (mCamera != null && mParameters.getSupportedFocusModes().contains(
+        List<String> focusModes = mParameters.getSupportedFocusModes();
+        if (mCamera != null && focusModes != null && focusModes.contains(
                 Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             mCamera.setAutoFocusMoveCallback(cb);
         }
@@ -833,7 +858,7 @@ public class CameraManager {
 
     /**
      * Enable the device image stabilization system.
-     * @param enabled
+     * @param enabled True to stabilize
      */
     public void setStabilization(boolean enabled) {
         Camera.Parameters params = getParameters();
@@ -852,7 +877,9 @@ public class CameraManager {
 
         try {
             mCamera.setParameters(params);
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            // Do nothing
+        }
     }
 
     /**
@@ -866,33 +893,18 @@ public class CameraManager {
     }
 
     /**
-     * Redirect the camera preview callbacks to the specified preview callback rather than the
-     * default preview callback.
-     * @param cb The callback
-     */
-    public void deviatePreviewCallbackWithBuffer(Camera.PreviewCallback cb) {
-        mCamera.setPreviewCallbackWithBuffer(cb);
-    }
-
-    /**
      * The CameraPreview class handles the Camera preview feed
      * and setting the surface holder.
      */
-    public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Camera.PreviewCallback {
+    public class CameraPreview extends SurfaceView implements Camera.PreviewCallback {
         private final static String TAG = "CameraManager.CameraPreview";
 
-        private SurfaceHolder mHolder;
         private SurfaceTexture mTexture;
         private byte[] mLastFrameBytes;
         private boolean mPauseCopyFrame;
 
         public CameraPreview(Context context) {
             super(context);
-
-            // Install a SurfaceHolder.Callback so we get notified when the
-            // underlying surface is created and destroyed.
-            mHolder = getHolder();
-            mHolder.addCallback(this);
         }
 
         /**
@@ -901,14 +913,10 @@ public class CameraManager {
          * Note that you have to restart camera preview manually after setting this.
          * Set to null to reset render to the SurfaceHolder.
          *
-         * @param texture
+         * @param texture The target texture
          */
         public void setRenderToTexture(SurfaceTexture texture) {
             mTexture = texture;
-        }
-
-        public SurfaceTexture getSurfaceTexture() {
-            return mTexture;
         }
 
         public void setPauseCopyFrame(boolean pause) {
@@ -928,10 +936,6 @@ public class CameraManager {
             return mLastFrameBytes;
         }
 
-        public SurfaceHolder getSurfaceHolder() {
-            return mHolder;
-        }
-
         public void notifyCameraChanged(boolean startPreview) {
             synchronized (mParametersThread) {
                 if (mCamera != null) {
@@ -942,11 +946,7 @@ public class CameraManager {
                     setupCamera();
 
                     try {
-                        if (mTexture != null) {
-                            mCamera.setPreviewTexture(mTexture);
-                        } else {
-                            mCamera.setPreviewDisplay(mHolder);
-                        }
+                        mCamera.setPreviewTexture(mTexture);
 
                         if (startPreview) {
                             mCamera.startPreview();
@@ -959,34 +959,7 @@ public class CameraManager {
             }
         }
 
-        public void surfaceCreated(SurfaceHolder holder) {
-            // The Surface has been created, now tell the camera where to draw the preview.
-            if (mCamera == null)
-                return;
-
-            try {
-                if (mTexture != null) {
-                    mCamera.setPreviewTexture(mTexture);
-                } else {
-                    mCamera.setPreviewDisplay(mHolder);
-                }
-                mCamera.startPreview();
-                postCallbackBuffer();
-            } catch (IOException e) {
-                Log.e(TAG, "Error setting camera preview: " + e.getMessage());
-            }
-        }
-
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            // empty. Take care of releasing the Camera preview in your activity.
-        }
-
-        public void surfaceChanged(final SurfaceHolder holder, final int format, final int w, final int h) {
-            if (mHolder.getSurface() == null) {
-                // preview surface does not exist
-                return;
-            }
-
+        public void startPreview() {
             // stop preview before making changes
             synchronized (this) {
                 try {
@@ -1000,7 +973,7 @@ public class CameraManager {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            surfaceChanged(holder, format, w, h);
+                            startPreview();
                         }
                     });
                     return;
@@ -1010,11 +983,7 @@ public class CameraManager {
 
                 // start preview with new settings
                 try {
-                    if (mTexture != null) {
-                        mCamera.setPreviewTexture(mTexture);
-                    } else {
-                        mCamera.setPreviewDisplay(mHolder);
-                    }
+                    mCamera.setPreviewTexture(mTexture);
                     mCamera.startPreview();
 
                     mParameters = mCamera.getParameters();
@@ -1042,14 +1011,16 @@ public class CameraManager {
             // Set device-specifics here
             try {
                 Camera.Parameters params = mCamera.getParameters();
+                Resources res = getResources();
 
-                if (getResources().getBoolean(R.bool.config_qualcommZslCameraMode)) {
-                    if (getResources().getBoolean(R.bool.config_useSamsungZSL)) {
-                        mCamera.sendRawCommand(1508, 0, 0);
+                if (res != null) {
+                    if (res.getBoolean(R.bool.config_qualcommZslCameraMode)) {
+                        if (res.getBoolean(R.bool.config_useSamsungZSL)) {
+                            mCamera.sendRawCommand(1508, 0, 0);
+                        }
+                        params.set("camera-mode", 1);
                     }
-                    params.set("camera-mode", 1);
                 }
-                mCamera.setDisplayOrientation(90);
 
                 mCamera.setParameters(params);
 
@@ -1062,10 +1033,151 @@ public class CameraManager {
 
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            mLastPreviewFrameTime = System.currentTimeMillis();
             if (mCamera != null && !mPauseCopyFrame) {
                 mCamera.addCallbackBuffer(mLastFrameBytes);
             }
+        }
+    }
+
+    public class CameraRenderer implements GLSurfaceView.Renderer {
+        int mTexture;
+        private SurfaceTexture mSurface;
+
+        private final String VERTEX_SHADER =
+                "attribute vec4 position;" +
+                        "attribute vec2 inputTextureCoordinate;" +
+                        "varying vec2 textureCoordinate;" +
+                        "void main()" +
+                        "{"+
+                        "gl_Position = position;"+
+                        "textureCoordinate = inputTextureCoordinate;" +
+                        "}";
+
+        private final String FRAGMENT_SHADER =
+                "#extension GL_OES_EGL_image_external : require\n"+
+                        "precision mediump float;" +
+                        "varying vec2 textureCoordinate;                            \n" +
+                        "uniform samplerExternalOES s_texture;               \n" +
+                        "void main() {" +
+                        "  gl_FragColor = texture2D( s_texture, textureCoordinate );\n" +
+                        "}";
+
+        private FloatBuffer vertexBuffer, textureVerticesBuffer;
+        private ShortBuffer drawListBuffer;
+        private int mProgram;
+        private int mPositionHandle;
+        private int mColorHandle;
+        private int mTextureCoordHandle;
+
+        // number of coordinates per vertex in this array
+        static final int COORDS_PER_VERTEX = 2;
+        static final float RATIO = 4.0f/3.0f;
+
+        private final float squareVertices[] = {
+                1.0f * RATIO,  -1.0f,
+                1.0f * RATIO,  1.0f,
+                -1.0f,  1.0f,
+                -1.0f,  -1.0f
+        };
+
+        private final float textureVertices[] = {
+                1, 0,
+                0, 0,
+                0, 1,
+                1, 1
+        };
+
+        private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
+
+        public CameraRenderer() {
+
+        }
+
+        public void onSurfaceCreated(GL10 unused, EGLConfig config) {
+            mTexture = createTexture();
+            mSurface = new SurfaceTexture(mTexture);
+            GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+
+            setRenderToTexture(mSurface);
+
+            // Setup vertex buffer
+            ByteBuffer bb = ByteBuffer.allocateDirect(squareVertices.length * 4);
+            bb.order(ByteOrder.nativeOrder());
+            vertexBuffer = bb.asFloatBuffer();
+            vertexBuffer.put(squareVertices);
+            vertexBuffer.position(0);
+
+            ByteBuffer bb2 = ByteBuffer.allocateDirect(textureVertices.length * 4);
+            bb2.order(ByteOrder.nativeOrder());
+            textureVerticesBuffer = bb2.asFloatBuffer();
+            textureVerticesBuffer.put(textureVertices);
+            textureVerticesBuffer.position(0);
+
+            // Load shaders
+            int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
+            int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
+
+            mProgram = GLES20.glCreateProgram();             // create empty OpenGL ES Program
+            GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
+            GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
+            GLES20.glLinkProgram(mProgram);
+
+            // Since we only use one program/texture/vertex array, we bind them once here
+            // and then we only draw what we need in onDrawFrame
+            GLES20.glUseProgram(mProgram);
+
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mTexture);
+
+            mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
+            GLES20.glEnableVertexAttribArray(mPositionHandle);
+            GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,vertexStride, vertexBuffer);
+
+            mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
+            GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
+            GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,vertexStride, textureVerticesBuffer);
+
+            mColorHandle = GLES20.glGetAttribLocation(mProgram, "s_texture");
+        }
+
+        public void onDrawFrame(GL10 unused) {
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+
+            if (mSurface != null) {
+                mSurface.updateTexImage();
+            }
+
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 4);
+        }
+
+        public void onSurfaceChanged(GL10 unused, int width, int height) {
+            GLES20.glViewport(0, 0, width, height);
+        }
+
+        public int loadShader(int type, String shaderCode) {
+            int shader = GLES20.glCreateShader(type);
+
+            GLES20.glShaderSource(shader, shaderCode);
+            GLES20.glCompileShader(shader);
+
+            return shader;
+        }
+
+        private int createTexture() {
+            int[] texture = new int[1];
+
+            GLES20.glGenTextures(1,texture, 0);
+            GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, texture[0]);
+            GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
+                    GL10.GL_TEXTURE_MIN_FILTER,GL10.GL_LINEAR);
+            GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
+                    GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
+                    GL10.GL_TEXTURE_WRAP_S, GL10.GL_CLAMP_TO_EDGE);
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
+                    GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE);
+
+            return texture[0];
         }
     }
 }

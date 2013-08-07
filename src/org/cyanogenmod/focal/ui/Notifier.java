@@ -95,7 +95,7 @@ public class Notifier extends LinearLayout {
                 mTextView = (TextView) findViewById(R.id.notifier_text);
                 mTextView.setText(text);
                 setAlpha(0.0f);
-                setX(Util.getScreenSize(null).x*2.0f/3.0f);
+                setX(Util.getScreenSize(null).x*1.0f/3.0f);
                 setY(Util.getScreenSize(null).y*2.0f/3.0f);
                 mTargetX = getX();
                 mTargetY = getY();

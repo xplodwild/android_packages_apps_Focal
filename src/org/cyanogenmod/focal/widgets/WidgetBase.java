@@ -111,7 +111,7 @@ public abstract class WidgetBase {
             }
         }
 
-        mWidget.addView(v, 0);
+        mWidget.addView(v);
     }
 
     /**
