@@ -35,7 +35,8 @@ LOCAL_REQUIRED_MODULES := \
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
 	metadata-extractor \
-	xmpcore
+	xmpcore \
+        android-support-v4
 
 include $(BUILD_PACKAGE)
 include $(CLEAR_VARS)
