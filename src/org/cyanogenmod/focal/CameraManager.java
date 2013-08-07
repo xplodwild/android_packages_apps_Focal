@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
@@ -116,7 +117,7 @@ public class CameraManager {
                     try {
                         wait();
                     } catch (InterruptedException e) {
-                        // do nothing
+                        // Do nothing here
                     }
 
                     List<NameValuePair> copy = new ArrayList<NameValuePair>(mPendingParameters);
@@ -137,11 +138,13 @@ public class CameraManager {
                         try {
                             mCamera.setParameters(params);
                         } catch (RuntimeException e) {
-                            Log.e(TAG, "Could not set parameter " + key + " to '" + val + "', restoring '"
+                            Log.e(TAG, "Could not set parameter " + key
+                                    + " to '" + val + "', restoring '"
                                     + workingValue + "'", e);
 
                             // Reset the parameter back in storage
-                            SettingsStorage.storeCameraSetting(mContext, mCurrentFacing, key, workingValue);
+                            SettingsStorage.storeCameraSetting(
+                                    mContext, mCurrentFacing, key, workingValue);
 
                             // Reset the camera as it likely crashed if we reached here
                             open(mCurrentFacing);
@@ -220,6 +223,7 @@ public class CameraManager {
                     if (mCameraReadyListener != null) {
                         mCameraReadyListener.onCameraFailed();
                     }
+
                     return;
                 }
 
@@ -229,7 +233,6 @@ public class CameraManager {
                 if (mCameraReadyListener != null) {
                     mCameraReadyListener.onCameraReady();
                 }
-
                 if (mPreviewPauseListener != null) {
                     mPreviewPauseListener.onPreviewResume();
                 }
@@ -408,7 +411,7 @@ public class CameraManager {
                     try {
                         mCamera.setParameters(params);
                     } catch (RuntimeException e) {
-                        // Do nothing
+                        // Do nothing here
                     }
                 }
             }
@@ -481,14 +484,15 @@ public class CameraManager {
         int width = Integer.parseInt(splat[0]);
         int height = Integer.parseInt(splat[1]);
 
-        setParameterAsync("picture-size", Integer.toString(width) + "x" + Integer.toString(height));
+        setParameterAsync("picture-size", Integer.toString(width)
+                + "x" + Integer.toString(height));
     }
 
     /**
      * Takes a snapshot
      */
-    public void takeSnapshot(Camera.ShutterCallback shutterCallback, Camera.PictureCallback raw,
-                             Camera.PictureCallback jpeg) {
+    public void takeSnapshot(Camera.ShutterCallback shutterCallback,
+            Camera.PictureCallback raw, Camera.PictureCallback jpeg) {
         Log.v(TAG, "takePicture");
         SoundManager.getSingleton().play(SoundManager.SOUND_SHUTTER);
         mCamera.takePicture(shutterCallback, raw, jpeg);
@@ -513,12 +517,10 @@ public class CameraManager {
         mMediaRecorder.setProfile(profile);
         mMediaRecorder.setOutputFile(fileName);
         // Set maximum file size.
-        long maxFileSize = Storage.getStorage().getAvailableSpace() - Storage.LOW_STORAGE_THRESHOLD;
+        long maxFileSize = Storage.getStorage().getAvailableSpace()
+                - Storage.LOW_STORAGE_THRESHOLD;
         mMediaRecorder.setMaxFileSize(maxFileSize);
         mMediaRecorder.setMaxDuration(0); // infinite
-
-
-        //mMediaRecorder.setPreviewDisplay(mPreview.getSurfaceHolder().getSurface());
 
         try {
             mMediaRecorder.prepare();
@@ -609,8 +611,9 @@ public class CameraManager {
                     Camera.Parameters params = getParameters();
 
                     if (params == null) {
-                        // We're likely in the middle of a transient state. Just do that again
-                        // shortly when the camera will be available.
+                        // We're likely in the middle of a transient state.
+                        // Just do that again shortly when the camera will
+                        // be available.
                         return;
                     }
 
@@ -662,8 +665,8 @@ public class CameraManager {
                     mCamera.setParameters(params);
                     mParameters = mCamera.getParameters();
                     try {
-                        // PicSphere and Pano renders to a texture, so the preview will be started
-                        // once the SurfaceTexture is ready to receive frames
+                        // PicSphere and Pano renders to a texture, so the preview will
+                        // be started once the SurfaceTexture is ready to receive frames
                         if (mode != CameraActivity.CAMERA_MODE_PICSPHERE
                                 && mode != CameraActivity.CAMERA_MODE_PANO) {
                             mCamera.startPreview();
@@ -723,8 +726,9 @@ public class CameraManager {
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_INFINITY);
         } else {
             // Use the default focus mode and log a message
-            Log.w(TAG, "Cannot set the focus mode to " + Camera.Parameters.FOCUS_MODE_INFINITY +
-                    " because the mode is not supported.");
+            Log.w(TAG, "Cannot set the focus mode to "
+                    + Camera.Parameters.FOCUS_MODE_INFINITY
+                    + " because the mode is not supported.");
         }
     }
 
@@ -737,10 +741,10 @@ public class CameraManager {
     public boolean doAutofocus(final AutoFocusCallback cb) {
         if (mCamera != null) {
             try {
-                // make sure our auto settings aren't locked
+                // Make sure our auto settings aren't locked
                 setLockSetup(false);
 
-                // trigger af
+                // Trigger af
                 mCamera.cancelAutoFocus();
 
                 mHandler.post(new Runnable() {
@@ -748,7 +752,7 @@ public class CameraManager {
                         try {
                             mCamera.autoFocus(cb);
                         } catch (Exception e) {
-                            // Do nothing
+                            // Do nothing here
                         }
                     }
                 });
@@ -817,7 +821,8 @@ public class CameraManager {
             try {
                 mCamera.setParameters(params);
             } catch (Exception e) {
-                // ignore, we might be setting it too fast since previous attempt
+                // Ignore, we might be setting it too
+                // fast since previous attempt
             }
         }
     }
@@ -841,7 +846,8 @@ public class CameraManager {
             try {
                 mCamera.setParameters(params);
             } catch (Exception e) {
-                // ignore, we might be setting it too fast since previous attempt
+                // Ignore, we might be setting it too
+                // fast since previous attempt
             }
         }
     }
@@ -862,7 +868,9 @@ public class CameraManager {
      */
     public void setStabilization(boolean enabled) {
         Camera.Parameters params = getParameters();
-        if (params == null) return;
+        if (params == null) {
+            return;
+        }
 
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
             // In wrappers: sony has sony-is, HTC has ois_mode, etc.
@@ -878,7 +886,7 @@ public class CameraManager {
         try {
             mCamera.setParameters(params);
         } catch (Exception e) {
-            // Do nothing
+            // Do nothing here
         }
     }
 
@@ -960,12 +968,12 @@ public class CameraManager {
         }
 
         public void startPreview() {
-            // stop preview before making changes
+            // Stop preview before making changes
             synchronized (this) {
                 try {
                     mCamera.stopPreview();
                 } catch (Exception e) {
-                    // ignore: tried to stop a non-existent preview
+                    // Ignore: tried to stop a non-existent preview
                 }
 
                 if (!mCameraOpen) {
@@ -981,7 +989,7 @@ public class CameraManager {
 
                 setupCamera();
 
-                // start preview with new settings
+                // Start preview with new settings
                 try {
                     mCamera.setPreviewTexture(mTexture);
                     mCamera.startPreview();
@@ -1069,7 +1077,7 @@ public class CameraManager {
         private int mColorHandle;
         private int mTextureCoordHandle;
 
-        // number of coordinates per vertex in this array
+        // Number of coordinates per vertex in this array
         static final int COORDS_PER_VERTEX = 2;
         static final float RATIO = 4.0f/3.0f;
 
@@ -1090,7 +1098,7 @@ public class CameraManager {
         private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
         public CameraRenderer() {
-
+            // Do nothing here
         }
 
         public void onSurfaceCreated(GL10 unused, EGLConfig config) {

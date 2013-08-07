@@ -30,7 +30,6 @@ import android.content.Intent;
  *
  */
 public class CameraButtonIntentReceiver extends BroadcastReceiver {
-
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent i = new Intent(Intent.ACTION_MAIN);

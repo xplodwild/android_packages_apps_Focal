@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.feats;
@@ -62,7 +63,8 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
     public static Bitmap scale(Bitmap bmp, int w, int h) {
         Bitmap b = null;
         if (bmp != null) {
-            Log.v(TAG, "Scaling bitmap from " + bmp.getWidth() + "x" + bmp.getHeight() + " to " + w + "x" + h);
+            Log.v(TAG, "Scaling bitmap from " + bmp.getWidth() + "x"
+                    + bmp.getHeight() + " to " + w + "x" + h);
 
             // We're going to need some memory
             System.gc();
@@ -81,7 +83,9 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
         // Generate textures
         GLES20.glGenTextures(1, mTextures, 0);
 
-        final int mMaxTextureSize = mContext.getResources().getInteger(R.integer.config_maxTextureSize);
+        final int mMaxTextureSize =
+                mContext.getResources().getInteger(R.integer.config_maxTextureSize);
+
         // Load input bitmap
         if (bitmap.getWidth() > mMaxTextureSize || bitmap.getHeight() > mMaxTextureSize) {
             mImageWidth = mMaxTextureSize;
@@ -96,7 +100,8 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
         // Upload to texture
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextures[0]);
         if (mImageWidth != bitmap.getWidth() || mImageHeight != bitmap.getHeight()) {
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, scale(bitmap, mImageWidth, mImageHeight), 0);
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, scale(bitmap,
+                    mImageWidth, mImageHeight), 0);
         } else {
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
         }
@@ -115,12 +120,10 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
             mAutoFixEffect.release();
         }
 
-        mAutoFixEffect = effectFactory.createEffect(
-                EffectFactory.EFFECT_AUTOFIX);
+        mAutoFixEffect = effectFactory.createEffect( EffectFactory.EFFECT_AUTOFIX);
         mAutoFixEffect.setParameter("scale", 0.4f);
 
-        mMinMaxEffect = effectFactory.createEffect(
-                EffectFactory.EFFECT_BLACKWHITE);
+        mMinMaxEffect = effectFactory.createEffect( EffectFactory.EFFECT_BLACKWHITE);
         mMinMaxEffect.setParameter("black", .1f);
         mMinMaxEffect.setParameter("white", .8f);
     }
@@ -158,7 +161,8 @@ public class AutoPictureEnhancer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        final int mMaxTextureSize = mContext.getResources().getInteger(R.integer.config_maxTextureSize);
+        final int mMaxTextureSize =
+                mContext.getResources().getInteger(R.integer.config_maxTextureSize);
         if (mTexRenderer != null) {
             if (width > mMaxTextureSize || height > mMaxTextureSize) {
                 mTexRenderer.updateViewSize(mMaxTextureSize, mMaxTextureSize);

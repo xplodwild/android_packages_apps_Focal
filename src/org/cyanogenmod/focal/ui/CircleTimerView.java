@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  * Copyright (C) 2012 The Android Open Source Project
  *
@@ -14,7 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.ui;
@@ -69,8 +70,6 @@ public class CircleTimerView extends View {
         super(context, attrs);
         init(context);
         setAlpha(0);
-        //setIntervalTime(5000);
-        //startIntervalAnimation();
     }
 
     public void setIntervalTime(long t) {
@@ -88,12 +87,14 @@ public class CircleTimerView extends View {
         mMarkerTime = -1;
         postInvalidate();
     }
+
     public void startIntervalAnimation() {
         mIntervalStartTime = SystemClock.elapsedRealtime();
         mAnimate = true;
         invalidate();
         mPaused = false;
     }
+
     public void stopIntervalAnimation() {
         mAnimate = false;
         mIntervalStartTime = -1;
@@ -131,8 +132,8 @@ public class CircleTimerView extends View {
     }
 
     /**
-     * Calculate the amount by which the radius of a CircleTimerView should be offset by the any
-     * of the extra painted objects.
+     * Calculate the amount by which the radius of a CircleTimerView should
+     * be offset by the any of the extra painted objects.
      */
     public static float calculateRadiusOffset(
             float strokeSize, float diamondStrokeSize, float markerStrokeSize) {
@@ -179,7 +180,7 @@ public class CircleTimerView extends View {
         }
 
         if (mIntervalStartTime == -1) {
-            // just draw a complete red circle, no white arc needed
+            // Just draw a complete red circle, no white arc needed
             mPaint.setColor(mRedColor);
             canvas.drawCircle (xCenter, yCenter, radius, mPaint);
             if (mTimerMode) {
@@ -187,19 +188,20 @@ public class CircleTimerView extends View {
             }
         } else {
             if (mAnimate) {
-                mCurrentIntervalTime = SystemClock.elapsedRealtime() - mIntervalStartTime + mAccumulatedTime;
+                mCurrentIntervalTime = SystemClock.elapsedRealtime()
+                        - mIntervalStartTime + mAccumulatedTime;
             }
-            //draw a combination of red and white arcs to create a circle
+            // Draw a combination of red and white arcs to create a circle
             mArcRect.top = yCenter - radius;
             mArcRect.bottom = yCenter + radius;
             mArcRect.left =  xCenter - radius;
             mArcRect.right = xCenter + radius;
             float redPercent = (float)mCurrentIntervalTime / (float)mIntervalTime;
-            // prevent timer from doing more than one full circle
+            // Prevent timer from doing more than one full circle
             redPercent = (redPercent > 1 && mTimerMode) ? 1 : redPercent;
 
             float whitePercent = 1 - (redPercent > 1 ? 1 : redPercent);
-            // draw white arc here
+            // Draw white arc here
             mPaint.setColor(mWhiteColor);
             if (mTimerMode){
                 canvas.drawArc (mArcRect, 270, - redPercent * 360 , false, mPaint);
@@ -207,7 +209,7 @@ public class CircleTimerView extends View {
                 canvas.drawArc (mArcRect, 270, + redPercent * 360 , false, mPaint);
             }
 
-            // draw red arc here
+            // Draw red arc here
             mPaint.setStrokeWidth(mStrokeSize);
             mPaint.setColor(mRedColor);
             if (mTimerMode) {
@@ -220,10 +222,8 @@ public class CircleTimerView extends View {
             if (mMarkerTime != -1 && radius > 0 && mIntervalTime != 0) {
                 mPaint.setStrokeWidth(mMarkerStrokeSize);
                 float angle = (float)(mMarkerTime % mIntervalTime) / (float)mIntervalTime * 360;
-                // draw 2dips thick marker
-                // the formula to draw the marker 1 unit thick is:
-                // 180 / (radius * Math.PI)
-                // after that we have to scale it by the screen density
+                // Draw 2dips thick marker the formula to draw the marker 1 unit thick is:
+                // 180 / (radius * Math.PI) after that we have to scale it by the screen density
                 canvas.drawArc (mArcRect, 270 + angle, mScreenDensity *
                         (float) (360 / (radius * Math.PI)) , false, mPaint);
             }

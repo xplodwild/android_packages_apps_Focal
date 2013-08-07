@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  * Copyright (C) 2012 Alex Curran
  *
@@ -14,7 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.ui.showcase;
@@ -23,7 +24,6 @@ import android.app.Activity;
 import android.view.View;
 
 public class ShowcaseViewBuilder {
-
     private final ShowcaseView showcaseView;
 
     public ShowcaseViewBuilder(Activity activity) {
@@ -35,7 +35,8 @@ public class ShowcaseViewBuilder {
     }
 
     public ShowcaseViewBuilder(Activity activity, int showcaseLayoutViewId) {
-        this.showcaseView = (ShowcaseView) activity.getLayoutInflater().inflate(showcaseLayoutViewId, null);
+        this.showcaseView = (ShowcaseView) activity.getLayoutInflater()
+                .inflate(showcaseLayoutViewId, null);
     }
 
     public ShowcaseViewBuilder setShowcaseView(View view) {
@@ -48,7 +49,8 @@ public class ShowcaseViewBuilder {
         return this;
     }
 
-    public ShowcaseViewBuilder setShowcaseItem(int itemType, int actionItemId, Activity activity) {
+    public ShowcaseViewBuilder setShowcaseItem(int itemType,
+            int actionItemId, Activity activity) {
         showcaseView.setShowcaseItem(itemType, actionItemId, activity);
         return this;
     }
@@ -63,7 +65,8 @@ public class ShowcaseViewBuilder {
         return this;
     }
 
-    public ShowcaseViewBuilder animateGesture(float offsetStartX, float offsetStartY, float offsetEndX, float offsetEndY) {
+    public ShowcaseViewBuilder animateGesture(float offsetStartX, float offsetStartY,
+            float offsetEndX, float offsetEndY) {
         showcaseView.animateGesture(offsetStartX, offsetStartY, offsetEndX, offsetEndY);
         return this;
     }

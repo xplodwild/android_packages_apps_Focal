@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
@@ -48,17 +49,16 @@ public class BitmapFilter {
     private ScriptIntrinsicBlur mBlurScript;
 
     public static BitmapFilter getSingleton() {
-        if (mSingleton == null)
+        if (mSingleton == null) {
             mSingleton = new BitmapFilter();
+        }
 
         return mSingleton;
     }
 
     private BitmapFilter() {
         mGlowCache = new HashMap<String, Bitmap>();
-
     }
-
 
     /**
      * Blurs a bitmap. There's no caching on this one.
@@ -114,10 +114,10 @@ public class BitmapFilter {
             int margin = 0;
             int halfMargin = margin / 2;
 
-            // the glow radius
+            // The glow radius
             int glowRadius = 4;
 
-            // extract the alpha from the source image
+            // Extract the alpha from the source image
             Bitmap alpha = src.extractAlpha();
 
             // The output bitmap (with the icon + glow)
@@ -130,7 +130,7 @@ public class BitmapFilter {
             Paint paint = new Paint();
             paint.setColor(glowColor);
 
-            // outer glow
+            // Outer glow
             ColorFilter emphasize = new LightingColorFilter(glowColor, 1);
             paint.setColorFilter(emphasize);
             canvas.drawBitmap(src, halfMargin, halfMargin, paint);
@@ -138,10 +138,7 @@ public class BitmapFilter {
             paint.setMaskFilter(new BlurMaskFilter(glowRadius, Blur.OUTER));
             canvas.drawBitmap(alpha, halfMargin, halfMargin, paint);
 
-            // original icon
-            //canvas.drawBitmap(src, halfMargin, halfMargin, null);
-
-            // cache icon
+            // Cache icon
             mGlowCache.put(name, bmp);
 
             return bmp;

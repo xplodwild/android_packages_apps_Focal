@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2009 The Android Open Source Project
  * Copyright (C) 2013 The CyanogenMod Project
  *
@@ -14,7 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.ui;
@@ -54,7 +55,9 @@ public class PreviewFrameLayout extends RelativeLayout {
     }
 
     public void setAspectRatio(double ratio) {
-        if (ratio <= 0.0) throw new IllegalArgumentException();
+        if (ratio <= 0.0) {
+            throw new IllegalArgumentException();
+        }
 
         ratio = 1 / ratio;
 
@@ -110,14 +113,18 @@ public class PreviewFrameLayout extends RelativeLayout {
                 return;
             }
 
-            float ratio = Math.min((float) fullHeight / (float) mPreviewHeight, (float) fullWidth / (float) mPreviewWidth);
+            float ratio = Math.min((float) fullHeight / (float) mPreviewHeight,
+                    (float) fullWidth / (float) mPreviewWidth);
             float width = mPreviewWidth * ratio;
             float height = mPreviewHeight * ratio;
 
             // Center the child SurfaceView within the parent.
             if (child != null) {
-                Log.v(TAG, "Layout: (" + (int) ((fullWidth - width)) / 2 + ", " + (int) ((fullHeight - height)) / 2 + ", " + (int) ((fullWidth + width)) / 2 + ", " + (int) ((fullHeight + height)) / 2 + ")");
-                child.layout((int) ((fullWidth - width)) / 2, (int) ((fullHeight - height)) / 2, (int) ((fullWidth + width)) / 2, (int) ((fullHeight + height)) / 2);
+                Log.v(TAG, "Layout: (" + (int) ((fullWidth - width)) / 2 + ", "
+                        + (int) ((fullHeight - height)) / 2 + ", " + (int) ((fullWidth
+                        + width)) / 2 + ", " + (int) ((fullHeight + height)) / 2 + ")");
+                child.layout((int) ((fullWidth - width)) / 2, (int) ((fullHeight - height))
+                        / 2, (int) ((fullWidth + width)) / 2, (int) ((fullHeight + height)) / 2);
             }
         }
     }

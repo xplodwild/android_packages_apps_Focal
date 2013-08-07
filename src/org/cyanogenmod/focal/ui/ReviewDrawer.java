@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.ui;
@@ -200,12 +201,12 @@ public class ReviewDrawer extends RelativeLayout {
         Cursor cursor = null;
 
         if (images) {
-            cursor = cr.query(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
+            cursor = cr.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns,
+                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
                     new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
         } else {
-            cursor = cr.query(
-                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Video.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
+            cursor = cr.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, columns,
+                    MediaStore.Video.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
                     new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
         }
 
@@ -214,7 +215,8 @@ public class ReviewDrawer extends RelativeLayout {
             return;
         }
 
-        final int imageColumnIndex = cursor.getColumnIndex(images ? MediaStore.Images.Media._ID : MediaStore.Video.Media._ID);
+        final int imageColumnIndex = cursor.getColumnIndex(images ?
+                MediaStore.Images.Media._ID : MediaStore.Video.Media._ID);
         final Cursor finalCursor = cursor;
 
         mHandler.post(new Runnable() {
@@ -247,7 +249,8 @@ public class ReviewDrawer extends RelativeLayout {
                     .appendPath(Integer.toString(id)).build();;
             String[] orientationColumn = new String[]{MediaStore.Images.Media.ORIENTATION};
 
-            Cursor cur = getContext().getContentResolver().query(uri, orientationColumn, null, null, null);
+            Cursor cur = getContext().getContentResolver().query(uri,
+                    orientationColumn, null, null, null);
             if (cur != null && cur.moveToFirst()) {
                 return cur.getInt(cur.getColumnIndex(orientationColumn[0]));
             } else {
@@ -283,18 +286,17 @@ public class ReviewDrawer extends RelativeLayout {
 
     public void notifyOrientationChanged(final int orientation) {
         mCurrentOrientation = orientation;
-        /*mReviewedImage.animate().rotation(mReviewedImageOrientation + orientation)
-                .setDuration(200).setInterpolator(new DecelerateInterpolator())
-                .start();*/
     }
 
     private void openInGallery(final int imageId) {
         if (imageId > 0) {
             Uri uri = null;
             if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-                uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
+                uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                        .appendPath(Integer.toString(imageId)).build();
             } else {
-                uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
+                uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                        .appendPath(Integer.toString(imageId)).build();
             }
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             try {
@@ -312,9 +314,11 @@ public class ReviewDrawer extends RelativeLayout {
             // Get URI
             Uri uri = null;
             if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-                uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
+                uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                        .appendPath(Integer.toString(imageId)).build();
             } else {
-                uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
+                uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                        .appendPath(Integer.toString(imageId)).build();
             }
 
             // Start gallery edit activity
@@ -364,7 +368,8 @@ public class ReviewDrawer extends RelativeLayout {
     public void close() {
         mIsOpen = false;
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new DecelerateInterpolator())
-                .translationY(-getMeasuredHeight()).alpha(0.0f).setListener(new Animator.AnimatorListener() {
+                .translationY(-getMeasuredHeight()).alpha(0.0f)
+                .setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
 
@@ -394,7 +399,9 @@ public class ReviewDrawer extends RelativeLayout {
      */
     public void slide(final float distance) {
         float finalPos = getTranslationY() + distance;
-        if (finalPos > 0) finalPos = 0;
+        if (finalPos > 0) {
+            finalPos = 0;
+        }
 
         setTranslationY(finalPos);
 
@@ -498,13 +505,13 @@ public class ReviewDrawer extends RelativeLayout {
             new Thread() {
                 public void run() {
                     mViewsToId.put(imageView, mImages.get(position));
-                    final Bitmap thumbnail = CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO ?
-                            (MediaStore.Video.Thumbnails.getThumbnail(
-                                    getContext().getContentResolver(), mImages.get(position),
-                                    MediaStore.Video.Thumbnails.MINI_KIND, null)) :
-                            (MediaStore.Images.Thumbnails.getThumbnail(
-                                    getContext().getContentResolver(), mImages.get(position),
-                                    MediaStore.Images.Thumbnails.MINI_KIND, null));
+                    final Bitmap thumbnail = CameraActivity.getCameraMode() ==
+                            CameraActivity.CAMERA_MODE_VIDEO ? (MediaStore.Video.Thumbnails
+                            .getThumbnail(getContext().getContentResolver(),
+                            mImages.get(position), MediaStore.Video.Thumbnails.MINI_KIND, null))
+                            : (MediaStore.Images.Thumbnails.getThumbnail(getContext()
+                            .getContentResolver(), mImages.get(position),
+                            MediaStore.Images.Thumbnails.MINI_KIND, null));
 
                     mHandler.post(new Runnable() {
                         @Override
@@ -572,8 +579,8 @@ public class ReviewDrawer extends RelativeLayout {
     public class ThumbnailTouchListener implements OnTouchListener {
         private final GestureDetector mGestureDetector;
         private ImageView mImageView;
-        private GestureDetector.SimpleOnGestureListener mListener = new GestureDetector.SimpleOnGestureListener() {
-
+        private GestureDetector.SimpleOnGestureListener mListener =
+                new GestureDetector.SimpleOnGestureListener() {
             private final float DRIFT_THRESHOLD = 80.0f;
             private final int SWIPE_THRESHOLD_VELOCITY = 800;
 
@@ -599,8 +606,8 @@ public class ReviewDrawer extends RelativeLayout {
                 }
 
                 mImageView.setTranslationY(ev2.getRawY() - ev1.getRawY());
-                float alpha = Math.max(0.0f,
-                        1.0f - Math.abs(mImageView.getTranslationY() / mImageView.getMeasuredHeight())*2.0f);
+                float alpha = Math.max(0.0f, 1.0f - Math.abs(mImageView.getTranslationY()
+                            / mImageView.getMeasuredHeight())*2.0f);
                 mImageView.setAlpha(alpha);
 
                 return true;

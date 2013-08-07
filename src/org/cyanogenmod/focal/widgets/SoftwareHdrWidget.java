@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.widgets;
@@ -30,9 +31,9 @@ import java.util.List;
 /**
  * Software HDR widget
  * This is distinct from the hardware HDR to avoid putting everything in one same class
- * and have to hack around the XML inflation. This widget only shows up if neither HDR scene-mode
- * is present and there is no AE-Bracket-HDR setting. If there are new methods of having HDR, you'll
- * have to add them in arrays.xml
+ * and have to hack around the XML inflation. This widget only shows up if neither HDR
+ * scene-mode is present and there is no AE-Bracket-HDR setting. If there are new
+ * methods of having HDR, you'll have to add them in arrays.xml.
  */
 public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListener {
     private CameraActivity mContext;
@@ -70,8 +71,8 @@ public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListene
             return false;
         }
 
-        // We hide the software HDR widget if either we have scene-mode=hdr, or any of the
-        // hdr setting key defined
+        // We hide the software HDR widget if either we have scene-mode=hdr,
+        // or any of the HDR setting key defined
         List<String> sceneModes = params.getSupportedSceneModes();
         if (sceneModes != null && sceneModes.contains("hdr")) {
             mTransformer.tearDown();
@@ -103,8 +104,6 @@ public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListene
             mContext.setCaptureTransformer(null);
         }
     }
-
-
 
     public void render() {
 

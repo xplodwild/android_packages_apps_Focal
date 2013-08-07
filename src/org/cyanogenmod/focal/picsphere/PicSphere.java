@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.picsphere;
@@ -180,12 +181,21 @@ public class PicSphere {
 
         // Process our images
         try {
-            if (!doAutopano()) return false;
-            //if (!doPtclean()) return false; ptclean seems to hang sometimes.. let's just skip it
-            if (!doAutoOptimiser()) return false;
-            if (!doPanoModify()) return false;
-            if (!doNona()) return false;
-            if (!doEnblend()) return false;
+            if (!doAutopano()) {
+                return false;
+            }
+            if (!doAutoOptimiser()) {
+                return false;
+            }
+            if (!doPanoModify()) {
+                return false;
+            }
+            if (!doNona()) {
+                return false;
+            }
+            if (!doEnblend()) {
+                return false;
+            }
         } catch (IOException ex) {
             Log.e(TAG, "Unable to process: ", ex);
             for (ProgressListener listener : mProgressListeners) {
@@ -209,7 +219,8 @@ public class PicSphere {
         // Remove source pictures and temporary path
         for (Uri uri : mPicturesUri) {
             List<String> segments = uri.getPathSegments();
-            Util.removeFromGallery(mContext.getContentResolver(), Integer.parseInt(segments.get(segments.size()-1)));
+            Util.removeFromGallery(mContext.getContentResolver(),
+                    Integer.parseInt(segments.get(segments.size()-1)));
         }
 
         mTempPath.delete();
@@ -405,7 +416,6 @@ public class PicSphere {
 
         doExifTagging(opts.outWidth, opts.outHeight);
 
-
         // Save it to gallery
         // XXX: This needs opening the output byte array... Isn't there any way to update
         // gallery data without having to reload/save the JPEG file? Because we have it already,
@@ -447,12 +457,10 @@ public class PicSphere {
         Log.d(TAG, "XMP metadata tagging...");
 
         try {
-
             XMPHelper xmp = new XMPHelper();
             xmp.writeXmpToFile(mTempPath + "/final.jpg", generatePhotoSphereXMP(width,
                     height, mPictures.size()));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e(TAG, "Couldn't access final file, did rendering fail?");
             return false;
         }

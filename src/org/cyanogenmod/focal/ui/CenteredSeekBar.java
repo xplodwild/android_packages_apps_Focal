@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.ui;
@@ -43,8 +44,10 @@ import java.math.BigDecimal;
  */
 public class CenteredSeekBar extends ImageView {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Bitmap thumbImage = BitmapFactory.decodeResource(getResources(), R.drawable.seek_thumb_normal);
-    private final Bitmap thumbPressedImage = BitmapFactory.decodeResource(getResources(), R.drawable.seek_thumb_pressed);
+    private final Bitmap thumbImage = BitmapFactory.decodeResource(
+            getResources(), R.drawable.seek_thumb_normal);
+    private final Bitmap thumbPressedImage = BitmapFactory.decodeResource(
+            getResources(), R.drawable.seek_thumb_pressed);
     private final float thumbWidth = thumbImage.getWidth();
     private final float thumbHalfWidth = 0.5f * thumbWidth;
     private final float thumbHalfHeight = 0.5f * thumbImage.getHeight();
@@ -59,7 +62,8 @@ public class CenteredSeekBar extends ImageView {
     private OnCenteredSeekBarChangeListener listener;
 
     /**
-     * Default color of a {@link CenteredSeekBar}, #FF33B5E5. This is also known as "Ice Cream Sandwich" blue.
+     * Default color of a {@link CenteredSeekBar}, #FF33B5E5.
+     * This is also known as "Ice Cream Sandwich" blue.
      */
     public static final int DEFAULT_COLOR = Color.argb(0xFF, 0x33, 0xB5, 0xE5);
 
@@ -70,13 +74,15 @@ public class CenteredSeekBar extends ImageView {
 
     // Localized constants from MotionEvent for compatibility
     // with API < 8 "Froyo".
-    public static final int ACTION_POINTER_UP = 0x6, ACTION_POINTER_INDEX_MASK = 0x0000ff00, ACTION_POINTER_INDEX_SHIFT = 8;
+    public static final int ACTION_POINTER_UP = 0x6, ACTION_POINTER_INDEX_MASK = 0x0000ff00,
+            ACTION_POINTER_INDEX_SHIFT = 8;
 
     private float mDownMotionX;
     private int mActivePointerId = INVALID_POINTER_ID;
 
     /**
-     * On touch, this offset plus the scaled value from the position of the touch will form the progress value. Usually 0.
+     * On touch, this offset plus the scaled value from the position of the
+     * touch will form the progress value. Usually 0.
      */
     float mTouchProgressOffset;
 
@@ -92,9 +98,11 @@ public class CenteredSeekBar extends ImageView {
      *            The maximum value of the selectable range.
      * @param context
      * @throws IllegalArgumentException
-     *             Will be thrown if min/max value type is not one of Long, Double, Integer, Float, Short, Byte or BigDecimal.
+     *             Will be thrown if min/max value type is not one of Long, Double,
+     *             Integer, Float, Short, Byte or BigDecimal.
      */
-    public CenteredSeekBar(Integer absoluteMinValue, Integer absoluteMaxValue, Context context) throws IllegalArgumentException {
+    public CenteredSeekBar(Integer absoluteMinValue, Integer absoluteMaxValue,
+            Context context) throws IllegalArgumentException {
         super(context);
         this.absoluteMinValue = absoluteMinValue;
         this.absoluteMaxValue = absoluteMaxValue;
@@ -102,7 +110,8 @@ public class CenteredSeekBar extends ImageView {
         absoluteMaxValuePrim = absoluteMaxValue.doubleValue();
         numberType = NumberType.fromNumber(absoluteMinValue);
 
-        // make RangeSeekBar focusable. This solves focus handling issues in case EditText widgets are being used along with the RangeSeekBar within ScollViews.
+        // Make RangeSeekBar focusable. This solves focus handling issues in case
+        // EditText widgets are being used along with the RangeSeekBar within ScollViews.
         setFocusable(true);
         setFocusableInTouchMode(true);
         init();
@@ -116,7 +125,8 @@ public class CenteredSeekBar extends ImageView {
         absoluteMaxValuePrim = absoluteMaxValue.doubleValue();
         numberType = NumberType.fromNumber(absoluteMinValue);
 
-        // make RangeSeekBar focusable. This solves focus handling issues in case EditText widgets are being used along with the RangeSeekBar within ScollViews.
+        // Make RangeSeekBar focusable. This solves focus handling issues in case
+        // EditText widgets are being used along with the RangeSeekBar within ScollViews.
         setFocusable(true);
         setFocusableInTouchMode(true);
         init();
@@ -124,7 +134,6 @@ public class CenteredSeekBar extends ImageView {
 
     private final void init() {
         mScaledTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-
     }
 
     public boolean isNotifyWhileDragging() {
@@ -132,7 +141,8 @@ public class CenteredSeekBar extends ImageView {
     }
 
     /**
-     * Should the widget notify the listener callback while the user is still dragging a thumb? Default is false.
+     * Should the widget notify the listener callback while the user
+     * is still dragging a thumb? Default is false.
      *
      * @param flag
      */
@@ -141,7 +151,8 @@ public class CenteredSeekBar extends ImageView {
     }
 
     /**
-     * Returns the absolute minimum value of the range that has been set at construction time.
+     * Returns the absolute minimum value of the range that has
+     * been set at construction time.
      *
      * @return The absolute minimum value of the range.
      */
@@ -150,7 +161,8 @@ public class CenteredSeekBar extends ImageView {
     }
 
     /**
-     * Returns the absolute maximum value of the range that has been set at construction time.
+     * Returns the absolute maximum value of the range that has
+     * been set at construction time.
      *
      * @return The absolute maximum value of the range.
      */
@@ -168,17 +180,18 @@ public class CenteredSeekBar extends ImageView {
     }
 
     /**
-     * Sets the currently selected minimum value. The widget will be invalidated and redrawn.
+     * Sets the currently selected minimum value.
+     * The widget will be invalidated and redrawn.
      *
      * @param value
-     *            The Integer value to set the minimum value to. Will be clamped to given absolute minimum/maximum range.
+     *            The Integer value to set the minimum value to.
+     *            Will be clamped to given absolute minimum/maximum range.
      */
     public void setSelectedMinValue(Integer value) {
-        // in case absoluteMinValue == absoluteMaxValue, avoid division by zero when normalizing.
+        // In case absoluteMinValue == absoluteMaxValue, avoid division by zero when normalizing.
         if (0 == (absoluteMaxValuePrim - absoluteMinValuePrim)) {
             setNormalizedValue(0d);
-        }
-        else {
+        } else {
             setNormalizedValue(valueToNormalized(value));
         }
     }
@@ -194,19 +207,19 @@ public class CenteredSeekBar extends ImageView {
     }
 
     /**
-     * Handles thumb selection and movement. Notifies listener callback on certain events.
+     * Handles thumb selection and movement.
+     * Notifies listener callback on certain events.
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
-        if (!isEnabled())
+        if (!isEnabled()) {
             return false;
+        }
 
         int pointerIndex;
 
         final int action = event.getAction();
         switch (action & MotionEvent.ACTION_MASK) {
-
             case MotionEvent.ACTION_DOWN:
                 // Remember where the motion event started
                 mActivePointerId = event.getPointerId(event.getPointerCount() - 1);
@@ -215,24 +228,22 @@ public class CenteredSeekBar extends ImageView {
 
                 pressedThumb = evalPressedThumb(mDownMotionX);
 
-                // Only handle thumb presses.
-                if (pressedThumb == null)
+                // Only handle thumb presses
+                if (pressedThumb == null) {
                     return super.onTouchEvent(event);
+                }
 
                 setPressed(true);
                 invalidate();
                 onStartTrackingTouch();
                 trackTouchEvent(event);
                 attemptClaimDrag();
-
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (pressedThumb != null) {
-
                     if (mIsDragging) {
                         trackTouchEvent(event);
-                    }
-                    else {
+                    } else {
                         // Scroll to follow the motion event
                         pointerIndex = event.findPointerIndex(mActivePointerId);
                         final float x = event.getX(pointerIndex);
@@ -256,8 +267,7 @@ public class CenteredSeekBar extends ImageView {
                     trackTouchEvent(event);
                     onStopTrackingTouch();
                     setPressed(false);
-                }
-                else {
+                } else {
                     // Touch up when we never crossed the touch slop threshold
                     // should be interpreted as a tap-seek to that location.
                     onStartTrackingTouch();
@@ -271,14 +281,13 @@ public class CenteredSeekBar extends ImageView {
                     listener.OnCenteredSeekBarValueChanged(this, getSelectedValue());
                 }
                 break;
-            case MotionEvent.ACTION_POINTER_DOWN: {
+            case MotionEvent.ACTION_POINTER_DOWN:
                 final int index = event.getPointerCount() - 1;
-                // final int index = ev.getActionIndex();
+                // Final int index = ev.getActionIndex();
                 mDownMotionX = event.getX(index);
                 mActivePointerId = event.getPointerId(index);
                 invalidate();
                 break;
-            }
             case MotionEvent.ACTION_POINTER_UP:
                 onSecondaryPointerUp(event);
                 invalidate();
@@ -295,7 +304,8 @@ public class CenteredSeekBar extends ImageView {
     }
 
     private final void onSecondaryPointerUp(MotionEvent ev) {
-        final int pointerIndex = (ev.getAction() & ACTION_POINTER_INDEX_MASK) >> ACTION_POINTER_INDEX_SHIFT;
+        final int pointerIndex = (ev.getAction() & ACTION_POINTER_INDEX_MASK)
+                >> ACTION_POINTER_INDEX_SHIFT;
 
         final int pointerId = ev.getPointerId(pointerIndex);
         if (pointerId == mActivePointerId) {
@@ -318,7 +328,8 @@ public class CenteredSeekBar extends ImageView {
     }
 
     /**
-     * Tries to claim the user's drag motion, and requests disallowing any ancestors from stealing events in the drag.
+     * Tries to claim the user's drag motion, and requests disallowing any ancestors
+     * from stealing events in the drag.
      */
     private void attemptClaimDrag() {
         if (getParent() != null) {
@@ -356,35 +367,40 @@ public class CenteredSeekBar extends ImageView {
         super.onDraw(canvas);
 
         // draw seek bar background line
-        final RectF rect = new RectF(padding, 0.5f * (getHeight() - lineHeight), getWidth() - padding, 0.5f * (getHeight() + lineHeight));
+        final RectF rect = new RectF(padding, 0.5f * (getHeight() - lineHeight),
+                getWidth() - padding, 0.5f * (getHeight() + lineHeight));
         paint.setStyle(Style.FILL);
         paint.setColor(Color.GRAY);
         paint.setAntiAlias(true);
         canvas.drawRect(rect, paint);
 
-        // draw seek bar active range line
-        if (normalizedValue > valueToNormalized(absoluteMaxValue)/2) {
-            rect.left = normalizedToScreen(valueToNormalized(absoluteMaxValue)/2);
+        // Draw seek bar active range line
+        if (normalizedValue > valueToNormalized(absoluteMaxValue) / 2) {
+            rect.left = normalizedToScreen(valueToNormalized(absoluteMaxValue) / 2);
             rect.right = normalizedToScreen(normalizedValue);
         } else {
             rect.left = normalizedToScreen(normalizedValue);
-            rect.right = normalizedToScreen(valueToNormalized(absoluteMaxValue)/2);
+            rect.right = normalizedToScreen(valueToNormalized(absoluteMaxValue) / 2);
         }
 
-
-        // fill color
+        // Fill color
         paint.setColor(DEFAULT_COLOR);
         canvas.drawRect(rect, paint);
 
-        // draw a small ball at the middle
-        canvas.drawCircle(normalizedToScreen(valueToNormalized(absoluteMaxValue)/2), getHeight() / 2.0f - 2.0f, 8.0f, paint);
+        // Draw a small ball at the middle
+        canvas.drawCircle(normalizedToScreen(valueToNormalized(absoluteMaxValue) / 2),
+                getHeight() / 2.0f - 2.0f, 8.0f, paint);
 
-        // draw  thumb
+        // Draw  thumb
         drawThumb(normalizedToScreen(normalizedValue), Thumb.MIN.equals(pressedThumb), canvas);
     }
 
     /**
-     * Overridden to save instance state when device orientation changes. This method is called automatically if you assign an id to the RangeSeekBar widget using the {@link #setId(int)} method. Other members of this class than the normalized min and max values don't need to be saved.
+     * Overridden to save instance state when device orientation changes.
+     * This method is called automatically if you assign an id to the
+     * RangeSeekBar widget using the {@link #setId(int)} method.
+     * Other members of this class than the normalized min and
+     * max values don't need to be saved.
      */
     @Override
     protected Parcelable onSaveInstanceState() {
@@ -395,7 +411,9 @@ public class CenteredSeekBar extends ImageView {
     }
 
     /**
-     * Overridden to restore instance state when device orientation changes. This method is called automatically if you assign an id to the RangeSeekBar widget using the {@link #setId(int)} method.
+     * Overridden to restore instance state when device orientation changes.
+     * This method is called automatically if you assign an id to the
+     * RangeSeekBar widget using the {@link #setId(int)} method.
      */
     @Override
     protected void onRestoreInstanceState(Parcelable parcel) {
@@ -415,7 +433,8 @@ public class CenteredSeekBar extends ImageView {
      *            The canvas to draw upon.
      */
     private void drawThumb(float screenCoord, boolean pressed, Canvas canvas) {
-        canvas.drawBitmap(pressed ? thumbPressedImage : thumbImage, screenCoord - thumbHalfWidth, (float) ((0.5f * getHeight()) - thumbHalfHeight), paint);
+        canvas.drawBitmap(pressed ? thumbPressedImage : thumbImage, screenCoord
+                - thumbHalfWidth, (float) ((0.5f * getHeight()) - thumbHalfHeight), paint);
     }
 
     /**
@@ -435,7 +454,8 @@ public class CenteredSeekBar extends ImageView {
     }
 
     /**
-     * Decides if given x-coordinate in screen space needs to be interpreted as "within" the normalized thumb x-coordinate.
+     * Decides if given x-coordinate in screen space needs to be interpreted as
+     * "within" the normalized thumb x-coordinate.
      *
      * @param touchX
      *            The x-coordinate in screen space to check.
@@ -448,25 +468,29 @@ public class CenteredSeekBar extends ImageView {
     }
 
     /**
-     * Sets normalized min value to value so that 0 <= value <= normalized max value <= 1. The View will get invalidated when calling this method.
+     * Sets normalized min value to value so that 0 <= value <= normalized max value <= 1.
+     * The View will get invalidated when calling this method.
      *
      * @param value
      *            The new normalized min value to set.
      */
     public void setNormalizedValue(double value) {
-        normalizedValue = Math.max(0d, Math.min(1d, Math.min(value, valueToNormalized(absoluteMaxValue))));
+        normalizedValue = Math.max(0d, Math.min(1d, Math.min(value,
+                valueToNormalized(absoluteMaxValue))));
         invalidate();
     }
 
     /**
-     * Converts a normalized value to a Integer object in the value space between absolute minimum and maximum.
+     * Converts a normalized value to a Integer object in the value
+     * space between absolute minimum and maximum.
      *
      * @param normalized
      * @return
      */
     @SuppressWarnings("unchecked")
     private Integer normalizedToValue(double normalized) {
-        return (Integer) numberType.toNumber(absoluteMinValuePrim + normalized * (absoluteMaxValuePrim - absoluteMinValuePrim));
+        return (Integer) numberType.toNumber(absoluteMinValuePrim + normalized
+                * (absoluteMaxValuePrim - absoluteMinValuePrim));
     }
 
     /**
@@ -481,7 +505,8 @@ public class CenteredSeekBar extends ImageView {
             // prevent division by zero, simply return 0.
             return 0d;
         }
-        return (value.doubleValue() - absoluteMinValuePrim) / (absoluteMaxValuePrim - absoluteMinValuePrim);
+        return (value.doubleValue() - absoluteMinValuePrim)
+                / (absoluteMaxValuePrim - absoluteMinValuePrim);
     }
 
     /**
@@ -540,7 +565,8 @@ public class CenteredSeekBar extends ImageView {
     private static enum NumberType {
         LONG, DOUBLE, INTEGER, FLOAT, SHORT, BYTE, BIG_DECIMAL;
 
-        public static <E extends Number> NumberType fromNumber(E value) throws IllegalArgumentException {
+        public static <E extends Number> NumberType fromNumber(E value)
+                throws IllegalArgumentException {
             if (value instanceof Long) {
                 return LONG;
             }
@@ -562,27 +588,11 @@ public class CenteredSeekBar extends ImageView {
             if (value instanceof BigDecimal) {
                 return BIG_DECIMAL;
             }
-            throw new IllegalArgumentException("Integer class '" + value.getClass().getName() + "' is not supported");
+            throw new IllegalArgumentException("Integer class '"
+                    + value.getClass().getName() + "' is not supported");
         }
 
         public Integer toNumber(double value) {
-            /*switch (this) {
-                case LONG:
-                    return new Long((long) value);
-                case DOUBLE:
-                    return value;
-                case INTEGER:
-                    return new Integer((int) value);
-                case FLOAT:
-                    return new Float(value);
-                case SHORT:
-                    return new Short((short) value);
-                case BYTE:
-                    return new Byte((byte) value);
-                case BIG_DECIMAL:
-                    return new BigDecimal(value);
-            }
-            throw new InstantiationError("can't convert " + this + " to a Integer object");*/
             return (int)value;
         }
     }

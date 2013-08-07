@@ -1,42 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2013 The CyanogenMod Project
+     Copyright (C) 2013 The CyanogenMod Project
 
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
 -->
 <resources>
-    <!-- Whether or not to stop preview between taking shots. -->
+    <!-- Whether or not to stop preview between taking shots -->
     <bool name="config_stopPreviewBetweenShots">false</bool>
 
-    <!-- Whether or not to enable camera-mode=1 for ZSL on Qcom devices -->
+    <!-- Whether or not to enable camera-mode=1 for ZSL on Qualcomm devices -->
     <bool name="config_qualcommZslCameraMode">true</bool>
 
     <!-- Whether or not to use preview data to take snapshots while in the video mode.
-     This enables snapshot during videos on older devices. -->
+         This enables snapshot during videos on older devices. -->
     <bool name="config_usePreviewForVideoSnapshot">false</bool>
 
     <!-- The largest possible GL texture size -->
     <integer name="config_maxTextureSize">4096</integer>
 
     <!-- The ideal panorama picture resolution to use. AOSP enforces a 640x480 resolution
-    whenever possible, but we can get better shots with higher resolution just as well. -->
+         whenever possible, but we can get better shots with higher resolution just as well. -->
     <integer name="config_panoramaDefaultWidth">1280</integer>
     <integer name="config_panoramaDefaultHeight">720</integer>
 
     <!-- Whether or not to enable Samsung HDR capabilities -->
     <bool name="config_useSamsungHDR">false</bool>
+
     <!-- Whether or not to enable Samsung ZSL capabilities -->
     <bool name="config_useSamsungZSL">false</bool>
 </resources>

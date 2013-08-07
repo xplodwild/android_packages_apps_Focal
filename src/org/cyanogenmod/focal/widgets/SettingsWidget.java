@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.widgets;
@@ -65,10 +66,11 @@ public class SettingsWidget extends WidgetBase {
     private int mInitialOrientation = -1;
     private int mOrientation;
 
-    private final Comparator<? super Camera.Size> mResolutionsSorter = new Comparator<Camera.Size>() {
+    private final Comparator<? super Camera.Size> mResolutionsSorter =
+            new Comparator<Camera.Size>() {
         @Override
         public int compare(Camera.Size size, Camera.Size size2) {
-            if (size.width*size.height > size2.width*size2.height) {
+            if (size.width * size.height > size2.width * size2.height) {
                 return -1;
             } else {
                 return 1;
@@ -159,23 +161,27 @@ public class SettingsWidget extends WidgetBase {
             builder.setView(mNumberPicker);
             builder.setTitle(null);
             builder.setCancelable(false);
-            builder.setPositiveButton(mContext.getString(R.string.ok), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(mContext.getString(R.string.ok),
+                    new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     mInitialOrientation = -1;
                     Camera.Size size = mResolutions.get(mNumberPicker.getValue());
 
-                    if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO ||
-                            CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
+                    if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO
+                            || CameraActivity.getCameraMode()
+                            == CameraActivity.CAMERA_MODE_PICSPHERE) {
                         // Set picture size
                         mCamManager.setPictureSize(size);
 
                         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
-                            SettingsStorage.storeCameraSetting(mContext, mCamManager.getCurrentFacing(),
-                                    "picture-size", ""+size.width+"x"+size.height);
+                            SettingsStorage.storeCameraSetting(mContext, mCamManager
+                                    .getCurrentFacing(), "picture-size",
+                                    ""+size.width+"x"+size.height);
                         } else {
-                            SettingsStorage.storeCameraSetting(mContext, mCamManager.getCurrentFacing(),
-                                    "picsphere-picture-size", ""+size.width+"x"+size.height);
+                            SettingsStorage.storeCameraSetting(mContext,
+                                    mCamManager.getCurrentFacing(), "picsphere-picture-size",
+                                    ""+size.width+"x"+size.height);
                         }
                     } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
                         // Set video size
@@ -219,17 +225,19 @@ public class SettingsWidget extends WidgetBase {
 
             for (Camera.Size size : mResolutions) {
                 float megapixels = size.width * size.height / 1000000.0f;
-                mResolutionsName.add(df.format(megapixels) + "MP (" + size.width + "x" + size.height + ")");
+                mResolutionsName.add(df.format(megapixels) +
+                        "MP (" + size.width + "x" + size.height + ")");
             }
 
             // Restore picture size if we have any
             String resolution = "";
             if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
-                resolution = SettingsStorage.getCameraSetting(context, mCamManager.getCurrentFacing(),
-                        "picture-size", ""+mResolutions.get(0).width+"x"+mResolutions.get(0).height);
+                resolution = SettingsStorage.getCameraSetting(context,
+                        mCamManager.getCurrentFacing(), "picture-size", ""+mResolutions
+                        .get(0).width+"x"+mResolutions.get(0).height);
             } else {
-                resolution = SettingsStorage.getCameraSetting(context, mCamManager.getCurrentFacing(),
-                        "picsphere-picture-size", "640x480");
+                resolution = SettingsStorage.getCameraSetting(context,
+                        mCamManager.getCurrentFacing(), "picsphere-picture-size", "640x480");
             }
             mCamManager.setPictureSize(resolution);
         } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
@@ -260,16 +268,18 @@ public class SettingsWidget extends WidgetBase {
             }
         }
 
-
-        mResolutionButton = new WidgetOptionButton(R.drawable.ic_widget_settings_resolution, context);
+        mResolutionButton = new WidgetOptionButton(
+                R.drawable.ic_widget_settings_resolution, context);
         mResolutionButton.setOnClickListener(mResolutionClickListener);
         mResolutionButton.setHintText(mContext.getString(R.string.widget_settings_picture_size));
         addViewToContainer(mResolutionButton);
 
         if (mCamManager.isExposureAreaSupported()
                 && CameraActivity.getCameraMode() != CameraActivity.CAMERA_MODE_PICSPHERE) {
-            mToggleExposureRing = new WidgetOptionButton(R.drawable.ic_widget_settings_exposurering, context);
-            mToggleExposureRing.setHintText(mContext.getString(R.string.widget_settings_exposure_ring));
+            mToggleExposureRing = new WidgetOptionButton(
+                    R.drawable.ic_widget_settings_exposurering, context);
+            mToggleExposureRing.setHintText(mContext.getString(
+                    R.string.widget_settings_exposure_ring));
             mToggleExposureRing.setOnClickListener(mExpoRingClickListener);
 
             // Restore exposure ring state
@@ -286,7 +296,8 @@ public class SettingsWidget extends WidgetBase {
         if (CameraActivity.getCameraMode() != CameraActivity.CAMERA_MODE_PICSPHERE) {
             mToggleAutoEnhancer = new WidgetOptionButton(R.drawable.ic_enhancing, context);
             mToggleAutoEnhancer.setOnClickListener(mAutoEnhanceClickListener);
-            mToggleAutoEnhancer.setHintText(mContext.getString(R.string.widget_settings_autoenhance));
+            mToggleAutoEnhancer.setHintText(mContext.getString(
+                    R.string.widget_settings_autoenhance));
 
             // Restore auto enhancer state
             if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_AUTO_ENHANCE, "0").equals("1")) {
@@ -300,14 +311,16 @@ public class SettingsWidget extends WidgetBase {
 
             addViewToContainer(mToggleAutoEnhancer);
 
-
             // Toggle rule of thirds
-            mToggleRuleOfThirds = new WidgetOptionButton(R.drawable.ic_widget_settings_rulethirds, context);
+            mToggleRuleOfThirds = new WidgetOptionButton(
+                    R.drawable.ic_widget_settings_rulethirds, context);
             mToggleRuleOfThirds.setOnClickListener(mRuleOfThirdsClickListener);
-            mToggleRuleOfThirds.setHintText(mContext.getString(R.string.widget_settings_ruleofthirds));
+            mToggleRuleOfThirds.setHintText(mContext.getString(
+                    R.string.widget_settings_ruleofthirds));
 
             // Restore rule of thirds visibility state
-            if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_RULE_OF_THIRDS, "0").equals("1")) {
+            if (SettingsStorage.getAppSetting(mContext,
+                    KEY_ENABLE_RULE_OF_THIRDS, "0").equals("1")) {
                 mContext.findViewById(R.id.rule_of_thirds).setVisibility(View.VISIBLE);
                 mToggleRuleOfThirds.setActiveDrawable(KEY_ENABLE_RULE_OF_THIRDS);
             } else {
@@ -319,8 +332,10 @@ public class SettingsWidget extends WidgetBase {
         }
 
         // Choose widgets to appear
-        mToggleWidgetsButton = new WidgetOptionButton(R.drawable.ic_widget_settings_widgets, context);
-        mToggleWidgetsButton.setHintText(mContext.getString(R.string.widget_settings_choose_widgets_button));
+        mToggleWidgetsButton = new WidgetOptionButton(
+                R.drawable.ic_widget_settings_widgets, context);
+        mToggleWidgetsButton.setHintText(mContext.getString(
+                R.string.widget_settings_choose_widgets_button));
         mToggleWidgetsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -350,8 +365,9 @@ public class SettingsWidget extends WidgetBase {
         }
 
         if (mWidgetsDialog != null) {
-            ((ViewGroup) mWidgetsDialog.getListView().getParent().getParent().getParent().getParent())
-                    .animate().rotation(orientation - mInitialOrientation).setDuration(300).start();
+            ((ViewGroup) mWidgetsDialog.getListView().getParent()
+                    .getParent().getParent().getParent()).animate().rotation(orientation
+                    - mInitialOrientation).setDuration(300).start();
         }
     }
 
@@ -401,7 +417,9 @@ public class SettingsWidget extends WidgetBase {
                         // Store the widget visibility status in SharedPreferences, using the
                         // widget class name as key
                         for (WidgetBase widget : widgets) {
-                            if (widget.getClass().getName().contains("SettingsWidget")) continue;
+                            if (widget.getClass().getName().contains("SettingsWidget")) {
+                                continue;
+                            }
 
                             SettingsStorage.storeVisibilitySetting(mContext,
                                     widget.getClass().getName(), !widget.isHidden());
@@ -413,7 +431,9 @@ public class SettingsWidget extends WidgetBase {
                     public void onClick(DialogInterface dialog, int id) {
                         // Restore visibility status from storage
                         for (WidgetBase widget : widgets) {
-                            if (widget.getClass().getName().contains("SettingsWidget")) continue;
+                            if (widget.getClass().getName().contains("SettingsWidget")) {
+                                continue;
+                            }
 
                             widget.setHidden(!SettingsStorage.getVisibilitySetting(
                                     mContext, widget.getClass().getName()));

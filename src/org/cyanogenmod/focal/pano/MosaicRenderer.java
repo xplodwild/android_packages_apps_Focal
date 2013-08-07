@@ -21,10 +21,8 @@ package org.cyanogenmod.focal.pano;
  * The Java interface to JNI calls regarding mosaic preview rendering.
  *
  */
-public class MosaicRenderer
-{
-    static
-    {
+public class MosaicRenderer {
+    static {
         System.loadLibrary("jni_mosaic2");
     }
 

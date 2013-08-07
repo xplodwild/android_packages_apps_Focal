@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
@@ -60,7 +61,6 @@ public class Util {
     public static final String ACTION_NEW_PICTURE = "android.hardware.action.NEW_PICTURE";
     // See android.hardware.Camera.ACTION_NEW_VIDEO.
     public static final String ACTION_NEW_VIDEO = "android.hardware.action.NEW_VIDEO";
-
 
     // Screen size holder
     private static Point mScreenSize = new Point();
@@ -122,7 +122,8 @@ public class Util {
      */
     public static Point getScreenSize(Activity activity) {
         if (activity != null) {
-            WindowManager service = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+            WindowManager service =
+                    (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
             service.getDefaultDisplay().getSize(mScreenSize);
         }
         return mScreenSize;
@@ -137,10 +138,12 @@ public class Util {
      * @return
      */
     public static Size getOptimalPreviewSize(Activity currentActivity,
-                                             List<Size> sizes, double targetRatio) {
+            List<Size> sizes, double targetRatio) {
         // Use a very small tolerance because we want an exact match.
         final double ASPECT_TOLERANCE = 0.01;
-        if (sizes == null) return null;
+        if (sizes == null) {
+            return null;
+        }
 
         Size optimalSize = null;
         double minDiff = Double.MAX_VALUE;
@@ -155,7 +158,9 @@ public class Util {
         // Try to find an size match aspect ratio and size
         for (Size size : sizes) {
             double ratio = (double) size.width / size.height;
-            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) {
+                continue;
+            }
             if (Math.abs(size.height - targetHeight) < minDiff) {
                 optimalSize = size;
                 minDiff = Math.abs(size.height - targetHeight);
@@ -184,7 +189,9 @@ public class Util {
      * @param duration
      */
     public static void fadeIn(View view, float startAlpha, float endAlpha, long duration) {
-        if (view.getVisibility() == View.VISIBLE) return;
+        if (view.getVisibility() == View.VISIBLE) {
+            return;
+        }
 
         view.setVisibility(View.VISIBLE);
         Animation animation = new AlphaAnimation(startAlpha, endAlpha);
@@ -232,14 +239,15 @@ public class Util {
 
         if (Build.VERSION.SDK_INT >= 17) {
             final RenderScript rs = RenderScript.create(context);
-            final ScriptIntrinsicYuvToRGB script = ScriptIntrinsicYuvToRGB.create(rs, Element.RGBA_8888(rs));
+            final ScriptIntrinsicYuvToRGB script = ScriptIntrinsicYuvToRGB
+                    .create(rs, Element.RGBA_8888(rs));
             Type.Builder tb = new Type.Builder(rs, Element.RGBA_8888(rs));
             tb.setX(width);
             tb.setY(height);
 
             Allocation allocationOut = Allocation.createTyped(rs, tb.create());
-            Allocation allocationIn = Allocation.createSized(rs, Element.U8(rs), (height * width) +
-                    ((height / 2) * (width / 2) * 2));
+            Allocation allocationIn = Allocation.createSized(rs, Element.U8(rs),
+                    (height * width) + ((height / 2) * (width / 2) * 2));
 
             script.setInput(allocationIn);
 
@@ -255,8 +263,9 @@ public class Util {
                 int uvp = frameSize + (j >> 1) * width, u = 0, v = 0;
                 for (int i = 0; i < width; i++, yp++) {
                     int y = (0xff & ((int) yuv420sp[yp])) - 16;
-                    if (y < 0)
+                    if (y < 0) {
                         y = 0;
+                    }
                     if ((i & 1) == 0) {
                         v = (0xff & yuv420sp[uvp++]) - 128;
                         u = (0xff & yuv420sp[uvp++]) - 128;
@@ -267,20 +276,24 @@ public class Util {
                     int g = (y1192 - 833 * v - 400 * u);
                     int b = (y1192 + 2066 * u);
 
-                    if (r < 0)
+                    if (r < 0) {
                         r = 0;
-                    else if (r > 262143)
+                    } else if (r > 262143) {
                         r = 262143;
-                    if (g < 0)
+                    }
+                    if (g < 0) {
                         g = 0;
-                    else if (g > 262143)
+                    } else if (g > 262143) {
                         g = 262143;
-                    if (b < 0)
+                    }
+                    if (b < 0) {
                         b = 0;
-                    else if (b > 262143)
+                    } else if (b > 262143) {
                         b = 262143;
+                    }
 
-                    rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
+                    rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00)
+                            | ((b >> 10) & 0xff);
                 }
             }
 
@@ -299,8 +312,9 @@ public class Util {
             int vp = ((int)(frameSize*1.5) + (j*(width/2)));
             for (int i = 0; i < width; i++, yp++) {
                 int y = (0xff & ((int) yuv422p[yp])) - 16;
-                if (y < 0)
+                if (y < 0) {
                     y = 0;
+                }
 
                 if ((i & 1) == 0) {
                     u = (0xff & yuv422p[up++]) - 128;
@@ -312,20 +326,24 @@ public class Util {
                 int g = (y1192 - 833 * v - 400 * u);
                 int b = (y1192 + 2066 * u);
 
-                if (r < 0)
+                if (r < 0) {
                     r = 0;
-                else if (r > 262143)
+                } else if (r > 262143) {
                     r = 262143;
-                if (g < 0)
+                }
+                if (g < 0) {
                     g = 0;
-                else if (g > 262143)
+                } else if (g > 262143) {
                     g = 262143;
-                if (b < 0)
+                }
+                if (b < 0) {
                     b = 0;
-                else if (b > 262143)
+                } else if (b > 262143) {
                     b = 262143;
+                }
 
-                rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
+                rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00)
+                        | ((b >> 10) & 0xff);
             }
         }
 
@@ -351,7 +369,6 @@ public class Util {
         context.sendBroadcast(new Intent("com.android.camera.NEW_PICTURE", uri));
     }
 
-
     /**
      * Removes an image from the gallery
      * @param cr
@@ -361,7 +378,6 @@ public class Util {
         cr.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 BaseColumns._ID + "=" + Long.toString(id), null);
     }
-
 
     /**
      * Converts the specified DP to PIXELS according to current screen density
