@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Start Focal</string>
+    <string name="shutter_button">Udløserknap</string>
+    <string name="cannot_connect_hal">Kan ikke forbinde til kamera</string>
+    <string name="recording">Optager</string>
+    <string name="double_tap_to_snapshot">Dobbelttryk for at tage et billede</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">OK</string>
+    <string name="no_gles20_support">Din enhed understøtter ikke GLES2</string>
+    <string name="no_gyroscope">Din enhed har ikke et gyroskop</string>
+    <string name="ps_long_press_to_stop">Tryk på udløserknappen længe for at\nafslutte din boble.</string>
+    <string name="disabled">Deaktiveret</string>
+    <string name="enabled">Aktiveret</string>
+    <string name="no_video_player">Kunne ikke afspille video, ingen afspiller fundet</string>
+    <string name="fullscreen_shutter_info">Tryk overalt for at tage et billede</string>
+    <string name="please_wait">Vent venligst\u2026</string>
+    <string name="retouch">RETOUCHÉR</string>
+    <string name="open_in_gallery">GALLERI</string>
+    <string name="mode_photo">Foto</string>
+    <string name="mode_video">Video</string>
+    <string name="mode_picsphere">BilledBoble</string>
+    <string name="mode_panorama">Panorama</string>
+    <string name="mode_switchcam">Sekundært kamera</string>
+    <string name="widget_burstmode_count_shots">Burst %d fotos</string>
+    <string name="widget_burstmode_off">Deaktivér burst-tilstand</string>
+    <string name="widget_burstmode_infinite">Uendelig burst</string>
+    <string name="widget_hdr_aebracket">Auto-bracketing</string>
+    <string name="widget_settings_choose_widgets">Vælg widgets på sidelinjen</string>
+    <string name="widget_settings_choose_widgets_button">Vælg widgets</string>
+    <string name="widget_settings_picture_size">Billedstørrelse</string>
+    <string name="widget_settings_exposure_ring">Vis eksponeringsring</string>
+    <string name="widget_settings_autoenhance">Auto-forbedring</string>
+    <string name="widget_settings_ruleofthirds">Det gyldne snit</string>
+    <string name="widget_autoexposure">Eksponeringsmålingstilstand</string>
+    <string name="widget_burstmode">Burst-tilstand</string>
+    <string name="widget_effect">Farveeffekter</string>
+    <string name="widget_enhancements">Farveforbedringer</string>
+    <string name="widget_exposure_compensation">Eksponeringskompensation</string>
+    <string name="widget_flash">Blitz-tilstand</string>
+    <string name="widget_hdr">HDR</string>
+    <string name="widget_iso">ISO-følsomhed</string>
+    <string name="widget_scenemode">Scenetilstand</string>
+    <string name="widget_settings">Indstillinger</string>
+    <string name="widget_shutter_speed">Udløserhastighed</string>
+    <string name="widget_skintone">Forbedring af hudfarve</string>
+    <string name="widget_softwarehdr">HDR</string>
+    <string name="widget_timermode">Timer-tilstand</string>
+    <string name="widget_videofr">Rammefrekvens til video</string>
+    <string name="widget_videohdr">HDR til video</string>
+    <string name="widget_whitebalance">Hvidbalance</string>
+    <string name="pano_panorama_rendering_failed">Kunne ikke rendere panorama.\nPrøv at lave et kortere ét.</string>
+    <string name="pano_panorama_rendering">Renderer panorama\u2026</string>
+    <string name="picsphere_undo_button">FORTRYD</string>
+    <string name="picsphere_start_hint">Tag et billede for at starte en boble</string>
+    <string name="picsphere_already_rendering">Vent venligst, mens den aktuelle BilledBoble renderes</string>
+    <string name="picsphere_rendering_progress">Renderer... (%d %%)</string>
+    <string name="picsphere_toast_background_render">Rendering startet\u2026</string>
+    <string name="picsphere_notif_title">Renderer BilledBoble\u2026</string>
+    <string name="picsphere_failed">Kunne ikke rendere BilledBoble</string>
+    <string name="picsphere_failed_details">Sørg for, at billederne kun overlapper på deres kanter.</string>
+    <string name="picsphere_need_two_pics">Du skal bruge mindst to billeder.</string>
+    <string name="picsphere_step_preparing">Forbereder\u2026</string>
+    <string name="picsphere_step_autopano">Matcher billeder\u2026</string>
+    <string name="picsphere_step_autooptimiser">Optimerer matchede billeder\u2026</string>
+    <string name="picsphere_step_ptclean">Rydder matchende punkter\u2026</string>
+    <string name="picsphere_step_panomodify">Beskærer tomme områder\u2026</string>
+    <string name="picsphere_step_nona">Sammenhæfter billeder\u2026</string>
+    <string name="picsphere_step_enblend">Blender billeder\u2026</string>
+    <string name="software_hdr_notif_title">Beregner HDR-billede\u2026</string>
+    <string name="software_hdr_failed">Kunne ikke rendere HDR</string>
+    <string name="software_hdr_failed_details">De oprindelige billeder er bibeholdt.</string>
+    <string name="showcase_welcome_1_title">Velkommen!</string>
+    <string name="showcase_welcome_1_body">Valgmulighederne er på sidelinjen,\ndu skal bare stryge den.</string>
+    <string name="showcase_welcome_2_title">Udløserknap</string>
+    <string name="showcase_welcome_2_body">Tryk på udløserknappen for at tage et billede.\nStryg den for at tilgå andre optagertilstande.</string>
+    <string name="showcase_panorama_title">Tilstanden Panorama</string>
+    <string name="showcase_panorama_body">Tryk på udløserknappen for at starte din panorama,\nog panorér derefter til det, du vil indfange.\nTryk på udløserknappen igen, når du er færdig.</string>
+    <string name="showcase_picsphere_title">Tilstanden BilledBoble</string>
+    <string name="showcase_picsphere_body">Justér dit første billede, hvor du vil,\nog tryk derefter på udløserknappen for at tage hvert billde\ni boblen. De blå prikker er reference-\npunkter, som du kan følge.\nHold udløserknappen nede længe, når du er færdig.</string>
+</resources>
