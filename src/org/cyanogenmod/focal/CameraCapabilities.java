@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
@@ -45,8 +46,8 @@ public class CameraCapabilities {
         CameraManager cam = context.getCamManager();
 
         // Populate the list of widgets.
-        // Basically, if we add a new widget, we just put it here. They
-        // will populate the sidebar in the same order as here
+        // Basically, if we add a new widget, we just put it here.
+        // They will populate the sidebar in the same order as here.
         mWidgets.add(new FlashWidget(cam, context));
         mWidgets.add(new WhiteBalanceWidget(cam, context));
         mWidgets.add(new SceneModeWidget(cam, context));
@@ -80,7 +81,7 @@ public class CameraCapabilities {
      * @param sideBarContainer The side bar layout that will contain all the toggle buttons
      */
     public void populateSidebar(Camera.Parameters params, ViewGroup sideBarContainer,
-                                ViewGroup widgetsContainer) {
+            ViewGroup widgetsContainer) {
         List<WidgetBase> unsupported = new ArrayList<WidgetBase>();
 
         for (int i = 0; i < mWidgets.size(); i++) {

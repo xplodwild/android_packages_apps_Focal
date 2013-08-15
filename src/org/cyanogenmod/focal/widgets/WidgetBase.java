@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.widgets;
@@ -150,7 +151,8 @@ public abstract class WidgetBase {
         layoutParams.columnSpec = GridLayout.spec(column, colSpan);
         layoutParams.rowSpec = GridLayout.spec(row, rowSpan);
         layoutParams.setGravity(Gravity.FILL);
-        layoutParams.width = colSpan * v.getResources().getDimensionPixelSize(R.dimen.widget_option_button_size);
+        layoutParams.width = colSpan * v.getResources().getDimensionPixelSize(
+                R.dimen.widget_option_button_size);
         mWidget.setLayoutParams(layoutParams);
     }
 
@@ -171,7 +173,9 @@ public abstract class WidgetBase {
      */
     public String restoreValueFromStorage(String key) {
         Camera.Parameters params = mCamManager.getParameters();
-        if (params == null) return "";
+        if (params == null) {
+            return "";
+        }
 
         String currentValue = params.get(key);
         if (currentValue != null) {
@@ -235,7 +239,6 @@ public abstract class WidgetBase {
     public boolean isHidden() {
         return mToggleButton.getVisibility() == View.GONE;
     }
-
 
     /**
      * Represents the button that toggles the widget, in the
@@ -316,13 +319,12 @@ public abstract class WidgetBase {
                 // will likely be clicked and its state will change.
                 toggleBackground(!mIsOpen);
             } else if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-                Log.e(TAG, "ACTION_MOVE dX=" +  Math.abs(event.getX() - mDownX) + " dY="  + Math.abs(event.getY() - mDownY));
-                if (!mIsOpen && (Math.abs(event.getX() - mDownX) > 8 || Math.abs(event.getY() - mDownY) > 8)) {
+                Log.e(TAG, "ACTION_MOVE dX=" +  Math.abs(event.getX() - mDownX) +
+                        " dY="  + Math.abs(event.getY() - mDownY));
+                if (!mIsOpen && (Math.abs(event.getX() - mDownX) > 8
+                        || Math.abs(event.getY() - mDownY) > 8)) {
                     toggleBackground(false);
                 }
-/*
-                SideBar sb = (SideBar) WidgetToggleButton.this.getParent().getParent();
-                sb.onTouchEvent(event);*/
             }
 
             return true;
@@ -333,8 +335,10 @@ public abstract class WidgetBase {
             public boolean onLongClick(View view) {
                 mCancelOpenOnDown = true;
                 if (mHintText != null && !mHintText.isEmpty()) {
-                    CameraActivity.notify(mHintText, 2000, getX(), Util.getScreenSize(null).y - getHeight() - getBottom());
+                    CameraActivity.notify(mHintText, 2000, getX(), Util.getScreenSize(null).y
+                            - getHeight() - getBottom());
                 }
+
                 toggleBackground(mIsOpen);
                 return true;
             }
@@ -376,8 +380,7 @@ public abstract class WidgetBase {
      * a {@link WidgetContainer}.
      */
     public class WidgetOptionLabel extends TextView implements WidgetOption {
-        public WidgetOptionLabel(Context context, AttributeSet attrs,
-                                 int defStyle) {
+        public WidgetOptionLabel(Context context, AttributeSet attrs, int defStyle) {
             super(context, attrs, defStyle);
             initialize();
         }
@@ -393,9 +396,12 @@ public abstract class WidgetBase {
         }
 
         private void initialize() {
-            setMinimumWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
-            setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
-            int padding = getResources().getDimensionPixelSize(R.dimen.widget_option_button_padding);
+            setMinimumWidth(getResources().getDimensionPixelSize(
+                    R.dimen.widget_option_button_size));
+            setMinimumHeight(getResources().getDimensionPixelSize(
+                    R.dimen.widget_option_button_size));
+            int padding = getResources().getDimensionPixelSize(
+                    R.dimen.widget_option_button_padding);
             setPadding(padding, padding, padding, padding);
             setGravity(Gravity.CENTER);
 
@@ -411,7 +417,8 @@ public abstract class WidgetBase {
 
         public void setSmall(boolean small) {
             if (small) {
-                setTextSize(getResources().getInteger(R.integer.widget_option_label_font_size_small));
+                setTextSize(getResources().getInteger(
+                        R.integer.widget_option_label_font_size_small));
             } else {
                 setTextSize(getResources().getInteger(R.integer.widget_option_label_font_size));
             }
@@ -434,8 +441,7 @@ public abstract class WidgetBase {
      * a {@link WidgetContainer}.
      */
     public class WidgetOptionImage extends ImageView implements WidgetOption {
-        public WidgetOptionImage(int resId, Context context, AttributeSet attrs,
-                                 int defStyle) {
+        public WidgetOptionImage(int resId, Context context, AttributeSet attrs, int defStyle) {
             super(context, attrs, defStyle);
             initialize(resId);
         }
@@ -451,8 +457,10 @@ public abstract class WidgetBase {
         }
 
         private void initialize(int resId) {
-            setMinimumWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
-            int padding = getResources().getDimensionPixelSize(R.dimen.widget_option_button_padding);
+            setMinimumWidth(getResources().getDimensionPixelSize(
+                    R.dimen.widget_option_button_size));
+            int padding = getResources().getDimensionPixelSize(
+                    R.dimen.widget_option_button_padding);
             setPadding(padding, padding, padding, padding);
             setImageResource(resId);
         }
@@ -474,7 +482,8 @@ public abstract class WidgetBase {
      * Note that you're not forced to use exclusively buttons,
      * TextViews through WidgetOptionLabel can also be added (for Timer for instance)
      */
-    public class WidgetOptionButton extends ImageView implements WidgetOption, View.OnLongClickListener {
+    public class WidgetOptionButton extends ImageView implements WidgetOption,
+            View.OnLongClickListener {
         private float mTouchOffset = 0.0f;
         private int mOriginalResource;
         private String mHintText;
@@ -535,8 +544,6 @@ public abstract class WidgetBase {
             return (super.onTouchEvent(event) || handle);
         }
 
-
-
         public void setActiveDrawable(String key) {
             setImageBitmap(BitmapFilter.getSingleton().getGlow(key,
                     getContext().getResources().getColor(R.color.widget_option_active),
@@ -546,7 +553,8 @@ public abstract class WidgetBase {
         private void initialize(int resId) {
             this.setImageResource(resId);
             this.setClickable(true);
-            int padding = getResources().getDimensionPixelSize(R.dimen.widget_option_button_padding);
+            int padding = getResources().getDimensionPixelSize(
+                    R.dimen.widget_option_button_padding);
             this.setPadding(padding, padding, padding, padding);
             mOriginalResource = resId;
             setOnLongClickListener(this);
@@ -565,8 +573,9 @@ public abstract class WidgetBase {
         @Override
         public boolean onLongClick(View view) {
             if (mHintText != null && mHintText.length() > 0) {
-                CameraActivity.notify(mHintText, 2000, Util.dpToPx(getContext(), 8) + getX() + mWidget.getX(),
-                        Util.dpToPx(getContext(), 32) + Util.dpToPx(getContext(), 4) * mHintText.length());
+                CameraActivity.notify(mHintText, 2000, Util.dpToPx(getContext(), 8) 
+                        + getX() + mWidget.getX(), Util.dpToPx(getContext(), 32)
+                        + Util.dpToPx(getContext(), 4) * mHintText.length());
                 return true;
             } else {
                 return false;
@@ -579,7 +588,6 @@ public abstract class WidgetBase {
      * a {@link WidgetContainer}.
      */
     public class WidgetOptionCenteredSeekBar extends CenteredSeekBar implements WidgetOption {
-
         public WidgetOptionCenteredSeekBar(Context context, AttributeSet attrs) {
             super(context, attrs);
             initialize();
@@ -591,7 +599,8 @@ public abstract class WidgetBase {
         }
 
         private void initialize() {
-            setMaxWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size) * 3);
+            setMaxWidth(getResources().getDimensionPixelSize(
+                    R.dimen.widget_option_button_size) * 3);
             setMaxHeight(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
 
             // Set padding
@@ -613,14 +622,7 @@ public abstract class WidgetBase {
 
         @Override
         public void notifyOrientationChanged(int orientation) {
-            /*if (orientation % 180 == 0) {
-                setMaxWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size) * 3);
-                setMaxHeight(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
-            } else {
-                setMaxWidth(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
-                setMaxHeight(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size) * 3);
-                invalidate();
-            }*/
+
         }
     }
 
@@ -644,7 +646,8 @@ public abstract class WidgetBase {
             // Set padding
             int pad = getResources().getDimensionPixelSize(R.dimen.widget_container_padding) * 2;
             this.setPadding(pad, pad, pad, pad);
-            this.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size) * 3);
+            this.setMinimumHeight(getResources().getDimensionPixelSize(
+                    R.dimen.widget_option_button_size) * 3);
         }
 
         @Override
@@ -753,7 +756,8 @@ public abstract class WidgetBase {
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
 
-            FrameLayout.LayoutParams layoutParam = (FrameLayout.LayoutParams) this.getLayoutParams();
+            FrameLayout.LayoutParams layoutParam =
+                    (FrameLayout.LayoutParams) this.getLayoutParams();
             layoutParam.width = FrameLayout.LayoutParams.WRAP_CONTENT;
             layoutParam.height = FrameLayout.LayoutParams.WRAP_CONTENT;
         }
@@ -768,7 +772,6 @@ public abstract class WidgetBase {
             setTranslationY(-WIDGET_ANIM_TRANSLATE);
             setVisibility(View.VISIBLE);
 
-
             // Set padding
             int pad = getResources().getDimensionPixelSize(R.dimen.widget_container_padding);
             this.setPadding(pad, pad, pad, pad);
@@ -776,12 +779,14 @@ public abstract class WidgetBase {
             this.animate().setListener(new AnimatorListener() {
                 @Override
                 public void onAnimationCancel(Animator arg0) {
+
                 }
 
                 @Override
                 public void onAnimationEnd(Animator arg0) {
-                    if (!mIsOpen)
+                    if (!mIsOpen) {
                         WidgetContainer.this.setVisibility(View.GONE);
+                    }
                 }
 
                 @Override
@@ -793,20 +798,18 @@ public abstract class WidgetBase {
                     WidgetContainer.this.setVisibility(View.VISIBLE);
                 }
             });
-
-
         }
 
         @Override
         protected void onMeasure(int widthSpec, int heightSpec) {
             super.onMeasure(widthSpec, heightSpec);
 
-            if (!isOpen())
+            if (!isOpen()) {
                 setVisibility(View.GONE);
-            else
+            } else {
                 setVisibility(View.VISIBLE);
+            }
         }
-
 
         public void notifyOrientationChanged(int orientation, boolean fastforward) {
             int buttonsCount = getChildCount();
@@ -816,16 +819,20 @@ public abstract class WidgetBase {
                 WidgetOption option = (WidgetOption) child;
 
                 // Don't rotate seekbars
-                if (child instanceof WidgetOptionCenteredSeekBar) continue;
-                if (child instanceof WidgetOptionSeekBar) continue;
+                if (child instanceof WidgetOptionCenteredSeekBar) {
+                    continue;
+                }
+                if (child instanceof WidgetOptionSeekBar) {
+                    continue;
+                }
 
                 option.notifyOrientationChanged(orientation);
 
                 if (fastforward) {
                     child.setRotation(orientation);
                 } else {
-                    child.animate().rotation(orientation)
-                            .setDuration(200).setInterpolator(new DecelerateInterpolator()).start();
+                    child.animate().rotation(orientation).setDuration(200).setInterpolator(
+                            new DecelerateInterpolator()).start();
                 }
             }
 
@@ -854,10 +861,12 @@ public abstract class WidgetBase {
                 // Somehow, GestureDetector takes the screen orientation into account, even if our
                 // activity is locked in landscape.
                 float distance = e2.getX() - e1.getX();
-                if (distance <= 0.1f)
+                if (distance <= 0.1f) {
                     distance = e2.getY() - e1.getY();
+                }
 
-                if (distance > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                if (distance > SWIPE_MIN_DISTANCE && Math.abs(velocityX)
+                        > SWIPE_THRESHOLD_VELOCITY) {
                     final SideBar sb = (SideBar) mToggleButton.getParent().getParent();
                     final WidgetRenderer wr = (WidgetRenderer) mWidget.getParent();
                     sb.toggleWidgetVisibility(WidgetBase.this, true);
@@ -865,8 +874,9 @@ public abstract class WidgetBase {
                     mToggleButton.toggleBackground(false);
                 }
             } catch (Exception e) {
-                // nothing
+                // Do nothing here
             }
+
             return false;
         }
     }

@@ -1,5 +1,4 @@
-/**
- * Copyright (C) 2010 The Android Open Source Project
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -14,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
@@ -48,12 +48,14 @@ public class Storage {
 
     // Singleton
     private Storage() {
+        // Do nothing here
     }
 
     public static Storage getStorage() {
         if (sStorage == null) {
             sStorage = new Storage();
         }
+
         return sStorage;
     }
 
@@ -86,8 +88,8 @@ public class Storage {
 
     // Save the image and add it to media store.
     public Uri addImage(ContentResolver resolver, String title,
-                        long date, Location location, int orientation, byte[] jpeg,
-                        int width, int height) {
+            long date, Location location, int orientation, byte[] jpeg,
+            int width, int height) {
         // Save the image.
         String path = writeFile(title, jpeg);
         return addImage(resolver, title, date, location, orientation,
@@ -96,14 +98,15 @@ public class Storage {
 
     // Add the image to media store.
     public Uri addImage(ContentResolver resolver, String title,
-                        long date, Location location, int orientation, int jpegLength,
-                        String path, int width, int height) {
+            long date, Location location, int orientation, int jpegLength,
+            String path, int width, int height) {
         // Insert into MediaStore.
         ContentValues values = new ContentValues(9);
         values.put(ImageColumns.TITLE, title);
         values.put(ImageColumns.DISPLAY_NAME, title + ".jpg");
         values.put(ImageColumns.DATE_TAKEN, date);
         values.put(ImageColumns.MIME_TYPE, "image/jpeg");
+
         // Clockwise rotation in degrees. 0, 90, 180, or 270.
         values.put(ImageColumns.ORIENTATION, orientation);
         values.put(ImageColumns.DATA, path);
@@ -130,7 +133,7 @@ public class Storage {
         return uri;
     }
 
-    // newImage() and updateImage() together do the same work as
+    // nullewImage() and updateImage() together do the same work as
     // addImage. newImage() is the first step, and it inserts the DATE_TAKEN and
     // DATA fields into the database.
     //
@@ -167,8 +170,8 @@ public class Storage {
     //
     // Returns true if the update is successful.
     public boolean updateImage(ContentResolver resolver, Uri uri,
-                               String title, Location location, int orientation, byte[] jpeg,
-                               int width, int height) {
+            String title, Location location, int orientation, byte[] jpeg,
+            int width, int height) {
         // Save the image.
         String path = generateFilepath(title);
         String tmpPath = path + ".tmp";
@@ -187,6 +190,7 @@ public class Storage {
             try {
                 out.close();
             } catch (Exception e) {
+                // Do nothing here
             }
         }
 
@@ -195,6 +199,7 @@ public class Storage {
         values.put(ImageColumns.TITLE, title);
         values.put(ImageColumns.DISPLAY_NAME, title + ".jpg");
         values.put(ImageColumns.MIME_TYPE, "image/jpeg");
+
         // Clockwise rotation in degrees. 0, 90, 180, or 270.
         values.put(ImageColumns.ORIENTATION, orientation);
         values.put(ImageColumns.SIZE, jpeg.length);

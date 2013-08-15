@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
@@ -38,8 +39,9 @@ public class SoundManager {
     private static SoundManager mSingleton;
 
     public static SoundManager getSingleton() {
-        if (mSingleton == null)
+        if (mSingleton == null) {
             mSingleton = new SoundManager();
+        }
 
         return mSingleton;
     }
@@ -73,5 +75,4 @@ public class SoundManager {
     public void play(int sound) {
         mSoundPool.play(mSoundsFD[sound], 1.0f, 1.0f, 0, 0, 1.0f);
     }
-
 }

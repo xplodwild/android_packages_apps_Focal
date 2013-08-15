@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
@@ -55,7 +56,6 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
     private CameraManager mCamManager;
     private FocusListener mListener;
     private boolean mIsFocusing;
-
 
     public FocusManager(CameraManager cam) {
         mHandler = new Handler();
@@ -105,8 +105,9 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
         if (mCamManager.doAutofocus(this)) {
             mIsFocusing = true;
 
-            if (mListener != null)
+            if (mListener != null) {
                 mListener.onFocusStart(false);
+            }
         }
     }
 
@@ -115,8 +116,9 @@ public class FocusManager implements AutoFocusCallback, AutoFocusMoveCallback {
         mLastFocusTimestamp = System.currentTimeMillis();
         mIsFocusing = false;
 
-        if (mListener != null)
+        if (mListener != null) {
             mListener.onFocusReturns(false, success);
+        }
     }
 
     @Override

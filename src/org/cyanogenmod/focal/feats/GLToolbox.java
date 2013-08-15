@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2013 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +20,6 @@ package org.cyanogenmod.focal.feats;
 import android.opengl.GLES20;
 
 public class GLToolbox {
-
     public static int loadShader(int shaderType, String source) {
         int shader = GLES20.glCreateShader(shaderType);
         if (shader != 0) {
@@ -57,8 +57,7 @@ public class GLToolbox {
             checkGlError("glAttachShader");
             GLES20.glLinkProgram(program);
             int[] linkStatus = new int[1];
-            GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus,
-                    0);
+            GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);
             if (linkStatus[0] != GLES20.GL_TRUE) {
                 String info = GLES20.glGetProgramInfoLog(program);
                 GLES20.glDeleteProgram(program);
@@ -86,5 +85,4 @@ public class GLToolbox {
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
                 GLES20.GL_CLAMP_TO_EDGE);
    }
-
 }

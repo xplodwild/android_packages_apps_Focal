@@ -1,6 +1,6 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
- * Copyright (C) 2012 Alex Curran
+* Copyright (C) 2012 Alex Curran
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,7 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.ui.showcase;
@@ -27,7 +28,6 @@ import android.view.View;
 
 
 public class AnimationUtils {
-
     private static final int DEFAULT_DURATION = 300;
     private static final String ALPHA = "alpha";
     private static final float INVISIBLE = 0f;
@@ -56,11 +56,13 @@ public class AnimationUtils {
         view.setAlpha(INVISIBLE);
     }
 
-    public static ObjectAnimator createFadeInAnimation(Object target, final AnimationStartListener listener) {
+    public static ObjectAnimator createFadeInAnimation(Object target,
+            final AnimationStartListener listener) {
         return createFadeInAnimation(target, DEFAULT_DURATION, listener);
     }
 
-    public static ObjectAnimator createFadeInAnimation(Object target, int duration, final AnimationStartListener listener) {
+    public static ObjectAnimator createFadeInAnimation(Object target, int duration,
+            final AnimationStartListener listener) {
         ObjectAnimator oa = ObjectAnimator.ofFloat(target, ALPHA, VISIBLE);
         oa.setDuration(duration).addListener(new Animator.AnimatorListener() {
             @Override
@@ -83,11 +85,13 @@ public class AnimationUtils {
         return oa;
     }
 
-    public static ObjectAnimator createFadeOutAnimation(Object target, final AnimationEndListener listener) {
+    public static ObjectAnimator createFadeOutAnimation(Object target,
+            final AnimationEndListener listener) {
         return createFadeOutAnimation(target, DEFAULT_DURATION, listener);
     }
 
-    public static ObjectAnimator createFadeOutAnimation(Object target, int duration, final AnimationEndListener listener) {
+    public static ObjectAnimator createFadeOutAnimation(Object target, int duration,
+            final AnimationEndListener listener) {
         ObjectAnimator oa = ObjectAnimator.ofFloat(target, ALPHA, INVISIBLE);
         oa.setDuration(duration).addListener(new Animator.AnimatorListener() {
             @Override
@@ -111,22 +115,27 @@ public class AnimationUtils {
     }
 
     public static AnimatorSet createMovementAnimation(View view, float canvasX, float canvasY,
-                                                      float offsetStartX, float offsetStartY,
-                                                      float offsetEndX, float offsetEndY,
-                                                      final AnimationEndListener listener) {
+            float offsetStartX, float offsetStartY, float offsetEndX, float offsetEndY,
+            final AnimationEndListener listener) {
         hide(view);
 
-        ObjectAnimator alphaIn = ObjectAnimator.ofFloat(view, ALPHA, INVISIBLE, VISIBLE).setDuration(500);
+        ObjectAnimator alphaIn = ObjectAnimator.ofFloat(
+                view, ALPHA, INVISIBLE, VISIBLE).setDuration(500);
 
-        ObjectAnimator setUpX = ObjectAnimator.ofFloat(view, COORD_X, canvasX + offsetStartX).setDuration(INSTANT);
-        ObjectAnimator setUpY = ObjectAnimator.ofFloat(view, COORD_Y, canvasY + offsetStartY).setDuration(INSTANT);
+        ObjectAnimator setUpX = ObjectAnimator.ofFloat(
+                view, COORD_X, canvasX + offsetStartX).setDuration(INSTANT);
+        ObjectAnimator setUpY = ObjectAnimator.ofFloat(
+                view, COORD_Y, canvasY + offsetStartY).setDuration(INSTANT);
 
-        ObjectAnimator moveX = ObjectAnimator.ofFloat(view, COORD_X, canvasX + offsetEndX).setDuration(1000);
-        ObjectAnimator moveY = ObjectAnimator.ofFloat(view, COORD_Y, canvasY + offsetEndY).setDuration(1000);
+        ObjectAnimator moveX = ObjectAnimator.ofFloat(
+                view, COORD_X, canvasX + offsetEndX).setDuration(1000);
+        ObjectAnimator moveY = ObjectAnimator.ofFloat(
+                view, COORD_Y, canvasY + offsetEndY).setDuration(1000);
         moveX.setStartDelay(1000);
         moveY.setStartDelay(1000);
 
-        ObjectAnimator alphaOut = ObjectAnimator.ofFloat(view, ALPHA, INVISIBLE).setDuration(500);
+        ObjectAnimator alphaOut = ObjectAnimator.ofFloat(
+                view, ALPHA, INVISIBLE).setDuration(500);
         alphaOut.setStartDelay(2500);
 
         AnimatorSet as = new AnimatorSet();
@@ -145,7 +154,8 @@ public class AnimationUtils {
     }
 
     public static AnimatorSet createMovementAnimation(View view, float x, float y) {
-        ObjectAnimator alphaIn = ObjectAnimator.ofFloat(view, ALPHA, INVISIBLE, VISIBLE).setDuration(500);
+        ObjectAnimator alphaIn = ObjectAnimator.ofFloat(
+                view, ALPHA, INVISIBLE, VISIBLE).setDuration(500);
 
         ObjectAnimator setUpX = ObjectAnimator.ofFloat(view, COORD_X, x).setDuration(INSTANT);
         ObjectAnimator setUpY = ObjectAnimator.ofFloat(view, COORD_Y, y).setDuration(INSTANT);

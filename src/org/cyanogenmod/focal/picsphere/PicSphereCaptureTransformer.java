@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.picsphere;
@@ -43,7 +44,9 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
     }
 
     public void removeLastPicture() {
-        if (mPicSphere == null) return;
+        if (mPicSphere == null) {
+            return;
+        }
 
         mPicSphere.removeLastPicture();
         mPicSphereManager.getRenderer().removeLastPicture();
@@ -65,7 +68,9 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
                 // In theory, drivers should return a proper value for horizontal angle. However,
                 // some careless OEMs put "0" or "360" to pass CTS, so we just check if the value
                 // seems legit, otherwise we put 45° as it's the angle of most phone lenses.
-                if (horizontalAngle < 30 || horizontalAngle > 70) horizontalAngle = 45;
+                if (horizontalAngle < 30 || horizontalAngle > 70) {
+                    horizontalAngle = 45;
+                }
 
                 mPicSphere.setHorizontalAngle(horizontalAngle);
             } else {
@@ -82,7 +87,6 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
         if (mPicSphere != null && mPicSphere.getPicturesCount() == 0) {
             CameraActivity.notify(mContext.getString(R.string.ps_long_press_to_stop), 4000);
         }
-
     }
 
     @Override

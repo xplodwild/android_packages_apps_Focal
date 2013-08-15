@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2013 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +24,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 public class TextureRenderer {
-
     private int mProgram;
     private int mTexSamplerHandle;
     private int mTexCoordHandle;
@@ -39,21 +39,21 @@ public class TextureRenderer {
     private int mTexHeight;
 
     private static final String VERTEX_SHADER =
-        "attribute vec4 a_position;\n" +
-        "attribute vec2 a_texcoord;\n" +
-        "varying vec2 v_texcoord;\n" +
-        "void main() {\n" +
-        "  gl_Position = a_position;\n" +
-        "  v_texcoord = a_texcoord;\n" +
-        "}\n";
+            "attribute vec4 a_position;\n" +
+            "attribute vec2 a_texcoord;\n" +
+            "varying vec2 v_texcoord;\n" +
+            "void main() {\n" +
+            "  gl_Position = a_position;\n" +
+            "  v_texcoord = a_texcoord;\n" +
+            "}\n";
 
     private static final String FRAGMENT_SHADER =
-        "precision mediump float;\n" +
-        "uniform sampler2D tex_sampler;\n" +
-        "varying vec2 v_texcoord;\n" +
-        "void main() {\n" +
-        "  gl_FragColor = texture2D(tex_sampler, v_texcoord);\n" +
-        "}\n";
+            "precision mediump float;\n" +
+            "uniform sampler2D tex_sampler;\n" +
+            "varying vec2 v_texcoord;\n" +
+            "void main() {\n" +
+            "  gl_FragColor = texture2D(tex_sampler, v_texcoord);\n" +
+            "}\n";
 
     private static final float[] TEX_VERTICES = {
         0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f

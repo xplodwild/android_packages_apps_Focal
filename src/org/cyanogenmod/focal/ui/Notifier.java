@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.ui;
@@ -71,9 +72,9 @@ public class Notifier extends LinearLayout {
 
         if (orientation % 180 != 0) {
             // We translate to fit orientation properly within the screen
-            animate().rotation(orientation).setDuration(200).x(mTargetX + mTextView.getMeasuredHeight()/2)
-                    .y(mTargetY - mTextView.getMeasuredWidth()/2).setInterpolator(new DecelerateInterpolator()).start();
-
+            animate().rotation(orientation).setDuration(200).x(mTargetX + mTextView
+                    .getMeasuredHeight() / 2).y(mTargetY - mTextView.getMeasuredWidth() / 2)
+                    .setInterpolator(new DecelerateInterpolator()).start();
         } else {
             animate().rotation(orientation).setDuration(200).x(mTargetX)
                     .y(mTargetY).setInterpolator(new DecelerateInterpolator()).start();
@@ -138,10 +139,12 @@ public class Notifier extends LinearLayout {
     }
 
     private void fadeIn() {
-        animate().setDuration(300).alpha(1.0f).setInterpolator(new AccelerateInterpolator()).start();
+        animate().setDuration(300).alpha(1.0f).setInterpolator(
+                new AccelerateInterpolator()).start();
     }
 
     private void fadeOut() {
-        animate().setDuration(300).alpha(0.0f).setInterpolator(new DecelerateInterpolator()).start();
+        animate().setDuration(300).alpha(0.0f).setInterpolator(
+                new DecelerateInterpolator()).start();
     }
 }

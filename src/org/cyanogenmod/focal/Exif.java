@@ -1,6 +1,6 @@
-/**
- * Copyright (C) 2010 The Android Open Source Project
+/*
  * Copyright (C) 2013 The CyanogenMod Project
+ * Copyright (C) 2010 The Android Open Source Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,7 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
@@ -123,7 +124,7 @@ public class Exif {
     }
 
     private static int pack(byte[] bytes, int offset, int length,
-                            boolean littleEndian) {
+            boolean littleEndian) {
         int step = 1;
         if (littleEndian) {
             offset += length - 1;

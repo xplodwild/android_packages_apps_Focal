@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,14 +13,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
 
 /**
  * Manages the storage of all the settings
@@ -53,7 +53,6 @@ public class SettingsStorage {
         store(context, PREFS_CAMERA, Integer.toString(facing) + ":" + key, value);
     }
 
-
     /**
      * Returns a setting of the camera
      * @param context
@@ -74,7 +73,6 @@ public class SettingsStorage {
     public static void storeAppSetting(Context context, String key, String value) {
         store(context, PREFS_APP, key, value);
     }
-
 
     /**
      * Returns a setting of the app
@@ -97,7 +95,6 @@ public class SettingsStorage {
         store(context, PREFS_VISIBILITY, key, visible ? "true" : "false");
     }
 
-
     /**
      * Returns a setting of the app (always defaults to visible)
      * @param context
@@ -107,5 +104,4 @@ public class SettingsStorage {
     public static boolean getVisibilitySetting(Context context, String key) {
         return retrieve(context, PREFS_VISIBILITY, key, "true").equals("true");
     }
-
 }

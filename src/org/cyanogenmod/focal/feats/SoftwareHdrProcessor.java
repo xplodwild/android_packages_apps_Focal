@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2013 The CyanogenMod Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
+ */
+
 package org.cyanogenmod.focal.feats;
 
 import android.content.Context;
@@ -84,21 +103,26 @@ public class SoftwareHdrProcessor {
 
         // Process our images
         try {
-            if (!doAlignImageStack()) return false;
-            if (!doEnfuse()) return false;
+            if (!doAlignImageStack()) {
+                return false;
+            }
+            if (!doEnfuse()) {
+                return false;
+            }
 
             // Save it to gallery
-            // XXX: This needs opening the output byte array... Isn't there any way to update
-            // gallery data without having to reload/save the JPEG file? Because we have it already,
-            // we could just move it.
+            // XXX: This needs opening the output byte array...
+            // Isn't there any way to update gallery data without having to reload/save
+            // the JPEG file? Because we have it already, we could just move it.
             byte[] jpegData;
             RandomAccessFile f = new RandomAccessFile(mTempPath+"/final.jpg", "r");
             try {
                 // Get and check length
                 long longlength = f.length();
                 int length = (int) longlength;
-                if (length != longlength)
+                if (length != longlength) {
                     throw new IOException("File size >= 2 GB");
+                }
                 // Read file and return data
                 jpegData = new byte[length];
                 f.readFully(jpegData);
@@ -157,8 +181,9 @@ public class SoftwareHdrProcessor {
     private boolean doEnfuse() throws IOException {
         Log.d(TAG, "Enfuse...");
 
-        // Build the list of output files. The convention set up by AlignImageStack is projectXXXX.tif,
-        // so we basically build that list out of the number of shots we fed to align_image_stack
+        // Build the list of output files. The convention set up by
+        // AlignImageStack is projectXXXX.tif, so we basically build that
+        // list out of the number of shots we fed to align_image_stack
         String files = "";
         for (int i = 0; i < mPictures.size(); i++) {
             // Check if file exists, otherwise enfuse will fail
