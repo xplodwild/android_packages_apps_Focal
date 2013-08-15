@@ -29,6 +29,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -69,6 +70,11 @@
         <receiver android:name="org.cyanogenmod.focal.CameraButtonIntentReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.CAMERA_BUTTON" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="org.cyanogenmod.focal.DisableCameraReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
