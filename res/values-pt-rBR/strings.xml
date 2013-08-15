@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2013 The CyanogenMod Project
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Abrir Focal</string>
+    <string name="shutter_button">Botão de disparo</string>
+    <string name="cannot_connect_hal">Não foi possível conectar à câmera</string>
+    <string name="recording">Gravando</string>
+    <string name="double_tap_to_snapshot">Toque duplo para tirar um foto</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">OK</string>
+    <string name="no_gles20_support">Seu dispositivo não suporta GLES2</string>
+    <string name="no_gyroscope">Seu dispositivo não possui um giroscópio</string>
+    <string name="ps_long_press_to_stop">Pressione o botão de disparar para\nterminar sua esfera.</string>
+    <string name="disabled">Desativado</string>
+    <string name="enabled">Ativado</string>
+    <string name="no_video_player">Não foi possível reproduzir o vídeo, nenhum tocador foi encontrado</string>
+    <string name="fullscreen_shutter_info">Toque em qualquer lugar para tirar foto</string>
+    <string name="please_wait">Por favor, aguarde\u2026</string>
+    <string name="retouch">RETOQUE</string>
+    <string name="open_in_gallery">GALERIA</string>
+    <string name="mode_photo">Foto</string>
+    <string name="mode_video">Vídeo</string>
+    <string name="mode_picsphere">FotoEsfera</string>
+    <string name="mode_panorama">Panorama</string>
+    <string name="mode_switchcam">Direção</string>
+    <string name="widget_burstmode_count_shots">%d fotos em modo contínuo</string>
+    <string name="widget_burstmode_off">Desativar disparo em modo contínuo</string>
+    <string name="widget_burstmode_infinite">Contínuo infinito</string>
+    <string name="widget_hdr_aebracket">Enquadramento automático</string>
+    <string name="widget_settings_choose_widgets">Escolher widget na barra lateral</string>
+    <string name="widget_settings_choose_widgets_button">Escolher widgets</string>
+    <string name="widget_settings_picture_size">Tamanho da imagem</string>
+    <string name="widget_settings_exposure_ring">Mostrar exposição de anel</string>
+    <string name="widget_settings_autoenhance">Reaçar automático</string>
+    <string name="widget_settings_ruleofthirds">Regra dos Terços</string>
+    <string name="widget_autoexposure">Modo de medida de exposição</string>
+    <string name="widget_burstmode">Modo contínuo</string>
+    <string name="widget_effect">Efeitos de cores</string>
+    <string name="widget_enhancements">Realce de cores</string>
+    <string name="widget_exposure_compensation">Compensação de exposição</string>
+    <string name="widget_flash">Modo de flash</string>
+    <string name="widget_hdr">HDR</string>
+    <string name="widget_iso">Sensitividade ISO</string>
+    <string name="widget_scenemode">Modo de cena</string>
+    <string name="widget_settings">Configurações</string>
+    <string name="widget_shutter_speed">Velocidade do disparador</string>
+    <string name="widget_skintone">Realce de tone de pele</string>
+    <string name="widget_softwarehdr">HDR</string>
+    <string name="widget_timermode">Modo temporizador</string>
+    <string name="widget_videofr">Taxa de frames do vídeo</string>
+    <string name="widget_videohdr">HDR de vídeo</string>
+    <string name="widget_whitebalance">Balanço do branco</string>
+    <string name="pano_panorama_rendering_failed">Falha ou renderizar o panorama.\nTente tirar um mais curto.</string>
+    <string name="pano_panorama_rendering">Renderizando o panorama\u2026</string>
+    <string name="picsphere_undo_button">DESFAZER</string>
+    <string name="picsphere_start_hint">Tire uma foto para iniciar a esfera</string>
+    <string name="picsphere_already_rendering">Por favor aguarde a FotoEsfera atual renderizar</string>
+    <string name="picsphere_rendering_progress">Renderizando\u2026 (%d %%)</string>
+    <string name="picsphere_toast_background_render">Renderização iniciada\u2026</string>
+    <string name="picsphere_notif_title">Renderizando FotoEsfera\u2026</string>
+    <string name="picsphere_failed">Falha ao renderizar FotoEsfera</string>
+    <string name="picsphere_failed_details">Certifique que as fotos somente sobrepõe nas bordas.</string>
+    <string name="picsphere_need_two_pics">Você precisa de pelo menos duas fotos.</string>
+    <string name="picsphere_step_preparing">Preparando\u2026</string>
+    <string name="picsphere_step_autopano">Associando as fotos\u2026</string>
+    <string name="picsphere_step_autooptimiser">Optimizando associações\u2026</string>
+    <string name="picsphere_step_ptclean">Limpando pontos de associação\u2026</string>
+    <string name="picsphere_step_panomodify">Cortando áreas vazias\u2026</string>
+    <string name="picsphere_step_nona">Juntando as fotos…</string>
+    <string name="picsphere_step_enblend">Misturando as fotos\u2026</string>
+    <string name="software_hdr_notif_title">Computando imagem HDR\u2026</string>
+    <string name="software_hdr_failed">Falha ao renderizar HDR</string>
+    <string name="software_hdr_failed_details">As fotos de origem foram mantidas.</string>
+    <string name="showcase_welcome_1_title">Bem vindo!</string>
+    <string name="showcase_welcome_1_body">As opções estão na barra lateral.\nsó deslize-a.</string>
+    <string name="showcase_welcome_2_title">Botão de disparo</string>
+    <string name="showcase_welcome_2_body">Toque no botão de disparo para tirar uma foto.\nDeslize para acessar outros modos de captura.</string>
+    <string name="showcase_panorama_title">Modo panorama</string>
+    <string name="showcase_panorama_body">Toque o botão de disparo para iniciar seu panorama.\nentão desloque para onde você deseja capturar.\nAo terminar, toque no disparador de novo.</string>
+    <string name="showcase_picsphere_title">Modo FotoEspera</string>
+    <string name="showcase_picsphere_body">Alinhe sua primeira foto onde você desejar,\n então toque no disparador para tirar cada foto\nda esfera. Os pontos azuis são pontos\nde referência que você pode seguir.\nPressione o disparador quando você terminar.</string>
+</resources>
