@@ -602,6 +602,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
     @Override
     public void onCameraReady() {
+        mCamManager.updateDisplayOrientation();
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -952,40 +954,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private class CameraPreviewListener implements CameraManager.PreviewPauseListener {
         @Override
         public void onPreviewPause() {
-            final PreviewFrameLayout container = (PreviewFrameLayout)
-                    findViewById(R.id.camera_preview_overlay_container);
-            final ImageView iv = (ImageView) findViewById(R.id.camera_preview_overlay);
-
-            if (iv.getAlpha() == 1.0f) {
-                return;
-            }
-
-            final Bitmap preview = mCamManager.getLastPreviewFrame();
-
-            if (preview == null) {
-                return;
-            }
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    container.setPreviewSize(preview.getWidth(), preview.getHeight());
-                    iv.setImageBitmap(preview);
-                    iv.setAlpha(1.0f);
-                }
-            });
+            // XXX: Do a little animation
         }
 
         @Override
         public void onPreviewResume() {
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    findViewById(R.id.gl_renderer_container).setAlpha(1.0f);
-                    ImageView iv = (ImageView) findViewById(R.id.camera_preview_overlay);
-                    iv.animate().setDuration(300).alpha(0.0f).start();
-                }
-            }, 100);
+            // XXX: Do a little animation
         }
     }
 
@@ -1092,6 +1066,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     mShutterButton.setImageDrawable(getResources()
                             .getDrawable(R.drawable.btn_shutter_video));
                 }
+            } else {
+                Log.e(TAG, "Unknown Camera Mode: " + mCameraMode + " ; No capture transformer");
             }
         }
 
@@ -1294,6 +1270,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             // Adjust orientationCompensation for the native orientation of the device.
             Configuration config = getResources().getConfiguration();
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
+            Util.getDisplayRotation(CameraActivity.this);
+
             boolean nativeLandscape = false;
 
             if (((rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180)

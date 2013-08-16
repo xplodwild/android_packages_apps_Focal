@@ -64,6 +64,7 @@ public class Util {
 
     // Screen size holder
     private static Point mScreenSize = new Point();
+    private static int mRotation = 90;
 
     private static DateFormat mJpegDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
 
@@ -76,19 +77,26 @@ public class Util {
      * @return Orientation angle of the display
      */
     public static int getDisplayRotation(Activity activity) {
-        int rotation = activity.getWindowManager().getDefaultDisplay()
-                .getRotation();
-        switch (rotation) {
-            case Surface.ROTATION_0:
-                return 0;
-            case Surface.ROTATION_90:
-                return 90;
-            case Surface.ROTATION_180:
-                return 180;
-            case Surface.ROTATION_270:
-                return 270;
+        if (activity != null) {
+            int rotation = activity.getWindowManager().getDefaultDisplay()
+                    .getRotation();
+            switch (rotation) {
+                case Surface.ROTATION_0:
+                    mRotation = 0;
+                    break;
+                case Surface.ROTATION_90:
+                    mRotation = 90;
+                    break;
+                case Surface.ROTATION_180:
+                    mRotation = 180;
+                    break;
+                case Surface.ROTATION_270:
+                    mRotation = 270;
+                    break;
+            }
         }
-        return 0;
+
+        return mRotation;
     }
 
     /**

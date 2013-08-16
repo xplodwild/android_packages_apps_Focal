@@ -174,63 +174,62 @@ public class ReviewDrawer extends RelativeLayout {
      * @param images True to get images, false to get videos
      */
     public void updateFromGallerySynchronous(final boolean images) {
-        mImages.clear();
+
         mHandler.post(new Runnable() {
             @Override
             public void run() {
+                mImages.clear();
                 mImagesListAdapter.notifyDataSetChanged();
-            }
-        });
 
-        String[] columns = null;
-        String orderBy = null;
-        if (images) {
-            columns = new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID};
-            orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
-        } else {
-            columns = new String[]{MediaStore.Video.Media.DATA, MediaStore.Video.Media._ID};
-            orderBy = MediaStore.Video.Media.DATE_TAKEN + " ASC";
-        }
 
-        // Select only the images that has been taken from the Camera
-        ContentResolver cr = getContext().getContentResolver();
-        if (cr == null) {
-            Log.e(TAG, "No content resolver!");
-            return;
-        }
-        Cursor cursor = null;
+                String[] columns = null;
+                String orderBy = null;
+                if (images) {
+                    columns = new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID};
+                    orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
+                } else {
+                    columns = new String[]{MediaStore.Video.Media.DATA, MediaStore.Video.Media._ID};
+                    orderBy = MediaStore.Video.Media.DATE_TAKEN + " ASC";
+                }
 
-        if (images) {
-            cursor = cr.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns,
-                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
-                    new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
-        } else {
-            cursor = cr.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, columns,
-                    MediaStore.Video.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
-                    new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
-        }
+                // Select only the images that has been taken from the Camera
+                ContentResolver cr = getContext().getContentResolver();
+                if (cr == null) {
+                    Log.e(TAG, "No content resolver!");
+                    return;
+                }
+                Cursor cursor = null;
 
-        if (cursor == null) {
-            Log.e(TAG, "Null cursor from MediaStore!");
-            return;
-        }
+                if (images) {
+                    cursor = cr.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns,
+                            MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
+                            new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
+                } else {
+                    cursor = cr.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, columns,
+                            MediaStore.Video.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
+                            new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
+                }
 
-        final int imageColumnIndex = cursor.getColumnIndex(images ?
-                MediaStore.Images.Media._ID : MediaStore.Video.Media._ID);
-        final Cursor finalCursor = cursor;
+                if (cursor == null) {
+                    Log.e(TAG, "Null cursor from MediaStore!");
+                    return;
+                }
 
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < finalCursor.getCount(); i++) {
-                    finalCursor.moveToPosition(i);
+                final int imageColumnIndex = cursor.getColumnIndex(images ?
+                        MediaStore.Images.Media._ID : MediaStore.Video.Media._ID);
 
-                    int id = finalCursor.getInt(imageColumnIndex);
+                for (int i = 0; i < cursor.getCount(); i++) {
+                    cursor.moveToPosition(i);
+
+                    int id = cursor.getInt(imageColumnIndex);
                     if (mReviewedImageId <= 0) {
                         mReviewedImageId = id;
                     }
                     addImageToList(id);
+                    mImagesListAdapter.notifyDataSetChanged();
                 }
+
+                scrollToLatestImage();
             }
         });
     }
@@ -370,26 +369,26 @@ public class ReviewDrawer extends RelativeLayout {
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new DecelerateInterpolator())
                 .translationY(-getMeasuredHeight()).alpha(0.0f)
                 .setListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
 
-            }
+                    }
 
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                setVisibility(View.GONE);
-            }
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        setVisibility(View.GONE);
+                    }
 
-            @Override
-            public void onAnimationCancel(Animator animator) {
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
 
-            }
+                    }
 
-            @Override
-            public void onAnimationRepeat(Animator animator) {
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
 
-            }
-        }).start();
+                    }
+                }).start();
     }
 
     /**
@@ -508,7 +507,7 @@ public class ReviewDrawer extends RelativeLayout {
                     final Bitmap thumbnail = CameraActivity.getCameraMode() ==
                             CameraActivity.CAMERA_MODE_VIDEO ? (MediaStore.Video.Thumbnails
                             .getThumbnail(getContext().getContentResolver(),
-                            mImages.get(position), MediaStore.Video.Thumbnails.MINI_KIND, null))
+                                    mImages.get(position), MediaStore.Video.Thumbnails.MINI_KIND, null))
                             : (MediaStore.Images.Thumbnails.getThumbnail(getContext()
                             .getContentResolver(), mImages.get(position),
                             MediaStore.Images.Thumbnails.MINI_KIND, null));
@@ -581,59 +580,59 @@ public class ReviewDrawer extends RelativeLayout {
         private ImageView mImageView;
         private GestureDetector.SimpleOnGestureListener mListener =
                 new GestureDetector.SimpleOnGestureListener() {
-            private final float DRIFT_THRESHOLD = 80.0f;
-            private final int SWIPE_THRESHOLD_VELOCITY = 800;
+                    private final float DRIFT_THRESHOLD = 80.0f;
+                    private final int SWIPE_THRESHOLD_VELOCITY = 800;
 
-            @Override
-            public boolean onDown(MotionEvent motionEvent) {
-                return true;
-            }
+                    @Override
+                    public boolean onDown(MotionEvent motionEvent) {
+                        return true;
+                    }
 
-            @Override
-            public void onShowPress(MotionEvent motionEvent) {
+                    @Override
+                    public void onShowPress(MotionEvent motionEvent) {
 
-            }
+                    }
 
-            @Override
-            public boolean onSingleTapUp(MotionEvent motionEvent) {
-                return false;
-            }
+                    @Override
+                    public boolean onSingleTapUp(MotionEvent motionEvent) {
+                        return false;
+                    }
 
-            @Override
-            public boolean onScroll(MotionEvent ev1, MotionEvent ev2, float vX, float vY) {
-                if (Math.abs(ev2.getX() - ev1.getX()) > DRIFT_THRESHOLD) {
-                    return false;
-                }
+                    @Override
+                    public boolean onScroll(MotionEvent ev1, MotionEvent ev2, float vX, float vY) {
+                        if (Math.abs(ev2.getX() - ev1.getX()) > DRIFT_THRESHOLD) {
+                            return false;
+                        }
 
-                mImageView.setTranslationY(ev2.getRawY() - ev1.getRawY());
-                float alpha = Math.max(0.0f, 1.0f - Math.abs(mImageView.getTranslationY()
-                            / mImageView.getMeasuredHeight())*2.0f);
-                mImageView.setAlpha(alpha);
+                        mImageView.setTranslationY(ev2.getRawY() - ev1.getRawY());
+                        float alpha = Math.max(0.0f, 1.0f - Math.abs(mImageView.getTranslationY()
+                                / mImageView.getMeasuredHeight())*2.0f);
+                        mImageView.setAlpha(alpha);
 
-                return true;
-            }
+                        return true;
+                    }
 
-            @Override
-            public void onLongPress(MotionEvent motionEvent) {
+                    @Override
+                    public void onLongPress(MotionEvent motionEvent) {
 
-            }
+                    }
 
-            @Override
-            public boolean onFling(MotionEvent ev1, MotionEvent ev2, float vX, float vY) {
-                if (Math.abs(ev2.getX() - ev1.getX()) > DRIFT_THRESHOLD) {
-                    return false;
-                }
+                    @Override
+                    public boolean onFling(MotionEvent ev1, MotionEvent ev2, float vX, float vY) {
+                        if (Math.abs(ev2.getX() - ev1.getX()) > DRIFT_THRESHOLD) {
+                            return false;
+                        }
 
-                if (Math.abs(vY) > SWIPE_THRESHOLD_VELOCITY) {
-                    mImageView.animate().translationY(-mImageView.getHeight()).alpha(0.0f)
-                            .setDuration(300).start();
-                    removeReviewedImage();
-                    return true;
-                }
+                        if (Math.abs(vY) > SWIPE_THRESHOLD_VELOCITY) {
+                            mImageView.animate().translationY(-mImageView.getHeight()).alpha(0.0f)
+                                    .setDuration(300).start();
+                            removeReviewedImage();
+                            return true;
+                        }
 
-                return false;
-            }
-        };
+                        return false;
+                    }
+                };
 
         public ThumbnailTouchListener(ImageView iv) {
             mImageView = iv;

@@ -76,11 +76,11 @@ public class CameraManager {
     private CameraReadyListener mCameraReadyListener;
     private Handler mHandler;
     private Context mContext;
-    private boolean mCameraOpen;
     private boolean mIsModeSwitching;
     private List<NameValuePair> mPendingParameters;
     private boolean mIsResuming;
     private CameraRenderer mRenderer;
+    private boolean mIsRecordingHint;
 
     public interface PreviewPauseListener {
         /**
@@ -168,7 +168,7 @@ public class CameraManager {
         mPendingParameters = new ArrayList<NameValuePair>();
         mParametersThread.start();
         mIsResuming = false;
-        mCameraOpen = false;
+        mIsRecordingHint = false;
         mRenderer = new CameraRenderer();
     }
 
@@ -199,7 +199,6 @@ public class CameraManager {
                         return;
                     }
                     mCamera = Camera.open(cameraId);
-                    mCameraOpen = true;
                     Log.v(TAG, "Camera is open");
 
                     mCamera.enableShutterSound(false);
@@ -318,7 +317,6 @@ public class CameraManager {
         if (mCamera != null && mCameraReady) {
             Log.v(TAG, "Releasing camera facing " + mCurrentFacing);
             mCamera.release();
-            mCameraOpen = false;
             mCamera = null;
             mParameters = null;
             mPreview.notifyCameraChanged(false);
@@ -352,6 +350,7 @@ public class CameraManager {
                         mPreview.notifyPreviewSize(width, height);
 
                         if (mIsResuming) {
+                            updateDisplayOrientation();
                             mCamera.startPreview();
                             mIsResuming = false;
                         }
@@ -441,7 +440,7 @@ public class CameraManager {
         int previewHeight = previewSize.height;
 
         // Convert YUV420SP preview data to RGB
-        if (data != null) {
+        if (data != null && data.length > 8) {
             Bitmap bitmap = Util.decodeYUV420SP(mContext, data, previewWidth, previewHeight);
             if (mCurrentFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 // Frontcam has the image flipped, flip it back to not look weird in portrait
@@ -492,10 +491,13 @@ public class CameraManager {
      * Takes a snapshot
      */
     public void takeSnapshot(Camera.ShutterCallback shutterCallback,
-            Camera.PictureCallback raw, Camera.PictureCallback jpeg) {
+                             Camera.PictureCallback raw, Camera.PictureCallback jpeg) {
         Log.v(TAG, "takePicture");
         SoundManager.getSingleton().play(SoundManager.SOUND_SHUTTER);
-        mCamera.takePicture(shutterCallback, raw, jpeg);
+
+        if (mCamera != null) {
+            mCamera.takePicture(shutterCallback, raw, jpeg);
+        }
     }
 
     /**
@@ -569,7 +571,7 @@ public class CameraManager {
         Camera.CameraInfo info =
                 new android.hardware.Camera.CameraInfo();
         Camera.getCameraInfo(mCurrentFacing, info);
-        orientation = (360 - orientation + 45) / 90 * 90;
+        //orientation = (360 - orientation + 45) / 90 * 90;
         int rotation = 0;
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             rotation = (info.orientation - orientation + 360) % 360;
@@ -617,13 +619,23 @@ public class CameraManager {
                         return;
                     }
 
-                    if (mode == CameraActivity.CAMERA_MODE_VIDEO) {
-                        params.setRecordingHint(true);
-                    } else {
-                        params.setRecordingHint(false);
-                    }
+                    boolean shouldStartPreview = false;
 
-                    mCamera.stopPreview();
+                    if (mode == CameraActivity.CAMERA_MODE_VIDEO) {
+                        if (!mIsRecordingHint) {
+                            params.setRecordingHint(true);
+                            mIsRecordingHint = true;
+                            mCamera.stopPreview();
+                            shouldStartPreview = true;
+                        }
+                    } else {
+                        if (mIsRecordingHint) {
+                            params.setRecordingHint(false);
+                            mIsRecordingHint = false;
+                            mCamera.stopPreview();
+                            shouldStartPreview = true;
+                        }
+                    }
 
                     if (mode == CameraActivity.CAMERA_MODE_PANO) {
                         // Apply special settings for panorama mode
@@ -636,8 +648,9 @@ public class CameraManager {
                     if (mode == CameraActivity.CAMERA_MODE_PICSPHERE) {
                         // If we are in PicSphere mode, set pic size to 640x480 to avoid using
                         // all the phone's resources when rendering, as well as not take 15 min
-                        // to render. Eventually, we could put up a setting somewhere to let users
-                        // rendering super high quality pictures.
+                        // to render. This value can be changed in the settings widget once
+                        // in PicSphere mode, so this value will be changed again when the
+                        // widget loads.
                         params.setPictureSize(640, 480);
                         params.setPreviewSize(640, 480);
 
@@ -647,34 +660,11 @@ public class CameraManager {
                         params.setPreviewSize(mTargetSize.x, mTargetSize.y);
                     }
 
-                    // Rotate the display to 90 degrees
-                    android.hardware.Camera.CameraInfo info =
-                            new android.hardware.Camera.CameraInfo();
-                    android.hardware.Camera.getCameraInfo(mCurrentFacing, info);
-                    int degrees = 90;
-
-                    int result;
-                    if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                        result = (info.orientation + degrees) % 360;
-                        result = (360 - result) % 360;  // compensate the mirror
-                    } else {  // back-facing
-                        result = (info.orientation - degrees + 360) % 360;
-                    }
-                    mCamera.setDisplayOrientation(result);
-
                     mCamera.setParameters(params);
                     mParameters = mCamera.getParameters();
-                    try {
-                        // PicSphere and Pano renders to a texture, so the preview will
-                        // be started once the SurfaceTexture is ready to receive frames
-                        if (mode != CameraActivity.CAMERA_MODE_PICSPHERE
-                                && mode != CameraActivity.CAMERA_MODE_PANO) {
-                            mCamera.startPreview();
-                        }
 
-                        mPreview.notifyPreviewSize(mTargetSize.x, mTargetSize.y);
-                    } catch (RuntimeException e) {
-                        Log.e(TAG, "Unable to start preview", e);
+                    if (shouldStartPreview) {
+                        mCamera.startPreview();
                     }
                 }
 
@@ -686,6 +676,25 @@ public class CameraManager {
                 }
             }
         }.start();
+    }
+
+    /**
+     * Updates the orientation of the display
+     */
+    public void updateDisplayOrientation() {
+        android.hardware.Camera.CameraInfo info =
+                new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(mCurrentFacing, info);
+        int degrees = Util.getDisplayRotation(null);
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        mCamera.setDisplayOrientation(result);
     }
 
     /**
@@ -957,48 +966,13 @@ public class CameraManager {
                         mCamera.setPreviewTexture(mTexture);
 
                         if (startPreview) {
+                            updateDisplayOrientation();
                             mCamera.startPreview();
                             postCallbackBuffer();
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Error setting camera preview: " + e.getMessage());
                     }
-                }
-            }
-        }
-
-        public void startPreview() {
-            // Stop preview before making changes
-            synchronized (this) {
-                try {
-                    mCamera.stopPreview();
-                } catch (Exception e) {
-                    // Ignore: tried to stop a non-existent preview
-                }
-
-                if (!mCameraOpen) {
-                    Log.w(TAG, "Camera not open yet, delaying surface update");
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            startPreview();
-                        }
-                    });
-                    return;
-                }
-
-                setupCamera();
-
-                // Start preview with new settings
-                try {
-                    mCamera.setPreviewTexture(mTexture);
-                    mCamera.startPreview();
-
-                    mParameters = mCamera.getParameters();
-                    postCallbackBuffer();
-                    requestLayout();
-                } catch (Exception e) {
-                    Log.d(TAG, "Error starting camera preview: " + e.getMessage());
                 }
             }
         }
@@ -1048,57 +1022,47 @@ public class CameraManager {
     }
 
     public class CameraRenderer implements GLSurfaceView.Renderer {
+        private final float[] mTransformMatrix;
         int mTexture;
         private SurfaceTexture mSurface;
 
-        private final String VERTEX_SHADER =
-                "attribute vec4 position;" +
-                        "attribute vec2 inputTextureCoordinate;" +
-                        "varying vec2 textureCoordinate;" +
-                        "void main()" +
-                        "{"+
-                        "gl_Position = position;"+
-                        "textureCoordinate = inputTextureCoordinate;" +
-                        "}";
+        private final static String VERTEX_SHADER =
+                "attribute vec4 vPosition;\n" +
+                        "attribute vec2 a_texCoord;\n" +
+                        "varying vec2 v_texCoord;\n" +
+                        "uniform mat4 u_xform;\n" +
+                        "void main() {\n" +
+                        "  gl_Position = vPosition;\n" +
+                        "  v_texCoord = vec2(u_xform * vec4(a_texCoord, 1.0, 1.0));\n" +
+                        "}\n";
 
-        private final String FRAGMENT_SHADER =
-                "#extension GL_OES_EGL_image_external : require\n"+
-                        "precision mediump float;" +
-                        "varying vec2 textureCoordinate;                            \n" +
-                        "uniform samplerExternalOES s_texture;               \n" +
-                        "void main() {" +
-                        "  gl_FragColor = texture2D( s_texture, textureCoordinate );\n" +
-                        "}";
+        private final static String FRAGMENT_SHADER =
+                "#extension GL_OES_EGL_image_external : require\n" +
+                        "precision mediump float;\n" +
+                        "uniform samplerExternalOES s_texture;\n" +
+                        "varying vec2 v_texCoord;\n" +
+                        "void main() {\n" +
+                        "  gl_FragColor = texture2D(s_texture, v_texCoord);\n" +
+                        "}\n";
 
         private FloatBuffer vertexBuffer, textureVerticesBuffer;
-        private ShortBuffer drawListBuffer;
         private int mProgram;
         private int mPositionHandle;
-        private int mColorHandle;
         private int mTextureCoordHandle;
+        private int mTransformHandle;
 
         // Number of coordinates per vertex in this array
         static final int COORDS_PER_VERTEX = 2;
         static final float RATIO = 4.0f/3.0f;
 
-        private final float squareVertices[] = {
-                1.0f * RATIO,  -1.0f,
-                1.0f * RATIO,  1.0f,
-                -1.0f,  1.0f,
-                -1.0f,  -1.0f
-        };
+        private final float squareVertices[] =
+                { 1.0f * RATIO, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f * RATIO, -1.0f };
 
-        private final float textureVertices[] = {
-                1, 0,
-                0, 0,
-                0, 1,
-                1, 1
-        };
-
-        private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
+        private final float textureVertices[] =
+                { 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f };
 
         public CameraRenderer() {
-            // Do nothing here
+            mTransformMatrix = new float[16];
         }
 
         public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -1137,15 +1101,17 @@ public class CameraManager {
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mTexture);
 
-            mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
+            mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
+            GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
+                    false, 0, vertexBuffer);
             GLES20.glEnableVertexAttribArray(mPositionHandle);
-            GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,vertexStride, vertexBuffer);
 
-            mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
+            mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "a_texCoord");
+            GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
+                    false, 0, textureVerticesBuffer);
             GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
-            GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,vertexStride, textureVerticesBuffer);
 
-            mColorHandle = GLES20.glGetAttribLocation(mProgram, "s_texture");
+            mTransformHandle = GLES20.glGetUniformLocation(mProgram, "u_xform");
         }
 
         public void onDrawFrame(GL10 unused) {
@@ -1153,6 +1119,8 @@ public class CameraManager {
 
             if (mSurface != null) {
                 mSurface.updateTexImage();
+                mSurface.getTransformMatrix(mTransformMatrix);
+                GLES20.glUniformMatrix4fv(mTransformHandle, 1, false, mTransformMatrix, 0);
             }
 
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 4);
@@ -1176,14 +1144,6 @@ public class CameraManager {
 
             GLES20.glGenTextures(1,texture, 0);
             GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, texture[0]);
-            GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
-                    GL10.GL_TEXTURE_MIN_FILTER,GL10.GL_LINEAR);
-            GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
-                    GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
-            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
-                    GL10.GL_TEXTURE_WRAP_S, GL10.GL_CLAMP_TO_EDGE);
-            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
-                    GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE);
 
             return texture[0];
         }
