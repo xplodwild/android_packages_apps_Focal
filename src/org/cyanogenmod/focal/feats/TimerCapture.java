@@ -202,7 +202,7 @@ public class TimerCapture extends CaptureTransformer implements RecognitionListe
 
     @Override
     public void onReadyForSpeech(Bundle bundle) {
-        Log.e(TAG, "ON READY FOR SPEECH");
+        Log.d(TAG, "ON READY FOR SPEECH");
         //mIsCountDownOn = true;
         //mNoSpeechCountDown.start();
         if (mIsMuted) {

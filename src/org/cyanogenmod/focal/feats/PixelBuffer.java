@@ -268,7 +268,7 @@ public class PixelBuffer {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Log.e(TAG, "Waiting for more memory! (Free: " + availableMegs + "MB)");
+                Log.w(TAG, "Waiting for more memory! (Free: " + availableMegs + "MB)");
                 // We're going to need some memory
                 System.gc();
                 Runtime.getRuntime().gc();

@@ -319,8 +319,6 @@ public abstract class WidgetBase {
                 // will likely be clicked and its state will change.
                 toggleBackground(!mIsOpen);
             } else if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-                Log.e(TAG, "ACTION_MOVE dX=" +  Math.abs(event.getX() - mDownX) +
-                        " dY="  + Math.abs(event.getY() - mDownY));
                 if (!mIsOpen && (Math.abs(event.getX() - mDownX) > 8
                         || Math.abs(event.getY() - mDownY) > 8)) {
                     toggleBackground(false);
