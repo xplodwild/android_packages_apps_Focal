@@ -415,21 +415,6 @@ public class Util {
         }
     }
 
-    /**
-     * Returns the upper power-of-two
-     * @param v
-     * @return
-     */
-    public static int getUpperPoT(int v) {
-        v--;
-        v |= v >> 1;
-        v |= v >> 2;
-        v |= v >> 4;
-        v |= v >> 8;
-        v |= v >> 16;
-        v++;
-        return v;
-    }
 
     /**
      * Returns the best Panorama preview size
@@ -460,6 +445,46 @@ public class Util {
                 pixelsDiff = d;
             }
         }
+        return output;
+    }
+
+    /**
+     * Returns the best PicSphere picture size. The reference size is 2048x1536 from Nexus 4.
+     * @param supportedSizes Supported picture size
+     * @param needSmaller If a larger image size is accepted
+     * @return A Point where X and Y corresponds to Width and Height
+     */
+    public static Point findBestPicSpherePictureSize(List<Size> supportedSizes, boolean needSmaller) {
+        Point output = null;
+        final int defaultPixels = 2048*1536;
+
+        int pixelsDiff = defaultPixels;
+
+        for (Size size : supportedSizes) {
+            int h = size.height;
+            int w = size.width;
+            int d = defaultPixels - h * w;
+
+            if (needSmaller && d < 0) { // no bigger preview than 960x720.
+                continue;
+            }
+
+            // we only want 4:3 format.
+            if ((h * 4 != w * 3)) {
+                continue;
+            }
+            d = Math.abs(d);
+            if (d < pixelsDiff) {
+                output = new Point(w, h);
+                pixelsDiff = d;
+            }
+        }
+
+        if (output == null) {
+            // Fail-safe, default to 640x480 is nothing suitable is found
+            output = new Point(640, 480);
+        }
+
         return output;
     }
 }

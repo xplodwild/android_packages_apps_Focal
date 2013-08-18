@@ -41,6 +41,7 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
     private int NOTIFICATION = 1337;
 
     private boolean mHasFailed = false;
+    private int mRenderQueue = 0;
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -83,6 +84,7 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
 
     public void render(final PicSphere sphere, final int orientation) {
         sphere.addProgressListener(this);
+        mRenderQueue++;
         new Thread() {
             public void run() {
                 if (!sphere.render(orientation)) {
@@ -91,7 +93,13 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
                             buildFailureNotification(getString(R.string.picsphere_failed),
                                     getString(R.string.picsphere_failed_details)));
                 }
-                PicSphereRenderingService.this.stopSelf();
+                mRenderQueue--;
+
+                if (mRenderQueue == 0) {
+                    // We have no more PicSpheres to render, so we can stop the service. Otherwise,
+                    // we leave it on for other spheres.
+                    PicSphereRenderingService.this.stopSelf();
+                }
             }
         }.start();
     }
@@ -111,8 +119,16 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
         String text = "";
 
         switch (newStep) {
-            case PicSphere.STEP_AUTOPANO:
-                text = getString(R.string.picsphere_step_autopano);
+            case PicSphere.STEP_PTOGEN:
+                text = getString(R.string.picsphere_step_ptogen);
+                break;
+
+            case PicSphere.STEP_PTOVAR:
+                text = getString(R.string.picsphere_step_ptovar);
+                break;
+
+            case PicSphere.STEP_CPFIND:
+                text = getString(R.string.picsphere_step_cpfind);
                 break;
 
             case PicSphere.STEP_PTCLEAN:
