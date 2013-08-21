@@ -30,7 +30,6 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -272,6 +271,8 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!mIsOpen) return false;
+
         if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
             for (int i = 0; i < SLOT_MAX; i++) {
                 PadButton button = mButtons[i];

@@ -30,7 +30,6 @@ import android.speech.SpeechRecognizer;
 import android.util.Log;
 
 import org.cyanogenmod.focal.CameraActivity;
-import org.cyanogenmod.focal.CameraManager;
 import org.cyanogenmod.focal.R;
 import org.cyanogenmod.focal.SnapshotManager;
 import org.cyanogenmod.focal.ui.ShutterButton;
@@ -101,7 +100,7 @@ public class TimerCapture extends CaptureTransformer implements RecognitionListe
 
     public void initializeVoiceShutter() {
         if (!mIsInitialised) {
-            Context context =  mCamManager.getPreviewSurface().getContext();
+            Context context =  mCamManager.getContext();
 
             if (context == null) {
                 Log.e(TAG, "Could not initialise voice shutter because of null context");

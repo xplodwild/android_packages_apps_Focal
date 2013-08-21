@@ -116,6 +116,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private boolean mIsFullscreenShutter;
     private int mShowcaseIndex;
     private boolean mIsCamSwitching;
+    private boolean mIsShutterLongClicked = false;
     private CameraPreviewListener mCamPreviewListener;
     private GLSurfaceView mGLSurfaceView;
 
@@ -309,7 +310,11 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         }
 
         if (SoftwareHdrCapture.isServiceBound()) {
-            unbindService(SoftwareHdrCapture.getServiceConnection());
+            try {
+                unbindService(SoftwareHdrCapture.getServiceConnection());
+            } catch (IllegalArgumentException e) {
+                // Do nothing
+            }
         }
 
         super.onPause();
@@ -456,10 +461,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mShutterButton.setImageDrawable(getResources().getDrawable(R.drawable.btn_shutter_photo));
         }
 
-        if (newMode != CAMERA_MODE_PANO) {
-            updateCapabilities();
-        }
-
         mCamManager.setCameraMode(mCameraMode);
 
         if (newMode == CAMERA_MODE_PANO) {
@@ -468,7 +469,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         }
 
         // Reload pictures in the ReviewDrawer
-        mReviewDrawer.updateFromGallery(newMode != CAMERA_MODE_VIDEO);
+        mReviewDrawer.updateFromGallery(newMode != CAMERA_MODE_VIDEO, 0);
     }
 
     /**
@@ -584,6 +585,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     protected void setupCamera() {
         // Setup the Camera hardware and preview
         mCamManager = new CameraManager(this);
+        ((CameraApplication)getApplication()).setCameraManager(mCamManager);
 
         setGLRenderer(mCamManager.getRenderer());
 
@@ -596,7 +598,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
     @Override
     public void onCameraReady() {
-        mCamManager.updateDisplayOrientation();
+
 
         runOnUiThread(new Runnable() {
             @Override
@@ -614,6 +616,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     return;
                 }
 
+                mCamManager.updateDisplayOrientation();
                 Camera.Size picSize = params.getPictureSize();
 
                 Camera.Size sz = Util.getOptimalPreviewSize(CameraActivity.this, params.getSupportedPreviewSizes(),
@@ -984,7 +987,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                         mCamManager.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
                     }
 
-                    updateCapabilities();
                     break;
             }
         }
@@ -1000,6 +1002,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
             // Tapping the shutter button locked exposure/WB, so we unlock it if we slide our finger
             mCamManager.setLockSetup(false);
+
+            // Cancel long-press action
+            mIsShutterLongClicked = false;
         }
 
         @Override
@@ -1033,7 +1038,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
      */
     public class MainShutterClickListener implements OnClickListener,
             View.OnLongClickListener, View.OnTouchListener {
-        boolean mIsLongClicked = false;
+
 
         @Override
         public void onClick(View v) {
@@ -1070,7 +1075,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             if (mCaptureTransformer != null) {
                 mCaptureTransformer.onShutterButtonLongPressed(mShutterButton);
             } else {
-                mIsLongClicked = true;
+                mIsShutterLongClicked = true;
                 mFocusManager.checkFocus();
             }
             return true;
@@ -1081,8 +1086,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             // If we long-press the shutter button and no capture transformer handles it, we
             // will just have nothing happening. We register the long click event in here, and
             // trigger a snapshot once it's released.
-            if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP && mIsLongClicked) {
-                mIsLongClicked = false;
+            if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP && mIsShutterLongClicked) {
+                mIsShutterLongClicked = false;
                 onClick(view);
             }
 
@@ -1318,6 +1323,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+            if (mPaused) return false;
+
             // A single tap equals to touch-to-focus in photo/video
             if ((mCameraMode == CAMERA_MODE_PHOTO && !mIsFullscreenShutter)
                     || mCameraMode == CAMERA_MODE_VIDEO) {

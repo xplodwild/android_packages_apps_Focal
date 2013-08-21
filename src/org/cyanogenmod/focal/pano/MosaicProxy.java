@@ -551,7 +551,7 @@ public class MosaicProxy extends CaptureTransformer
                     Uri uri = savePanorama(jpeg.data, jpeg.width, jpeg.height, mCurrentOrientation);
                     if (uri != null) {
                         Util.broadcastNewPicture(mActivity, uri);
-                        mActivity.getReviewDrawer().updateFromGallery(true);
+                        mActivity.getReviewDrawer().updateFromGallery(true, 0);
                     }
 
                     mMainHandler.sendMessage(

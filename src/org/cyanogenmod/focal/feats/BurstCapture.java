@@ -61,9 +61,6 @@ public class BurstCapture extends CaptureTransformer {
         mShotsDone = 0;
         mBurstInProgress = true;
         mSnapManager.queueSnapshot(true, 0);
-
-        // Open the quick review drawer
-        mActivity.getReviewDrawer().openQuickReview();
     }
 
     public void terminateBurstShot() {
@@ -116,6 +113,8 @@ public class BurstCapture extends CaptureTransformer {
 
         if (mShotsDone < mBurstCount || mBurstCount == 0) {
             tryTakeShot();
+        } else {
+            mBurstInProgress = false;
         }
     }
 

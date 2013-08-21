@@ -66,6 +66,7 @@ public class ReviewDrawer extends RelativeLayout {
     private ImageListAdapter mImagesListAdapter;
     private int mReviewedImageId;
     private int mCurrentOrientation;
+    private final Object mImagesLock = new Object();
     private boolean mIsOpen;
     private ViewPager mViewPager;
 
@@ -107,9 +108,9 @@ public class ReviewDrawer extends RelativeLayout {
 
         // Load pictures or videos from gallery
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-            updateFromGallery(false);
+            updateFromGallery(false, 0);
         } else {
-            updateFromGallery(true);
+            updateFromGallery(true, 0);
         }
 
         // Make sure drawer is initially closed
@@ -158,11 +159,12 @@ public class ReviewDrawer extends RelativeLayout {
      * This method is threaded!
      *
      * @param images True to get images, false to get videos
+     * @param scrollPos Position to scroll to, or 0 to get latest image
      */
-    public void updateFromGallery(final boolean images) {
+    public void updateFromGallery(final boolean images, final int scrollPos) {
         new Thread() {
             public void run() {
-                updateFromGallerySynchronous(images);
+                updateFromGallerySynchronous(images, scrollPos);
             }
         }.start();
     }
@@ -172,18 +174,19 @@ public class ReviewDrawer extends RelativeLayout {
      * This method is synchronous, see updateFromGallery for the threaded one.
      *
      * @param images True to get images, false to get videos
+     * @param scrollPos Position to scroll to, or 0 to get latest image
      */
-    public void updateFromGallerySynchronous(final boolean images) {
-
+    public void updateFromGallerySynchronous(final boolean images, final int scrollPos) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mImages.clear();
-                mImagesListAdapter.notifyDataSetChanged();
+                synchronized (mImagesLock) {
+                    mImages.clear();
+                    mImagesListAdapter.notifyDataSetChanged();
+                }
 
-
-                String[] columns = null;
-                String orderBy = null;
+                String[] columns;
+                String orderBy;
                 if (images) {
                     columns = new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID};
                     orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
@@ -193,12 +196,15 @@ public class ReviewDrawer extends RelativeLayout {
                 }
 
                 // Select only the images that has been taken from the Camera
-                ContentResolver cr = getContext().getContentResolver();
+                Context ctx = getContext();
+                if (ctx == null) return;
+                ContentResolver cr = ctx.getContentResolver();
                 if (cr == null) {
                     Log.e(TAG, "No content resolver!");
                     return;
                 }
-                Cursor cursor = null;
+
+                Cursor cursor;
 
                 if (images) {
                     cursor = cr.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns,
@@ -229,7 +235,10 @@ public class ReviewDrawer extends RelativeLayout {
                     mImagesListAdapter.notifyDataSetChanged();
                 }
 
-                scrollToLatestImage();
+                if (scrollPos < mImages.size()) {
+                    mViewPager.setCurrentItem(scrollPos+1, false);
+                    mViewPager.setCurrentItem(scrollPos, true);
+                }
             }
         });
     }
@@ -289,7 +298,7 @@ public class ReviewDrawer extends RelativeLayout {
 
     private void openInGallery(final int imageId) {
         if (imageId > 0) {
-            Uri uri = null;
+            Uri uri;
             if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
                 uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI.buildUpon()
                         .appendPath(Integer.toString(imageId)).build();
@@ -299,7 +308,10 @@ public class ReviewDrawer extends RelativeLayout {
             }
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             try {
-                getContext().startActivity(intent);
+                Context ctx = getContext();
+                if (ctx != null) {
+                    ctx.startActivity(intent);
+                }
             } catch (ActivityNotFoundException e) {
                 CameraActivity.notify(getContext().getString(R.string.no_video_player), 2000);
             }
@@ -323,7 +335,10 @@ public class ReviewDrawer extends RelativeLayout {
             // Start gallery edit activity
             editIntent.setDataAndType(uri, "image/*");
             editIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            getContext().startActivity(Intent.createChooser(editIntent, null));
+            Context ctx = getContext();
+            if (ctx != null) {
+                ctx.startActivity(Intent.createChooser(editIntent, null));
+            }
         }
     }
 
@@ -394,7 +409,7 @@ public class ReviewDrawer extends RelativeLayout {
     /**
      * Slide the review drawer of the specified distance on the X axis
      *
-     * @param distance
+     * @param distance The distance to slide
      */
     public void slide(final float distance) {
         float finalPos = getTranslationY() + distance;
@@ -424,10 +439,11 @@ public class ReviewDrawer extends RelativeLayout {
      */
     public void removeReviewedImage() {
         Util.removeFromGallery(getContext().getContentResolver(), mReviewedImageId);
+        int position = mViewPager.getCurrentItem();
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-            updateFromGallery(false);
+            updateFromGallery(false, position);
         } else {
-            updateFromGallery(true);
+            updateFromGallery(true, position);
         }
 
         mHandler.postDelayed(new Runnable() {
@@ -440,16 +456,6 @@ public class ReviewDrawer extends RelativeLayout {
             }
         }, 300);
         // XXX: Undo popup
-    }
-
-    private void recycleBitmap(final Bitmap bmp) {
-        // We delay the recycle a bit to avoid crashes when scrolling or doing things too fast
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                bmp.recycle();
-            }
-        }, 1000);
     }
 
     /**
@@ -470,7 +476,9 @@ public class ReviewDrawer extends RelativeLayout {
         }
 
         public void addImage(int id) {
-            mImages.add(0, id);
+            synchronized (mImagesLock) {
+                mImages.add(0, id);
+            }
         }
 
         @Override
@@ -503,20 +511,30 @@ public class ReviewDrawer extends RelativeLayout {
 
             new Thread() {
                 public void run() {
-                    mViewsToId.put(imageView, mImages.get(position));
+                    int imageId = -1;
+                    synchronized (mImagesLock) {
+                        try {
+                            imageId = mImages.get(position);
+                        } catch (IndexOutOfBoundsException e) {
+                            return;
+                        }
+                    }
+
+                    mViewsToId.put(imageView, imageId);
                     final Bitmap thumbnail = CameraActivity.getCameraMode() ==
                             CameraActivity.CAMERA_MODE_VIDEO ? (MediaStore.Video.Thumbnails
                             .getThumbnail(getContext().getContentResolver(),
                                     mImages.get(position), MediaStore.Video.Thumbnails.MINI_KIND, null))
                             : (MediaStore.Images.Thumbnails.getThumbnail(getContext()
-                            .getContentResolver(), mImages.get(position),
+                            .getContentResolver(), imageId,
                             MediaStore.Images.Thumbnails.MINI_KIND, null));
 
+                    final int rotation = getCameraPhotoOrientation(imageId);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-
                             imageView.setImageBitmap(thumbnail);
+                            imageView.setRotation(rotation);
                         }
                     });
                 }
@@ -645,6 +663,14 @@ public class ReviewDrawer extends RelativeLayout {
                 if (mImageView.getTranslationY() > mImageView.getMeasuredHeight()*0.5f) {
                     mImageView.animate().translationY(-mImageView.getHeight()).alpha(0.0f)
                             .setDuration(300).start();
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mImageView.setTranslationY(0.0f);
+                            mImageView.setTranslationX(mImageView.getWidth());
+                            mImageView.animate().translationX(0.0f).alpha(1.0f).start();
+                        }
+                    }, 400);
                     removeReviewedImage();
                 } else {
                     mImageView.animate().translationY(0).alpha(1.0f)

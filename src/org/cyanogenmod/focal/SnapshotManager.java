@@ -204,7 +204,7 @@ public class SnapshotManager {
 
             // Calculate the width and the height of the jpeg.
             final Camera.Size s = mCameraManager.getParameters().getPictureSize();
-            int orientation = 0; //Exif.getOrientation(jpegData) - mCameraManager.getOrientation();
+            int orientation = Exif.getOrientation(jpegData) - mCameraManager.getOrientation();
             final int width = s.width,
                     height = s.height;
 
@@ -867,11 +867,11 @@ public class SnapshotManager {
                 }
 
                 Util.broadcastNewPicture(mContext, uri);
+            }
 
-                if (snap != null) {
-                    for (SnapshotListener listener : mListeners) {
-                        listener.onSnapshotSaved(snap);
-                    }
+            if (snap != null) {
+                for (SnapshotListener listener : mListeners) {
+                    listener.onSnapshotSaved(snap);
                 }
             }
         }

@@ -66,7 +66,7 @@ public class Util {
     private static Point mScreenSize = new Point();
     private static int mRotation = 90;
 
-    private static DateFormat mJpegDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+    private static DateFormat mJpegDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmssSSS");
 
     /**
      * Returns the orientation of the display

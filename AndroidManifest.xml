@@ -39,7 +39,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:largeHeap="true">
+        android:largeHeap="true"
+        android:name="org.cyanogenmod.focal.CameraApplication">
 
         <service android:name="org.cyanogenmod.focal.picsphere.PicSphereRenderingService" />
         <service android:name="org.cyanogenmod.focal.feats.SoftwareHdrRenderingService" />
