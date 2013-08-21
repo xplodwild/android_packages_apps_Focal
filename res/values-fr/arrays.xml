@@ -47,15 +47,6 @@
         <item>Croquis</item>
         <item>Néon</item>
     </string-array>
-    <string-array name="widget_iso_hints">
-        <item>ISO automatique</item>
-        <item>ISO réduction du tremblement</item>
-        <item>ISO 100</item>
-        <item>ISO 200</item>
-        <item>ISO 400</item>
-        <item>ISO 800</item>
-        <item>ISO 1600</item>
-    </string-array>
     <string-array name="widget_scenemode_hints">
         <item>Automatique</item>
         <item>Réduction du flou de mouvement</item>

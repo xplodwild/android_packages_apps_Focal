@@ -101,4 +101,11 @@
     <string name="showcase_panorama_body">Érintse meg az exponáló gombot a panoráma kép készítés elindításához,\nazután pásztázzon arra, amit rögzíteni kíván.\nMiután végzett, érintse meg ismét az exponáló gombot.</string>
     <string name="showcase_picsphere_title">Gömbpanoráma mód</string>
     <string name="showcase_picsphere_body">Igazítsa oda az első képet ahová szeretné,\nmajd minden egyes képhez érintse meg az exponáló gombot.\nA kék referenciapontok segítenek a lekövetésben.\nNyomja meg hosszan az exponáló gombot a befejezéshez.</string>
+    <string name="iso_hint_auto">Automatikus ISO</string>
+    <string name="iso_hint_hjr">Kézremegést csökkentő ISO</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
 </resources>

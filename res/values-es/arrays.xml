@@ -47,15 +47,6 @@
         <item>Dibujo</item>
         <item>Neón</item>
     </string-array>
-    <string-array name="widget_iso_hints">
-        <item>ISO automático</item>
-        <item>ISO reductor temblor</item>
-        <item>ISO 100</item>
-        <item>ISO 200</item>
-        <item>ISO 400</item>
-        <item>ISO 800</item>
-        <item>ISO 1600</item>
-    </string-array>
     <string-array name="widget_scenemode_hints">
         <item>Automático</item>
         <item>Reducción desenfoque movimiento</item>

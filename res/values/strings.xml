@@ -119,4 +119,13 @@
     <string name="showcase_panorama_body">Tap the shutter to start your panorama,\nthen pan what you want to capture.\nOnce done, tap the shutter button again.</string>
     <string name="showcase_picsphere_title">PicSphere mode</string>
     <string name="showcase_picsphere_body">Align your first picture where you like,\nthen tap the shutter to take each picture\nof the sphere. The blue dots are points\nof reference you can follow.\nLong-press the shutter once you\'re done.</string>
+
+    <!-- ISO Value Hints -->
+    <string name="iso_hint_auto">Automatic ISO</string>
+    <string name="iso_hint_hjr">Hands-Jitter Reduction ISO</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
 </resources>

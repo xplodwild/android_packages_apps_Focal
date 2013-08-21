@@ -48,16 +48,6 @@
         <item>Neon</item>
     </string-array>
 
-    <string-array name="widget_iso_hints">
-        <item>Automatisch</item>
-        <item>Bildstabilisierung</item>
-        <item>ISO 100</item>
-        <item>ISO 200</item>
-        <item>ISO 400</item>
-        <item>ISO 800</item>
-        <item>ISO 1600</item>
-    </string-array>
-
     <string-array name="widget_scenemode_hints">
         <item>Automatisch</item>
         <item>Bewegungsunschärfe-Reduktion</item>

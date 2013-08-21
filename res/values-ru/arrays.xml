@@ -39,15 +39,6 @@
         <item>Рисунок</item>
         <item>Неон</item>
     </string-array>
-    <string-array name="widget_iso_hints">
-        <item>Авто ISO</item>
-        <item>HJR ISO</item>
-        <item>100 ISO</item>
-        <item>200 ISO</item>
-        <item>400 ISO</item>
-        <item>800 ISO</item>
-        <item>1600 ISO</item>
-    </string-array>
     <string-array name="widget_scenemode_hints">
         <item>Автоматически</item>
         <item>Устранение размытого движения</item>

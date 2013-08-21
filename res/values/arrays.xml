@@ -126,14 +126,14 @@
         <item>@drawable/ic_widget_iso_1600</item>
     </array>
 
-    <string-array name="widget_iso_hints">
-        <item>Automatic ISO</item>
-        <item>Hands-Jitter Reduction ISO</item>
-        <item>100 ISO</item>
-        <item>200 ISO</item>
-        <item>400 ISO</item>
-        <item>800 ISO</item>
-        <item>1600 ISO</item>
+    <string-array name="widget_iso_hints" translatable="false">
+        <item>@string/iso_hint_auto</item>
+        <item>@string/iso_hint_hjr</item>
+        <item>@string/iso_hint_100</item>
+        <item>@string/iso_hint_200</item>
+        <item>@string/iso_hint_400</item>
+        <item>@string/iso_hint_800</item>
+        <item>@string/iso_hint_1600</item>
     </string-array>
 
     <!-- Scene Mode widget values -->

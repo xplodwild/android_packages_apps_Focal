@@ -47,15 +47,6 @@
         <item>Σκίτσο</item>
         <item>Neon</item>
     </string-array>
-    <string-array name="widget_iso_hints">
-        <item>Αυτόματο ISO</item>
-        <item>ISO μείωσης κουνήματος χεριού</item>
-        <item>ISO 100</item>
-        <item>ISO 200</item>
-        <item>ISO 400</item>
-        <item>ISO 800</item>
-        <item>ISO 1600</item>
-    </string-array>
     <string-array name="widget_scenemode_hints">
         <item>Αυτόματη</item>
         <item>Μείωση motion blur</item>

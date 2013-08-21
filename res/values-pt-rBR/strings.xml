@@ -82,6 +82,9 @@
     <string name="picsphere_failed_details">Certifique que as fotos somente sobrepõe nas bordas.</string>
     <string name="picsphere_need_two_pics">Você precisa de pelo menos duas fotos.</string>
     <string name="picsphere_step_preparing">Preparando\u2026</string>
+    <string name="picsphere_step_ptogen">Gerando metadados\u2026</string>
+    <string name="picsphere_step_ptovar">Gravando orientação da câmera\u2026</string>
+    <string name="picsphere_step_cpfind">Buscando pontos de controle\u2026</string>
     <string name="picsphere_step_autooptimiser">Alinhando imagens\u2026</string>
     <string name="picsphere_step_ptclean">Limpando pontos\u2026</string>
     <string name="picsphere_step_panomodify">Cortando áreas vazias\u2026</string>
@@ -98,7 +101,11 @@
     <string name="showcase_panorama_body">Toque o botão de disparo para iniciar seu panorama.\nentão desloque para onde você deseja capturar.\nAo terminar, toque no disparador de novo.</string>
     <string name="showcase_picsphere_title">Modo FotoEspera</string>
     <string name="showcase_picsphere_body">Alinhe sua primeira foto onde você desejar,\n então toque no disparador para tirar cada foto\nda esfera. Os pontos azuis são pontos\nde referência que você pode seguir.\nPressione o disparador quando você terminar.</string>
-    <string name="picsphere_step_ptogen">Gerando metadados\u2026</string>
-    <string name="picsphere_step_ptovar">Gravando orientação da câmera\u2026</string>
-    <string name="picsphere_step_cpfind">Buscando pontos de controle\u2026</string>
+    <string name="iso_hint_auto">ISO Automático</string>
+    <string name="iso_hint_hjr">ISO Redução de Vibração</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
 </resources>

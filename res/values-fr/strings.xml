@@ -102,4 +102,11 @@
     <string name="showcase_panorama_body">Appuyez sur le déclencheur pour démarrer,\npuis orientez simplement le téléphone.\nUne fois fini, appuyez de nouveau sur le déclencheur.</string>
     <string name="showcase_picsphere_title">Mode PicSphere</string>
     <string name="showcase_picsphere_body">Prenez la première photo où vous le souhaitez,\npuis chaque photo de votre sphère.\nVous pouvez utiliser les points bleus\ncomme point de repère idéal.\nMaintenez appuyé le déclencheur pour finir.</string>
+    <string name="iso_hint_auto">ISO automatique</string>
+    <string name="iso_hint_hjr">ISO réduction du tremblement</string>
+    <string name="iso_hint_100">ISO 100</string>
+    <string name="iso_hint_200">ISO 200</string>
+    <string name="iso_hint_400">ISO 400</string>
+    <string name="iso_hint_800">ISO 800</string>
+    <string name="iso_hint_1600">ISO 1600</string>
 </resources>

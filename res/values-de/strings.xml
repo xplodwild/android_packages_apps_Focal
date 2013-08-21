@@ -102,4 +102,11 @@
     <string name="showcase_panorama_body">Drücken Sie den Auslöser, um ein Panorama zu beginnen und schwenken Sie Ihr Gerät für die Aufnahme.\nWenn Sie fertig sind, drücken Sie den Auslöser erneut.</string>
     <string name="showcase_picsphere_title">PicSphere-Modus</string>
     <string name="showcase_picsphere_body">Richten Sie das erste Bild aus. Danach drücken Sie für jedes Bild der PicSphere einmal den Auslöser. Die blauen Punkte dienen als Referenz.\nDrücken Sie den Auslöser lange, um die Aufnahme abzuschließen.</string>
+    <string name="iso_hint_auto">Automatisch</string>
+    <string name="iso_hint_hjr">Bildstabilisierung</string>
+    <string name="iso_hint_100">ISO 100</string>
+    <string name="iso_hint_200">ISO 200</string>
+    <string name="iso_hint_400">ISO 400</string>
+    <string name="iso_hint_800">ISO 800</string>
+    <string name="iso_hint_1600">ISO 1600</string>
 </resources>

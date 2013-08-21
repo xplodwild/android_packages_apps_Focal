@@ -99,4 +99,11 @@
     <string name="showcase_panorama_body">Ťuknutím na tlačidlo spúšte spustíte vašu panorámu,\npotom posúvajte na to, čo chcete zachytiť.\nNa dokončenie ťuknite znovu na tlačidlo spúšte.</string>
     <string name="showcase_picsphere_title">Režim PicSphere</string>
     <string name="showcase_picsphere_body">Zarovnajte vašu prvú snímku podľa potreby,\npotom ťuknite na spúšť na zachytenie každej snímky\nsféry. Modré bodky sú referenčné\nbody, ktoré môžete nasledovať.\nDlhším stlačením spúšte dokončíte sféru.</string>
+    <string name="iso_hint_auto">Automatické ISO</string>
+    <string name="iso_hint_hjr">ISO odstraňujúce chvenie rúk</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
 </resources>

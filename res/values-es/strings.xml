@@ -102,4 +102,11 @@
     <string name="showcase_panorama_body">Toca sobre el disparador para iniciar la foto panorámica\ny desplaza lentamente la cámara sobre lo que deseas capturar.\nPara terminar, toca sobre el disparador nuevamente.</string>
     <string name="showcase_picsphere_title">PicSphere</string>
     <string name="showcase_picsphere_body">Toca sobre el disparador para tomar la primera imagen.\nAhora, toca sucesivamente el disparador en cada uno de los\npuntos azules que aparecerán como referencia, para ir\ncomponiendo la foto PicSphere.\nUn toque largo sobre el disparador finalizará el proceso.</string>
+    <string name="iso_hint_auto">ISO automático</string>
+    <string name="iso_hint_hjr">ISO reductor temblor</string>
+    <string name="iso_hint_100">ISO 100</string>
+    <string name="iso_hint_200">ISO 200</string>
+    <string name="iso_hint_400">ISO 400</string>
+    <string name="iso_hint_800">ISO 800</string>
+    <string name="iso_hint_1600">ISO 1600</string>
 </resources>

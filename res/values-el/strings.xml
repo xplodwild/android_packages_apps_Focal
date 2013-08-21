@@ -102,4 +102,11 @@
     <string name="showcase_panorama_body">Πιέστε το πλήκτρο κλείστρου για να ξεκινήσετε το\nπανόραμα και επιλέξτε τι θέλετε να καταγράψετε.\nΜόλις τελειώσετε, πιέστε ξανά το πλήκτρο κλείστρου.</string>
     <string name="showcase_picsphere_title">Λειτουργία PicSphere</string>
     <string name="showcase_picsphere_body">Ευθυγραμμίστε την πρώτη εικόνα όπου σας αρέσει\nκαι μετά πιέστε το πλήκτρο κλείστρου για να τραβήξετε\nκάθε φωτογραφία του sphere. Οι μπλε τελείες είναι\nσημεία αναφοράς που μπορείτε να ακολουθήσετε.\nΜόλις τελειώσετε, πιέστε παρατεταμένα το πλήκτρο κλείστρου.</string>
+    <string name="iso_hint_auto">Αυτόματο ISO</string>
+    <string name="iso_hint_hjr">ISO μείωσης κουνήματος χεριού</string>
+    <string name="iso_hint_100">ISO 100</string>
+    <string name="iso_hint_200">ISO 200</string>
+    <string name="iso_hint_400">ISO 400</string>
+    <string name="iso_hint_800">ISO 800</string>
+    <string name="iso_hint_1600">ISO 1600</string>
 </resources>

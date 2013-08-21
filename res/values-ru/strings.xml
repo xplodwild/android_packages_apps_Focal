@@ -98,4 +98,11 @@
     <string name="showcase_panorama_body">Нажмите на кнопку затвора для начала создания панорамы,\nа затем перемещайте камеру.\nДля завершения панорамы нажмите на кнопку затвора.</string>
     <string name="showcase_picsphere_title">Режим фотосферы</string>
     <string name="showcase_picsphere_body">Наведите объектив на  понравившееся место,\n затем делайте снимки фотосферы.\nСледуйте по направлению синих точек.\nДолгое нажатие кнопки затвора завершает создание фотосферы.</string>
+    <string name="iso_hint_auto">Авто ISO</string>
+    <string name="iso_hint_hjr">HJR ISO</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
 </resources>

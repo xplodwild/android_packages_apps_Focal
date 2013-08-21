@@ -46,15 +46,6 @@
         <item>Rascunho</item>
         <item>Néon</item>
     </string-array>
-    <string-array name="widget_iso_hints">
-        <item>ISO Automático</item>
-        <item>ISO Redução de Vibração</item>
-        <item>100 ISO</item>
-        <item>200 ISO</item>
-        <item>400 ISO</item>
-        <item>800 ISO</item>
-        <item>1600 ISO</item>
-    </string-array>
     <string-array name="widget_scenemode_hints">
         <item>Automático</item>
         <item>Redução de Desfocagem</item>

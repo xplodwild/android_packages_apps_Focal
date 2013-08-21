@@ -99,4 +99,11 @@
     <string name="showcase_panorama_body">Tryk på udløserknappen for at starte din panorama,\nog panorér derefter til det, du vil indfange.\nTryk på udløserknappen igen, når du er færdig.</string>
     <string name="showcase_picsphere_title">Tilstanden BilledBoble</string>
     <string name="showcase_picsphere_body">Justér dit første billede, hvor du vil,\nog tryk derefter på udløserknappen for at tage hvert billde\ni boblen. De blå prikker er reference-\npunkter, som du kan følge.\nHold udløserknappen nede længe, når du er færdig.</string>
+    <string name="iso_hint_auto">Automatisk ISO</string>
+    <string name="iso_hint_hjr">Hands-Jitter Reduction ISO</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
 </resources>
