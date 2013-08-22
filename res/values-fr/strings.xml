@@ -82,7 +82,6 @@
     <string name="picsphere_failed_details">Les images ne doivent se superposer que sur les bords.</string>
     <string name="picsphere_need_two_pics">Deux images minimum sont requises.</string>
     <string name="picsphere_step_preparing">Préparation\u2026</string>
-    <string name="picsphere_step_autopano">Établissement de la correspondance\u2026</string>
     <string name="picsphere_step_autooptimiser">Optimisation des correspondances\u2026</string>
     <string name="picsphere_step_ptclean">Nettoyage des points\u2026</string>
     <string name="picsphere_step_panomodify">Rognage des coins\u2026</string>

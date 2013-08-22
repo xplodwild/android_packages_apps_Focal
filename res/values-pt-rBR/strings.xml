@@ -82,7 +82,6 @@
     <string name="picsphere_failed_details">Certifique que as fotos somente sobrepõe nas bordas.</string>
     <string name="picsphere_need_two_pics">Você precisa de pelo menos duas fotos.</string>
     <string name="picsphere_step_preparing">Preparando\u2026</string>
-    <string name="picsphere_step_autopano">Associando as fotos\u2026</string>
     <string name="picsphere_step_autooptimiser">Optimizando associações\u2026</string>
     <string name="picsphere_step_ptclean">Limpando pontos de associação\u2026</string>
     <string name="picsphere_step_panomodify">Cortando áreas vazias\u2026</string>

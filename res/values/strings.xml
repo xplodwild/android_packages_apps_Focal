@@ -96,9 +96,11 @@
     <string name="picsphere_failed_details">Make sure pictures only overlap on their edges.</string>
     <string name="picsphere_need_two_pics">You need at least two pictures.</string>
     <string name="picsphere_step_preparing">Preparing\u2026</string>
-    <string name="picsphere_step_autopano">Matching pictures\u2026</string>
-    <string name="picsphere_step_autooptimiser">Optimizing matches\u2026</string>
-    <string name="picsphere_step_ptclean">Cleaning matching points\u2026</string>
+    <string name="picsphere_step_ptogen">Generating metadata\u2026</string>
+    <string name="picsphere_step_ptovar">Writing camera orientation\u2026</string>
+    <string name="picsphere_step_cpfind">Finding control points\u2026</string>
+    <string name="picsphere_step_autooptimiser">Aligning images\u2026</string>
+    <string name="picsphere_step_ptclean">Cleaning points\u2026</string>
     <string name="picsphere_step_panomodify">Cropping empty areas\u2026</string>
     <string name="picsphere_step_nona">Stitching pictures\u2026</string>
     <string name="picsphere_step_enblend">Blending pictures\u2026</string>

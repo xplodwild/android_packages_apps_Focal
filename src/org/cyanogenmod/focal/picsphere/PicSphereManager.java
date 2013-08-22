@@ -206,8 +206,8 @@ public class PicSphereManager implements PicSphere.ProgressListener {
     private boolean copyBinaries() {
         try {
             String files[] = {
-                    "autooptimiser", "autopano", "celeste", "enblend", "enfuse", "nona", "pano_modify",
-                    "ptclean", "tiffinfo", "align_image_stack",
+                    "autooptimiser", "pto_gen", "cpfind", "celeste", "multiblend", "enfuse", "nona", "pano_modify",
+                    "ptclean", "tiffinfo", "align_image_stack", "pto_var",
                     "libexiv2.so", "libglib-2.0.so", "libgmodule-2.0.so", "libgobject-2.0.so",
                     "libgthread-2.0.so", "libjpeg.so", "libpano13.so", "libtiff.so", "libtiffdecoder.so",
                     "libvigraimpex.so"

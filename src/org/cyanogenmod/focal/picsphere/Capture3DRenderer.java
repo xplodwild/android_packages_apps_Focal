@@ -581,6 +581,17 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         mViewMatrix = mCameraQuat.getConjugate().getMatrix();
     }
 
+    public Vector3 getAngleAsVector() {
+        float[] orientation = mSensorFusion.getFusedOrientation();
+
+        // Convert angles to degrees
+        float rX = (float) (orientation[0] * 180.0f/Math.PI);
+        float rY = (float) (orientation[1] * 180.0f/Math.PI);
+        float rZ = (float) (orientation[2] * 180.0f/Math.PI);
+
+        return new Vector3(rX, rY, rZ);
+    }
+
     /**
      * Helper function to compile a shader.
      *

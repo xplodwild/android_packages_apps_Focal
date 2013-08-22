@@ -28,6 +28,7 @@ LOCAL_PACKAGE_NAME := Focal
 LOCAL_REQUIRED_MODULES := \
 	libjni_mosaic2 \
 	libxmphelper_jni \
+	libpopen_helper_jni \
 	libexiv2 \
 	libglib-2.0 \
 	libgmodule-2.0 \

@@ -83,7 +83,6 @@
     <string name="picsphere_failed_details">Asegúrate de que las imágenes solo se solapan en sus bordes.</string>
     <string name="picsphere_need_two_pics">Necesitas al menos dos imágenes.</string>
     <string name="picsphere_step_preparing">Preparando\u2026</string>
-    <string name="picsphere_step_autopano">Buscando coincidencias\u2026</string>
     <string name="picsphere_step_autooptimiser">Optimizando coincidencias\u2026</string>
     <string name="picsphere_step_ptclean">Limpiando zonas coincidentes\u2026</string>
     <string name="picsphere_step_panomodify">Recortando áreas vacías\u2026</string>

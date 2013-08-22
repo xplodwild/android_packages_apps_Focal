@@ -27,9 +27,6 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.hardware.Camera;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,7 +44,6 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,7 +57,6 @@ import org.cyanogenmod.focal.ui.ExposureHudRing;
 import org.cyanogenmod.focal.ui.FocusHudRing;
 import org.cyanogenmod.focal.ui.Notifier;
 import org.cyanogenmod.focal.ui.PanoProgressBar;
-import org.cyanogenmod.focal.ui.PreviewFrameLayout;
 import org.cyanogenmod.focal.ui.ReviewDrawer;
 import org.cyanogenmod.focal.ui.SavePinger;
 import org.cyanogenmod.focal.ui.ShutterButton;
@@ -503,7 +498,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         setViewRotation(mPanoProgressBar, mOrientationCompensation);
         setViewRotation(mPicSphereUndo, mOrientationCompensation);
         setViewRotation(mHelperText, mOrientationCompensation);
-        mCamManager.setOrientation(mOrientationCompensation);
         mNotifier.notifyOrientationChanged(mOrientationCompensation);
         mSideBar.notifyOrientationChanged(mOrientationCompensation);
         mWidgetRenderer.notifyOrientationChanged(mOrientationCompensation);
@@ -1266,6 +1260,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                 return;
             }
             mOrientation = Util.roundOrientation(orientation, mOrientation);
+
+            // Notify camera of the raw orientation
+            mCamManager.setOrientation(mOrientation);
 
             // Adjust orientationCompensation for the native orientation of the device.
             Configuration config = getResources().getConfiguration();

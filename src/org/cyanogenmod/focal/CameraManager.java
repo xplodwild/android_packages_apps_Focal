@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -565,6 +564,8 @@ public class CameraManager {
      * @param orientation The orientation, in degrees
      */
     public void setOrientation(int orientation) {
+        if (mOrientation == orientation) return;
+
         mOrientation = orientation;
 
         // Rotate the pictures accordingly (display is kept at 90 degrees)
@@ -646,12 +647,12 @@ public class CameraManager {
                     }
 
                     if (mode == CameraActivity.CAMERA_MODE_PICSPHERE) {
-                        // If we are in PicSphere mode, set pic size to 640x480 to avoid using
-                        // all the phone's resources when rendering, as well as not take 15 min
-                        // to render. This value can be changed in the settings widget once
-                        // in PicSphere mode, so this value will be changed again when the
-                        // widget loads.
-                        params.setPictureSize(640, 480);
+                        // If we are in PicSphere mode, we look for a correct 4:3 resolution. We
+                        // default the preview size to 640x480 however, as we don't need anything
+                        // bigger than that. We prefer to have a smaller resolution in case our
+                        // recommended resolution isn't available, as it will be faster to render.
+                        Point size = Util.findBestPicSpherePictureSize(params.getSupportedPictureSizes(), true);
+                        params.setPictureSize(size.x, size.y);
                         params.setPreviewSize(640, 480);
 
                         // Set focus mode to infinity
