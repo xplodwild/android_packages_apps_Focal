@@ -83,7 +83,6 @@
     <string name="picsphere_failed_details">Kontrollera att bilderna endast överlappar vid kanterna.</string>
     <string name="picsphere_need_two_pics">Du behöver åtminstone två bilder.</string>
     <string name="picsphere_step_preparing">Förbereder\u2026</string>
-    <string name="picsphere_step_autopano">Matchar bilder\u2026</string>
     <string name="picsphere_step_autooptimiser">Optimerar matchningar\u2026</string>
     <string name="picsphere_step_ptclean">Rensar matchningspunkter\u2026</string>
     <string name="picsphere_step_panomodify">Beskär tomma områden\u2026</string>

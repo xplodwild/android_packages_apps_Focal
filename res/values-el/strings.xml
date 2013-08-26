@@ -83,7 +83,6 @@
     <string name="picsphere_failed_details">Βεβαιωθείτε ότι οι εικόνες επικαλύπτονται μόνο στις άκρες τους.</string>
     <string name="picsphere_need_two_pics">Χρειάζεστε τουλάχιστον δύο φωτογραφίες.</string>
     <string name="picsphere_step_preparing">Προετοιμασία\u2026</string>
-    <string name="picsphere_step_autopano">Ταίριαγμα εικόνων\u2026</string>
     <string name="picsphere_step_autooptimiser">Βελτίωση ταιριάγματος\u2026</string>
     <string name="picsphere_step_ptclean">Καθαρισμός σημείων ταιριάγματος\u2026</string>
     <string name="picsphere_step_panomodify">Περικόπή άδειων περιοχών\u2026</string>
