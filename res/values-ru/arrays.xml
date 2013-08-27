@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string-array name="widget_flash_hints">
+        <item>Авто</item>
+        <item>Выкл.</item>
+        <item>Вкл.</item>
+        <item>Фонарик</item>
+        <item>Удаление эфф. красных глаз</item>
+    </string-array>
+    <string-array name="widget_effects_hints">
+        <item>Выкл.</item>
+        <item>Ч/Б</item>
+        <item>Негатив</item>
+        <item>Соляризация</item>
+        <item>Сепия</item>
+        <item>Постеризация</item>
+        <item>Тёмная доска</item>
+        <item>Доска</item>
+        <item>Под водой</item>
+        <item>Рельеф</item>
+        <item>Рисунок</item>
+        <item>Неон</item>
+    </string-array>
+    <string-array name="widget_iso_hints">
+        <item>Авто ISO</item>
+        <item>HJR ISO</item>
+        <item>100 ISO</item>
+        <item>200 ISO</item>
+        <item>400 ISO</item>
+        <item>800 ISO</item>
+        <item>1600 ISO</item>
+    </string-array>
+    <string-array name="widget_scenemode_hints">
+        <item>Автоматически</item>
+        <item>Устранение размытого движения</item>
+        <item>Дополненная реальность</item>
+        <item>Лучший снимок</item>
+        <item>Ребёнок</item>
+        <item>Контровой свет</item>
+        <item>Портрет с контровым светом</item>
+        <item>Штрих-код</item>
+        <item>Пляж</item>
+        <item>Искусственный свет</item>
+        <item>Темнота</item>
+        <item>Еда</item>
+        <item>Документ</item>
+        <item>Фейерверк</item>
+        <item>Цветы</item>
+        <item>Сумерки</item>
+        <item>HDR</item>
+        <item>Высокая чувствительность</item>
+        <item>Пейзаж</item>
+        <item>Ночь</item>
+        <item>Портрет ночью</item>
+        <item>Портрет ночью</item>
+        <item>Вечеринка</item>
+        <item>Домашнее животное</item>
+        <item>Портрет</item>
+        <item>Снег</item>
+        <item>Мягкая кожа</item>
+        <item>Спорт</item>
+        <item>Освещение</item>
+        <item>Стабильный снимок</item>
+        <item>Закат</item>
+        <item>Sweep stitch</item>
+        <item>Театр</item>
+    </string-array>
+    <string-array name="widget_whitebalance_hints">
+        <item>Авто</item>
+        <item>Пасмурный день</item>
+        <item>Лампа накаливания</item>
+        <item>Лампа дн. света</item>
+        <item>Солнечный свет</item>
+        <item>Облачно</item>
+    </string-array>
+    <string-array name="widget_autoexposure_hints">
+        <item>Усреднённый</item>
+        <item>По центру кадра</item>
+        <item>Точечный замер</item>
+    </string-array>
+</resources>
