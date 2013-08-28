@@ -38,23 +38,40 @@ public class ShutterSpeedWidget extends WidgetBase {
     private static final String KEY_PARAMETER = "shutter-speed";
     private static final String KEY_MAX_PARAMETER = "sony-max-shutter-speed";
     private static final String KEY_MIN_PARAMETER = "sony-min-shutter-speed";
+    private static final String KEY_AUTO_VALUE = "auto";
 
     private WidgetOptionButton mMinusButton;
     private WidgetOptionButton mPlusButton;
+    private WidgetOptionButton mAutoButton;
     private WidgetOptionLabel mValueLabel;
 
 
     private class MinusClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            setShutterSpeedValue(Math.max(getShutterSpeedValue() - 1, getMinShutterSpeedValue()));
+            if (getShutterSpeedRawValue().equals(KEY_AUTO_VALUE)) {
+                setShutterSpeedValue(getMaxShutterSpeedValue());
+            } else {
+                setShutterSpeedValue(Math.max(getShutterSpeedValue() - 1, getMinShutterSpeedValue()));
+            }
         }
     }
 
     private class PlusClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            setShutterSpeedValue(Math.min(getShutterSpeedValue() + 1, getMaxShutterSpeedValue()));
+            if (getShutterSpeedRawValue().equals(KEY_AUTO_VALUE)) {
+                setShutterSpeedValue(getMinShutterSpeedValue());
+            } else {
+                setShutterSpeedValue(Math.min(getShutterSpeedValue() + 1, getMaxShutterSpeedValue()));
+            }
+        }
+    }
+
+    private class AutoClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            setAutoShutterSpeed();
         }
     }
 
@@ -64,16 +81,23 @@ public class ShutterSpeedWidget extends WidgetBase {
         // Add views in the widget
         mMinusButton = new WidgetOptionButton(R.drawable.ic_widget_timer_minus, context);
         mPlusButton = new WidgetOptionButton(R.drawable.ic_widget_timer_plus, context);
+        mAutoButton = new WidgetOptionButton(R.drawable.ic_widget_iso_auto, context);
         mValueLabel = new WidgetOptionLabel(context);
 
         mMinusButton.setOnClickListener(new MinusClickListener());
         mPlusButton.setOnClickListener(new PlusClickListener());
+        mAutoButton.setOnClickListener(new AutoClickListener());
 
         addViewToContainer(mMinusButton);
         addViewToContainer(mValueLabel);
         addViewToContainer(mPlusButton);
+        addViewToContainer(mAutoButton);
 
         mValueLabel.setText(getShutterSpeedDisplayValue(restoreValueFromStorage(KEY_PARAMETER)));
+        if ((restoreValueFromStorage(KEY_PARAMETER) != null) &&
+            (restoreValueFromStorage(KEY_PARAMETER).equals(KEY_AUTO_VALUE))) {
+            mAutoButton.setActiveDrawable(KEY_PARAMETER + ":" + KEY_AUTO_VALUE);
+        }
 
         getToggleButton().setHintText(R.string.widget_shutter_speed);
     }
@@ -84,7 +108,20 @@ public class ShutterSpeedWidget extends WidgetBase {
     }
 
     public int getShutterSpeedValue() {
-        return Integer.parseInt(mCamManager.getParameters().get(KEY_PARAMETER));
+        int retVal = 0;
+        String val = mCamManager.getParameters().get(KEY_PARAMETER);
+        if (val.equals(KEY_AUTO_VALUE) ){
+            retVal = getMaxShutterSpeedValue() + 1;
+        }
+        else {
+            retVal = Integer.parseInt(mCamManager.getParameters().get(KEY_PARAMETER));
+        }
+        return retVal;
+    }
+
+    public String getShutterSpeedRawValue() {
+        String val = mCamManager.getParameters().get(KEY_PARAMETER);
+        return val;
     }
 
     public int getMinShutterSpeedValue() {
@@ -97,20 +134,29 @@ public class ShutterSpeedWidget extends WidgetBase {
 
     public void setShutterSpeedValue(int value) {
         String valueStr = Integer.toString(value);
-
         mCamManager.setParameterAsync(KEY_PARAMETER, valueStr);
         SettingsStorage.storeCameraSetting(mWidget.getContext(), mCamManager.getCurrentFacing(),
                 KEY_PARAMETER, valueStr);
         mValueLabel.setText(getShutterSpeedDisplayValue(valueStr));
+        mAutoButton.resetImage();
     }
+
+    public void setAutoShutterSpeed() {
+        mCamManager.setParameterAsync(KEY_PARAMETER, KEY_AUTO_VALUE);
+        SettingsStorage.storeCameraSetting(mWidget.getContext(), mCamManager.getCurrentFacing(),
+                KEY_PARAMETER, "auto");
+        mValueLabel.setText(getShutterSpeedDisplayValue(KEY_AUTO_VALUE));
+        mAutoButton.setActiveDrawable(KEY_PARAMETER + ":" + KEY_AUTO_VALUE);
+    }
+
 
     public String getShutterSpeedDisplayValue(String value) {
         String[] values = mWidget.getContext().getResources().getStringArray(
                 R.array.widget_shutter_speed_display_values);
-        if (value == null || value.equals("auto")) {
-           return values[0];
+        if (value == null || value.equals(KEY_AUTO_VALUE)) {
+            return values[0];
         } else {
-           return values[Integer.parseInt(value) + 1];
+            return values[Integer.parseInt(value) + 1];
         }
     }
 }
