@@ -56,7 +56,7 @@ public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListene
         addViewToContainer(mBtnOff);
 
         mPreviousMode = mBtnOff;
-        mPreviousMode.setActiveDrawable(DRAWABLE_TAG+"=off");
+        mPreviousMode.activeImage(DRAWABLE_TAG + "=off");
 
         mTransformer = new SoftwareHdrCapture(mContext);
 
@@ -94,12 +94,12 @@ public class SoftwareHdrWidget extends WidgetBase implements View.OnClickListene
     public void onClick(View view) {
         if (view == mBtnOn) {
             mPreviousMode.resetImage();
-            mBtnOn.setActiveDrawable(DRAWABLE_TAG + "=on");
+            mBtnOn.activeImage(DRAWABLE_TAG + "=on");
             mPreviousMode = mBtnOn;
             mContext.setCaptureTransformer(mTransformer);
         } else if (view == mBtnOff) {
             mPreviousMode.resetImage();
-            mBtnOff.setActiveDrawable(DRAWABLE_TAG+"=off");
+            mBtnOff.activeImage(DRAWABLE_TAG + "=off");
             mPreviousMode = mBtnOff;
             mContext.setCaptureTransformer(null);
         }

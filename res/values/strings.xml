@@ -60,21 +60,21 @@
     <string name="widget_settings_autoenhance">Auto-enhancement</string>
     <string name="widget_settings_ruleofthirds">Rule of Thirds</string>
 
-    <string name="widget_autoexposure">Exposure measure mode</string>
+    <string name="widget_autoexposure">Light measure</string>
     <string name="widget_burstmode">Burst mode</string>
-    <string name="widget_effect">Color effects</string>
-    <string name="widget_enhancements">Color enhancements</string>
-    <string name="widget_exposure_compensation">Exposure compensation</string>
-    <string name="widget_flash">Flash mode</string>
+    <string name="widget_effect">Effects</string>
+    <string name="widget_enhancements">Color adjust.</string>
+    <string name="widget_exposure_compensation">Exposure comp.</string>
+    <string name="widget_flash">Flash</string>
     <string name="widget_hdr">High Dynamic Range</string>
-    <string name="widget_iso">ISO Sensitivity</string>
-    <string name="widget_scenemode">Scene Mode</string>
+    <string name="widget_iso">ISO</string>
+    <string name="widget_scenemode">Scene mode</string>
     <string name="widget_settings">Settings</string>
-    <string name="widget_shutter_speed">Shutter Speed</string>
+    <string name="widget_shutter_speed">Shutter speed</string>
     <string name="widget_skintone">Skin Tone Enhancement</string>
     <string name="widget_softwarehdr">High Dynamic Range</string>
     <string name="widget_timermode">Timer mode</string>
-    <string name="widget_videofr">Video Framerate</string>
+    <string name="widget_videofr">Video framerate</string>
     <string name="widget_videohdr">Video High Dynamic Range</string>
     <string name="widget_whitebalance">White balance</string>
 

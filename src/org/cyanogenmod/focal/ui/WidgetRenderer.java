@@ -27,6 +27,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 
 import org.cyanogenmod.focal.R;
+import org.cyanogenmod.focal.Util;
 import org.cyanogenmod.focal.widgets.WidgetBase;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import java.util.List;
 public class WidgetRenderer extends FrameLayout {
     public final static String TAG = "WidgetRenderer";
 
-    private final static float WIDGETS_MARGIN = 80.0f;
+    private static float WIDGETS_MARGIN;
 
     private List<WidgetBase.WidgetContainer> mOpenWidgets;
     private float mTotalHeight;
@@ -61,6 +62,7 @@ public class WidgetRenderer extends FrameLayout {
 
     private void initialize() {
         mOpenWidgets = new ArrayList<WidgetBase.WidgetContainer>();
+        WIDGETS_MARGIN = Util.dpToPx(getContext(), 32);
         mTotalHeight = WIDGETS_MARGIN;
         mSpacing = getResources().getDimension(R.dimen.widget_spacing);
     }
@@ -166,9 +168,11 @@ public class WidgetRenderer extends FrameLayout {
         widget.notifyOrientationChanged(mOrientation, true);
 
         // Position it properly
-        widget.forceFinalY(mTotalHeight - WIDGETS_MARGIN);
-        widget.setY(mTotalHeight - WIDGETS_MARGIN);
+        float finalY = mTotalHeight;
+        widget.setYSmooth(finalY);
         mTotalHeight += widget.getMeasuredHeight() + mSpacing;
+
+        reorderWidgets(null);
     }
 
     /**
@@ -178,6 +182,7 @@ public class WidgetRenderer extends FrameLayout {
      * @param widget Widget closed
      */
     public void widgetClosed(WidgetBase.WidgetContainer widget) {
+        widget.setYSmooth(widget.getFinalY() - Util.dpToPx(getContext(), 8));
         mOpenWidgets.remove(widget);
 
         // Reposition all the widgets

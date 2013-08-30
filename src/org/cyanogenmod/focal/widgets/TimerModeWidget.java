@@ -87,7 +87,7 @@ public class TimerModeWidget extends WidgetBase implements View.OnClickListener 
     private void turnOn() {
         if (!mIsEnabled || mTransformer.getTimer() == TimerCapture.VOICE_TIMER_VALUE) {
             mCameraActivity.setCaptureTransformer(mTransformer);
-            mBtnToggle.setActiveDrawable(DRAWABLE_TAG + "=on");
+            mBtnToggle.activeImage(DRAWABLE_TAG + "=on");
             mIsEnabled = true;
 
             if (mTransformer.getTimer() == TimerCapture.VOICE_TIMER_VALUE) {
@@ -135,7 +135,7 @@ public class TimerModeWidget extends WidgetBase implements View.OnClickListener 
 
             mTransformer.setTimer(TimerCapture.VOICE_TIMER_VALUE);
             mCameraActivity.setCaptureTransformer(mTransformer);
-            mBtnVoice.setActiveDrawable(DRAWABLE_TAG+"=voice");
+            mBtnVoice.activeImage(DRAWABLE_TAG + "=voice");
             mIsEnabled = true;
         }
     }

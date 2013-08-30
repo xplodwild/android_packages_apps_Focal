@@ -75,7 +75,7 @@ public class BurstModeWidget extends WidgetBase implements View.OnClickListener 
         mBtnInf.setOnClickListener(this);
 
         mPreviousMode = mBtnOff;
-        mPreviousMode.setActiveDrawable(DRAWABLE_TAG+"=off");
+        mPreviousMode.activeImage(DRAWABLE_TAG + "=off");
 
         mTransformer = new BurstCapture(activity);
     }
@@ -97,28 +97,28 @@ public class BurstModeWidget extends WidgetBase implements View.OnClickListener 
         if (view == mBtnOff) {
             // Disable the transformer
             mCameraActivity.setCaptureTransformer(null);
-            mBtnOff.setActiveDrawable(DRAWABLE_TAG+"=off");
+            mBtnOff.activeImage(DRAWABLE_TAG + "=off");
             mPreviousMode = mBtnOff;
         } else if (view == mBtn5) {
             mTransformer.setBurstCount(5);
             mCameraActivity.setCaptureTransformer(mTransformer);
-            mBtn5.setActiveDrawable(DRAWABLE_TAG+"=5");
+            mBtn5.activeImage(DRAWABLE_TAG + "=5");
             mPreviousMode = mBtn5;
         } else if (view == mBtn10) {
             mTransformer.setBurstCount(10);
             mCameraActivity.setCaptureTransformer(mTransformer);
-            mBtn10.setActiveDrawable(DRAWABLE_TAG+"=10");
+            mBtn10.activeImage(DRAWABLE_TAG + "=10");
             mPreviousMode = mBtn10;
         } else if (view == mBtn15) {
             mTransformer.setBurstCount(15);
             mCameraActivity.setCaptureTransformer(mTransformer);
-            mBtn15.setActiveDrawable(DRAWABLE_TAG+"=15");
+            mBtn15.activeImage(DRAWABLE_TAG + "=15");
             mPreviousMode = mBtn15;
         } else if (view == mBtnInf) {
             // Infinite burst count
             mTransformer.setBurstCount(0);
             mCameraActivity.setCaptureTransformer(mTransformer);
-            mBtnInf.setActiveDrawable(DRAWABLE_TAG+"=inf");
+            mBtnInf.activeImage(DRAWABLE_TAG + "=inf");
             mPreviousMode = mBtnInf;
         }
     }

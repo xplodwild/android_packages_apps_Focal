@@ -22,17 +22,23 @@ package org.cyanogenmod.focal.widgets;
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -44,7 +50,6 @@ import org.cyanogenmod.focal.R;
 import org.cyanogenmod.focal.SettingsStorage;
 import org.cyanogenmod.focal.Util;
 import org.cyanogenmod.focal.ui.CenteredSeekBar;
-import org.cyanogenmod.focal.ui.SideBar;
 import org.cyanogenmod.focal.ui.WidgetRenderer;
 
 /**
@@ -55,29 +60,40 @@ public abstract class WidgetBase {
     public final static String TAG = "WidgetBase";
 
     protected CameraManager mCamManager;
-    private GestureDetector mGestureDetector;
     protected WidgetToggleButton mToggleButton;
+    protected WidgetToggleButton mShortcutButton;
     protected WidgetContainer mWidget;
     private int mWidgetMaxWidth;
     private boolean mIsOpen;
 
     private final static int WIDGET_FADE_DURATION_MS = 200;
-    private final static int WIDGET_ANIM_TRANSLATE = 80;
+    private final static float WIDGET_FADE_SCALE = 0.75f;
+
+
+
+    private class ToggleClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            if (isOpen()) {
+                WidgetBase.this.close();
+            } else {
+                WidgetBase.this.open();
+            }
+        }
+    }
 
     public WidgetBase(CameraManager cam, Context context, int iconResId) {
         mCamManager = cam;
         mWidget = new WidgetContainer(context);
         mToggleButton = new WidgetToggleButton(context);
-        mGestureDetector = new GestureDetector(context, new WidgetFlingGestureListener());
+        mShortcutButton = new WidgetToggleButton(context);
+        mShortcutButton.setShortcut(true);
         mIsOpen = false;
 
-        // Setup the container
-        mWidget.setColumnCount(0);
-        mWidget.setRowCount(1);
-        mWidget.setAlpha(0.0f);
-
         // Setup the toggle button
-        mToggleButton.setImageResource(iconResId);
+        mToggleButton.setCompoundDrawablesWithIntrinsicBounds(0, iconResId, 0, 0);
+        mShortcutButton.setCompoundDrawablesWithIntrinsicBounds(0, iconResId, 0, 0);
+        mWidget.setIconId(iconResId);
 
         mWidgetMaxWidth = context.getResources().getInteger(R.integer.widget_default_max_width);
 
@@ -103,16 +119,16 @@ public abstract class WidgetBase {
      * @param v The view to add
      */
     public void addViewToContainer(View v) {
-        if (mWidget.getRowCount() * mWidget.getColumnCount() < mWidget.getChildCount() + 1) {
-            if (mWidget.getColumnCount() == mWidgetMaxWidth) {
+        if (mWidget.getGrid().getRowCount() * mWidget.getGrid().getColumnCount() < mWidget.getGrid().getChildCount() + 1) {
+            if (mWidget.getGrid().getColumnCount() == mWidgetMaxWidth) {
                 // Add a new line instead of a column to fit the max width
-                mWidget.setRowCount(mWidget.getRowCount() + 1);
+                mWidget.getGrid().setRowCount(mWidget.getGrid().getRowCount() + 1);
             } else {
-                mWidget.setColumnCount(mWidget.getColumnCount() + 1);
+                mWidget.getGrid().setColumnCount(mWidget.getGrid().getColumnCount() + 1);
             }
         }
 
-        mWidget.addView(v);
+        mWidget.getGrid().addView(v);
     }
 
     /**
@@ -124,8 +140,8 @@ public abstract class WidgetBase {
      * @param column
      */
     public void forceGridSize(int row, int column) {
-        mWidget.setColumnCount(column);
-        mWidget.setRowCount(row);
+        mWidget.getGrid().setColumnCount(column);
+        mWidget.getGrid().setRowCount(row);
     }
 
     /**
@@ -138,26 +154,29 @@ public abstract class WidgetBase {
      */
     public void setViewAt(int row, int column, int rowSpan, int colSpan, View v) {
         // Do some safety checks first
-        if (mWidget.getRowCount() < row + rowSpan) {
-            mWidget.setRowCount(row + rowSpan);
+        if (mWidget.getGrid().getRowCount() < row + rowSpan) {
+            mWidget.getGrid().setRowCount(row + rowSpan);
         }
-        if (mWidget.getColumnCount() < column + colSpan) {
-            mWidget.setColumnCount(column + colSpan);
+        if (mWidget.getGrid().getColumnCount() < column + colSpan) {
+            mWidget.getGrid().setColumnCount(column + colSpan);
         }
 
-        mWidget.addView(v);
+        mWidget.getGrid().addView(v);
 
         GridLayout.LayoutParams layoutParams = (GridLayout.LayoutParams) v.getLayoutParams();
         layoutParams.columnSpec = GridLayout.spec(column, colSpan);
         layoutParams.rowSpec = GridLayout.spec(row, rowSpan);
         layoutParams.setGravity(Gravity.FILL);
-        layoutParams.width = colSpan * v.getResources().getDimensionPixelSize(
-                R.dimen.widget_option_button_size);
-        mWidget.setLayoutParams(layoutParams);
+        layoutParams.width = colSpan * v.getMinimumWidth();
+        v.setLayoutParams(layoutParams);
     }
 
     public WidgetToggleButton getToggleButton() {
         return mToggleButton;
+    }
+
+    public WidgetToggleButton getShortcutButton() {
+        return mShortcutButton;
     }
 
     public WidgetContainer getWidget() {
@@ -189,6 +208,10 @@ public abstract class WidgetBase {
         return currentValue;
     }
 
+    /**
+     * @param key The name of the parameter to get
+     * @return The parameter value, or null if it doesn't exist
+     */
     public String getCameraValue(String key) {
         Camera.Parameters params = mCamManager.getParameters();
         return params.get(key);
@@ -211,6 +234,8 @@ public abstract class WidgetBase {
     public void open() {
         WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
 
+        if (parent == null) return;
+
         mWidget.setVisibility(View.VISIBLE);
         mWidget.invalidate();
 
@@ -218,17 +243,32 @@ public abstract class WidgetBase {
 
         parent.widgetOpened(mWidget);
 
-        mWidget.animate().alpha(1.0f).translationYBy(WIDGET_ANIM_TRANSLATE)
+        // Set initial widget state
+        mWidget.setAlpha(0.0f);
+        mWidget.setScaleX(WIDGET_FADE_SCALE);
+        mWidget.setScaleY(WIDGET_FADE_SCALE);
+        mWidget.setX(0);
+
+        mWidget.setY(Util.dpToPx(mWidget.getContext(), 8));
+
+        mWidget.animate().alpha(1.0f).scaleX(1.0f).scaleY(1.0f)
                 .setDuration(WIDGET_FADE_DURATION_MS).start();
+
+        mShortcutButton.toggleBackground(true);
+        mToggleButton.toggleBackground(true);
     }
 
     public void close() {
         WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
-        parent.widgetClosed(mWidget);
+        if (parent != null) {
+            parent.widgetClosed(mWidget);
+        }
 
-        mWidget.animate().alpha(0.0f).translationYBy(-WIDGET_ANIM_TRANSLATE)
+        mWidget.animate().alpha(0.0f).scaleX(WIDGET_FADE_SCALE).scaleY(WIDGET_FADE_SCALE)
                 .setDuration(WIDGET_FADE_DURATION_MS).start();
 
+        mShortcutButton.toggleBackground(false);
+        mToggleButton.toggleBackground(false);
         mIsOpen = false;
     }
 
@@ -244,44 +284,62 @@ public abstract class WidgetBase {
      * Represents the button that toggles the widget, in the
      * side bar.
      */
-    public class WidgetToggleButton extends ImageView {
+    public class WidgetToggleButton extends Button {
         private float mDownX;
         private float mDownY;
         private boolean mCancelOpenOnDown;
         private String mHintText;
+        private boolean mIsShortcut = false;
 
         public WidgetToggleButton(Context context, AttributeSet attrs,
                                   int defStyle) {
-            super(context, attrs, defStyle);
+            super(context, attrs, android.R.style.Widget_DeviceDefault_Button_Borderless_Small);
             initialize();
         }
 
         public WidgetToggleButton(Context context, AttributeSet attrs) {
-            super(context, attrs);
+            super(context, attrs, android.R.style.Widget_DeviceDefault_Button_Borderless_Small);
             initialize();
         }
 
         public WidgetToggleButton(Context context) {
-            super(context);
+            super(context, null, android.R.style.Widget_DeviceDefault_Button_Borderless_Small);
             initialize();
         }
 
         private void initialize() {
+            Resources res = getResources();
+            if (res == null) return;
+
             this.setClickable(true);
 
-            int pad = getResources().getDimensionPixelSize(R.dimen.widget_toggle_button_padding);
+            int pad = res.getDimensionPixelSize(R.dimen.widget_toggle_button_padding);
             this.setPadding(pad, pad, pad, pad);
 
             this.setOnClickListener(new ToggleClickListener());
             this.setOnLongClickListener(new LongClickListener());
+
+            setTextSize(11);
+            setGravity(Gravity.CENTER);
+            setLines(2);
+
+            int pxSize = (int) Util.dpToPx(getContext(), 82);
+            setMaxWidth(pxSize);
+            setMinWidth(pxSize);
         }
 
         public void setHintText(String text) {
             mHintText = text;
+            if (!mIsShortcut) {
+                setText(text);
+            }
         }
 
         public void setHintText(int resId) {
             mHintText = getResources().getString(resId);
+            if (!mIsShortcut) {
+                setText(mHintText);
+            }
         }
 
         public String getHintText() {
@@ -299,13 +357,11 @@ public abstract class WidgetBase {
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             // to dispatch click / long click event, we do it first
-            boolean defaultResult;
             if (event.getActionMasked() == MotionEvent.ACTION_UP && mCancelOpenOnDown) {
                 toggleBackground(mIsOpen);
-                defaultResult = false;
                 return true;
             } else {
-                defaultResult = super.onTouchEvent(event);
+                super.onTouchEvent(event);
             }
 
             // Handle the background color on touch
@@ -328,6 +384,17 @@ public abstract class WidgetBase {
             return true;
         }
 
+        public void setShortcut(boolean b) {
+            mIsShortcut = b;
+            if (b) {
+                setText("");
+                int pxSize = (int) Util.dpToPx(getContext(), 72);
+                setMaxWidth(pxSize);
+                setMinWidth(pxSize);
+                setMaxHeight(pxSize / 2);
+            }
+        }
+
         private class LongClickListener implements OnLongClickListener {
             @Override
             public boolean onLongClick(View view) {
@@ -342,13 +409,7 @@ public abstract class WidgetBase {
             }
         }
 
-        private class ToggleClickListener implements OnClickListener {
-            @Override
-            public void onClick(View v) {
-                SideBar sb = (SideBar) WidgetToggleButton.this.getParent().getParent();
-                sb.toggleWidgetVisibility(WidgetBase.this, false);
-            }
-        }
+
     }
 
     /**
@@ -455,9 +516,14 @@ public abstract class WidgetBase {
         }
 
         private void initialize(int resId) {
-            setMinimumWidth(getResources().getDimensionPixelSize(
-                    R.dimen.widget_option_button_size));
-            int padding = getResources().getDimensionPixelSize(
+            Resources res = getResources();
+            if (res == null) return;
+
+            setMinimumWidth(res.getDimensionPixelSize(
+                    R.dimen.widget_option_button_size) / 2);
+            setMaxWidth(getMinimumWidth());
+
+            int padding = res.getDimensionPixelSize(
                     R.dimen.widget_option_button_padding);
             setPadding(padding, padding, padding, padding);
             setImageResource(resId);
@@ -480,81 +546,79 @@ public abstract class WidgetBase {
      * Note that you're not forced to use exclusively buttons,
      * TextViews through WidgetOptionLabel can also be added (for Timer for instance)
      */
-    public class WidgetOptionButton extends ImageView implements WidgetOption,
+    public class WidgetOptionButton extends Button implements WidgetOption,
             View.OnLongClickListener {
         private float mTouchOffset = 0.0f;
-        private int mOriginalResource;
+        private BitmapDrawable mOriginalDrawable;
         private String mHintText;
+
 
         public WidgetOptionButton(int resId, Context context, AttributeSet attrs,
                                   int defStyle) {
-            super(context, attrs, defStyle);
+            super(context, attrs, android.R.style.Widget_DeviceDefault_Button_Borderless_Small);
             initialize(resId);
         }
 
         public WidgetOptionButton(int resId, Context context, AttributeSet attrs) {
-            super(context, attrs);
+            super(context, attrs, android.R.style.Widget_DeviceDefault_Button_Borderless_Small);
             initialize(resId);
 
         }
 
         public WidgetOptionButton(int resId, Context context) {
-            super(context);
+            super(context, null, android.R.style.Widget_DeviceDefault_Button_Borderless_Small);
             initialize(resId);
         }
 
         public void resetImage() {
-            setImageResource(mOriginalResource);
+            this.setCompoundDrawablesRelativeWithIntrinsicBounds(null, mOriginalDrawable, null, null);
         }
 
         public void setHintText(String hint) {
             mHintText = hint;
+            this.setText(mHintText);
         }
 
         public void setHintText(int resId) {
-            mHintText = getResources().getString(resId);
+            Resources res = getResources();
+            if (res == null) return;
+
+            mHintText = res.getString(resId);
+            this.setText(mHintText);
         }
 
-        @Override
-        public boolean onTouchEvent(MotionEvent event) {
-            boolean handle = false;
+        public void activeImage(String key) {
+            Resources res = getResources();
+            if (res == null) return;
 
-            mGestureDetector.onTouchEvent(event);
-
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                handle = true;
-                mTouchOffset = mWidget.getY() - event.getRawY();
-                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
-                parent.widgetPressed(mWidget);
-                this.setBackgroundColor(getResources().getColor(R.color.widget_toggle_pressed));
-            } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
-                mWidget.setY(event.getRawY() + mTouchOffset);
-                parent.widgetMoved(mWidget);
-                mWidget.forceFinalY(getY());
-                handle = true;
-            } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
-                parent.widgetDropped(mWidget);
-                this.setBackgroundColor(0);
-            }
-
-            return (super.onTouchEvent(event) || handle);
-        }
-
-        public void setActiveDrawable(String key) {
-            setImageBitmap(BitmapFilter.getSingleton().getGlow(key,
-                    getContext().getResources().getColor(R.color.widget_option_active),
-                    ((BitmapDrawable) getDrawable()).getBitmap()));
+            this.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
+                    new BitmapDrawable(res,
+                            BitmapFilter.getSingleton().getGlow(key,
+                                    res.getColor(R.color.widget_option_active),
+                                    mOriginalDrawable.getBitmap())), null, null);
         }
 
         private void initialize(int resId) {
-            this.setImageResource(resId);
-            this.setClickable(true);
-            int padding = getResources().getDimensionPixelSize(
-                    R.dimen.widget_option_button_padding);
-            this.setPadding(padding, padding, padding, padding);
-            mOriginalResource = resId;
+            Resources res = getResources();
+            if (res == null) return;
+
+            mOriginalDrawable = (BitmapDrawable) res.getDrawable(resId);
+            this.setCompoundDrawablesRelativeWithIntrinsicBounds(null, mOriginalDrawable, null, null);
+            this.setGravity(Gravity.CENTER);
+            this.setSingleLine(true);
+            this.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+            this.setMarqueeRepeatLimit(-1);
+
+            int pxSize = (int) Util.dpToPx(getContext(), 64);
+            this.setMinimumWidth(pxSize);
+            this.setMinimumHeight(pxSize);
+            this.setMaxWidth(pxSize);
+            this.setMaxHeight(pxSize);
+            this.setSelected(true);
+            this.setFadingEdgeLength((int) Util.dpToPx(getContext(), 6));
+            this.setHorizontalFadingEdgeEnabled(true);
+
+            this.setTextSize(12);
             setOnLongClickListener(this);
         }
 
@@ -571,7 +635,7 @@ public abstract class WidgetBase {
         @Override
         public boolean onLongClick(View view) {
             if (mHintText != null && mHintText.length() > 0) {
-                CameraActivity.notify(mHintText, 2000, Util.dpToPx(getContext(), 8) 
+                CameraActivity.notify(mHintText, 2000, Util.dpToPx(getContext(), 8)
                         + getX() + mWidget.getX(), Util.dpToPx(getContext(), 32)
                         + Util.dpToPx(getContext(), 4) * mHintText.length());
                 return true;
@@ -597,12 +661,15 @@ public abstract class WidgetBase {
         }
 
         private void initialize() {
-            setMaxWidth(getResources().getDimensionPixelSize(
+            Resources res = getResources();
+            if (res == null) return;
+
+            setMaxWidth(res.getDimensionPixelSize(
                     R.dimen.widget_option_button_size) * 3);
-            setMaxHeight(getResources().getDimensionPixelSize(R.dimen.widget_option_button_size));
+            setMaxHeight(res.getDimensionPixelSize(R.dimen.widget_option_button_size));
 
             // Set padding
-            int pad = getResources().getDimensionPixelSize(R.dimen.widget_container_padding);
+            int pad = res.getDimensionPixelSize(R.dimen.widget_container_padding);
             this.setPadding(pad, pad, pad, pad);
         }
 
@@ -610,7 +677,10 @@ public abstract class WidgetBase {
         public void onFinishInflate() {
             super.onFinishInflate();
             GridLayout.LayoutParams params = (GridLayout.LayoutParams) this.getLayoutParams();
-            params.setGravity(Gravity.CENTER);
+
+            if (params != null) {
+                params.setGravity(Gravity.CENTER);
+            }
         }
 
         @Override
@@ -641,10 +711,13 @@ public abstract class WidgetBase {
         }
 
         private void initialize() {
+            Resources res = getResources();
+            if (res == null) return;
+
             // Set padding
-            int pad = getResources().getDimensionPixelSize(R.dimen.widget_container_padding) * 2;
+            int pad = res.getDimensionPixelSize(R.dimen.widget_container_padding) * 2;
             this.setPadding(pad, pad, pad, pad);
-            this.setMinimumHeight(getResources().getDimensionPixelSize(
+            this.setMinimumHeight(res.getDimensionPixelSize(
                     R.dimen.widget_option_button_size) * 3);
         }
 
@@ -652,8 +725,11 @@ public abstract class WidgetBase {
         public void onFinishInflate() {
             super.onFinishInflate();
             GridLayout.LayoutParams params = (GridLayout.LayoutParams) this.getLayoutParams();
-            params.setMargins(120, 120, 120, 120);
-            this.setLayoutParams(params);
+
+            if (params != null) {
+                params.setMargins(120, 120, 120, 120);
+                this.setLayoutParams(params);
+            }
         }
 
         @Override
@@ -670,9 +746,18 @@ public abstract class WidgetBase {
     /**
      * Represents the floating window of a widget.
      */
-    public class WidgetContainer extends GridLayout {
-        private float mTouchOffset = 0.0f;
+    public class WidgetContainer extends FrameLayout {
+        private float mTouchOffsetY = 0.0f;
+        private float mTouchOffsetX = 0.0f;
+        private float mTouchDownX = 0.0f;
+        private float mTouchDownY = 0.0f;
         private float mTargetY = 0.0f;
+        private ViewGroup mRootView;
+        private GridLayout mGridView;
+        private ImageView mWidgetIcon;
+        private Button mPinButton;
+        private ImageButton mResetButton;
+        private ViewPropertyAnimator mRootAnimator;
 
         public WidgetContainer(Context context, AttributeSet attrs,
                                int defStyle) {
@@ -697,8 +782,8 @@ public abstract class WidgetBase {
          */
         public void setYSmooth(float y) {
             if (mTargetY != y) {
-                this.animate().cancel();
-                this.animate().y(y).setDuration(100).start();
+                mRootAnimator.cancel();
+                mRootAnimator.y(y).setDuration(100).start();
                 mTargetY = y;
             }
         }
@@ -723,17 +808,29 @@ public abstract class WidgetBase {
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             boolean handle = false;
-            if (getAlpha() < 1) return false;
-
-            mGestureDetector.onTouchEvent(event);
+            if (getAlpha() == 0.0f) return false;
 
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 handle = true;
-                mTouchOffset = getY() - event.getRawY();
+                mTouchOffsetY = getY() - event.getRawY();
+                mTouchOffsetX = getX() - event.getRawX();
+                mTouchDownX = event.getRawX();
+                mTouchDownY = event.getRawY();
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 parent.widgetPressed(mWidget);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                setY(event.getRawY() + mTouchOffset);
+                float driftX = Math.abs(event.getRawX() - mTouchDownX);
+                float driftY = Math.abs(event.getRawY() - mTouchDownY);
+
+                if (driftX < driftY) {
+                    setX(0);
+                    setY(event.getRawY() + mTouchOffsetY);
+                } else {
+                    setY(mTargetY);
+                    setX(event.getRawX() + mTouchOffsetX);
+                }
+
+                setAlpha(1 - driftX / getWidth());
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 parent.widgetMoved(mWidget);
                 forceFinalY(getY());
@@ -741,6 +838,14 @@ public abstract class WidgetBase {
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 WidgetRenderer parent = (WidgetRenderer) mWidget.getParent();
                 parent.widgetDropped(mWidget);
+
+                if (event.getRawX() - mTouchDownX > getWidth() / 2) {
+                    animate().x(getWidth()).alpha(0).start();
+                    close();
+                    mToggleButton.toggleBackground(false);
+                } else {
+                    animate().x(0).alpha(1).start();
+                }
             }
 
             if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -756,46 +861,113 @@ public abstract class WidgetBase {
 
             FrameLayout.LayoutParams layoutParam =
                     (FrameLayout.LayoutParams) this.getLayoutParams();
-            layoutParam.width = FrameLayout.LayoutParams.WRAP_CONTENT;
-            layoutParam.height = FrameLayout.LayoutParams.WRAP_CONTENT;
+            if (layoutParam != null) {
+                layoutParam.width = FrameLayout.LayoutParams.WRAP_CONTENT;
+                layoutParam.height = FrameLayout.LayoutParams.WRAP_CONTENT;
+            }
         }
 
         private void initialize() {
-            this.setBackgroundColor(getResources().getColor(R.color.widget_background));
-            this.setColumnOrderPreserved(true);
+            Context context = getContext();
+            if (context == null) {
+                Log.e(TAG, "Null context when initializing widget");
+                return;
+            }
+            Resources res = getResources();
+            if (res == null) {
+                Log.e(TAG, "Null resources when initializing widget");
+                return;
+            }
+
+            // Inflate our widget layout
+            LayoutInflater inflater =
+                    (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            mRootView = (ViewGroup) inflater.inflate(R.layout.widget_container, this);
+
+            if (mRootView == null) {
+                Log.e(TAG, "Error inflating the widget layout XML");
+                return;
+            }
+
+            // Grab all the views
+            mGridView = (GridLayout) mRootView.findViewById(R.id.widget_options_container);
+            mWidgetIcon = (ImageView) mRootView.findViewById(R.id.widget_icon);
+            mPinButton = (Button) mRootView.findViewById(R.id.btn_pin_widget);
+            //mResetButton = (ImageButton) mRootView.findViewById(R.id.btn_reset_widget);
+
+            mGridView.setColumnOrderPreserved(true);
+            mGridView.setRowCount(1);
+            mGridView.setColumnCount(0);
+
+            mGridView.setOnTouchListener(new OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    // We consume all events of the scrollview to avoid dragging the
+                    // widget by scrolling
+                    mGridView.onTouchEvent(motionEvent);
+                    return true;
+                }
+            });
+
+            mPinButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Resources res = getResources();
+                    if (res == null) return;
+
+                    // Toggle shortcut (pinned) status
+                    if (SettingsStorage.getShortcutSetting(getContext(),
+                            WidgetBase.this.getClass().getCanonicalName())) {
+                        // It was a shortcut, remove it
+                        SettingsStorage.storeShortcutSetting(getContext(),
+                                WidgetBase.this.getClass().getCanonicalName(), false);
+                        mPinButton.setBackground(res.getDrawable(R.drawable.btn_pin_widget_inactive));
+                        mShortcutButton.setVisibility(View.GONE);
+                        mToggleButton.setVisibility(View.VISIBLE);
+                    } else {
+                        // Add it
+                        SettingsStorage.storeShortcutSetting(getContext(),
+                                WidgetBase.this.getClass().getCanonicalName(), true);
+                        mPinButton.setBackground(res.getDrawable(R.drawable.ic_pin_widget_active));
+                        mShortcutButton.setVisibility(View.VISIBLE);
+                        mToggleButton.setVisibility(View.GONE);
+                    }
+                }
+            });
 
             // We default the window invisible, so we must respect the status
             // obtained after the "close" animation
             setAlpha(0.0f);
-            setTranslationY(-WIDGET_ANIM_TRANSLATE);
+            setScaleX(WIDGET_FADE_SCALE);
+            setScaleY(WIDGET_FADE_SCALE);
             setVisibility(View.VISIBLE);
 
-            // Set padding
-            int pad = getResources().getDimensionPixelSize(R.dimen.widget_container_padding);
-            this.setPadding(pad, pad, pad, pad);
+            mRootAnimator = mRootView.animate();
 
-            this.animate().setListener(new AnimatorListener() {
-                @Override
-                public void onAnimationCancel(Animator arg0) {
+            if (mRootAnimator != null) {
+                mRootAnimator.setListener(new AnimatorListener() {
+                    @Override
+                    public void onAnimationCancel(Animator arg0) {
 
-                }
-
-                @Override
-                public void onAnimationEnd(Animator arg0) {
-                    if (!mIsOpen) {
-                        WidgetContainer.this.setVisibility(View.GONE);
                     }
-                }
 
-                @Override
-                public void onAnimationRepeat(Animator arg0) {
-                }
+                    @Override
+                    public void onAnimationEnd(Animator arg0) {
+                        if (!mIsOpen) {
+                            WidgetContainer.this.setVisibility(View.GONE);
+                        }
+                    }
 
-                @Override
-                public void onAnimationStart(Animator arg0) {
-                    WidgetContainer.this.setVisibility(View.VISIBLE);
-                }
-            });
+                    @Override
+                    public void onAnimationRepeat(Animator arg0) {
+                    }
+
+                    @Override
+                    public void onAnimationStart(Animator arg0) {
+                        WidgetContainer.this.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
         }
 
         @Override
@@ -810,10 +982,10 @@ public abstract class WidgetBase {
         }
 
         public void notifyOrientationChanged(int orientation, boolean fastforward) {
-            int buttonsCount = getChildCount();
+            int buttonsCount = mGridView.getChildCount();
 
             for (int i = 0; i < buttonsCount; i++) {
-                View child = getChildAt(i);
+                View child = mGridView.getChildAt(i);
                 WidgetOption option = (WidgetOption) child;
 
                 // Don't rotate seekbars
@@ -824,7 +996,9 @@ public abstract class WidgetBase {
                     continue;
                 }
 
-                option.notifyOrientationChanged(orientation);
+                if (option != null) {
+                    option.notifyOrientationChanged(orientation);
+                }
 
                 if (fastforward) {
                     child.setRotation(orientation);
@@ -836,46 +1010,13 @@ public abstract class WidgetBase {
 
             WidgetBase.this.notifyOrientationChanged(orientation);
         }
-    }
 
-    /**
-     * Handles the swipe of widgets out of the screen (to the top/left)
-     */
-    public class WidgetFlingGestureListener extends GestureDetector.SimpleOnGestureListener {
-        //private final static String TAG = "GestureListener";
+        public GridLayout getGrid() {
+            return mGridView;
+        }
 
-        private static final int SWIPE_MIN_DISTANCE = 10;
-        private static final int SWIPE_MAX_OFF_PATH = 250;
-        private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            try {
-                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                    return false;
-
-                // swipe top to close the widget
-
-                // Somehow, GestureDetector takes the screen orientation into account, even if our
-                // activity is locked in landscape.
-                float distance = e2.getX() - e1.getX();
-                if (distance <= 0.1f) {
-                    distance = e2.getY() - e1.getY();
-                }
-
-                if (distance > SWIPE_MIN_DISTANCE && Math.abs(velocityX)
-                        > SWIPE_THRESHOLD_VELOCITY) {
-                    final SideBar sb = (SideBar) mToggleButton.getParent().getParent();
-                    final WidgetRenderer wr = (WidgetRenderer) mWidget.getParent();
-                    sb.toggleWidgetVisibility(WidgetBase.this, true);
-                    wr.widgetClosed(mWidget);
-                    mToggleButton.toggleBackground(false);
-                }
-            } catch (Exception e) {
-                // Do nothing here
-            }
-
-            return false;
+        public void setIconId(int iconResId) {
+            mWidgetIcon.setImageResource(iconResId);
         }
     }
 }
