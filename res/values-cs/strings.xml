@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Spustit Focal</string>
+    <string name="shutter_button">Spoušť</string>
+    <string name="cannot_connect_hal">Nelze přistupovat k fotoaparátu zařízení</string>
+    <string name="recording">Nahrávání</string>
+    <string name="double_tap_to_snapshot">Dvojitým dotykem pořídíte fotografii</string>
+    <string name="no_gles20_support">Zařízení nepodporuje standard GLES2</string>
+    <string name="no_gyroscope">Zařízení nedisponuje gyroskopem</string>
+    <string name="ps_long_press_to_stop">Dlouhým stiskem spouště\ndokončíte sférickou fotografii.</string>
+    <string name="disabled">Zakázano</string>
+    <string name="enabled">Povoleno</string>
+    <string name="no_video_player">Video nelze přehrát, není dostupný přehrávač</string>
+    <string name="fullscreen_shutter_info">Dotykem kdekoliv pořídíte fotografii</string>
+    <string name="please_wait">Počkejte prosím\u2026</string>
+    <string name="retouch">RETUŠOVAT</string>
+    <string name="open_in_gallery">GALERIE</string>
+
+    <string name="mode_photo">Fotografie</string>
+    <string name="mode_picsphere">Sférická fotografie</string>
+    <string name="mode_switchcam">Přední kamera</string>
+
+    <string name="widget_burstmode_count_shots">Pořízení %d snímků v řadě</string>
+    <string name="widget_burstmode_off">Zakázat pořizování snímků v řadě</string>
+    <string name="widget_burstmode_infinite">Nekonečné pořizování snímků v řadě</string>
+
+    <string name="widget_hdr_aebracket">Automatické posouvání expozice</string>
+
+    <string name="widget_settings_choose_widgets">Zvolte widgety v postraní liště</string>
+    <string name="widget_settings_choose_widgets_button">Zvolte widgety</string>
+    <string name="widget_settings_picture_size">Velikost obrázku</string>
+    <string name="widget_settings_exposure_ring">Zobrazit expoziční prstenec</string>
+    <string name="widget_settings_autoenhance">Automatické vylepšení</string>
+    <string name="widget_settings_ruleofthirds">Pravidlo třetin</string>
+
+    <string name="widget_autoexposure">Režím měření expozice</string>
+    <string name="widget_burstmode">Vícenásobný režim</string>
+    <string name="widget_effect">Barevné efekty</string>
+    <string name="widget_enhancements">Barevné vylepšení</string>
+    <string name="widget_exposure_compensation">Kompenzace expozice</string>
+    <string name="widget_flash">Režim blesku</string>
+    <string name="widget_hdr">Dynamický rozsah expozice (HDR)</string>
+    <string name="widget_iso">Citlivost ISO</string>
+    <string name="widget_scenemode">Scénický režim</string>
+    <string name="widget_settings">Nastavení</string>
+    <string name="widget_shutter_speed">Rychlost uzávěrky</string>
+    <string name="widget_skintone">Vylepšení tonality kůže</string>
+    <string name="widget_softwarehdr">Dynamický rozsah expozice (HDR)</string>
+    <string name="widget_timermode">Režim časovače</string>
+    <string name="widget_videofr">Snímková rychlost videa</string>
+    <string name="widget_videohdr">Dynamický rozsah expozice pro video</string>
+    <string name="widget_whitebalance">Vyvážení bílé</string>
+
+    <string name="pano_panorama_rendering_failed">Vykreslení panorama selhalo.\nZkuste pořídit kratší panorama.</string>
+    <string name="pano_panorama_rendering">Vykreslování panorama\u2026</string>
+
+    <string name="picsphere_undo_button">ZPĚT</string>
+    <string name="picsphere_start_hint">Pro zahájení snímání sférické fotografie pořiďte fotografii</string>
+    <string name="picsphere_already_rendering">Prosím vyčkejte dokud není sférická fotofrafie kompletně vykreslena</string>
+    <string name="picsphere_rendering_progress">Vykreslování\u2026 (%d %%)</string>
+    <string name="picsphere_toast_background_render">Vykreslování zahájeno\u2026</string>
+    <string name="picsphere_notif_title">Vykreslování sférické fotografie\u2026</string>
+    <string name="picsphere_failed">Vykreslování sférické fotografie selhalo</string>
+    <string name="picsphere_failed_details">Ujistěte se, zda se pořízení fotografie na hranách překrývají.</string>
+    <string name="picsphere_need_two_pics">Je potřeba pořídit alespoň dvě fotografie.</string>
+    <string name="picsphere_step_preparing">Připravování\u2026</string>
+    <string name="picsphere_step_ptogen">Vytváření metadat\u2026</string>
+    <string name="picsphere_step_ptovar">Ukládání orientace fotoaparátu\u2026</string>
+    <string name="picsphere_step_cpfind">Vyhledávání řídících bodů\u2026</string>
+    <string name="picsphere_step_autooptimiser">Zarovnávání obrázků\u2026</string>
+    <string name="picsphere_step_ptclean">Čištění bodů\u2026</string>
+    <string name="picsphere_step_panomodify">Odstříhávání prázdých oblastí\u2026</string>
+    <string name="picsphere_step_nona">Sestavování obrázků\u2026</string>
+    <string name="picsphere_step_enblend">Prolínání obrázků\u2026</string>
+
+    <string name="software_hdr_notif_title">Vytváření obrázku HDR\u2026</string>
+    <string name="software_hdr_failed">Vykreslování obrázku HDR selhalo</string>
+    <string name="software_hdr_failed_details">Zdorjové obrázky zůstali uloženy.</string>
+
+    <string name="showcase_welcome_1_title">Vítáme Vás!</string>
+    <string name="showcase_welcome_1_body">Možnosti jsou dostupné na postraní liště,\nstačí ji jen vysunout.</string>
+    <string name="showcase_welcome_2_title">Tlačítko spouště</string>
+    <string name="showcase_welcome_2_body">Dotykem na tlačítko spouště pořídíte obrázek.\nPřesunem získáte možnost změnit režim.</string>
+    <string name="showcase_panorama_title">Režim panorama</string>
+    <string name="showcase_panorama_body">Dotykem na spoušti zahájíte snímání panorama,\npoté natáčejte zařízení do směru, který chcete zachytit.\nDlaším dotykem na spoušti dojde k ukončení snímání panorama.</string>
+    <string name="showcase_picsphere_title">Režim sférické fotografie</string>
+    <string name="showcase_picsphere_body">Srovnejte umístění první fotografie,\npoté se dotkněte spouště pro zahájení snímání\nsférické fotografie. Modré body Vás budou navádět pro získání fotografie\nv daném směru.\nDlouhým stiskem spouště bude pořizování ukončeno.</string>
+
+    <string name="iso_hint_auto">automatické ISO</string>
+    <string name="iso_hint_hjr">ISO pro redukci třesoucích se rukou</string>
+</resources>
