@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Käynnistä Focal</string>
+    <string name="shutter_button">Kuvausnäppäin</string>
+    <string name="cannot_connect_hal">Ei yhteyttä kameraan</string>
+    <string name="recording">Nauhoitetaan</string>
+    <string name="double_tap_to_snapshot">Tupla-kosketa ottaaksesi kuvan</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">OK</string>
+    <string name="no_gles20_support">Laitteesi ei tue GLES2:ta</string>
+    <string name="no_gyroscope">Laitteessasi ei ole gyroskooppia</string>
+    <string name="ps_long_press_to_stop">Paina kuvausnäppäintä pitkään lopettaaksesi spheren.</string>
+    <string name="disabled">Pois käytöstä</string>
+    <string name="enabled">Käytössä</string>
+    <string name="no_video_player">Videon toistaminen epäonnistui, soitinta ei löydy</string>
+    <string name="fullscreen_shutter_info">Paina mihin tahansa ottaaksesi kuvan</string>
+    <string name="please_wait">Odota\u2026</string>
+    <string name="retouch">UUDELLEENKOSKETA</string>
+    <string name="open_in_gallery">GALLERIA</string>
+    <string name="mode_photo">Kuva</string>
+    <string name="mode_video">Video</string>
+    <string name="mode_picsphere">PicSphere</string>
+    <string name="mode_panorama">Panoraama</string>
+    <string name="mode_switchcam">Kameran vaihto</string>
+    <string name="widget_burstmode_count_shots">%d kuvan sarja</string>
+    <string name="widget_burstmode_off">Poista sarjakuvaus käytöstä</string>
+    <string name="widget_burstmode_infinite">Loputon sarjakuvaus</string>
+    <string name="widget_hdr_aebracket">Automaattinen haarukointi</string>
+    <string name="widget_settings_choose_widgets">Valitse sivuvalikon widgetit</string>
+    <string name="widget_settings_choose_widgets_button">Valitse widgetit</string>
+    <string name="widget_settings_picture_size">Kuvan koko</string>
+    <string name="widget_settings_exposure_ring">Näytä valotuskehä</string>
+    <string name="widget_settings_autoenhance">Automaattinen parantaminen</string>
+    <string name="widget_settings_ruleofthirds">3x3-ruudukko</string>
+    <string name="widget_autoexposure">Automaattinen valotusarvo</string>
+    <string name="widget_burstmode">Sarjakuvaus</string>
+    <string name="widget_effect">Väriefektit</string>
+    <string name="widget_enhancements">Värimuutokset</string>
+    <string name="widget_exposure_compensation">Valotuksen korjaus</string>
+    <string name="widget_flash">Salama</string>
+    <string name="widget_hdr">High Dynamic Range</string>
+    <string name="widget_iso">ISO-herkkyys</string>
+    <string name="widget_scenemode">Scene Mode</string>
+    <string name="widget_settings">Asetukset</string>
+    <string name="widget_shutter_speed">Sulkimen nopeus</string>
+    <string name="widget_skintone">Ihonvärin vaihto</string>
+    <string name="widget_softwarehdr">HDR</string>
+    <string name="widget_timermode">Ajastin</string>
+    <string name="widget_videofr">Videon kuvausnopeus</string>
+    <string name="widget_videohdr">Video HDR</string>
+    <string name="widget_whitebalance">Valkotasapaino</string>
+    <string name="pano_panorama_rendering_failed">Panoraamakuvan mallinnus epäonnistui.\Yritä ottaa lyhyempi kuva.</string>
+    <string name="pano_panorama_rendering">Mallinnetaan panoraamaa\u2026</string>
+    <string name="picsphere_undo_button">PERU</string>
+    <string name="picsphere_start_hint">Ota kuva aloittaaksesi spheren</string>
+    <string name="picsphere_already_rendering">Odota kun PicSphere-kuvaa mallinnetaan</string>
+    <string name="picsphere_rendering_progress">Mallinnetan\u2026 (%d %%)</string>
+    <string name="picsphere_toast_background_render">Mallinnus aloitettu\u2026</string>
+    <string name="picsphere_notif_title">Mallinnetaan PicSphere-kuvaa\u2026</string>
+    <string name="picsphere_failed">PicSpheren mallinnus epäonnistui</string>
+    <string name="picsphere_failed_details">Varmista että kuvat ovat päällekkäin vain reunoilla.</string>
+    <string name="picsphere_need_two_pics">Tarvitset vähintään kaksi kuvaa.</string>
+    <string name="picsphere_step_preparing">Valmistellaan\u2026</string>
+    <string name="picsphere_step_ptogen">Luodaan metadataa\u2026</string>
+    <string name="picsphere_step_ptovar">Tarkistetaan kameran asentoa\u2026</string>
+    <string name="picsphere_step_cpfind">Etsitään ohjauspisteet\u2026</string>
+    <string name="picsphere_step_autooptimiser">Käännetään kuvia\u2026</string>
+    <string name="picsphere_step_ptclean">Puhdistetaan pisteitä\u2026</string>
+    <string name="picsphere_step_panomodify">Rajataan tyhjiä alueita\u2026</string>
+    <string name="picsphere_step_nona">Yhdistetään kuvia\u2026</string>
+    <string name="picsphere_step_enblend">Sulautetaan kuvia\u2026</string>
+    <string name="software_hdr_notif_title">Luodaan HDR-kuvaa\u2026</string>
+    <string name="software_hdr_failed">HDR-kuvan mallinnus epäonnistui</string>
+    <string name="software_hdr_failed_details">Alkuperäiset kuvat säilytettiin.</string>
+    <string name="showcase_welcome_1_title">Tervetuloa!</string>
+    <string name="showcase_welcome_1_body">Asetukset ovat sivuvalikossa, liu\'uta näyttääksesi.</string>
+    <string name="showcase_welcome_2_title">Kuvausnäppäin</string>
+    <string name="showcase_welcome_2_body">Paina kuvausnäppäintä ottaksesi kuvan.\nLiu\'ta sitä päästäksesi muihin tiloihin.</string>
+    <string name="showcase_panorama_title">Panoraamatila</string>
+    <string name="showcase_panorama_body">Paina kuvausnäppäintä aloittaaksesi panoraamakuvan,\nja kuvaa haluamaltasi alueelta.\nKun kuva on valmis, paina suljinnäppäintä uudestaan.</string>
+    <string name="showcase_picsphere_title">PicSphere-tila</string>
+    <string name="showcase_picsphere_body">Osoita ensimmäinen kuva mihin haluat,\nsitten paina kuvausnäppäintä ottaaksesi jokaisen kuvan spherestä.\nSiniset pisteet ovat apuna.\nPaina kuvausnäppäintä pitkään kun olet valmis.</string>
+    <string name="iso_hint_auto">Automaattinen ISO</string>
+    <string name="iso_hint_hjr">Käsien tärinän vähentäminen ISO</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
+</resources>
