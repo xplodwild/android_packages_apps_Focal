@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2013 The CyanogenMod Project
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+    MA  02110-1301, USA.
+-->
+<resources>
+
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Avvia Focal</string>
+    <string name="shutter_button">Pulsante scatto</string>
+    <string name="cannot_connect_hal">Impossibile collegarsi alla fotocamera</string>
+    <string name="recording">Registrazione</string>
+    <string name="double_tap_to_snapshot">Scatta con doppio tocco</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">OK</string>
+    <string name="no_gles20_support">Il dispositivo non supporta GLES2</string>
+    <string name="no_gyroscope">Il dispositivo non ha il giroscopio</string>
+    <string name="ps_long_press_to_stop">Tenere premuto il pulsante scatto per finire la sfera.</string>
+    <string name="disabled">Disattivato</string>
+    <string name="enabled">Attivato</string>
+    <string name="no_video_player">Impossibile riprodurre il video, nessun lettore trovato</string>
+    <string name="fullscreen_shutter_info">Toccare un punto qualsiasi per scattare</string>
+    <string name="please_wait">Attendere&#8230;</string>
+    <string name="retouch">RITOCCO</string>
+    <string name="open_in_gallery">GALLERIA</string>
+    <string name="mode_photo">Foto</string>
+    <string name="mode_video">Video</string>
+    <string name="mode_picsphere">PicSfera</string>
+    <string name="mode_panorama">Panorama</string>
+    <string name="mode_switchcam">Frontale</string>
+    <string name="widget_burstmode_count_shots">%d scatti in sequenza</string>
+    <string name="widget_burstmode_off">Disattiva scatti multipli</string>
+    <string name="widget_burstmode_infinite">Scatti infiniti</string>
+    <string name="widget_hdr_aebracket">Auto bracketing</string>
+    <string name="widget_settings_choose_widgets">Widget nella barra degli strumenti</string>
+    <string name="widget_settings_choose_widgets_button">Scegliere i widget</string>
+    <string name="widget_settings_picture_size">Dimensione immagine</string>
+    <string name="widget_settings_exposure_ring">Esposizione</string>
+    <string name="widget_settings_autoenhance">Miglioramenti automatici</string>
+    <string name="widget_settings_ruleofthirds">Regola dei terzi</string>
+    <string name="widget_autoexposure">Autoesposizione</string>
+    <string name="widget_burstmode">Scatti continui</string>
+    <string name="widget_effect">Effetti colore</string>
+    <string name="widget_enhancements">Esaltazione colori</string>
+    <string name="widget_exposure_compensation">Compensazione esposizione</string>
+    <string name="widget_flash">Flash</string>
+    <string name="widget_hdr">HDR - High Dynamic Range</string>
+    <string name="widget_iso">Sensibilità ISO</string>
+    <string name="widget_scenemode">Scena</string>
+    <string name="widget_settings">Impostazioni</string>
+    <string name="widget_shutter_speed">Velocità otturatore</string>
+    <string name="widget_skintone">Esaltazione toni pelle</string>
+    <string name="widget_softwarehdr">HDR - High Dynamic Range</string>
+    <string name="widget_timermode">Timer</string>
+    <string name="widget_videofr">Video Framerate</string>
+    <string name="widget_videohdr">Video High Dynamic Range</string>
+    <string name="widget_whitebalance">Bilanciamento bianco</string>
+    <string name="pano_panorama_rendering_failed">Impossibile elaborare il panorama.\nProvare con uno più breve.</string>
+    <string name="pano_panorama_rendering">Elaborazione panorama&#8230;</string>
+    <string name="picsphere_undo_button">ANNULLA</string>
+    <string name="picsphere_start_hint">Scattare una foto per cominciare</string>
+    <string name="picsphere_already_rendering">Attendere l\'elaborazione della PicSfera</string>
+    <string name="picsphere_rendering_progress">Elaborazione... (%d %%)</string>
+    <string name="picsphere_toast_background_render">Elaborazione iniziata&#8230;</string>
+    <string name="picsphere_notif_title">Elaborazione PicSsfera&#8230;</string>
+    <string name="picsphere_failed">Errore nell\'elaborazione della PicSfera</string>
+    <string name="picsphere_failed_details">Assicurarsi che gli scatti si sovrappongano solo sui bordi.</string>
+    <string name="picsphere_need_two_pics">Occorrono almeno due scatti.</string>
+    <string name="picsphere_step_preparing">Preparazione&#8230;</string>
+    <string name="picsphere_step_ptogen">Generazione dei metadati\u2026</string>
+    <string name="picsphere_step_ptovar">Registrazione orientamento fotocamera\u2026</string>
+    <string name="picsphere_step_cpfind">Ricerca dei punti di controllo\u2026</string>
+    <string name="picsphere_step_autooptimiser">Ottimizzazione&#8230;</string>
+    <string name="picsphere_step_ptclean">Azzeramento punti di corrispondenza&#8230;</string>
+    <string name="picsphere_step_panomodify">Eliminazione zone vuote&#8230;</string>
+    <string name="picsphere_step_nona">Deformazione&#8230;</string>
+    <string name="picsphere_step_enblend">Fusione degli scatti&#8230;</string>
+    <string name="software_hdr_notif_title">Elaborazione HDR&#8230;</string>
+    <string name="software_hdr_failed">Elaborazione HDR fallita</string>
+    <string name="software_hdr_failed_details">Gli scatti originali sono stati mantenuti.</string>
+    <string name="showcase_welcome_1_title">Benvenuto!</string>
+    <string name="showcase_welcome_1_body">Le opzioni sono nella barra degli strumenti,\nattivabile scorrendo da sinistra a destra.</string>
+    <string name="showcase_welcome_2_title">Pulsante scatto</string>
+    <string name="showcase_welcome_2_body">Toccare il pulsante scatto per fotografare.\nScorrere dal pulsante per scegliere le modalità di scatto.</string>
+    <string name="showcase_panorama_title">Panorama</string>
+    <string name="showcase_panorama_body">Toccare il pulsante per iniziare,\npoi fare una lenta panoramica.\nUna volta fatto, premere nuovamente il pulsante.</string>
+    <string name="showcase_picsphere_title">PicSfera</string>
+    <string name="showcase_picsphere_body">Scattare a piacimento la prima immagine,\npoi premere il pulsante per ogni\nimmagine successiva della sfera,\nutilizzando i puntini blu di riferimento.\nPremere a lungo il pulsante una volta terminato.</string>
+    <string name="iso_hint_auto">ISO automatico</string>
+    <string name="iso_hint_hjr">ISO riduzione tremolio</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
+</resources>
