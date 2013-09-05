@@ -17,7 +17,8 @@
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
      MA  02110-1301, USA.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+        tools:locale="en">
     <!-- Hardware HDR settings keys. If any of these key is present, the software HDR widget
          is hidden. If you need to force-disable software HDR, see config.xml. -->
     <string-array name="hardware_hdr_keys" translatable="false">
