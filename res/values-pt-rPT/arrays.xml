@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whisky</item>
+        <item>whiskey</item>
+        <item>cheese</item>
+        <item>ok cid, tira uma foto</item>
+    </string-array>
+    <string-array name="widget_flash_hints">
+        <item>Auto</item>
+        <item>Inativo</item>
+        <item>Ativo</item>
+        <item>Tocha</item>
+        <item>Redução de olhos vermelhos</item>
+    </string-array>
+    <string-array name="widget_effects_hints">
+        <item>Inativo</item>
+        <item>Preto e Branco</item>
+        <item>Negativo</item>
+        <item>Solarização</item>
+        <item>Sépia</item>
+        <item>Posterização</item>
+        <item>Quadro negro</item>
+        <item>Quadro branco</item>
+        <item>Aqua</item>
+        <item>Realçar</item>
+        <item>Esboço</item>
+        <item>Neon</item>
+    </string-array>
+    <string-array name="widget_scenemode_hints">
+        <item>Automático</item>
+        <item>Redução de desfoque</item>
+        <item>Realidade Aumentada</item>
+        <item>Melhor foto</item>
+        <item>Bebé</item>
+        <item>Luz de fundo</item>
+        <item>Luz de fundo retrato</item>
+        <item>Código de barras</item>
+        <item>Praia</item>
+        <item>Luz de velas</item>
+        <item>Escuro</item>
+        <item>Prato</item>
+        <item>Documento</item>
+        <item>Fogo de artifício</item>
+        <item>Flores</item>
+        <item>Crepúsculo</item>
+        <item>HDR</item>
+        <item>Alta sensibilidade</item>
+        <item>Paisagem</item>
+        <item>Noite</item>
+        <item>Noite retrato</item>
+        <item>Noite retrato</item>
+        <item>Festa</item>
+        <item>Animal de estimação</item>
+        <item>Retrato</item>
+        <item>Neve</item>
+        <item>Pele</item>
+        <item>Desporto</item>
+        <item>Holofote</item>
+        <item>Foto estável</item>
+        <item>Pôr do sol</item>
+        <item>Costura</item>
+        <item>Teatro</item>
+    </string-array>
+    <string-array name="widget_whitebalance_hints">
+        <item>Automático</item>
+        <item>Nublado</item>
+        <item>Incandescente</item>
+        <item>Fluorescente</item>
+        <item>Luz do sol</item>
+        <item>Luz do sol nublada</item>
+    </string-array>
+    <string-array name="widget_autoexposure_hints">
+        <item>Média de frame</item>
+        <item>Ponderado ao centro</item>
+        <item>Medição pontual</item>
+    </string-array>
+</resources>
