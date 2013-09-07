@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whisky</item>
+        <item>whiskey</item>
+        <item>cheese</item>
+        <item>ok cid, take a picture</item>
+    </string-array>
+    <string-array name="widget_flash_hints">
+        <item>Automaattinen</item>
+        <item>Pois käytöstä</item>
+        <item>Käytössä</item>
+        <item>Lamppu</item>
+        <item>Punasilmäisyyden poisto</item>
+    </string-array>
+    <string-array name="widget_effects_hints">
+        <item>Pois käytöstä</item>
+        <item>Mustavalkoinen</item>
+        <item>Negatiivi</item>
+        <item>Valotus</item>
+        <item>Seepia</item>
+        <item>Juliste</item>
+        <item>Liitutaulu</item>
+        <item>Valkotaulu</item>
+        <item>Aqua</item>
+        <item>Kohokuva</item>
+        <item>Piirros</item>
+        <item>Neon</item>
+    </string-array>
+    <string-array name="widget_scenemode_hints">
+        <item>Automaattinen</item>
+        <item>Liikkeen sumennuksen vähentäminen</item>
+        <item>Lisätty todellisuus</item>
+        <item>Paras otos</item>
+        <item>Vauva</item>
+        <item>Taustavalo</item>
+        <item>Taustavalo/Muotokuva</item>
+        <item>Viivakoodi</item>
+        <item>Ranta</item>
+        <item>Kynttilänvalo</item>
+        <item>Pimeä</item>
+        <item>Tarjoilu</item>
+        <item>Dokumentti</item>
+        <item>Ilotulitus</item>
+        <item>Kukat</item>
+        <item>Hämärä/Käsikuvaus</item>
+        <item>HDR</item>
+        <item>Erittäin herkkä</item>
+        <item>Vaakataso</item>
+        <item>Yö</item>
+        <item>Yö/Muotokuva</item>
+        <item>Yö/Muotokuva</item>
+        <item>Juhla</item>
+        <item>Lemmikki</item>
+        <item>Muotokuva</item>
+        <item>Lumi</item>
+        <item>Pehmeä iho</item>
+        <item>Urheilu</item>
+        <item>Valokeila</item>
+        <item>Vakaa kuva</item>
+        <item>Auringonlasku</item>
+        <item>Puhdistettu yhdistelmä</item>
+        <item>Teatteri</item>
+    </string-array>
+
+    <string-array name="widget_whitebalance_hints">
+        <item>Automaattinen</item>
+        <item>Pilvinen</item>
+        <item>Hehkuva</item>
+        <item>Fluoresoiva</item>
+        <item>Päivänvalo</item>
+        <item>Pilvinen/Päivänvalo</item>
+    </string-array>
+    <string-array name="widget_autoexposure_hints">
+        <item>Keskimääräinen kehys</item>
+        <item>Keskelle keskittynyt</item>
+        <item>Pisteeseen kohdistettu</item>
+    </string-array>
+</resources>
