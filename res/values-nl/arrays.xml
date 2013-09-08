@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whiskey</item>
+        <item>cheese</item>
+        <item>ok cid, take a picture</item>
+    </string-array>
+
+    <string-array name="widget_flash_hints">
+        <item>Automatisch</item>
+        <item>Uitgeschakeld</item>
+        <item>Ingeschakeld</item>
+        <item>Zaklamp</item>
+        <item>Rode ogen verminderen</item>
+    </string-array>
+
+    <string-array name="widget_effects_hints">
+        <item>Uitgeschakeld</item>
+        <item>Zwart-wit</item>
+        <item>Negatief</item>
+        <item>Solariseren</item>
+        <item>Sepia</item>
+        <item>Posteriseren</item>
+        <item>Schoolbord</item>
+        <item>Whiteboard</item>
+        <item>Aqua</item>
+        <item>Reliëf</item>
+        <item>Schets</item>
+        <item>Neon</item>
+    </string-array>
+
+    <string-array name="widget_scenemode_hints">
+        <item>Automatisch</item>
+        <item>Bewegingsonscherpte verwijderen</item>
+        <item>Toegevoegde realiteit</item>
+        <item>Beste opname</item>
+        <item>Baby</item>
+        <item>Achtergrondlicht</item>
+        <item>Portret (achtergrondlicht)</item>
+        <item>Streepjescode</item>
+        <item>Strand</item>
+        <item>Kaarslicht</item>
+        <item>Donker</item>
+        <item>Gerecht</item>
+        <item>Document</item>
+        <item>Vuurwerk</item>
+        <item>Bloemen</item>
+        <item>Schemering</item>
+        <item>HDR</item>
+        <item>Hoge gevoeligheid</item>
+        <item>Landschap</item>
+        <item>Nacht</item>
+        <item>Nachtportret</item>
+        <item>Nachtportret</item>
+        <item>Feest</item>
+        <item>Huisdier</item>
+        <item>Portret</item>
+        <item>Sneeuw</item>
+        <item>Zachte huid</item>
+        <item>Sport</item>
+        <item>Schijnwerper</item>
+        <item>Stabiele foto</item>
+        <item>Zonsondergang</item>
+        <item>Draaipanorama</item>
+        <item>Theater</item>
+    </string-array>
+
+    <string-array name="widget_whitebalance_hints">
+        <item>Automatisch</item>
+        <item>Bewolkt</item>
+        <item>Gloeilamp</item>
+        <item>TL-lamp</item>
+        <item>Daglicht</item>
+        <item>Daglicht (bewolkt)</item>
+    </string-array>
+
+    <string-array name="widget_autoexposure_hints">
+        <item>Meervelds</item>
+        <item>Centrumgericht</item>
+        <item>Spot</item>
+    </string-array>
+</resources>
