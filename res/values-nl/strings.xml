@@ -113,7 +113,7 @@
     <string name="showcase_picsphere_body">Lijn de eerste afbeelding uit,\ntik op de sluiterknop om alle foto\'s te maken\nvan de sphere. De blauwe stippen zijn referentiepunten die u kunt volgen.\nHoud de sluiterknop ingedrukt als u klaar bent.</string>
 
     <string name="iso_hint_auto">Automatisch</string>
-    <string name="iso_hint_hjr">>Beeldstabilisatie (HJR)</string>
+    <string name="iso_hint_hjr">Beeldstabilisatie (HJR)</string>
     <string name="iso_hint_100">ISO 100</string>
     <string name="iso_hint_200">ISO 200</string>
     <string name="iso_hint_400">ISO 400</string>
