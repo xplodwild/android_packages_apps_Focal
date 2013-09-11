@@ -17,7 +17,8 @@
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
      MA  02110-1301, USA.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+        tools:locale="en">
     <string name="app_name">Focal</string>
     <string name="launch_app">Launch Focal</string>
     <string name="shutter_button">Shutter button</string>
