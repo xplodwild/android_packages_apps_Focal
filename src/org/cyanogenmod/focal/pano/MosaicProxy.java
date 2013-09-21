@@ -259,7 +259,7 @@ public class MosaicProxy extends CaptureTransformer
     }
 
     private void configMosaicPreview() {
-        boolean isLandscape = (mCamManager.getOrientation() != -90);
+        boolean isLandscape = false;
         Log.d(TAG, "isLandscape ? " + isLandscape +
                 " (orientation: " + mCamManager.getOrientation() + ")");
 

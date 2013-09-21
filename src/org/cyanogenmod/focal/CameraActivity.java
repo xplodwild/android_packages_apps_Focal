@@ -800,6 +800,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     public void initializePanorama() {
         mMosaicProxy = new MosaicProxy(this);
         setCaptureTransformer(mMosaicProxy);
+        mCamManager.setRenderToTexture(null);
         updateRingsVisibility();
     }
 
