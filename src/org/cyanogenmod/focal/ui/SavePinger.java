@@ -178,6 +178,8 @@ public class SavePinger extends View {
         }
 
         mLastTime = systemTime;
-        invalidate();
+        if (getAlpha() > 0.0) {
+            invalidate();
+        }
     }
 }

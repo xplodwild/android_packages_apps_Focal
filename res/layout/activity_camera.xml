@@ -22,7 +22,6 @@
         android:id="@+id/camera_app_root"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#000000"
         tools:context=".CameraActivity">
 
     <FrameLayout
