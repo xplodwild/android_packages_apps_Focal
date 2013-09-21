@@ -23,6 +23,8 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
 
+import fr.xplod.focal.R;
+
 /**
  * Manages sounds played by the app. Since we have a limited
  * set of sounds that can be played, we pre-load them and we use

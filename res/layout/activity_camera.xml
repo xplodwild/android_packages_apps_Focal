@@ -101,6 +101,15 @@
 
     </FrameLayout>
 
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left|bottom"
+            android:id="@+id/shortcuts_container"
+            android:gravity="bottom">
+    </LinearLayout>
+
     <org.cyanogenmod.focal.ui.SideBar
         android:id="@+id/sidebar_scroller"
         android:layout_width="wrap_content"

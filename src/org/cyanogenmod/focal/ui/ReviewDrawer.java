@@ -40,6 +40,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import org.cyanogenmod.focal.CameraActivity;
@@ -88,8 +89,6 @@ public class ReviewDrawer extends RelativeLayout {
     private void initialize() {
         mHandler = new Handler();
         mImages = new ArrayList<Integer>();
-
-        setOrientation(LinearLayout.VERTICAL);
 
         // Default hidden
         setAlpha(0.0f);

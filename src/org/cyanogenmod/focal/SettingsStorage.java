@@ -29,6 +29,7 @@ public class SettingsStorage {
     private final static String PREFS_CAMERA = "nemesis-camera";
     private final static String PREFS_APP = "nemesis-app";
     private final static String PREFS_VISIBILITY = "nemesis-visibility";
+    private final static String PREFS_SHORTCUTS = "nemesis-shortcuts";
     public final static String TAG = "SettingsStorage";
 
     private static void store(Context context, String prefsName, String key, String value) {
@@ -103,5 +104,25 @@ public class SettingsStorage {
      */
     public static boolean getVisibilitySetting(Context context, String key) {
         return retrieve(context, PREFS_VISIBILITY, key, "true").equals("true");
+    }
+
+    /**
+     * Stores a setting of the widgets shortcut
+     * @param context
+     * @param key
+     * @param pinned
+     */
+    public static void storeShortcutSetting(Context context, String key, boolean pinned) {
+        store(context, PREFS_SHORTCUTS, key, pinned ? "true" : "false");
+    }
+
+    /**
+     * Returns a setting of the widgets shortcut
+     * @param context
+     * @param key
+     * @return
+     */
+    public static boolean getShortcutSetting(Context context, String key) {
+        return retrieve(context, PREFS_SHORTCUTS, key, "false").equals("true");
     }
 }

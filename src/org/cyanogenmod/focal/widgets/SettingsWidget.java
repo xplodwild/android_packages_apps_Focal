@@ -83,7 +83,7 @@ public class SettingsWidget extends WidgetBase {
         public void onClick(View view) {
             mContext.setExposureRingVisible(!mContext.isExposureRingVisible());
             if (mContext.isExposureRingVisible()) {
-                mToggleExposureRing.setActiveDrawable(DRAWABLE_KEY_EXPO_RING);
+                mToggleExposureRing.activeImage(DRAWABLE_KEY_EXPO_RING);
             } else {
                 mToggleExposureRing.resetImage();
             }
@@ -99,7 +99,7 @@ public class SettingsWidget extends WidgetBase {
             View rot = mContext.findViewById(R.id.rule_of_thirds);
 
             if (rot.getVisibility() == View.GONE) {
-                mToggleRuleOfThirds.setActiveDrawable(DRAWABLE_KEY_RULE_OF_THIRDS);
+                mToggleRuleOfThirds.activeImage(DRAWABLE_KEY_RULE_OF_THIRDS);
                 rot.setVisibility(View.VISIBLE);
             } else {
                 mToggleRuleOfThirds.resetImage();
@@ -118,7 +118,7 @@ public class SettingsWidget extends WidgetBase {
             snapMan.setAutoEnhance(!snapMan.getAutoEnhance());
 
             if (snapMan.getAutoEnhance()) {
-                mToggleAutoEnhancer.setActiveDrawable(DRAWABLE_KEY_AUTO_ENHANCE);
+                mToggleAutoEnhancer.activeImage(DRAWABLE_KEY_AUTO_ENHANCE);
             } else {
                 mToggleAutoEnhancer.resetImage();
             }
@@ -285,7 +285,7 @@ public class SettingsWidget extends WidgetBase {
             // Restore exposure ring state
             if (SettingsStorage.getAppSetting(mContext, KEY_SHOW_EXPOSURE_RING, "0").equals("1")) {
                 mContext.setExposureRingVisible(true);
-                mToggleExposureRing.setActiveDrawable(DRAWABLE_KEY_EXPO_RING);
+                mToggleExposureRing.activeImage(DRAWABLE_KEY_EXPO_RING);
             } else {
                 mContext.setExposureRingVisible(false);
             }
@@ -302,7 +302,7 @@ public class SettingsWidget extends WidgetBase {
             // Restore auto enhancer state
             if (SettingsStorage.getAppSetting(mContext, KEY_ENABLE_AUTO_ENHANCE, "0").equals("1")) {
                 mContext.getSnapManager().setAutoEnhance(true);
-                mToggleAutoEnhancer.setActiveDrawable(DRAWABLE_KEY_AUTO_ENHANCE);
+                mToggleAutoEnhancer.activeImage(DRAWABLE_KEY_AUTO_ENHANCE);
             } else {
                 if (mContext.getSnapManager() != null) {
                     mContext.getSnapManager().setAutoEnhance(false);
@@ -322,7 +322,7 @@ public class SettingsWidget extends WidgetBase {
             if (SettingsStorage.getAppSetting(mContext,
                     KEY_ENABLE_RULE_OF_THIRDS, "0").equals("1")) {
                 mContext.findViewById(R.id.rule_of_thirds).setVisibility(View.VISIBLE);
-                mToggleRuleOfThirds.setActiveDrawable(KEY_ENABLE_RULE_OF_THIRDS);
+                mToggleRuleOfThirds.activeImage(KEY_ENABLE_RULE_OF_THIRDS);
             } else {
                 mContext.findViewById(R.id.rule_of_thirds).setVisibility(View.GONE);
                 mToggleRuleOfThirds.resetImage();

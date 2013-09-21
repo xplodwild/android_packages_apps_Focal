@@ -20,6 +20,8 @@
 package org.cyanogenmod.focal;
 
 import android.hardware.Camera;
+import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 
 import org.cyanogenmod.focal.widgets.*;
@@ -79,9 +81,11 @@ public class CameraCapabilities {
      *
      * @param params           The Camera parameters returned from the HAL for compatibility check
      * @param sideBarContainer The side bar layout that will contain all the toggle buttons
+     * @param homeContainer    The viewgroup containing home shortcuts
+     * @param widgetsContainer The container of the final rendered widgets
      */
     public void populateSidebar(Camera.Parameters params, ViewGroup sideBarContainer,
-            ViewGroup widgetsContainer) {
+                                ViewGroup homeContainer, ViewGroup widgetsContainer) {
         List<WidgetBase> unsupported = new ArrayList<WidgetBase>();
 
         for (int i = 0; i < mWidgets.size(); i++) {
@@ -90,8 +94,19 @@ public class CameraCapabilities {
             // Add the widget to the sidebar if it is supported by the device.
             // The compatibility is determined by widgets themselves.
             if (widget.isSupported(params)) {
-                sideBarContainer.addView(widget.getToggleButton());
                 widgetsContainer.addView(widget.getWidget());
+                homeContainer.addView(widget.getShortcutButton());
+                sideBarContainer.addView(widget.getToggleButton());
+
+                // If the widget is pinned, show it on the main screen, otherwise in the bar
+                if (SettingsStorage.getShortcutSetting(widget.getWidget().getContext(),
+                        widget.getClass().getCanonicalName())) {
+                    widget.getShortcutButton().setVisibility(View.VISIBLE);
+                    widget.getToggleButton().setVisibility(View.GONE);
+                } else {
+                    widget.getShortcutButton().setVisibility(View.GONE);
+                    widget.getToggleButton().setVisibility(View.VISIBLE);
+                }
             } else {
                 unsupported.add(widget);
             }

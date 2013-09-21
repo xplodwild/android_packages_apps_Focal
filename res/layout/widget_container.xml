@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="250dp"
+              android:layout_height="120dp"
+              android:background="@color/widget_background"
+              android:id="@+id/widget_container">
+
+    <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:padding="4dp">
+
+        <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:id="@+id/widget_icon"
+                android:src="@drawable/ic_widget_effect"
+                android:adjustViewBounds="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="0dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="0dp"/>
+
+        <Button
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:id="@+id/btn_pin_widget"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="4dp"
+                android:adjustViewBounds="true"
+                android:padding="0dp"
+                android:scaleType="centerInside"
+                style="@android:style/Widget.DeviceDefault.Button.Borderless.Small"
+                android:background="@drawable/btn_pin_widget_inactive"/>
+
+    </RelativeLayout>
+
+    <TextView
+            android:layout_width="2dp"
+            android:layout_height="fill_parent"
+            android:id="@+id/textView"
+            android:background="#33B5E5"/>
+
+    <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/scrollView"
+            android:layout_gravity="center"
+            android:fadingEdge="vertical|horizontal"
+            android:fadingEdgeLength="6dp"
+            android:requiresFadingEdge="vertical|horizontal">
+
+        <GridLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:columnCount="3"
+                android:rowCount="1"
+                android:id="@+id/widget_options_container"
+                android:fadingEdge="vertical|horizontal"
+                android:fadingEdgeLength="6dp"
+                android:requiresFadingEdge="vertical|horizontal"
+                android:useDefaultMargins="true">
+
+        </GridLayout>
+    </ScrollView>
+
+</LinearLayout>

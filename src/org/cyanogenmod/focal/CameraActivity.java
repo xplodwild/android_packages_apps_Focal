@@ -127,6 +127,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private final static int SHOWCASE_INDEX_PANORAMA  = 0;
     private final static int SHOWCASE_INDEX_PICSPHERE = 0;
 
+    private final static String KEY_SHOWCASE_WELCOME = "SHOWCASE_WELCOME";
+    private final static String KEY_SHOWCASE_PANORAMA = "SHOWCASE_PANORAMA";
+    private final static String KEY_SHOWCASE_PICSPHERE = "SHOWCASE_PICSPHERE";
+
     /**
      * Gesture listeners to apply on camera previews views
      */
@@ -236,8 +240,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     }
 
     public void startShowcaseWelcome() {
-        if (SettingsStorage.getAppSetting(this, "SHOWCASE_WELCOME", "0").equals("0")) {
-            SettingsStorage.storeAppSetting(this, "SHOWCASE_WELCOME", "1");
+        if (SettingsStorage.getAppSetting(this, KEY_SHOWCASE_WELCOME, "0").equals("0")) {
+            SettingsStorage.storeAppSetting(this, KEY_SHOWCASE_WELCOME, "1");
             ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
             co.hideOnClickOutside = true;
             mShowcaseView = ShowcaseView.insertShowcaseView(mSideBar,
@@ -251,37 +255,34 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mShowcaseView.animateGesture(size.x/2, size.y*2.0f/3.0f, size.x/2, size.y/2.0f);
             mShowcaseView.setOnShowcaseEventListener(this);
             mShowcaseIndex = SHOWCASE_INDEX_WELCOME_1;
-
-            mShowcaseView.notifyOrientationChanged(mOrientationCompensation);
         }
     }
 
     public void startShowcasePanorama() {
-        if (SettingsStorage.getAppSetting(this, "SHOWCASE_PANORAMA", "0").equals("0")) {
-            SettingsStorage.storeAppSetting(this, "SHOWCASE_PANORAMA", "1");
+        if (SettingsStorage.getAppSetting(this, KEY_SHOWCASE_PANORAMA, "0").equals("0")) {
+            SettingsStorage.storeAppSetting(this, KEY_SHOWCASE_PANORAMA, "1");
             ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
             co.hideOnClickOutside = true;
             Point size = new Point();
             getWindowManager().getDefaultDisplay().getSize(size);
-            mShowcaseView = ShowcaseView.insertShowcaseView(size.x - Util.dpToPx(this, 16), size.y/2, this, getString(R.string.showcase_panorama_title),
+            mShowcaseView = ShowcaseView.insertShowcaseView(size.x/2, size.y - Util.dpToPx(this, 16),
+                    this, getString(R.string.showcase_panorama_title),
                     getString(R.string.showcase_panorama_body), co);
 
             mShowcaseIndex = SHOWCASE_INDEX_PANORAMA;
-
-            mShowcaseView.notifyOrientationChanged(mOrientationCompensation);
         }
     }
 
     public void startShowcasePicSphere() {
-        if (SettingsStorage.getAppSetting(this, "SHOWCASE_PICSPHERE", "0").equals("0")) {
-            SettingsStorage.storeAppSetting(this, "SHOWCASE_PICSPHERE", "1");
+        if (SettingsStorage.getAppSetting(this, KEY_SHOWCASE_PICSPHERE, "0").equals("0")) {
+            SettingsStorage.storeAppSetting(this, KEY_SHOWCASE_PICSPHERE, "1");
             ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
             co.hideOnClickOutside = true;
             Point size = new Point();
             getWindowManager().getDefaultDisplay().getSize(size);
 
-            mShowcaseView = ShowcaseView.insertShowcaseView(size.x - Util.dpToPx(this, 16),
-                    size.y/2, this, getString(R.string.showcase_picsphere_title),
+            mShowcaseView = ShowcaseView.insertShowcaseView(size.x / 2,
+                    size.y - Util.dpToPx(this, 16), this, getString(R.string.showcase_picsphere_title),
                     getString(R.string.showcase_picsphere_body), co);
 
             mShowcaseIndex = SHOWCASE_INDEX_PICSPHERE;
@@ -507,10 +508,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         mSwitchRingPad.notifyOrientationChanged(mOrientationCompensation);
         mSavePinger.notifyOrientationChanged(mOrientationCompensation);
         mReviewDrawer.notifyOrientationChanged(mOrientationCompensation);
-
-        if (mShowcaseView != null) {
-            mShowcaseView.notifyOrientationChanged(mOrientationCompensation);
-        }
     }
 
     public void updateCapabilities() {
@@ -600,8 +597,6 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
     @Override
     public void onCameraReady() {
-
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -929,15 +924,19 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
                 ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
                 co.hideOnClickOutside = true;
-                mShowcaseView = ShowcaseView.insertShowcaseView(size.x - Util.dpToPx(this, 16),
-                        size.y/2, this, getString(R.string.showcase_welcome_2_title),
+                mShowcaseView = ShowcaseView.insertShowcaseView(size.x / 2,
+                        size.y - Util.dpToPx(this, 16), this,
+                        getString(R.string.showcase_welcome_2_title),
                         getString(R.string.showcase_welcome_2_body), co);
-                mShowcaseView.notifyOrientationChanged(mOrientationCompensation);
 
                 // animate gesture
-                mShowcaseView.animateGesture(size.x - Util.dpToPx(this, 16),
-                        size.y / 2, size.x * 2 / 3, size.y / 2);
+                mShowcaseView.animateGesture(size.x / 2,
+                        size.y - Util.dpToPx(this, 16), size.x / 2, size.y / 2);
                 mShowcaseView.setOnShowcaseEventListener(this);
+
+                // ping the button
+                mSwitchRingPad.animateHint();
+
                 break;
         }
     }
