@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 The CyanogenMod Project
+ * Copyright (C) 2013 Guillaume Lesniak
  * Copyright (C) 2010 The Android Open Source Project
  *
  * This program is free software; you can redistribute it and/or
