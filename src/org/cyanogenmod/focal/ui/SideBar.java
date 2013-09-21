@@ -63,7 +63,6 @@ public class SideBar extends ScrollView {
      */
     private void initialize() {
         this.setBackgroundColor(getResources().getColor(R.color.widget_background));
-        setHorizontalScrollBarEnabled(true);
         mIsOpen = true;
     }
 
