@@ -473,6 +473,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         // Reload pictures in the ReviewDrawer
         mReviewDrawer.updateFromGallery(newMode != CAMERA_MODE_VIDEO, 0);
+        updateCapabilities();
     }
 
     /**
