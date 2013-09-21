@@ -23,7 +23,7 @@ import android.hardware.Camera;
 import android.view.View;
 
 import org.cyanogenmod.focal.CameraActivity;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.feats.TimerCapture;
 
 /**

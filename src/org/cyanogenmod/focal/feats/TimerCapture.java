@@ -30,7 +30,7 @@ import android.speech.SpeechRecognizer;
 import android.util.Log;
 
 import org.cyanogenmod.focal.CameraActivity;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SnapshotManager;
 import org.cyanogenmod.focal.ui.ShutterButton;
 

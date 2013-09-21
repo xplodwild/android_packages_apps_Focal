@@ -31,7 +31,7 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import org.cyanogenmod.focal.CameraManager;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

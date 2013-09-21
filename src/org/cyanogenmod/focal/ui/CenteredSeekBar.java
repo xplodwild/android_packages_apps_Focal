@@ -34,7 +34,7 @@ import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
 
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 
 import java.math.BigDecimal;
 

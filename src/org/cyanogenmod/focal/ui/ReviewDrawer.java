@@ -43,7 +43,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import org.cyanogenmod.focal.CameraActivity;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.Util;
 
 import java.util.ArrayList;

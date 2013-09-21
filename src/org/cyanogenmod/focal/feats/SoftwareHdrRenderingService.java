@@ -28,7 +28,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SnapshotManager;
 import org.cyanogenmod.focal.Util;
 import org.cyanogenmod.focal.picsphere.PicSphere;

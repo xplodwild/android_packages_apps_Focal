@@ -27,7 +27,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 
 /**
  * Service that handles PicSphere rendering outside

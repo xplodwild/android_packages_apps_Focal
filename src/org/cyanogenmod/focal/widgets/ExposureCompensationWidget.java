@@ -23,7 +23,7 @@ import android.content.Context;
 import android.hardware.Camera;
 
 import org.cyanogenmod.focal.CameraManager;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SettingsStorage;
 import org.cyanogenmod.focal.ui.CenteredSeekBar;
 

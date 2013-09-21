@@ -40,7 +40,7 @@ import android.widget.TextView;
 import org.cyanogenmod.focal.BitmapFilter;
 import org.cyanogenmod.focal.CameraActivity;
 import org.cyanogenmod.focal.CameraManager;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SettingsStorage;
 import org.cyanogenmod.focal.Util;
 import org.cyanogenmod.focal.ui.CenteredSeekBar;

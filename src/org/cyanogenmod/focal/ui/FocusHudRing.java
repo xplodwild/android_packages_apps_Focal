@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 
 import org.cyanogenmod.focal.CameraManager;
 import org.cyanogenmod.focal.FocusManager;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 
 /**
  * Focus ring HUD that lets user select focus point (tap to focus)

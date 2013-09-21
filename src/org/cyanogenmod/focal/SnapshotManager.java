@@ -55,6 +55,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.xplod.focal.R;
+
 /**
  * This class manages taking snapshots and videos from Camera
  */

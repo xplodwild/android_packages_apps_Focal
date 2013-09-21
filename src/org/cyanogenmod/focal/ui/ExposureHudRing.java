@@ -26,7 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.cyanogenmod.focal.CameraManager;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 
 /**
  * Exposure ring HUD that lets user select exposure metering point

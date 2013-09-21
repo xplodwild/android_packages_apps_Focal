@@ -22,7 +22,7 @@ package org.cyanogenmod.focal.widgets;
 import android.content.Context;
 
 import org.cyanogenmod.focal.CameraManager;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 
 public class VideoFrWidget extends SimpleToggleWidget {
 

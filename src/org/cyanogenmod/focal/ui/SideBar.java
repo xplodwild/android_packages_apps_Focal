@@ -30,7 +30,7 @@ import android.widget.HorizontalScrollView;
 
 import org.cyanogenmod.focal.CameraActivity;
 import org.cyanogenmod.focal.CameraCapabilities;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.widgets.WidgetBase;
 
 public class SideBar extends HorizontalScrollView {

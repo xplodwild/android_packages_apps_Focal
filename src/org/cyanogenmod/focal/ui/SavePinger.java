@@ -29,7 +29,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 
 public class SavePinger extends View {
     public final static String TAG = "SavePinger";

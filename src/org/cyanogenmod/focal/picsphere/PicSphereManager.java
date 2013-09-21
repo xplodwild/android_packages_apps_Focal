@@ -31,7 +31,7 @@ import android.view.TextureView;
 import android.widget.FrameLayout;
 
 import org.cyanogenmod.focal.CameraActivity;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SnapshotManager;
 
 import java.io.File;

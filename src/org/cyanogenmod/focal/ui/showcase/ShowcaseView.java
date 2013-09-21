@@ -48,7 +48,7 @@ import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 
 import java.lang.reflect.Field;
 

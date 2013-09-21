@@ -30,7 +30,7 @@ import android.widget.NumberPicker;
 import org.cyanogenmod.focal.CameraActivity;
 import org.cyanogenmod.focal.CameraCapabilities;
 import org.cyanogenmod.focal.CameraManager;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SettingsStorage;
 import org.cyanogenmod.focal.SnapshotManager;
 

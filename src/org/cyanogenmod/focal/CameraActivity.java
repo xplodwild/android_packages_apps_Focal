@@ -66,6 +66,8 @@ import org.cyanogenmod.focal.ui.ThumbnailFlinger;
 import org.cyanogenmod.focal.ui.WidgetRenderer;
 import org.cyanogenmod.focal.ui.showcase.ShowcaseView;
 
+import fr.xplod.focal.R;
+
 public class CameraActivity extends Activity implements CameraManager.CameraReadyListener,
         ShowcaseView.OnShowcaseEventListener {
     public final static String TAG = "CameraActivity";
