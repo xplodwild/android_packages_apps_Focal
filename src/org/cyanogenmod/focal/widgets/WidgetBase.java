@@ -605,20 +605,19 @@ public abstract class WidgetBase {
             mOriginalDrawable = (BitmapDrawable) res.getDrawable(resId);
             this.setCompoundDrawablesRelativeWithIntrinsicBounds(null, mOriginalDrawable, null, null);
             this.setGravity(Gravity.CENTER);
-            this.setSingleLine(true);
-            this.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-            this.setMarqueeRepeatLimit(-1);
+            this.setLines(2);
 
-            int pxSize = (int) Util.dpToPx(getContext(), 64);
-            this.setMinimumWidth(pxSize);
-            this.setMinimumHeight(pxSize);
-            this.setMaxWidth(pxSize);
-            this.setMaxHeight(pxSize);
+            int pxHeight = (int) Util.dpToPx(getContext(), 56);
+            int pxWidth = (int) Util.dpToPx(getContext(), 64);
+            this.setMinimumWidth(pxWidth);
+            this.setMinimumHeight(pxHeight);
+            this.setMaxWidth(pxWidth);
+            this.setMaxHeight(pxHeight);
             this.setSelected(true);
             this.setFadingEdgeLength((int) Util.dpToPx(getContext(), 6));
             this.setHorizontalFadingEdgeEnabled(true);
 
-            this.setTextSize(12);
+            this.setTextSize(10);
             setOnLongClickListener(this);
         }
 
