@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2013 The CyanogenMod Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
+ */
+
 package org.cyanogenmod.focal.picsphere;
 
 import android.app.Notification;
@@ -8,7 +27,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 
 /**
  * Service that handles PicSphere rendering outside
@@ -22,6 +41,7 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
     private int NOTIFICATION = 1337;
 
     private boolean mHasFailed = false;
+    private int mRenderQueue = 0;
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -64,6 +84,7 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
 
     public void render(final PicSphere sphere, final int orientation) {
         sphere.addProgressListener(this);
+        mRenderQueue++;
         new Thread() {
             public void run() {
                 if (!sphere.render(orientation)) {
@@ -72,7 +93,13 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
                             buildFailureNotification(getString(R.string.picsphere_failed),
                                     getString(R.string.picsphere_failed_details)));
                 }
-                PicSphereRenderingService.this.stopSelf();
+                mRenderQueue--;
+
+                if (mRenderQueue == 0) {
+                    // We have no more PicSpheres to render, so we can stop the service. Otherwise,
+                    // we leave it on for other spheres.
+                    PicSphereRenderingService.this.stopSelf();
+                }
             }
         }.start();
     }
@@ -92,8 +119,16 @@ public class PicSphereRenderingService extends Service implements PicSphere.Prog
         String text = "";
 
         switch (newStep) {
-            case PicSphere.STEP_AUTOPANO:
-                text = getString(R.string.picsphere_step_autopano);
+            case PicSphere.STEP_PTOGEN:
+                text = getString(R.string.picsphere_step_ptogen);
+                break;
+
+            case PicSphere.STEP_PTOVAR:
+                text = getString(R.string.picsphere_step_ptovar);
+                break;
+
+            case PicSphere.STEP_CPFIND:
+                text = getString(R.string.picsphere_step_cpfind);
                 break;
 
             case PicSphere.STEP_PTCLEAN:

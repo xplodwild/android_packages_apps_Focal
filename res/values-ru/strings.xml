@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Запуск Focal</string>
+    <string name="shutter_button">Кнопка затвора</string>
+    <string name="cannot_connect_hal">Не удаётся подключиться к камере</string>
+    <string name="recording">Запись</string>
+    <string name="double_tap_to_snapshot">Нажмите дважды, чтобы сделать снимок</string>
+    <string name="ok">OK</string>
+    <string name="no_gles20_support">Ваше устройство не поддерживает GLES2</string>
+    <string name="no_gyroscope">Ваше устройство не оснащено гироскопом</string>
+    <string name="ps_long_press_to_stop">Нажмите и удерживайте кнопку затвора для окончания фотосферы</string>
+    <string name="disabled">Выключено</string>
+    <string name="enabled">Включено</string>
+    <string name="no_video_player">Не удалось воспроизвести видео. Видеоплеер не найден.</string>
+    <string name="fullscreen_shutter_info">Нажмите в любом месте, чтобы сделать снимок</string>
+    <string name="please_wait">Пожалуйста, подождите\u2026</string>
+    <string name="retouch">РЕТУШЬ</string>
+    <string name="open_in_gallery">ГАЛЕРЕЯ</string>
+    <string name="mode_photo">Фото</string>
+    <string name="mode_video">Видео</string>
+    <string name="mode_picsphere">Фотосфера</string>
+    <string name="mode_panorama">Панорама</string>
+    <string name="mode_switchcam">Фронт. камера</string>
+    <string name="widget_burstmode_count_shots">Серия из %d снимков</string>
+    <string name="widget_burstmode_off">Выключить серийную съёмку</string>
+    <string name="widget_burstmode_infinite">Непрерывная съёмка</string>
+    <string name="widget_hdr_aebracket">Автобрекетинг</string>
+    <string name="widget_settings_choose_widgets">Выберите виджеты в боковой панели</string>
+    <string name="widget_settings_choose_widgets_button">Выберите виджеты</string>
+    <string name="widget_settings_picture_size">Размер изображения</string>
+    <string name="widget_settings_exposure_ring">Показывать кольцо экспозиции</string>
+    <string name="widget_settings_autoenhance">Автоулучшение</string>
+    <string name="widget_settings_ruleofthirds">Сетка</string>
+    <string name="widget_autoexposure">Экспозамер</string>
+    <string name="widget_burstmode">Серийная съёмка</string>
+    <string name="widget_effect">Цветовые эффекты</string>
+    <string name="widget_enhancements">Улучшение цвета</string>
+    <string name="widget_exposure_compensation">Компенсация экспозиции</string>
+    <string name="widget_flash">Режим вспышки</string>
+    <string name="widget_hdr">HDR</string>
+    <string name="widget_iso">Чувствительность ISO</string>
+    <string name="widget_scenemode">Режим съёмки</string>
+    <string name="widget_settings">Настройки</string>
+    <string name="widget_shutter_speed">Скорость съёмки</string>
+    <string name="widget_skintone">Улучшение цвета кожи</string>
+    <string name="widget_softwarehdr">HDR</string>
+    <string name="widget_timermode">Таймер</string>
+    <string name="widget_videofr">Частота кадров видео</string>
+    <string name="widget_videohdr">HDR-видео</string>
+    <string name="widget_whitebalance">Баланс белого</string>
+    <string name="pano_panorama_rendering_failed">Ошибка создания панорамы.\nПопробуйте сделать ещё снимок.</string>
+    <string name="pano_panorama_rendering">Создание панорамы\u2026</string>
+    <string name="picsphere_undo_button">ОТМЕНА</string>
+    <string name="picsphere_start_hint">Сделайте снимок для создания фотосферы</string>
+    <string name="picsphere_already_rendering">Пожалуйста, подождите завершения создания текущей фотосферы</string>
+    <string name="picsphere_rendering_progress">Создание\u2026 (%d %%)</string>
+    <string name="picsphere_toast_background_render">Создание началось\u2026</string>
+    <string name="picsphere_notif_title">Создание фотосферы\u2026</string>
+    <string name="picsphere_failed">Создание фотосферы завершилось с ошибкой</string>
+    <string name="picsphere_failed_details">Убедитесь, что снимки накладываются друг на друга по краям</string>
+    <string name="picsphere_need_two_pics">Сделайте минимум два снимка</string>
+    <string name="picsphere_step_preparing">Подготовка\u2026</string>
+    <string name="picsphere_step_ptogen">Создание метаданных\u2026</string>
+    <string name="picsphere_step_ptovar">Запись ориентации камеры\u2026</string>
+    <string name="picsphere_step_cpfind">Поиск контрольных точек\u2026</string>
+    <string name="picsphere_step_autooptimiser">Выравнивание изображений\u2026</string>
+    <string name="picsphere_step_ptclean">Очистка точек\u2026</string>
+    <string name="picsphere_step_panomodify">Обрезка пустых областей\u2026</string>
+    <string name="picsphere_step_nona">Сборка изображений\u2026</string>
+    <string name="picsphere_step_enblend">Смешивание изображений\u2026</string>
+    <string name="software_hdr_notif_title">Вычисление HDR-изображения\u2026</string>
+    <string name="software_hdr_failed">Создание HDR-изображения завершилось с ошибкой</string>
+    <string name="software_hdr_failed_details">Исходные изображения были сохранены</string>
+    <string name="showcase_welcome_1_title">Добро пожаловать!</string>
+    <string name="showcase_welcome_1_body">Настройки находятся в боковой панели, \nпросто сдвиньте её.</string>
+    <string name="showcase_welcome_2_title">Кнопка затвора</string>
+    <string name="showcase_welcome_2_body">Нажмите на кнопку затвора, чтобы сделать снимок.\nСдвиньте её для доступа к другим режимам съёмки.</string>
+    <string name="showcase_panorama_title">Режим панорамы</string>
+    <string name="showcase_panorama_body">Нажмите на кнопку затвора для начала создания панорамы,\nа затем перемещайте камеру.\nДля завершения панорамы нажмите на кнопку затвора.</string>
+    <string name="showcase_picsphere_title">Режим фотосферы</string>
+    <string name="showcase_picsphere_body">Наведите объектив на  понравившееся место,\n затем делайте снимки фотосферы.\nСледуйте по направлению синих точек.\nДолгое нажатие кнопки затвора завершает создание фотосферы.</string>
+    <string name="iso_hint_auto">Авто ISO</string>
+    <string name="iso_hint_hjr">HJR ISO</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
+</resources>

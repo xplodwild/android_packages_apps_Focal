@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whisky</item>
+        <item>whiskey</item>
+        <item>cheese</item>
+        <item>ok cid, take a picture</item>
+    </string-array>
+    <string-array name="widget_flash_hints">
+        <item>Automatikus</item>
+        <item>Letiltva</item>
+        <item>Engedélyezve</item>
+        <item>Vaku</item>
+        <item>Vörösszem csökkentés</item>
+    </string-array>
+    <string-array name="widget_effects_hints">
+        <item>Letiltva</item>
+        <item>Fekete &amp; Fehér</item>
+        <item>Negatív</item>
+        <item>Szolarizált</item>
+        <item>Szépia</item>
+        <item>Poszterizált</item>
+        <item>Feketetábla</item>
+        <item>Fehértábla</item>
+        <item>Víz</item>
+        <item>Dombormű</item>
+        <item>Vázlat</item>
+        <item>Neon</item>
+    </string-array>
+    <string-array name="widget_scenemode_hints">
+        <item>Automatikus</item>
+        <item>Bemozdulás csökkentés</item>
+        <item>Kiterjesztett valóság</item>
+        <item>Legjobb kép</item>
+        <item>Gyerek</item>
+        <item>Háttérvilágítás</item>
+        <item>Háttérvilágítású portré</item>
+        <item>Vonalkód</item>
+        <item>Strand</item>
+        <item>Gyertyafény</item>
+        <item>Sötét</item>
+        <item>Étel</item>
+        <item>Dokumentum</item>
+        <item>Tűzijáték</item>
+        <item>Virágok</item>
+        <item>Kézben tartott szürkület</item>
+        <item>HDR</item>
+        <item>Nagy érzékenység</item>
+        <item>Tájkép</item>
+        <item>Éjszakai</item>
+        <item>Éjszakai portré</item>
+        <item>Éjszakai beltéri portré</item>
+        <item>Buli</item>
+        <item>Háziállat</item>
+        <item>Portré</item>
+        <item>Hó</item>
+        <item>Lágy bőr</item>
+        <item>Sport</item>
+        <item>Reflektorfény</item>
+        <item>Állókép</item>
+        <item>Napnyugta</item>
+        <item>Varrott</item>
+        <item>Színház</item>
+    </string-array>
+    <string-array name="widget_whitebalance_hints">
+        <item>Automatikus</item>
+        <item>Felhős</item>
+        <item>Izzólámpa</item>
+        <item>Fénycső</item>
+        <item>Napfény</item>
+        <item>Felhős napfény</item>
+    </string-array>
+    <string-array name="widget_autoexposure_hints">
+        <item>Kiértékelő</item>
+        <item>Középre súlyozott</item>
+        <item>Spotmérés</item>
+    </string-array>
+</resources>

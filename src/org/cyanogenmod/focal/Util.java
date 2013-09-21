@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
@@ -61,11 +62,11 @@ public class Util {
     // See android.hardware.Camera.ACTION_NEW_VIDEO.
     public static final String ACTION_NEW_VIDEO = "android.hardware.action.NEW_VIDEO";
 
-
     // Screen size holder
     private static Point mScreenSize = new Point();
+    private static int mRotation = 90;
 
-    private static DateFormat mJpegDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+    private static DateFormat mJpegDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmssSSS");
 
     /**
      * Returns the orientation of the display
@@ -76,19 +77,26 @@ public class Util {
      * @return Orientation angle of the display
      */
     public static int getDisplayRotation(Activity activity) {
-        int rotation = activity.getWindowManager().getDefaultDisplay()
-                .getRotation();
-        switch (rotation) {
-            case Surface.ROTATION_0:
-                return 0;
-            case Surface.ROTATION_90:
-                return 90;
-            case Surface.ROTATION_180:
-                return 180;
-            case Surface.ROTATION_270:
-                return 270;
+        if (activity != null) {
+            int rotation = activity.getWindowManager().getDefaultDisplay()
+                    .getRotation();
+            switch (rotation) {
+                case Surface.ROTATION_0:
+                    mRotation = 0;
+                    break;
+                case Surface.ROTATION_90:
+                    mRotation = 90;
+                    break;
+                case Surface.ROTATION_180:
+                    mRotation = 180;
+                    break;
+                case Surface.ROTATION_270:
+                    mRotation = 270;
+                    break;
+            }
         }
-        return 0;
+
+        return mRotation;
     }
 
     /**
@@ -122,7 +130,8 @@ public class Util {
      */
     public static Point getScreenSize(Activity activity) {
         if (activity != null) {
-            WindowManager service = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+            WindowManager service =
+                    (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
             service.getDefaultDisplay().getSize(mScreenSize);
         }
         return mScreenSize;
@@ -137,10 +146,12 @@ public class Util {
      * @return
      */
     public static Size getOptimalPreviewSize(Activity currentActivity,
-                                             List<Size> sizes, double targetRatio) {
+            List<Size> sizes, double targetRatio) {
         // Use a very small tolerance because we want an exact match.
         final double ASPECT_TOLERANCE = 0.01;
-        if (sizes == null) return null;
+        if (sizes == null) {
+            return null;
+        }
 
         Size optimalSize = null;
         double minDiff = Double.MAX_VALUE;
@@ -155,7 +166,9 @@ public class Util {
         // Try to find an size match aspect ratio and size
         for (Size size : sizes) {
             double ratio = (double) size.width / size.height;
-            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) {
+                continue;
+            }
             if (Math.abs(size.height - targetHeight) < minDiff) {
                 optimalSize = size;
                 minDiff = Math.abs(size.height - targetHeight);
@@ -184,7 +197,9 @@ public class Util {
      * @param duration
      */
     public static void fadeIn(View view, float startAlpha, float endAlpha, long duration) {
-        if (view.getVisibility() == View.VISIBLE) return;
+        if (view.getVisibility() == View.VISIBLE) {
+            return;
+        }
 
         view.setVisibility(View.VISIBLE);
         Animation animation = new AlphaAnimation(startAlpha, endAlpha);
@@ -232,14 +247,15 @@ public class Util {
 
         if (Build.VERSION.SDK_INT >= 17) {
             final RenderScript rs = RenderScript.create(context);
-            final ScriptIntrinsicYuvToRGB script = ScriptIntrinsicYuvToRGB.create(rs, Element.RGBA_8888(rs));
+            final ScriptIntrinsicYuvToRGB script = ScriptIntrinsicYuvToRGB
+                    .create(rs, Element.RGBA_8888(rs));
             Type.Builder tb = new Type.Builder(rs, Element.RGBA_8888(rs));
             tb.setX(width);
             tb.setY(height);
 
             Allocation allocationOut = Allocation.createTyped(rs, tb.create());
-            Allocation allocationIn = Allocation.createSized(rs, Element.U8(rs), (height * width) +
-                    ((height / 2) * (width / 2) * 2));
+            Allocation allocationIn = Allocation.createSized(rs, Element.U8(rs),
+                    (height * width) + ((height / 2) * (width / 2) * 2));
 
             script.setInput(allocationIn);
 
@@ -255,8 +271,9 @@ public class Util {
                 int uvp = frameSize + (j >> 1) * width, u = 0, v = 0;
                 for (int i = 0; i < width; i++, yp++) {
                     int y = (0xff & ((int) yuv420sp[yp])) - 16;
-                    if (y < 0)
+                    if (y < 0) {
                         y = 0;
+                    }
                     if ((i & 1) == 0) {
                         v = (0xff & yuv420sp[uvp++]) - 128;
                         u = (0xff & yuv420sp[uvp++]) - 128;
@@ -267,20 +284,24 @@ public class Util {
                     int g = (y1192 - 833 * v - 400 * u);
                     int b = (y1192 + 2066 * u);
 
-                    if (r < 0)
+                    if (r < 0) {
                         r = 0;
-                    else if (r > 262143)
+                    } else if (r > 262143) {
                         r = 262143;
-                    if (g < 0)
+                    }
+                    if (g < 0) {
                         g = 0;
-                    else if (g > 262143)
+                    } else if (g > 262143) {
                         g = 262143;
-                    if (b < 0)
+                    }
+                    if (b < 0) {
                         b = 0;
-                    else if (b > 262143)
+                    } else if (b > 262143) {
                         b = 262143;
+                    }
 
-                    rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
+                    rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00)
+                            | ((b >> 10) & 0xff);
                 }
             }
 
@@ -299,8 +320,9 @@ public class Util {
             int vp = ((int)(frameSize*1.5) + (j*(width/2)));
             for (int i = 0; i < width; i++, yp++) {
                 int y = (0xff & ((int) yuv422p[yp])) - 16;
-                if (y < 0)
+                if (y < 0) {
                     y = 0;
+                }
 
                 if ((i & 1) == 0) {
                     u = (0xff & yuv422p[up++]) - 128;
@@ -312,20 +334,24 @@ public class Util {
                 int g = (y1192 - 833 * v - 400 * u);
                 int b = (y1192 + 2066 * u);
 
-                if (r < 0)
+                if (r < 0) {
                     r = 0;
-                else if (r > 262143)
+                } else if (r > 262143) {
                     r = 262143;
-                if (g < 0)
+                }
+                if (g < 0) {
                     g = 0;
-                else if (g > 262143)
+                } else if (g > 262143) {
                     g = 262143;
-                if (b < 0)
+                }
+                if (b < 0) {
                     b = 0;
-                else if (b > 262143)
+                } else if (b > 262143) {
                     b = 262143;
+                }
 
-                rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
+                rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00)
+                        | ((b >> 10) & 0xff);
             }
         }
 
@@ -351,7 +377,6 @@ public class Util {
         context.sendBroadcast(new Intent("com.android.camera.NEW_PICTURE", uri));
     }
 
-
     /**
      * Removes an image from the gallery
      * @param cr
@@ -361,7 +386,6 @@ public class Util {
         cr.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 BaseColumns._ID + "=" + Long.toString(id), null);
     }
-
 
     /**
      * Converts the specified DP to PIXELS according to current screen density
@@ -391,21 +415,6 @@ public class Util {
         }
     }
 
-    /**
-     * Returns the upper power-of-two
-     * @param v
-     * @return
-     */
-    public static int getUpperPoT(int v) {
-        v--;
-        v |= v >> 1;
-        v |= v >> 2;
-        v |= v >> 4;
-        v |= v >> 8;
-        v |= v >> 16;
-        v++;
-        return v;
-    }
 
     /**
      * Returns the best Panorama preview size
@@ -436,6 +445,46 @@ public class Util {
                 pixelsDiff = d;
             }
         }
+        return output;
+    }
+
+    /**
+     * Returns the best PicSphere picture size. The reference size is 2048x1536 from Nexus 4.
+     * @param supportedSizes Supported picture size
+     * @param needSmaller If a larger image size is accepted
+     * @return A Point where X and Y corresponds to Width and Height
+     */
+    public static Point findBestPicSpherePictureSize(List<Size> supportedSizes, boolean needSmaller) {
+        Point output = null;
+        final int defaultPixels = 2048*1536;
+
+        int pixelsDiff = defaultPixels;
+
+        for (Size size : supportedSizes) {
+            int h = size.height;
+            int w = size.width;
+            int d = defaultPixels - h * w;
+
+            if (needSmaller && d < 0) { // no bigger preview than 960x720.
+                continue;
+            }
+
+            // we only want 4:3 format.
+            if ((h * 4 != w * 3)) {
+                continue;
+            }
+            d = Math.abs(d);
+            if (d < pixelsDiff) {
+                output = new Point(w, h);
+                pixelsDiff = d;
+            }
+        }
+
+        if (output == null) {
+            // Fail-safe, default to 640x480 is nothing suitable is found
+            output = new Point(640, 480);
+        }
+
         return output;
     }
 }

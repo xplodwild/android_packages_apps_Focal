@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.widgets;
@@ -24,7 +25,7 @@ import android.view.View;
 import android.widget.SeekBar;
 
 import org.cyanogenmod.focal.CameraManager;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SettingsStorage;
 import org.cyanogenmod.focal.ui.CenteredSeekBar;
 
@@ -106,18 +107,23 @@ public class EnhancementsWidget extends WidgetBase {
             setViewAt(i, 1, 1, 1, mValueLabel[i]);
 
             if (i == ROW_CONTRAST) {
-                setViewAt(i, 0, 1, 1, new WidgetOptionImage(R.drawable.ic_widget_contrast, context));
+                setViewAt(i, 0, 1, 1, new WidgetOptionImage(
+                        R.drawable.ic_widget_contrast, context));
             } else if (i == ROW_SATURATION) {
-                setViewAt(i, 0, 1, 1, new WidgetOptionImage(R.drawable.ic_widget_saturation, context));
+                setViewAt(i, 0, 1, 1, new WidgetOptionImage(
+                        R.drawable.ic_widget_saturation, context));
             } else if (i == ROW_SHARPNESS) {
-                setViewAt(i, 0, 1, 1, new WidgetOptionImage(R.drawable.ic_widget_sharpness, context));
+                setViewAt(i, 0, 1, 1, new WidgetOptionImage(
+                        R.drawable.ic_widget_sharpness, context));
             }
-
         }
 
-        mSeekBar[ROW_CONTRAST].setOnSeekBarChangeListener(new SeekBarListener(KEY_CONTRAST_PARAMETER));
-        mSeekBar[ROW_SHARPNESS].setOnSeekBarChangeListener(new SeekBarListener(KEY_SHARPNESS_PARAMETER));
-        mSeekBar[ROW_SATURATION].setOnSeekBarChangeListener(new SeekBarListener(KEY_SATURATION_PARAMETER));
+        mSeekBar[ROW_CONTRAST].setOnSeekBarChangeListener(
+                new SeekBarListener(KEY_CONTRAST_PARAMETER));
+        mSeekBar[ROW_SHARPNESS].setOnSeekBarChangeListener(
+                new SeekBarListener(KEY_SHARPNESS_PARAMETER));
+        mSeekBar[ROW_SATURATION].setOnSeekBarChangeListener(
+                new SeekBarListener(KEY_SATURATION_PARAMETER));
 
         mValueLabel[ROW_CONTRAST].setText(restoreValueFromStorage(KEY_CONTRAST_PARAMETER));
         mValueLabel[ROW_SHARPNESS].setText(restoreValueFromStorage(KEY_SHARPNESS_PARAMETER));
@@ -154,16 +160,16 @@ public class EnhancementsWidget extends WidgetBase {
 
         if (key.equals(KEY_CONTRAST_PARAMETER)) {
             mValueLabel[ROW_CONTRAST].setText(valueStr);
-            SettingsStorage.storeCameraSetting(getWidget().getContext(), mCamManager.getCurrentFacing(),
-                    KEY_CONTRAST_PARAMETER, valueStr);
+            SettingsStorage.storeCameraSetting(getWidget().getContext(),
+                    mCamManager.getCurrentFacing(),KEY_CONTRAST_PARAMETER, valueStr);
         } else if (key.equals(KEY_SHARPNESS_PARAMETER)) {
             mValueLabel[ROW_SHARPNESS].setText(valueStr);
-            SettingsStorage.storeCameraSetting(getWidget().getContext(), mCamManager.getCurrentFacing(),
-                    KEY_SHARPNESS_PARAMETER, valueStr);
+            SettingsStorage.storeCameraSetting(getWidget().getContext(),
+                    mCamManager.getCurrentFacing(), KEY_SHARPNESS_PARAMETER, valueStr);
         } else if (key.equals(KEY_SATURATION_PARAMETER)) {
             mValueLabel[ROW_SATURATION].setText(valueStr);
-            SettingsStorage.storeCameraSetting(getWidget().getContext(), mCamManager.getCurrentFacing(),
-                    KEY_SATURATION_PARAMETER, valueStr);
+            SettingsStorage.storeCameraSetting(getWidget().getContext(),
+                    mCamManager.getCurrentFacing(), KEY_SATURATION_PARAMETER, valueStr);
         }
     }
 }

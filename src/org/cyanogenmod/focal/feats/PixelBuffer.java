@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.feats;
@@ -24,7 +25,7 @@ import android.graphics.Bitmap;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.Util;
 
 import java.nio.IntBuffer;
@@ -68,7 +69,7 @@ public class PixelBuffer {
     final static private int EGL_TEXTURE_RGBA = 0x305E;
     final static private int EGL_TEXTURE_2D = 0x305F;
 
-    GLSurfaceView.Renderer mRenderer; // borrow this interface
+    GLSurfaceView.Renderer mRenderer; // Borrow this interface
     int mWidth, mHeight;
     Bitmap mBitmap;
 
@@ -90,7 +91,8 @@ public class PixelBuffer {
 
         int[] version = new int[2];
         int[] attribList = null;
-        final int mMaxTextureSize = mContext.getResources().getInteger(R.integer.config_maxTextureSize);
+        final int mMaxTextureSize =
+                mContext.getResources().getInteger(R.integer.config_maxTextureSize);
 
         if (mWidth < mMaxTextureSize && mHeight < mMaxTextureSize) {
             // The texture is smaller than the maximum supported size, use it directly.
@@ -120,7 +122,7 @@ public class PixelBuffer {
         mEGLConfig = chooseConfig(); // Choosing a config is a little more complicated
 
         // Make sure you run in OpenGL ES 2.0, as everything in Nemesis uses a shader pipeline
-        mEGLContext = mEGL.eglCreateContext(mEGLDisplay, mEGLConfig, EGL_NO_CONTEXT, new int[]{
+        mEGLContext = mEGL.eglCreateContext(mEGLDisplay, mEGLConfig, EGL_NO_CONTEXT, new int[] {
                 EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE
         });
         mEGLSurface = mEGL.eglCreatePbufferSurface(mEGLDisplay, mEGLConfig,  attribList);
@@ -228,7 +230,8 @@ public class PixelBuffer {
         System.gc();
         Runtime.getRuntime().gc();
 
-        final int mMaxTextureSize = mContext.getResources().getInteger(R.integer.config_maxTextureSize);
+        final int mMaxTextureSize =
+                mContext.getResources().getInteger(R.integer.config_maxTextureSize);
         boolean isScaled = (mWidth > mMaxTextureSize || mHeight > mMaxTextureSize);
 
         int scaledWidth = isScaled ? mMaxTextureSize : mWidth;
@@ -254,7 +257,8 @@ public class PixelBuffer {
 
         if (isScaled) {
             ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-            ActivityManager activityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager activityManager =
+                    (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
             activityManager.getMemoryInfo(mi);
             long availableMegs = mi.availMem / 1048576L;
             Log.d(TAG, "Available memory: " + availableMegs + "MB");
@@ -264,7 +268,7 @@ public class PixelBuffer {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Log.e(TAG, "Waiting for more memory! (Free: " + availableMegs + "MB)");
+                Log.w(TAG, "Waiting for more memory! (Free: " + availableMegs + "MB)");
                 // We're going to need some memory
                 System.gc();
                 Runtime.getRuntime().gc();

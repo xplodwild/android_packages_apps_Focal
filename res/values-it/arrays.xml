@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+
+    <string-array name="transformer_timer_voice_words">
+        <item>sorridete</item>
+        <item>sorridi</item>
+        <item>scatta</item>
+        <item>foto</item>
+        <item>ciis</item>
+        <item>scatta una foto</item>
+    </string-array>
+    <string-array name="widget_flash_hints">
+        <item>Auto</item>
+        <item>Disattivato</item>
+        <item>Attivato</item>
+        <item>Torcia</item>
+        <item>Riduzione occhi rossi</item>
+    </string-array>
+    <string-array name="widget_effects_hints">
+        <item>Disattivato</item>
+        <item>Bianco &amp; nero</item>
+        <item>Negativo</item>
+        <item>Solarizza</item>
+        <item>Seppia</item>
+        <item>Posterizza</item>
+        <item>Lavagna</item>
+        <item>Lavagna bianca</item>
+        <item>Acqua</item>
+        <item>Rilievo</item>
+        <item>Disegno</item>
+        <item>Neon</item>
+    </string-array>
+    <string-array name="widget_scenemode_hints">
+        <item>Automatico</item>
+        <item>Riduzione sfocatura movimento</item>
+        <item>Realtà aumentata</item>
+        <item>Scatto migliore</item>
+        <item>Baby</item>
+        <item>Luce da dietro</item>
+        <item>Ritratto luce da dietro</item>
+        <item>Codice a barre</item>
+        <item>Spiaggia</item>
+        <item>Luce di candela</item>
+        <item>Scuro</item>
+        <item>Piatto</item>
+        <item>Documento</item>
+        <item>Fuochi d\'artificio</item>
+        <item>Fiori</item>
+        <item>Crepuscolo</item>
+        <item>HDR</item>
+        <item>Alta sensibilità</item>
+        <item>Paesaggio</item>
+        <item>Notte</item>
+        <item>Ritratto di notte</item>
+        <item>Ritratto di notte</item>
+        <item>Party</item>
+        <item>Cucciolo</item>
+        <item>Ritratto</item>
+        <item>Neve</item>
+        <item>Pelle morbida</item>
+        <item>Sport</item>
+        <item>Lampadina</item>
+        <item>Foto stabilizzata</item>
+        <item>Tramonto</item>
+        <item>Panorama multifoto</item>
+        <item>Teatro</item>
+    </string-array>
+    <string-array name="widget_whitebalance_hints">
+        <item>Automatico</item>
+        <item>Nuvoloso</item>
+        <item>Incandescente</item>
+        <item>Fluorescente</item>
+        <item>Diurno</item>
+        <item>Diurno nuvoloso</item>
+    </string-array>
+    <string-array name="widget_autoexposure_hints">
+        <item>Valutativa</item>
+        <item>Media pesata al centro</item>
+        <item>Spot</item>
+    </string-array>
+</resources>

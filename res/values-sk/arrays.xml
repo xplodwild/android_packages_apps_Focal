@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whisky</item>
+        <item>whiskey</item>
+        <item>sýýr</item>
+        <item>odfoť ma</item>
+    </string-array>
+
+    <string-array name="widget_flash_hints">
+        <item>Auto</item>
+        <item>Zakázaný</item>
+        <item>Povolený</item>
+        <item>Svietidlo</item>
+        <item>Odstránenie červených očí</item>
+    </string-array>
+
+    <string-array name="widget_effects_hints">
+        <item>Zakázaný</item>
+        <item>Čiernobiely</item>
+        <item>Negatív</item>
+        <item>Solarizovať</item>
+        <item>Sépia</item>
+        <item>Plagát</item>
+        <item>Čierna tabuľa</item>
+        <item>Biela tabuľa</item>
+        <item>Voda</item>
+        <item>Reliéf</item>
+        <item>Náčrtok</item>
+        <item>Neón</item>
+    </string-array>
+
+    <string-array name="widget_scenemode_hints">
+        <item>Automatická</item>
+        <item>Odstránenie rozmazania pohybom</item>
+        <item>Rozšírená realita</item>
+        <item>Najlepší záber</item>
+        <item>Dieťa</item>
+        <item>Podsvietenie</item>
+        <item>Podsvietenie portrétu</item>
+        <item>Čiarový kód</item>
+        <item>Pláž</item>
+        <item>Šero</item>
+        <item>Tma</item>
+        <item>Dish</item>
+        <item>Dokument</item>
+        <item>Ohňostroj</item>
+        <item>Kvety</item>
+        <item>Súmrak voľnou rukou</item>
+        <item>HDR</item>
+        <item>Vysoká citlivosť</item>
+        <item>Krajina</item>
+        <item>Noc</item>
+        <item>Nočný portrét</item>
+        <item>Nočný portrét</item>
+        <item>Večierok</item>
+        <item>Zvieratá</item>
+        <item>Portrét</item>
+        <item>Sneh</item>
+        <item>Jemný odtieň pleti</item>
+        <item>Šport</item>
+        <item>Reflektor</item>
+        <item>Stála fotografia</item>
+        <item>Západ slnka</item>
+        <item>Spájanie pohybom</item>
+        <item>Divadlo</item>
+    </string-array>
+
+    <string-array name="widget_whitebalance_hints">
+        <item>Automaticky</item>
+        <item>Zamračené</item>
+        <item>Žiarovka</item>
+        <item>Žiarivka</item>
+        <item>Denné svetlo</item>
+        <item>Nepriame denné svetlo</item>
+    </string-array>
+
+    <string-array name="widget_autoexposure_hints">
+        <item>Priemer snímku</item>
+        <item>Vyváženie na stred</item>
+        <item>Bodové meranie</item>
+    </string-array>
+</resources>

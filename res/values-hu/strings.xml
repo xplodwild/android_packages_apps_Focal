@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Focal indítása</string>
+    <string name="shutter_button">Exponáló gomb</string>
+    <string name="cannot_connect_hal">Nem lehet csatlakozni a kamerához</string>
+    <string name="recording">Felvétel</string>
+    <string name="double_tap_to_snapshot">Kép készítéséhez duplán érintse meg</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">OK</string>
+    <string name="no_gles20_support">A készülék nem támogatja a GLES2-t</string>
+    <string name="no_gyroscope">A készülék nem rendelkezik giroszkóppal</string>
+    <string name="ps_long_press_to_stop">A gömbpanoráma befejezéséhez\nhosszan érintse meg az exponáló gombot.</string>
+    <string name="disabled">Letiltva</string>
+    <string name="enabled">Engedélyezve</string>
+    <string name="no_video_player">Nem lehet lejátszani a videót, nem található lejátszó</string>
+    <string name="fullscreen_shutter_info">Bárhol érintse meg a kép készítéséhez</string>
+    <string name="please_wait">Kérem, várjon\u2026</string>
+    <string name="retouch">RETUSÁLÁS</string>
+    <string name="open_in_gallery">GALÉRIA</string>
+    <string name="mode_photo">Fotó</string>
+    <string name="mode_video">Videó</string>
+    <string name="mode_picsphere">Gömbpanoráma</string>
+    <string name="mode_panorama">Panoráma</string>
+    <string name="mode_switchcam">Kamera</string>
+    <string name="widget_burstmode_count_shots">%d kép</string>
+    <string name="widget_burstmode_off">Sorozatfelvétel letiltva</string>
+    <string name="widget_burstmode_infinite">Végtelen számú kép</string>
+    <string name="widget_hdr_aebracket">Automatikus expozíció sorozat</string>
+    <string name="widget_settings_choose_widgets">Válasszon modulokat az oldalsávon</string>
+    <string name="widget_settings_choose_widgets_button">Válasszon modulokat</string>
+    <string name="widget_settings_picture_size">Kép méret</string>
+    <string name="widget_settings_exposure_ring">Expozíció gyűrű megjelenítése</string>
+    <string name="widget_settings_autoenhance">Auto-feljavítás</string>
+    <string name="widget_settings_ruleofthirds">Harmadolási szabály</string>
+    <string name="widget_autoexposure">Exponálás mérés módja</string>
+    <string name="widget_burstmode">Sorozatfelvétel</string>
+    <string name="widget_effect">Színhatások</string>
+    <string name="widget_enhancements">Színfokozás</string>
+    <string name="widget_exposure_compensation">Expo korrekció</string>
+    <string name="widget_flash">Zseblámpa</string>
+    <string name="widget_hdr">HDR</string>
+    <string name="widget_iso">ISO érzékenység</string>
+    <string name="widget_scenemode">Kép jellege</string>
+    <string name="widget_settings">Beállítások</string>
+    <string name="widget_shutter_speed">Zársebesség</string>
+    <string name="widget_skintone">Bőrtónus kiemelése</string>
+    <string name="widget_softwarehdr">HDR</string>
+    <string name="widget_timermode">Időzítő</string>
+    <string name="widget_videofr">Videó képkocka</string>
+    <string name="widget_videohdr">Videó HDR</string>
+    <string name="widget_whitebalance">Fehéregyensúly</string>
+    <string name="pano_panorama_rendering_failed">Nem sikerült összeállítani a panorámaképet.\nPróbáljon meg egy képkockával kisebb képet készíteni.</string>
+    <string name="pano_panorama_rendering">Panorámakép összeállítása\u2026</string>
+    <string name="picsphere_undo_button">VISSZAVONÁS</string>
+    <string name="picsphere_start_hint">A gömbpanoráma készítésének elindításához készítsen egy képet</string>
+    <string name="picsphere_already_rendering">Várjon, amíg a gömbpanoráma elkészül</string>
+    <string name="picsphere_rendering_progress">Összeállítás... (%d %%)</string>
+    <string name="picsphere_toast_background_render">Összeállítás elindítva\u2026</string>
+    <string name="picsphere_notif_title">Gömbpanoráma összeállítása\u2026</string>
+    <string name="picsphere_failed">Nem sikerült összeállítani a gömbpanorámát</string>
+    <string name="picsphere_failed_details">Győződjön meg róla, hogy a képek átfedik egymást.</string>
+    <string name="picsphere_need_two_pics">Legalább két képre van szükség.</string>
+    <string name="picsphere_step_preparing">Előkészítés\u2026</string>
+    <string name="picsphere_step_ptogen">Metaadatok generálása\u2026</string>
+    <string name="picsphere_step_ptovar">Kamera orientáció rögzítése\u2026</string>
+    <string name="picsphere_step_cpfind">Vezérlőpontok keresése\u2026</string>
+    <string name="picsphere_step_autooptimiser">Képek elrendezése\u2026</string>
+    <string name="picsphere_step_ptclean">Azonos részek eltávolítása\u2026</string>
+    <string name="picsphere_step_panomodify">Üres területek kivágása\u2026</string>
+    <string name="picsphere_step_nona">Képek összeillesztésének rögzítése\u2026</string>
+    <string name="picsphere_step_enblend">Képek elegyítése\u2026</string>
+    <string name="software_hdr_notif_title">HDR kép számítása\u2026</string>
+    <string name="software_hdr_failed">HDR összeállítás sikertelen</string>
+    <string name="software_hdr_failed_details">Az eredeti kép megtartva.</string>
+    <string name="showcase_welcome_1_title">Üdvözöljük!</string>
+    <string name="showcase_welcome_1_body">A beállításokat az oldalsávon találja,\ncsak húzza elő.</string>
+    <string name="showcase_welcome_2_title">Exponáló gomb</string>
+    <string name="showcase_welcome_2_body">Érintse meg az exponáló gombot a kép elkészítéséhez.\nTovábbi felvételi módokhoz csúsztatással fér hozzá.</string>
+    <string name="showcase_panorama_title">Panoráma mód</string>
+    <string name="showcase_panorama_body">Érintse meg az exponáló gombot a panoráma kép készítés elindításához,\nazután pásztázzon arra, amit rögzíteni kíván.\nMiután végzett, érintse meg ismét az exponáló gombot.</string>
+    <string name="showcase_picsphere_title">Gömbpanoráma mód</string>
+    <string name="showcase_picsphere_body">Igazítsa oda az első képet ahová szeretné,\nmajd minden egyes képhez érintse meg az exponáló gombot.\nA kék referenciapontok segítenek a lekövetésben.\nNyomja meg hosszan az exponáló gombot a befejezéshez.</string>
+    <string name="iso_hint_auto">Automatikus ISO</string>
+    <string name="iso_hint_hjr">Kézremegést csökkentő ISO</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
+</resources>

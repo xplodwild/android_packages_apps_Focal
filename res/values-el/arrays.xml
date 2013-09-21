@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whisky</item>
+        <item>whiskey</item>
+        <item>cheese</item>
+        <item>ok cid, take a picture</item>
+    </string-array>
+    <string-array name="widget_flash_hints">
+        <item>Αυτόματο</item>
+        <item>Απενεργοποιημένο</item>
+        <item>Ενεργοποιημένο</item>
+        <item>Φακός</item>
+        <item>Μείωση κόκκινων ματιών</item>
+    </string-array>
+    <string-array name="widget_effects_hints">
+        <item>Απενεργοποιημένο</item>
+        <item>Ασπρόμαυρο</item>
+        <item>Αρνητικό</item>
+        <item>Υπερφωτισμός</item>
+        <item>Σέπια</item>
+        <item>Ποστεροποίηση</item>
+        <item>Μαύρος πίνακας</item>
+        <item>Άσπρος πίνακας</item>
+        <item>Νερό</item>
+        <item>Ξεθώριασμα</item>
+        <item>Σκίτσο</item>
+        <item>Neon</item>
+    </string-array>
+    <string-array name="widget_scenemode_hints">
+        <item>Αυτόματη</item>
+        <item>Μείωση motion blur</item>
+        <item>Επαυξημένη πραγματικότητα</item>
+        <item>Καλύτερη λήψη</item>
+        <item>Μωρό</item>
+        <item>Οπίσθιος φωτισμός</item>
+        <item>Πορτραίτο με οπίσθιο φωτισμό</item>
+        <item>Barcode</item>
+        <item>Παραλία</item>
+        <item>Φως κεριού</item>
+        <item>Σκοτάδι</item>
+        <item>Πιάτο</item>
+        <item>Έγγραφο</item>
+        <item>Πυροτεχνήματα</item>
+        <item>Λουλούδια</item>
+        <item>Αμυδρό φως</item>
+        <item>HDR</item>
+        <item>Υψηλή ευαισθησία</item>
+        <item>Τοπίο</item>
+        <item>Νύχτα</item>
+        <item>Νυχτερινό πορτραίτο</item>
+        <item>Νυχτερινό πορτραίτο</item>
+        <item>Πάρτι</item>
+        <item>Κατοικίδιο</item>
+        <item>Πορτραίτο</item>
+        <item>Χιόνι</item>
+        <item>Απαλό δέρμα</item>
+        <item>Αθλήματα</item>
+        <item>Προβολέας</item>
+        <item>Σταθερή φωτογραφία</item>
+        <item>Ηλιοβασίλεμα</item>
+        <item>Λειτουργία sweep</item>
+        <item>Θέατρο</item>
+    </string-array>
+    <string-array name="widget_whitebalance_hints">
+        <item>Αυτόματη</item>
+        <item>Συννεφιά</item>
+        <item>Λαμπτήρας πυρακτώσεως</item>
+        <item>Λαμπτήρας φθορισμού</item>
+        <item>Φως ημέρας</item>
+        <item>Φώς συννεφιασμένης ημέρας</item>
+    </string-array>
+    <string-array name="widget_autoexposure_hints">
+        <item>Μέσος όρος κάδρου</item>
+        <item>Μέτρηση κέντρου βάρους</item>
+        <item>Σημειακή μέτρηση</item>
+    </string-array>
+</resources>

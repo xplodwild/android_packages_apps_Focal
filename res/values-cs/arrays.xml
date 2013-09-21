@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whisky</item>
+        <item>whiskey</item>
+        <item>sýr</item>
+        <item>cide, udělej fotku</item>
+    </string-array>
+
+    <string-array name="widget_flash_hints">
+        <item>Automaticky</item>
+        <item>Zakázán</item>
+        <item>Povolen</item>
+        <item>Svítilna</item>
+        <item>Redukce červených očí</item>
+    </string-array>
+
+    <string-array name="widget_effects_hints">
+        <item>Vypnutý</item>
+        <item>Černobílý</item>
+        <item>Negativní</item>
+        <item>Solarizace</item>
+        <item>Sépie</item>
+        <item>Posterizace</item>
+        <item>Černá tabule</item>
+        <item>Bílá tabule</item>
+        <item>Voda</item>
+        <item>Reliéf</item>
+        <item>Skica</item>
+        <item>Žádný</item>
+    </string-array>
+
+    <string-array name="widget_scenemode_hints">
+        <item>Automatický</item>
+        <item>Redukce rozmazání</item>
+        <item>Rozšířená realita</item>
+        <item>Nejlepší snímek</item>
+        <item>Dítě</item>
+        <item>Protisvětlo</item>
+        <item>Portrét s protisvětlem</item>
+        <item>Čárový kód</item>
+        <item>Pláž</item>
+        <item>Osvíceno svíčkami</item>
+        <item>Temné</item>
+        <item>Jídlo</item>
+        <item>Dokument</item>
+        <item>Ohňostroj</item>
+        <item>Květiny</item>
+        <item>Stmívání bez stativu</item>
+        <item>HDR</item>
+        <item>Vysoká citlivost</item>
+        <item>Krajina</item>
+        <item>Noc</item>
+        <item>Noční portrét</item>
+        <item>Noční portrét</item>
+        <item>Párty</item>
+        <item>Mazlíček</item>
+        <item>Portrét</item>
+        <item>Sníh</item>
+        <item>Měkké světlo</item>
+        <item>Sporty</item>
+        <item>Reflektor</item>
+        <item>Ze stativu</item>
+        <item>Západ slunce</item>
+        <item>Plynulé panorama</item>
+        <item>Divadlo</item>
+    </string-array>
+
+    <string-array name="widget_whitebalance_hints">
+        <item>Automaticky</item>
+        <item>Zataženo</item>
+        <item>Žárovka</item>
+        <item>Zářivka</item>
+        <item>Denní světlo</item>
+        <item>Zataženo ve dne</item>
+    </string-array>
+
+    <string-array name="widget_autoexposure_hints">
+        <item>Celoplošné průměrové</item>
+        <item>Se zdůrazněným středem</item>
+        <item>Bodové</item>
+    </string-array>
+</resources>

@@ -129,8 +129,8 @@ public class PanoProgressBar extends ImageView {
     }
 
     public void setProgress(int progress) {
-        // The panning direction will be decided after user pan more than 10 degrees in one
-        // direction.
+        // The panning direction will be decided after user pan more
+        // than 10 degrees in one direction.
         if (mDirection == DIRECTION_NONE) {
             if (progress > 10) {
                 setRightIncreasing(true);
@@ -141,7 +141,7 @@ public class PanoProgressBar extends ImageView {
         // mDirection might be modified by setRightIncreasing() above. Need to check again.
         if (mDirection != DIRECTION_NONE) {
             mProgress = progress * mWidth / mMaxProgress + mProgressOffset;
-            // value bounds.
+            // Value bounds
             mProgress = Math.min(mWidth, Math.max(0, mProgress));
             if (mDirection == DIRECTION_RIGHT) {
                 // The right most progress is adjusted.
@@ -183,7 +183,7 @@ public class PanoProgressBar extends ImageView {
             canvas.drawRect(l, mDrawBounds.top, r, mDrawBounds.bottom, mIndicatorPaint);
         }
 
-        // draw the mask image on the top for shaping.
+        // Draw the mask image on the top for shaping.
         super.onDraw(canvas);
     }
 }

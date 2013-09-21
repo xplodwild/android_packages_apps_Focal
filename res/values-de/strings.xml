@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Focal wird gestartet</string>
+    <string name="shutter_button">Auslöser</string>
+    <string name="cannot_connect_hal">Keine Verbindung zur Kamera möglich</string>
+    <string name="recording">Aufnehmen</string>
+    <string name="double_tap_to_snapshot">Doppelklicken, um ein Foto zu machen</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">OK</string>
+    <string name="no_gles20_support">Diese Funktion benötigt ein Gerät mit GLES2-Unterstützung</string>
+    <string name="no_gyroscope">Diese Funktion benötigt ein Gerät mit Gyroskop</string>
+    <string name="ps_long_press_to_stop">Auslöser lange drücken, um die PicSphere zu beenden</string>
+    <string name="disabled">Aus</string>
+    <string name="enabled">An</string>
+    <string name="no_video_player">Video kann nicht abgespielt werden, weil kein geeignetes Wiedergabeprogramm gefunden wurde</string>
+    <string name="fullscreen_shutter_info">Bildschirm berühren, um zu fotografieren</string>
+    <string name="please_wait">Bitte warten\u2026</string>
+    <string name="retouch">RETUSCHE</string>
+    <string name="open_in_gallery">GALERIE</string>
+    <string name="mode_photo">Foto</string>
+    <string name="mode_video">Video</string>
+    <string name="mode_picsphere">PicSphere</string>
+    <string name="mode_panorama">Panorama</string>
+    <string name="mode_switchcam">Kamera wechseln</string>
+    <string name="widget_burstmode_count_shots">%d Aufnahmen in Serie</string>
+    <string name="widget_burstmode_off">Serienaufnahme aus</string>
+    <string name="widget_burstmode_infinite">Unendlich</string>
+    <string name="widget_hdr_aebracket">Belichtungsreihe</string>
+    <string name="widget_settings_choose_widgets">Widgets der Seitenleiste wählen</string>
+    <string name="widget_settings_choose_widgets_button">Widgets auswählen</string>
+    <string name="widget_settings_picture_size">Bildgröße</string>
+    <string name="widget_settings_exposure_ring">Belichtungsring anzeigen</string>
+    <string name="widget_settings_autoenhance">Autom. Verbesserung</string>
+    <string name="widget_settings_ruleofthirds">Gitternetz</string>
+    <string name="widget_autoexposure">Belichtungsmessung</string>
+    <string name="widget_burstmode">Serienaufnahme</string>
+    <string name="widget_effect">Farbeffekte</string>
+    <string name="widget_enhancements">Farbverbesserungen</string>
+    <string name="widget_exposure_compensation">Belichtungskorrektur</string>
+    <string name="widget_flash">Blitzmodus</string>
+    <string name="widget_hdr">HDR-Aufnahme</string>
+    <string name="widget_iso">ISO</string>
+    <string name="widget_scenemode">Szenenmodus</string>
+    <string name="widget_settings">Einstellungen</string>
+    <string name="widget_shutter_speed">Auslösegeschwindigkeit</string>
+    <string name="widget_skintone">Verbesserung der Hauttöne</string>
+    <string name="widget_softwarehdr">HDR-Aufnahme (SW)</string>
+    <string name="widget_timermode">Selbstauslöser</string>
+    <string name="widget_videofr">Video-Bildrate</string>
+    <string name="widget_videohdr">HDR-Video</string>
+    <string name="widget_whitebalance">Weißabgleich</string>
+    <string name="pano_panorama_rendering_failed">Das Panoramabild konnte nicht erstellt werden./nBitte versuchen Sie eine kürzere Aufnahme</string>
+    <string name="pano_panorama_rendering">Panoramabild wird erstellt\u2026</string>
+    <string name="picsphere_undo_button">Rückgängig</string>
+    <string name="picsphere_start_hint">Zum Starten ein Bild machen</string>
+    <string name="picsphere_already_rendering">Bitte warten, bis das laufende Zusammenfügen abgeschlossen ist</string>
+    <string name="picsphere_rendering_progress">PicSphere wird zusammengefügt\u2026 (%d %%)</string>
+    <string name="picsphere_toast_background_render">Zusammenfügen gestartet\u2026</string>
+    <string name="picsphere_notif_title">PicSphere wird zusammengefügt\u2026</string>
+    <string name="picsphere_failed">Zusammenfügen fehlgeschlagen</string>
+    <string name="picsphere_failed_details">Bitte darauf achten, dass sich Fotos nur am Rand überlappen.</string>
+    <string name="picsphere_need_two_pics">Es sind mindestens zwei Fotos erforderlich.</string>
+    <string name="picsphere_step_preparing">Vorbereiten\u2026</string>
+    <string name="picsphere_step_ptogen">Metadaten generieren\u2026</string>
+    <string name="picsphere_step_ptovar">Kameraausrichtung speichern\u2026</string>
+    <string name="picsphere_step_cpfind">Kontrollpunkte suchen\u2026</string>
+    <string name="picsphere_step_autooptimiser">Bilder ausrichten\u2026</string>
+    <string name="picsphere_step_ptclean">Kontrollpunkte löschen\u2026</string>
+    <string name="picsphere_step_panomodify">Leere Bereiche entfernen\u2026</string>
+    <string name="picsphere_step_nona">Bilder zusammenfügen\u2026</string>
+    <string name="picsphere_step_enblend">Bilder überblenden\u2026</string>
+    <string name="software_hdr_notif_title">HDR-Bild wird verarbeitet\u2026</string>
+    <string name="software_hdr_failed">HDR-Berechnung fehlgeschlagen</string>
+    <string name="software_hdr_failed_details">Die Quellbilder wurden erhalten.</string>
+    <string name="showcase_welcome_1_title">Willkommen!</string>
+    <string name="showcase_welcome_1_body">Die Optionen sind in der Seitenleiste,\nziehen Sie sie einfach heraus.</string>
+    <string name="showcase_welcome_2_title">Auslöser</string>
+    <string name="showcase_welcome_2_body">Drücken Sie den Auslöser, um ein Foto zu machen.\nZiehen Sie ihn, um weitere Modi anzuzeigen.</string>
+    <string name="showcase_panorama_title">Panorama-Modus</string>
+    <string name="showcase_panorama_body">Drücken Sie den Auslöser, um ein Panorama zu beginnen und schwenken Sie Ihr Gerät für die Aufnahme.\nWenn Sie fertig sind, drücken Sie den Auslöser erneut.</string>
+    <string name="showcase_picsphere_title">PicSphere-Modus</string>
+    <string name="showcase_picsphere_body">Richten Sie das erste Bild aus. Danach drücken Sie für jedes Bild der PicSphere einmal den Auslöser. Die blauen Punkte dienen als Referenz.\nDrücken Sie den Auslöser lange, um die Aufnahme abzuschließen.</string>
+    <string name="iso_hint_auto">Automatisch</string>
+    <string name="iso_hint_hjr">Bildstabilisierung</string>
+    <string name="iso_hint_100">ISO 100</string>
+    <string name="iso_hint_200">ISO 200</string>
+    <string name="iso_hint_400">ISO 400</string>
+    <string name="iso_hint_800">ISO 800</string>
+    <string name="iso_hint_1600">ISO 1600</string>
+</resources>

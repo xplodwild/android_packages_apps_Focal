@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Abrir Focal</string>
+    <string name="shutter_button">Disparador</string>
+    <string name="cannot_connect_hal">Imposible conectar con la cámara</string>
+    <string name="recording">Grabando</string>
+    <string name="double_tap_to_snapshot">Doble toque para tomar una foto</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">ACEPTAR</string>
+    <string name="no_gles20_support">El dispositivo no soporta GLES2</string>
+    <string name="no_gyroscope">El dispositivo no dispone de giróscopo</string>
+    <string name="ps_long_press_to_stop">Para finalizar la captura haz una\npulsación larga sobre el disparador.</string>
+    <string name="disabled">Deshabilitado</string>
+    <string name="enabled">Habilitado</string>
+    <string name="no_video_player">Imposible reproducir el vídeo. No se ha encontrado un reproductor</string>
+    <string name="fullscreen_shutter_info">Toca en cualquier sitio para disparar</string>
+    <string name="please_wait">Por favor, espera\u2026</string>
+    <string name="retouch">RETOCAR</string>
+    <string name="open_in_gallery">GALERÍA</string>
+    <string name="mode_photo">Foto</string>
+    <string name="mode_video">Vídeo</string>
+    <string name="mode_picsphere">PicSphere</string>
+    <string name="mode_panorama">Panorámica</string>
+    <string name="mode_switchcam">Frontal</string>
+    <string name="widget_burstmode_count_shots">Ráfaga de %d disparos</string>
+    <string name="widget_burstmode_off">Modo ráfaga deshabilitado</string>
+    <string name="widget_burstmode_infinite">Ráfaga continua</string>
+    <string name="widget_hdr_aebracket">Exposición HDR automática</string>
+    <string name="widget_settings_choose_widgets">Elegir los widgets para la barra lateral</string>
+    <string name="widget_settings_choose_widgets_button">Elegir widgets</string>
+    <string name="widget_settings_picture_size">Tamaño de imagen</string>
+    <string name="widget_settings_exposure_ring">Control de exposición</string>
+    <string name="widget_settings_autoenhance">Mejoras automáticas</string>
+    <string name="widget_settings_ruleofthirds">Regla de los tercios</string>
+    <string name="widget_autoexposure">Medición de exposición</string>
+    <string name="widget_burstmode">Modo de ráfaga</string>
+    <string name="widget_effect">Efectos de color</string>
+    <string name="widget_enhancements">Mejoras de color</string>
+    <string name="widget_exposure_compensation">Compensación de exposición</string>
+    <string name="widget_flash">Modo de flash</string>
+    <string name="widget_hdr">Alto rango dinámico (HDR)</string>
+    <string name="widget_iso">Sensibilidad ISO</string>
+    <string name="widget_scenemode">Modo de escena</string>
+    <string name="widget_settings">Ajustes</string>
+    <string name="widget_shutter_speed">Velocidad obturador</string>
+    <string name="widget_skintone">Mejora tono de piel</string>
+    <string name="widget_softwarehdr">Alto rango dinámico (HDR)</string>
+    <string name="widget_timermode">Temporizador</string>
+    <string name="widget_videofr">Fotogramas por segundo</string>
+    <string name="widget_videohdr">Vídeo de alto rango dinámico</string>
+    <string name="widget_whitebalance">Balance de blancos</string>
+    <string name="pano_panorama_rendering_failed">Error al procesar la foto panorámica.\nIntenta tomar una captura más corta.</string>
+    <string name="pano_panorama_rendering">Procesando la foto panorámica\u2026</string>
+    <string name="picsphere_undo_button">DESHACER</string>
+    <string name="picsphere_start_hint">Toma una foto para iniciar PicSphere</string>
+    <string name="picsphere_already_rendering">Por favor, espera a que termine el procesado de la foto PicSphere actual</string>
+    <string name="picsphere_rendering_progress">Procesando\u2026 (%d %%)</string>
+    <string name="picsphere_toast_background_render">Iniciando procesamiento\u2026</string>
+    <string name="picsphere_notif_title">Procesando la foto PicSphere\u2026</string>
+    <string name="picsphere_failed">Error al procesar la foto PicSphere</string>
+    <string name="picsphere_failed_details">Asegúrate de que las imágenes solo se solapan en sus bordes.</string>
+    <string name="picsphere_need_two_pics">Necesitas al menos dos imágenes.</string>
+    <string name="picsphere_step_preparing">Preparando\u2026</string>
+    <string name="picsphere_step_ptogen">Generando metadatos\u2026</string>
+    <string name="picsphere_step_ptovar">Guardando orientación\u2026</string>
+    <string name="picsphere_step_cpfind">Buscando puntos de control\u2026</string>
+    <string name="picsphere_step_autooptimiser">Optimizando coincidencias\u2026</string>
+    <string name="picsphere_step_ptclean">Limpiando zonas coincidentes\u2026</string>
+    <string name="picsphere_step_panomodify">Recortando áreas vacías\u2026</string>
+    <string name="picsphere_step_nona">Procesando imágenes\u2026</string>
+    <string name="picsphere_step_enblend">Uniendo imágenes\u2026</string>
+    <string name="software_hdr_notif_title">Procesando imagen HDR\u2026</string>
+    <string name="software_hdr_failed">Error al procesar la imagen HDR</string>
+    <string name="software_hdr_failed_details">Las imágenes originales se han conservado.</string>
+    <string name="showcase_welcome_1_title">¡Bienvenido!</string>
+    <string name="showcase_welcome_1_body">Las opciones se encuentran en la barra lateral.\nDesliza sobre la pantalla para mostrarlas.</string>
+    <string name="showcase_welcome_2_title">Disparador</string>
+    <string name="showcase_welcome_2_body">Toca sobre el disparador para tomar una foto.\nDesliza sobre él para acceder a otros modos de captura.</string>
+    <string name="showcase_panorama_title">Panorámica</string>
+    <string name="showcase_panorama_body">Toca sobre el disparador para iniciar la foto panorámica\ny desplaza lentamente la cámara sobre lo que deseas capturar.\nPara terminar, toca sobre el disparador nuevamente.</string>
+    <string name="showcase_picsphere_title">PicSphere</string>
+    <string name="showcase_picsphere_body">Toca sobre el disparador para tomar la primera imagen.\nAhora, toca sucesivamente el disparador en cada uno de los\npuntos azules que aparecerán como referencia, para ir\ncomponiendo la foto PicSphere.\nUn toque largo sobre el disparador finalizará el proceso.</string>
+    <string name="iso_hint_auto">ISO automático</string>
+    <string name="iso_hint_hjr">ISO reductor temblor</string>
+    <string name="iso_hint_100">ISO 100</string>
+    <string name="iso_hint_200">ISO 200</string>
+    <string name="iso_hint_400">ISO 400</string>
+    <string name="iso_hint_800">ISO 800</string>
+    <string name="iso_hint_1600">ISO 1600</string>
+</resources>

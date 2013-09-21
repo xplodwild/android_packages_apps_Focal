@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2013 The CyanogenMod Project
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+<resources>
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whisky</item>
+        <item>whiskey</item>
+        <item>cheese</item>
+        <item>ok cid, take a picture</item>
+    </string-array>
+    <string-array name="widget_flash_hints">
+        <item>Auto</item>
+        <item>Deaktiveret</item>
+        <item>Aktiveret</item>
+        <item>Lommelygte</item>
+        <item>Rødøjereduktion</item>
+    </string-array>
+    <string-array name="widget_effects_hints">
+        <item>Deaktiveret</item>
+        <item>Sort &amp; Hvid</item>
+        <item>Negativ</item>
+        <item>Solarisering</item>
+        <item>Sepia</item>
+        <item>Posterisering</item>
+        <item>Sort tavle</item>
+        <item>Hvid tavle</item>
+        <item>Vand</item>
+        <item>Relief</item>
+        <item>Skitse</item>
+        <item>Neon</item>
+    </string-array>
+    <string-array name="widget_scenemode_hints">
+        <item>Automatisk</item>
+        <item>Antisløring</item>
+        <item>Augmenteret virkelighed</item>
+        <item>Bedste foto</item>
+        <item>Baby</item>
+        <item>Bagbelysning</item>
+        <item>Bagbelyst portræt</item>
+        <item>Stregkode</item>
+        <item>Strand</item>
+        <item>Stearinlys</item>
+        <item>Mørk</item>
+        <item>Fad</item>
+        <item>Dokument</item>
+        <item>Fyrværkeri</item>
+        <item>Blomster</item>
+        <item>Håndholdt Skumring</item>
+        <item>HDR</item>
+        <item>Høj følsomhed</item>
+        <item>Landskab</item>
+        <item>Nat</item>
+        <item>Natportræt</item>
+        <item>Natportræt</item>
+        <item>Fest</item>
+        <item>Kæledyr</item>
+        <item>Portræt</item>
+        <item>Sne</item>
+        <item>Blød hud</item>
+        <item>Sport</item>
+        <item>Spotlight</item>
+        <item>Stabilt foto</item>
+        <item>Solnedgang</item>
+        <item>Sammenhæftning</item>
+        <item>Teater</item>
+    </string-array>
+    <string-array name="widget_whitebalance_hints">
+        <item>Automatisk</item>
+        <item>Overskyet</item>
+        <item>Hvidglødende</item>
+        <item>Fluorescerende</item>
+        <item>Dagslys</item>
+        <item>Overskyet dagslys</item>
+    </string-array>
+    <string-array name="widget_autoexposure_hints">
+        <item>Rammegennemsnit</item>
+        <item>Centervægtet</item>
+        <item>Spotmåling</item>
+    </string-array>
+</resources>

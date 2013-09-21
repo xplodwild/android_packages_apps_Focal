@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2013 The CyanogenMod Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
+ */
+
 package org.cyanogenmod.focal.feats;
 
 import android.app.Notification;
@@ -9,7 +28,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SnapshotManager;
 import org.cyanogenmod.focal.Util;
 import org.cyanogenmod.focal.picsphere.PicSphere;
@@ -77,8 +96,8 @@ public class SoftwareHdrRenderingService extends Service {
 
         new Thread() {
             public void run() {
-                SoftwareHdrProcessor processor = new SoftwareHdrProcessor(SoftwareHdrRenderingService.this,
-                        snapMan);
+                SoftwareHdrProcessor processor =
+                        new SoftwareHdrProcessor(SoftwareHdrRenderingService.this, snapMan);
                 processor.setPictures(pictures);
 
                 if (processor.render(orientation)) {
@@ -86,9 +105,9 @@ public class SoftwareHdrRenderingService extends Service {
                     removeTempFiles(picturesUri, processor.getTempPath());
                 } else {
                     mHasFailed = true;
-                    mNM.notify(NOTIFICATION,
-                            buildFailureNotification(getString(R.string.software_hdr_failed),
-                                    getString(R.string.software_hdr_failed_details)));
+                    mNM.notify(NOTIFICATION, buildFailureNotification(getString(
+                            R.string.software_hdr_failed), getString(
+                            R.string.software_hdr_failed_details)));
                 }
 
                 SoftwareHdrRenderingService.this.stopSelf();
@@ -100,7 +119,8 @@ public class SoftwareHdrRenderingService extends Service {
         // Remove source pictures and temporary path
         for (Uri uri : pictures) {
             List<String> segments = uri.getPathSegments();
-            Util.removeFromGallery(getContentResolver(), Integer.parseInt(segments.get(segments.size() - 1)));
+            Util.removeFromGallery(getContentResolver(),
+                    Integer.parseInt(segments.get(segments.size() - 1)));
         }
 
         tempPath.delete();

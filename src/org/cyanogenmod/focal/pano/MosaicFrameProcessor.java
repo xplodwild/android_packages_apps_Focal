@@ -65,7 +65,7 @@ public class MosaicFrameProcessor {
 
     public interface ProgressListener {
         public void onProgress(boolean isFinished, float panningRateX, float panningRateY,
-                               float progressX, float progressY);
+                float progressX, float progressY);
     }
 
     public static MosaicFrameProcessor getInstance() {
@@ -117,7 +117,9 @@ public class MosaicFrameProcessor {
     private void setupMosaicer(int previewWidth, int previewHeight, int bufSize) {
         Log.v(TAG, "setupMosaicer w, h=" + previewWidth + ',' + previewHeight + ',' + bufSize);
 
-        if (mIsMosaicMemoryAllocated) throw new RuntimeException("MosaicFrameProcessor in use!");
+        if (mIsMosaicMemoryAllocated) {
+            throw new RuntimeException("MosaicFrameProcessor in use!");
+        }
         mIsMosaicMemoryAllocated = true;
         mMosaicer.allocateMosaicMemory(previewWidth, previewHeight);
     }

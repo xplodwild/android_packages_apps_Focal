@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2013 The CyanogenMod Project
+     Copyright (C) 2013 The CyanogenMod Project
 
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
 -->
-
-<resources>
-    <!-- Hardware HDR settings keys. If any of these key is present, the software HDR widget is
-         hidden. If you need to force-disable software HDR, see config.xml -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+        tools:locale="en">
+    <!-- Hardware HDR settings keys. If any of these key is present, the software HDR widget
+         is hidden. If you need to force-disable software HDR, see config.xml. -->
     <string-array name="hardware_hdr_keys" translatable="false">
         <item>ae-bracket-hdr</item>
     </string-array>
-
 
     <!-- Voice shutter trigger commands -->
     <string-array name="transformer_timer_voice_words">
@@ -44,7 +44,6 @@
         <item>red-eye</item>
     </string-array>
 
-
     <array name="widget_flash_icons" translatable="false">
         <item>@drawable/ic_widget_flash_auto</item>
         <item>@drawable/ic_widget_flash_off</item>
@@ -60,7 +59,6 @@
         <item>Torch</item>
         <item>Red-eye reduction</item>
     </string-array>
-
 
     <!-- Effects widget values -->
     <string-array name="widget_effects_values" translatable="false">
@@ -129,16 +127,15 @@
         <item>@drawable/ic_widget_iso_1600</item>
     </array>
 
-    <string-array name="widget_iso_hints">
-        <item>Automatic ISO</item>
-        <item>Hands-Jitter Reduction ISO</item>
-        <item>100 ISO</item>
-        <item>200 ISO</item>
-        <item>400 ISO</item>
-        <item>800 ISO</item>
-        <item>1600 ISO</item>
+    <string-array name="widget_iso_hints" translatable="false">
+        <item>@string/iso_hint_auto</item>
+        <item>@string/iso_hint_hjr</item>
+        <item>@string/iso_hint_100</item>
+        <item>@string/iso_hint_200</item>
+        <item>@string/iso_hint_400</item>
+        <item>@string/iso_hint_800</item>
+        <item>@string/iso_hint_1600</item>
     </string-array>
-
 
     <!-- Scene Mode widget values -->
     <string-array name="widget_scenemode_values" translatable="false">

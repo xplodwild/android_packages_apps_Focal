@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.picsphere;
@@ -88,8 +89,8 @@ public class Quaternion {
         float wz = w * z;
 
         // This calculation would be a lot more complicated for non-unit length quaternions
-        // Note: The constructor of Matrix4 expects the Matrix in column-major format like expected by
-        // OpenGL
+        // Note: The constructor of Matrix4 expects the Matrix in column-major format like
+        // expected by OpenGL
         return new float[]{1.0f - 2.0f * (y2 + z2), 2.0f * (xy - wz), 2.0f * (xz + wy), 0.0f,
                 2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz - wx), 0.0f,
                 2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f,

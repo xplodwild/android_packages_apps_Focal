@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Εκκίνηση Focal</string>
+    <string name="shutter_button">Πλήκτρο κλείστρου</string>
+    <string name="cannot_connect_hal">Δεν είναι δυνατή η σύνδεση με τη φωτογραφική μηχανή</string>
+    <string name="recording">Εγγραφή</string>
+    <string name="double_tap_to_snapshot">Διπλό πάτημα για λήψη φωτογραφίας</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">ΟΚ</string>
+    <string name="no_gles20_support">Η συσκευή σας δεν υποστηρίζει GLES2</string>
+    <string name="no_gyroscope">Η συσκευή σας δεν έχει γυροσκόπιο</string>
+    <string name="ps_long_press_to_stop">Κρατήστε πατημένο το πλήκτρο\nκλείστρου για να ολοκληρώσετε το sphere σας.</string>
+    <string name="disabled">Ανενεργό</string>
+    <string name="enabled">Ενεργό</string>
+    <string name="no_video_player">Δεν είναι δυνατή η αναπαραγωγή του βίντεο, δεν βρέθηκε πρόγραμμα αναπαραγωγής</string>
+    <string name="fullscreen_shutter_info">Πιέστε οπουδήποτε για λήψη</string>
+    <string name="please_wait">Παρακαλώ περιμένετε\u2026</string>
+    <string name="retouch">ΡΕΤΟΥΣ</string>
+    <string name="open_in_gallery">ΣΥΛΛΟΓΗ</string>
+    <string name="mode_photo">Φωτογραφία</string>
+    <string name="mode_video">Βίντεο</string>
+    <string name="mode_picsphere">PicSphere</string>
+    <string name="mode_panorama">Πανόραμα</string>
+    <string name="mode_switchcam">Εμπρόσθια</string>
+    <string name="widget_burstmode_count_shots">Ρίψη %d λήψεων</string>
+    <string name="widget_burstmode_off">Απενεργοποίηση λειτουργίας ριπής</string>
+    <string name="widget_burstmode_infinite">Απεριόριστη ριπή</string>
+    <string name="widget_hdr_aebracket">Αυτόματο bracketing</string>
+    <string name="widget_settings_choose_widgets">Επιλέξτε widget στην πλαϊνή μπάρα</string>
+    <string name="widget_settings_choose_widgets_button">Επιλέξτε widget</string>
+    <string name="widget_settings_picture_size">Μέγεθος εικόνας</string>
+    <string name="widget_settings_exposure_ring">Εμφάνιση δαχτυλιδιού έκθεσης</string>
+    <string name="widget_settings_autoenhance">Αυτόματη βελτίωση</string>
+    <string name="widget_settings_ruleofthirds">Νόμος των τρίτων</string>
+    <string name="widget_autoexposure">Λειτουργία μέτρησης έκθεσης</string>
+    <string name="widget_burstmode">Λειτουργία ριπής</string>
+    <string name="widget_effect">Εφέ χρώματος</string>
+    <string name="widget_enhancements">Βελτιώσεις χρώματος</string>
+    <string name="widget_exposure_compensation">Αντιστάθμιση έκθεσης</string>
+    <string name="widget_flash">Λειτουργία φλας</string>
+    <string name="widget_hdr">Υψηλό δυναμικό εύρος (HDR)</string>
+    <string name="widget_iso">Ευαισθησία ISO</string>
+    <string name="widget_scenemode">Λειτουργία σκηνής</string>
+    <string name="widget_settings">Ρυθμίσεις</string>
+    <string name="widget_shutter_speed">Ταχύτητα κλείστρου</string>
+    <string name="widget_skintone">Βελτίωση τόνου δέρματος</string>
+    <string name="widget_softwarehdr">Υψηλό δυναμικό εύρος (HDR)</string>
+    <string name="widget_timermode">Λειτουργία χρονοδιακόπτη</string>
+    <string name="widget_videofr">Ρυθμός καρέ βίντεο</string>
+    <string name="widget_videohdr">Υψηλό δυναμικό εύρος βίντεο (HDR)</string>
+    <string name="widget_whitebalance">Ισορροπία λευκού</string>
+    <string name="pano_panorama_rendering_failed">Απέτυχε η επεξεργασία του πανοράματος.\nΠροσπαθήστε να τραβήξετε ένα μικρότερο.</string>
+    <string name="pano_panorama_rendering">Επεξεργασία πανοράματος\u2026</string>
+    <string name="picsphere_undo_button">ΑΝΑΙΡΕΣΗ</string>
+    <string name="picsphere_start_hint">Τραβήξτε μια φωτογραφία για να ξεκινήσετε ένα sphere</string>
+    <string name="picsphere_already_rendering">Παρακαλώ περιμένετε την επεξεργασία του τρέχοντος PicSphere</string>
+    <string name="picsphere_rendering_progress">Επεξεργασία\u2026 (%d %%)</string>
+    <string name="picsphere_toast_background_render">Η επεξεργασία ξεκίνησε\u2026</string>
+    <string name="picsphere_notif_title">Επεξεργασία PicSphere\u2026</string>
+    <string name="picsphere_failed">Απέτυχε η επεξεργασία του PicSphere</string>
+    <string name="picsphere_failed_details">Βεβαιωθείτε ότι οι εικόνες επικαλύπτονται μόνο στις άκρες τους.</string>
+    <string name="picsphere_need_two_pics">Χρειάζεστε τουλάχιστον δύο φωτογραφίες.</string>
+    <string name="picsphere_step_preparing">Προετοιμασία\u2026</string>
+    <string name="picsphere_step_ptogen">Δημιουργία μεταδεδομένων\u2026</string>
+    <string name="picsphere_step_ptovar">Αποθήκευση προσανατολισμού μηχανής\u2026</string>
+    <string name="picsphere_step_cpfind">Εύρεση σημείων ελέγχου\u2026</string>
+    <string name="picsphere_step_autooptimiser">Βελτίωση ταιριάγματος\u2026</string>
+    <string name="picsphere_step_ptclean">Καθαρισμός σημείων\u2026</string>
+    <string name="picsphere_step_panomodify">Περικόπή άδειων περιοχών\u2026</string>
+    <string name="picsphere_step_nona">Συρραφή εικόνων\u2026</string>
+    <string name="picsphere_step_enblend">Συνδυασμός εικόνων\u2026</string>
+    <string name="software_hdr_notif_title">Υπολογισμός φωτογραφίας HDR\u2026</string>
+    <string name="software_hdr_failed">Απέτυχε η επεξεργασία HDR</string>
+    <string name="software_hdr_failed_details">Οι αρχικές φωτογραφίες έχουν αποθηκευτεί.</string>
+    <string name="showcase_welcome_1_title">Καλώς ήλθατε!</string>
+    <string name="showcase_welcome_1_body">Οι επιλογές είναι στην πλαϊνή μπάρα,\nαπλώς σύρτε την.</string>
+    <string name="showcase_welcome_2_title">Πλήκτρο κλείστρου</string>
+    <string name="showcase_welcome_2_body">Πιέστε το πλήκτρο κλείστρου για να τραβήξετε\nμια φωτογραφία. Συρετέ το για πρόσβαση\nστις άλλες λειτουργίες λήψης.</string>
+    <string name="showcase_panorama_title">Λειτουργία πανοράματος</string>
+    <string name="showcase_panorama_body">Πιέστε το πλήκτρο κλείστρου για να ξεκινήσετε το\nπανόραμα και επιλέξτε τι θέλετε να καταγράψετε.\nΜόλις τελειώσετε, πιέστε ξανά το πλήκτρο κλείστρου.</string>
+    <string name="showcase_picsphere_title">Λειτουργία PicSphere</string>
+    <string name="showcase_picsphere_body">Ευθυγραμμίστε την πρώτη εικόνα όπου σας αρέσει\nκαι μετά πιέστε το πλήκτρο κλείστρου για να τραβήξετε\nκάθε φωτογραφία του sphere. Οι μπλε τελείες είναι\nσημεία αναφοράς που μπορείτε να ακολουθήσετε.\nΜόλις τελειώσετε, πιέστε παρατεταμένα το πλήκτρο κλείστρου.</string>
+    <string name="iso_hint_auto">Αυτόματο ISO</string>
+    <string name="iso_hint_hjr">ISO μείωσης κουνήματος χεριού</string>
+    <string name="iso_hint_100">ISO 100</string>
+    <string name="iso_hint_200">ISO 200</string>
+    <string name="iso_hint_400">ISO 400</string>
+    <string name="iso_hint_800">ISO 800</string>
+    <string name="iso_hint_1600">ISO 1600</string>
+</resources>

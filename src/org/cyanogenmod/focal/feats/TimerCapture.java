@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.feats;
@@ -29,8 +30,7 @@ import android.speech.SpeechRecognizer;
 import android.util.Log;
 
 import org.cyanogenmod.focal.CameraActivity;
-import org.cyanogenmod.focal.CameraManager;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SnapshotManager;
 import org.cyanogenmod.focal.ui.ShutterButton;
 
@@ -100,7 +100,7 @@ public class TimerCapture extends CaptureTransformer implements RecognitionListe
 
     public void initializeVoiceShutter() {
         if (!mIsInitialised) {
-            Context context =  mCamManager.getPreviewSurface().getContext();
+            Context context =  mCamManager.getContext();
 
             if (context == null) {
                 Log.e(TAG, "Could not initialise voice shutter because of null context");
@@ -120,7 +120,8 @@ public class TimerCapture extends CaptureTransformer implements RecognitionListe
 
             mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
-            mShutterWords = context.getResources().getStringArray(R.array.transformer_timer_voice_words);
+            mShutterWords = context.getResources().getStringArray(
+                    R.array.transformer_timer_voice_words);
         }
 
         // Turn it on
@@ -200,7 +201,7 @@ public class TimerCapture extends CaptureTransformer implements RecognitionListe
 
     @Override
     public void onReadyForSpeech(Bundle bundle) {
-        Log.e(TAG, "ON READY FOR SPEECH");
+        Log.d(TAG, "ON READY FOR SPEECH");
         //mIsCountDownOn = true;
         //mNoSpeechCountDown.start();
         if (mIsMuted) {
@@ -232,11 +233,6 @@ public class TimerCapture extends CaptureTransformer implements RecognitionListe
     @Override
     public void onError(int error) {
         Log.e(TAG, "error " +  error);
-        /*if (mIsCountDownOn)
-        {
-            mIsCountDownOn = false;
-            mNoSpeechCountDown.cancel();
-        }*/
         mIsInitialised = false;
         initializeVoiceShutter();
     }
@@ -244,17 +240,11 @@ public class TimerCapture extends CaptureTransformer implements RecognitionListe
     @Override
     public void onResults(Bundle bundle) {
         onPartialResults(bundle);
-
-        /* If after processing the full results there's still no answer, re-arm */
-        //if (mSpeechActive) {
         initializeVoiceShutter();
-        //}
     }
 
     @Override
     public void onPartialResults(Bundle partialResults) {
-        //Log.d(TAG, "got partials!");
-        //if (!mSpeechActive) { return; }
         ArrayList data = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         if (data == null) {
             Log.e(TAG, "Null Partial Results");
@@ -282,7 +272,6 @@ public class TimerCapture extends CaptureTransformer implements RecognitionListe
     public void onEvent(int i, Bundle bundle) {
 
     }
-
 
     public void updateTimerIndicator() {
 

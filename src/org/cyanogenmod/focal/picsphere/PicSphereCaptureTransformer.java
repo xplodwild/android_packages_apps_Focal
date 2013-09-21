@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.picsphere;
@@ -21,7 +22,7 @@ package org.cyanogenmod.focal.picsphere;
 import android.util.Log;
 
 import org.cyanogenmod.focal.CameraActivity;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SnapshotManager;
 import org.cyanogenmod.focal.feats.CaptureTransformer;
 import org.cyanogenmod.focal.ui.ShutterButton;
@@ -35,6 +36,7 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
     private PicSphereManager mPicSphereManager;
     private PicSphere mPicSphere;
     private CameraActivity mContext;
+    private Vector3 mLastShotAngle;
 
     public PicSphereCaptureTransformer(CameraActivity context) {
         super(context.getCamManager(), context.getSnapManager());
@@ -43,7 +45,9 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
     }
 
     public void removeLastPicture() {
-        if (mPicSphere == null) return;
+        if (mPicSphere == null) {
+            return;
+        }
 
         mPicSphere.removeLastPicture();
         mPicSphereManager.getRenderer().removeLastPicture();
@@ -57,21 +61,18 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
     @Override
     public void onShutterButtonClicked(ShutterButton button) {
         if (mPicSphere == null) {
-            if (mPicSphereManager.getSpheresCount() == 0) {
-                // Initialize a new sphere
-                mPicSphere = mPicSphereManager.createPicSphere();
-                float horizontalAngle = mCamManager.getParameters().getHorizontalViewAngle();
+            // Initialize a new sphere
+            mPicSphere = mPicSphereManager.createPicSphere();
+            float horizontalAngle = mCamManager.getParameters().getHorizontalViewAngle();
 
-                // In theory, drivers should return a proper value for horizontal angle. However,
-                // some careless OEMs put "0" or "360" to pass CTS, so we just check if the value
-                // seems legit, otherwise we put 45° as it's the angle of most phone lenses.
-                if (horizontalAngle < 30 || horizontalAngle > 70) horizontalAngle = 45;
-
-                mPicSphere.setHorizontalAngle(horizontalAngle);
-            } else {
-                CameraActivity.notify(mContext.getString(R.string.picsphere_already_rendering), 2000);
-                return;
+            // In theory, drivers should return a proper value for horizontal angle. However,
+            // some careless OEMs put "0" or "360" to pass CTS, so we just check if the value
+            // seems legit, otherwise we put 45° as it's the angle of most phone lenses.
+            if (horizontalAngle < 30 || horizontalAngle > 70) {
+                horizontalAngle = 45;
             }
+
+            mPicSphere.setHorizontalAngle(horizontalAngle);
         }
 
         mSnapManager.setBypassProcessing(true);
@@ -82,7 +83,6 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
         if (mPicSphere != null && mPicSphere.getPicturesCount() == 0) {
             CameraActivity.notify(mContext.getString(R.string.ps_long_press_to_stop), 4000);
         }
-
     }
 
     @Override
@@ -104,6 +104,7 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
     @Override
     public void onSnapshotShutter(SnapshotManager.SnapshotInfo info) {
         mPicSphereManager.getRenderer().addSnapshot(info.mThumbnail);
+        mLastShotAngle = mPicSphereManager.getRenderer().getAngleAsVector();
     }
 
     @Override
@@ -119,7 +120,7 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
     @Override
     public void onSnapshotSaved(SnapshotManager.SnapshotInfo info) {
         if (mPicSphere != null) {
-            mPicSphere.addPicture(info.mUri);
+            mPicSphere.addPicture(info.mUri, mLastShotAngle);
             mContext.setPicSphereUndoVisible(true);
             mContext.setHelperText("");
         } else {

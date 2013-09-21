@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.picsphere;
@@ -30,7 +31,7 @@ import android.view.TextureView;
 import android.widget.FrameLayout;
 
 import org.cyanogenmod.focal.CameraActivity;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SnapshotManager;
 
 import java.io.File;
@@ -205,8 +206,8 @@ public class PicSphereManager implements PicSphere.ProgressListener {
     private boolean copyBinaries() {
         try {
             String files[] = {
-                    "autooptimiser", "autopano", "celeste", "enblend", "enfuse", "nona", "pano_modify",
-                    "ptclean", "tiffinfo", "align_image_stack",
+                    "autooptimiser", "pto_gen", "cpfind", "celeste", "multiblend", "enfuse", "nona", "pano_modify",
+                    "ptclean", "tiffinfo", "align_image_stack", "pto_var",
                     "libexiv2.so", "libglib-2.0.so", "libgmodule-2.0.so", "libgobject-2.0.so",
                     "libgthread-2.0.so", "libjpeg.so", "libpano13.so", "libtiff.so", "libtiffdecoder.so",
                     "libvigraimpex.so"
@@ -257,8 +258,8 @@ public class PicSphereManager implements PicSphere.ProgressListener {
     @Override
     public void onStepChange(PicSphere sphere, int newStep) {
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE) {
-            mContext.setHelperText(String.format(mContext.getString(R.string.picsphere_rendering_progress),
-                    sphere.getRenderProgress()));
+            mContext.setHelperText(String.format(mContext.getString(
+                    R.string.picsphere_rendering_progress), sphere.getRenderProgress()));
         }
     }
 
@@ -274,5 +275,4 @@ public class PicSphereManager implements PicSphere.ProgressListener {
             mCapture3DRenderer.setCamPreviewVisible(true);
         }
     }
-
 }

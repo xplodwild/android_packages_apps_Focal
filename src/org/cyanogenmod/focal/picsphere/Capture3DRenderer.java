@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.picsphere;
@@ -30,7 +31,7 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import org.cyanogenmod.focal.CameraManager;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -44,8 +45,8 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * Manages the 3D rendering of the sphere capture mode, using gyroscope to orientate the camera
- * and displays the preview at the center.
+ * Manages the 3D rendering of the sphere capture mode, using gyroscope to
+ * orientate the camera and displays the preview at the center.
  *
  * TODO: Fallback for non-GLES2 devices?
  */
@@ -86,11 +87,15 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
                     SNAPSHOT_SCALE *RATIO, SNAPSHOT_SCALE,
                     SNAPSHOT_SCALE *RATIO, -SNAPSHOT_SCALE
             };
+
     // u,v
-    private final float mTexCoordData[] =   {0.0f, 0.0f,
-            0.0f, 1.0f,
-            1.0f, 1.0f,
-            1.0f, 0.0f};
+    private final float mTexCoordData[] =
+            {
+                    0.0f, 0.0f,
+                    0.0f, 1.0f,
+                    1.0f, 1.0f,
+                    1.0f, 0.0f
+            };
 
     private final static int CAMERA = 0;
     private final static int SNAPSHOT = 1;
@@ -125,30 +130,34 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         public Skybox() {
             mFaces[FACE_NORTH] = new Snapshot(false);
             mFaces[FACE_NORTH].mModelMatrix = matrixFromEuler(0, 90, 0, 0, 0, DIST);
-            mFaces[FACE_NORTH].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_fr));
+            mFaces[FACE_NORTH].setTexture(BitmapFactory.decodeResource(mContext.getResources(),
+                    R.drawable.picsphere_sky_fr));
 
             mFaces[FACE_SOUTH] = new Snapshot(false);
             mFaces[FACE_SOUTH].mModelMatrix = matrixFromEuler(0, 90, 0, 0, 0, -DIST);
-            mFaces[FACE_SOUTH].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_bk));
+            mFaces[FACE_SOUTH].setTexture(BitmapFactory.decodeResource(mContext.getResources(),
+                    R.drawable.picsphere_sky_bk));
 
             mFaces[FACE_WEST] = new Snapshot(false);
             mFaces[FACE_WEST].mModelMatrix = matrixFromEuler(0, 90, 90, 0, 0, DIST);
-            mFaces[FACE_WEST].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_lt));
+            mFaces[FACE_WEST].setTexture(BitmapFactory.decodeResource(mContext.getResources(),
+                    R.drawable.picsphere_sky_lt));
 
             mFaces[FACE_EAST] = new Snapshot(false);
             mFaces[FACE_EAST].mModelMatrix = matrixFromEuler(0, 90, 270, 0, 0, DIST);
-            mFaces[FACE_EAST].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_rt));
+            mFaces[FACE_EAST].setTexture(BitmapFactory.decodeResource(mContext.getResources(),
+                    R.drawable.picsphere_sky_rt));
 
             mFaces[FACE_UP] = new Snapshot(false);
             mFaces[FACE_UP].mModelMatrix = matrixFromEuler(90, 0, 270, 0, 0, DIST);
-            mFaces[FACE_UP].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_up));
+            mFaces[FACE_UP].setTexture(BitmapFactory.decodeResource(mContext.getResources(),
+                    R.drawable.picsphere_sky_up));
 
             mFaces[FACE_DOWN] = new Snapshot(false);
             mFaces[FACE_DOWN].mModelMatrix = matrixFromEuler(-90, 0, 90, 0, 0, DIST);
-            mFaces[FACE_DOWN].setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.picsphere_sky_dn));
+            mFaces[FACE_DOWN].setTexture(BitmapFactory.decodeResource(mContext.getResources(),
+                    R.drawable.picsphere_sky_dn));
         }
-
-
 
         public void draw() {
             for (int i = 0; i < mFaces.length; i++) {
@@ -157,9 +166,7 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
                 }
             }
         }
-
     }
-
 
     /**
      * Stores the information about each snapshot displayed in the sphere
@@ -229,10 +236,14 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
             GLES20.glGenTextures(1, texture, 0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture[0]);
 
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
+                    GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
+                    GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
+                    GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
+                    GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mBitmapToLoad, 0);
             //tex.recycle();
@@ -260,23 +271,25 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
             }
             mTexCoordBuffer.position(0);
 
-
             GLES20.glEnableVertexAttribArray(mTexCoordHandler[mMode]);
             GLES20.glEnableVertexAttribArray(mPositionHandler[mMode]);
 
             if (mIsFourToThree) {
-                GLES20.glVertexAttribPointer(mPositionHandler[mMode], 2, GLES20.GL_FLOAT, false, 8, m43VertexBuffer);
+                GLES20.glVertexAttribPointer(mPositionHandler[mMode],
+                        2, GLES20.GL_FLOAT, false, 8, m43VertexBuffer);
             } else {
-                GLES20.glVertexAttribPointer(mPositionHandler[mMode], 2, GLES20.GL_FLOAT, false, 8, mVertexBuffer);
+                GLES20.glVertexAttribPointer(mPositionHandler[mMode],
+                        2, GLES20.GL_FLOAT, false, 8, mVertexBuffer);
             }
-            GLES20.glVertexAttribPointer(mTexCoordHandler[mMode], 2, GLES20.GL_FLOAT, false, 8, mTexCoordBuffer);
+            GLES20.glVertexAttribPointer(mTexCoordHandler[mMode], 2,
+                    GLES20.GL_FLOAT, false, 8, mTexCoordBuffer);
 
-            // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
-            // (which currently contains model * view).
+            // This multiplies the view matrix by the model matrix, and stores the
+            // result in the MVP matrix (which currently contains model * view).
             Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
 
-            // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
-            // (which now contains model * view * projection).
+            // This multiplies the modelview matrix by the projection matrix, and stores
+            // the result in the MVP matrix (which now contains model * view * projection).
             Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
 
             // Pass in the combined matrix.
@@ -317,7 +330,8 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
 
     private void createDot(float rx, float ry) {
         Snapshot dot = new Snapshot(false);
-        dot.setTexture(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_picsphere_marker));
+        dot.setTexture(BitmapFactory.decodeResource(mContext.getResources(),
+                R.drawable.ic_picsphere_marker));
         dot.mModelMatrix = matrixFromEuler(rx, 0, ry, 0, 0, 100);
         Matrix.scaleM(dot.mModelMatrix, 0, 0.1f, 0.1f, 0.1f);
         dot.setAutoAlphaAngle(rx, ry);
@@ -330,7 +344,6 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         float[] matrix = quat.getMatrix();
 
         Matrix.translateM(matrix, 0, tx, ty, tz);
-
 
         return matrix;
     }
@@ -566,6 +579,17 @@ public class Capture3DRenderer implements GLSurfaceView.Renderer {
         // Update quaternion from euler angles out of orientation and set it as view matrix
         mCameraQuat.fromEuler(rY, 0.0f, rX);
         mViewMatrix = mCameraQuat.getConjugate().getMatrix();
+    }
+
+    public Vector3 getAngleAsVector() {
+        float[] orientation = mSensorFusion.getFusedOrientation();
+
+        // Convert angles to degrees
+        float rX = (float) (orientation[0] * 180.0f/Math.PI);
+        float rY = (float) (orientation[1] * 180.0f/Math.PI);
+        float rZ = (float) (orientation[2] * 180.0f/Math.PI);
+
+        return new Vector3(rX, rY, rZ);
     }
 
     /**

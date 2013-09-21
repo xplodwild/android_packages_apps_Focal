@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Focal starten</string>
+    <string name="shutter_button">Sluiterknop</string>
+    <string name="cannot_connect_hal">Kan geen verbinding maken met de camera</string>
+    <string name="recording">Opnemen</string>
+    <string name="double_tap_to_snapshot">Dubbeltikken om een foto te maken</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">OK</string>
+    <string name="no_gles20_support">Dit apparaat ondersteunt geen GLES2</string>
+    <string name="no_gyroscope">Dit apparaat heeft geen gyroscoop</string>
+    <string name="ps_long_press_to_stop">Sluiterknop lang indrukken/n om de PicSphere te voltooien</string>
+    <string name="disabled">Uitgeschakeld</string>
+    <string name="enabled">Ingeschakeld</string>
+    <string name="no_video_player">Kan video niet afspelen, geen mediaspeler gevonden</string>
+    <string name="fullscreen_shutter_info">Tik ergens om een foto te maken</string>
+    <string name="please_wait">Een ogenblik geduld\u2026</string>
+    <string name="retouch">BEWERKEN</string>
+    <string name="open_in_gallery">GALERIJ</string>
+
+    <string name="mode_photo">Foto</string>
+    <string name="mode_video">Video</string>
+    <string name="mode_picsphere">PicSphere</string>
+    <string name="mode_panorama">Panorama</string>
+    <string name="mode_switchcam">Camera wisselen</string>
+
+    <string name="widget_burstmode_count_shots">%d opnamen achter elkaar</string>
+    <string name="widget_burstmode_off">Serieopname uitschakelen</string>
+    <string name="widget_burstmode_infinite">Oneindig</string>
+
+    <string name="widget_hdr_aebracket">Brackets automatisch</string>
+
+    <string name="widget_settings_choose_widgets">Zijbalkwidgets kiezen</string>
+    <string name="widget_settings_choose_widgets_button">Widgets kiezen</string>
+    <string name="widget_settings_picture_size">Grootte van foto</string>
+    <string name="widget_settings_exposure_ring">Belichtingsring tonen</string>
+    <string name="widget_settings_autoenhance">Automatisch verbeteren</string>
+    <string name="widget_settings_ruleofthirds">Raster</string>
+
+    <string name="widget_autoexposure">Belichting meten</string>
+    <string name="widget_burstmode">Serieopname</string>
+    <string name="widget_effect">Kleureffecten</string>
+    <string name="widget_enhancements">Kleurverbeteringen</string>
+    <string name="widget_exposure_compensation">Belichtingscompensatie</string>
+    <string name="widget_flash">Flits</string>
+    <string name="widget_hdr">HDR</string>
+    <string name="widget_iso">ISO</string>
+    <string name="widget_scenemode">Scènekeuze</string>
+    <string name="widget_settings">Instellingen</string>
+    <string name="widget_shutter_speed">Sluitertijd</string>
+    <string name="widget_skintone">Huidtint verbeteren</string>
+    <string name="widget_softwarehdr">HDR (SW)</string>
+    <string name="widget_timermode">Timer</string>
+    <string name="widget_videofr">Videoframerate</string>
+    <string name="widget_videohdr">HDR-video</string>
+    <string name="widget_whitebalance">Witbalans</string>
+
+    <string name="pano_panorama_rendering_failed">Panoramaopname mislukt./n Probeer een kortere.</string>
+    <string name="pano_panorama_rendering">Panorama renderen\u2026</string>
+
+    <string name="picsphere_undo_button">ONGEDAAN MAKEN</string>
+    <string name="picsphere_start_hint">Neem een foto om de PicSphere te starten</string>
+    <string name="picsphere_already_rendering">Een ogenlbik geduld a.u.b. De huidige PicSphere wordt voltooid</string>
+    <string name="picsphere_rendering_progress">Renderen\u2026 (%d %%)</string>
+    <string name="picsphere_toast_background_render">Renderen gestart\u2026</string>
+    <string name="picsphere_notif_title">PicSphere renderen\u2026</string>
+    <string name="picsphere_failed">PicSphere renderen mislukt</string>
+    <string name="picsphere_failed_details">Zorg ervoor dat de afbeeldingen alleen met de randen overlappen</string>
+    <string name="picsphere_need_two_pics">Er zijn minimaal twee foto\'s nodig.</string>
+    <string name="picsphere_step_preparing">Voorbereiden\u2026</string>
+    <string name="picsphere_step_ptogen">Metadata genereren\u2026</string>
+    <string name="picsphere_step_ptovar">Camerastand opslaan\u2026</string>
+    <string name="picsphere_step_cpfind">Controlepunten zoeken\u2026</string>
+    <string name="picsphere_step_autooptimiser">Afbeeldingen uitlijnen\u2026</string>
+    <string name="picsphere_step_ptclean">Punten opruimen\u2026</string>
+    <string name="picsphere_step_panomodify">Lege stukken wegknippen\u2026</string>
+    <string name="picsphere_step_nona">Afbeeldingen aan elkaar plakken\u2026</string>
+    <string name="picsphere_step_enblend">Afbeelding in elkaar laten overvloeien\u2026</string>
+
+    <string name="software_hdr_notif_title">HDR-afbeelding berekenen\u2026</string>
+    <string name="software_hdr_failed">HDR renderen mislukt</string>
+    <string name="software_hdr_failed_details">De bronafbeeldingen zijn bewaard.</string>
+
+    <string name="showcase_welcome_1_title">Welkom!</string>
+    <string name="showcase_welcome_1_body">De opties staan in de zijbalk,\nsleep eroverheen om te kiezen.</string>
+    <string name="showcase_welcome_2_title">Sluiterknop</string>
+    <string name="showcase_welcome_2_body">Tik op de sluiterknop om een foto te maken.\nSleep erover voor andere opnamestanden.</string>
+    <string name="showcase_panorama_title">Panoramaopname</string>
+    <string name="showcase_panorama_body">Tik op de sluiterknop om de panoramaopname te starten\nen richt op wat u wilt opnemen.\nTik nogmaals op de sluiterknop wanneer u klaar bent.</string>
+    <string name="showcase_picsphere_title">PicSphere</string>
+    <string name="showcase_picsphere_body">Lijn de eerste afbeelding uit,\ntik op de sluiterknop om alle foto\'s te maken\nvan de sphere. De blauwe stippen zijn referentiepunten die u kunt volgen.\nHoud de sluiterknop ingedrukt als u klaar bent.</string>
+
+    <string name="iso_hint_auto">Automatisch</string>
+    <string name="iso_hint_hjr">Beeldstabilisatie (HJR)</string>
+    <string name="iso_hint_100">ISO 100</string>
+    <string name="iso_hint_200">ISO 200</string>
+    <string name="iso_hint_400">ISO 400</string>
+    <string name="iso_hint_800">ISO 800</string>
+    <string name="iso_hint_1600">ISO 1600</string>
+</resources>

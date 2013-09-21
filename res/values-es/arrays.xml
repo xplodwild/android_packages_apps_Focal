@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whisky</item>
+        <item>whiskey</item>
+        <item>patata</item>
+        <item>bien cid, toma una foto</item>
+    </string-array>
+    <string-array name="widget_flash_hints">
+        <item>Automático</item>
+        <item>Apagado</item>
+        <item>Encendido</item>
+        <item>Linterna</item>
+        <item>Ojos rojos</item>
+    </string-array>
+    <string-array name="widget_effects_hints">
+        <item>Ninguno</item>
+        <item>Blanco y negro</item>
+        <item>Negativo</item>
+        <item>Solarizar</item>
+        <item>Sepia</item>
+        <item>Posterizar</item>
+        <item>Fondo oscuro</item>
+        <item>Fondo claro</item>
+        <item>Agua</item>
+        <item>Realzar</item>
+        <item>Dibujo</item>
+        <item>Neón</item>
+    </string-array>
+    <string-array name="widget_scenemode_hints">
+        <item>Automático</item>
+        <item>Reducción desenfoque movimiento</item>
+        <item>Realidad aumentada</item>
+        <item>Mejor toma</item>
+        <item>Bebé</item>
+        <item>Contraluz</item>
+        <item>Retrato a contraluz</item>
+        <item>Código de barras</item>
+        <item>Playa</item>
+        <item>Luz de vela</item>
+        <item>Oscuro</item>
+        <item>Reflector</item>
+        <item>Documento</item>
+        <item>Fuegos artificiales</item>
+        <item>Flores</item>
+        <item>Crepúsculo</item>
+        <item>HDR</item>
+        <item>Alta sensibilidad</item>
+        <item>Paisaje</item>
+        <item>Noche</item>
+        <item>Retrato nocturno</item>
+        <item>Interior nocturno</item>
+        <item>Fiesta</item>
+        <item>Mascota</item>
+        <item>Retrato</item>
+        <item>Nieve</item>
+        <item>Suavizado</item>
+        <item>Deporte</item>
+        <item>Destacado</item>
+        <item>Estable</item>
+        <item>Atarceder</item>
+        <item>Superposición</item>
+        <item>Teatro</item>
+    </string-array>
+    <string-array name="widget_whitebalance_hints">
+        <item>Automático</item>
+        <item>Nublado</item>
+        <item>Incandescente</item>
+        <item>Fluorescente</item>
+        <item>Luz natural</item>
+        <item>Parc. nublado</item>
+    </string-array>
+    <string-array name="widget_autoexposure_hints">
+        <item>Matricial</item>
+        <item>Ponderada al centro</item>
+        <item>Puntual</item>
+    </string-array>
+</resources>

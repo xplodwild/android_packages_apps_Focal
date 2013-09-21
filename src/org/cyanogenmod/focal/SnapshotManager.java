@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
@@ -44,6 +45,7 @@ import com.drew.metadata.Tag;
 
 import org.cyanogenmod.focal.feats.AutoPictureEnhancer;
 import org.cyanogenmod.focal.feats.PixelBuffer;
+import org.cyanogenmod.focal.widgets.SimpleToggleWidget;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -52,6 +54,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.xplod.focal.R;
 
 /**
  * This class manages taking snapshots and videos from Camera
@@ -97,8 +101,8 @@ public class SnapshotManager {
         public void onMediaSavingStart();
 
         /**
-         * This callback is called when ImageSaver has done its job of saving an image, or
-         * MediaRecorder is done storing a video
+         * This callback is called when ImageSaver has done its job of saving an image,
+         * or MediaRecorder is done storing a video
          * The primary purpose of this method is to hide the SavePinger
          */
         public void onMediaSavingDone();
@@ -132,7 +136,6 @@ public class SnapshotManager {
         // Whether or not to bypass image processing (even if user enabled it)
         public boolean mBypassProcessing;
     }
-
 
     private Context mContext;
     private CameraManager mCameraManager;
@@ -171,7 +174,6 @@ public class SnapshotManager {
     private Uri mCurrentVideoUri;
     private ContentValues mCurrentVideoValues;
 
-
     private Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
         @Override
         public void onShutter() {
@@ -188,8 +190,10 @@ public class SnapshotManager {
             }
 
             // If we used Samsung HDR, reset exposure
-            if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR)) {
-                mCameraManager.setParameterAsync("exposure-compensation", Integer.toString(mResetExposure));
+            if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR) &&
+                SimpleToggleWidget.isWidgetEnabled(mContext, mCameraManager, "scene-mode", "hdr")) {
+                mCameraManager.setParameterAsync("exposure-compensation",
+                        Integer.toString(mResetExposure));
             }
         }
     };
@@ -209,7 +213,8 @@ public class SnapshotManager {
             final SnapshotInfo snap = mSnapshotsQueue.get(0);
 
             // If we have a Samsung HDR, convert from YUV422 to JPEG first
-            if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR)) {
+            if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR) &&
+                SimpleToggleWidget.isWidgetEnabled(mContext, mCameraManager, "scene-mode", "hdr")) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 Bitmap bm = Util.decodeYUV422P(jpegData, s.width, s.height);
                 // TODO: Replace 90 with real JPEG compression level when we'll have that setting
@@ -242,7 +247,8 @@ public class SnapshotManager {
 
                             // Read EXIF
                             List<Tag> tagsList = new ArrayList<Tag>();
-                            BufferedInputStream is = new BufferedInputStream(new ByteArrayInputStream(finalData));
+                            BufferedInputStream is = new BufferedInputStream(
+                                    new ByteArrayInputStream(finalData));
                             try {
                                 Metadata metadata = JpegMetadataReader.readMetadata(is, false);
 
@@ -261,7 +267,8 @@ public class SnapshotManager {
                             mOffscreenGL = new PixelBuffer(mContext, s.width, s.height);
                             mAutoPicEnhancer = new AutoPictureEnhancer(mContext);
                             mOffscreenGL.setRenderer(mAutoPicEnhancer);
-                            mAutoPicEnhancer.setTexture(BitmapFactory.decodeByteArray(finalData, 0, finalData.length));
+                            mAutoPicEnhancer.setTexture(BitmapFactory.decodeByteArray(finalData,
+                                    0, finalData.length));
 
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
                             mOffscreenGL.getBitmap().compress(Bitmap.CompressFormat.JPEG, 90, baos);
@@ -319,7 +326,8 @@ public class SnapshotManager {
         @Override
         public void run() {
             Camera.Size s = mCameraManager.getParameters().getPreviewSize();
-            mImageNamer.prepareUri(mContentResolver, System.currentTimeMillis(), s.width, s.height, 0);
+            mImageNamer.prepareUri(mContentResolver, System.currentTimeMillis(),
+                    s.width, s.height, 0);
 
             SnapshotInfo info = new SnapshotInfo();
             info.mSave = true;
@@ -398,15 +406,18 @@ public class SnapshotManager {
 
     public void prepareNamerUri(int width, int height) {
         if (mImageNamer == null) {
-            // ImageNamer can be dead if the user exitted the app. We restart it temporarily.
+            // ImageNamer can be dead if the user exitted the app.
+            // We restart it temporarily.
             mImageNamer = new ImageNamer();
         }
-        mImageNamer.prepareUri(mContentResolver, System.currentTimeMillis(), width, height, 0);
+        mImageNamer.prepareUri(mContentResolver,
+                System.currentTimeMillis(), width, height, 0);
     }
 
     public Uri getNamerUri() {
         if (mImageNamer == null) {
-            // ImageNamer can be dead if the user exitted the app. We restart it temporarily.
+            // ImageNamer can be dead if the user exitted the app.
+            // We restart it temporarily.
             mImageNamer = new ImageNamer();
         }
         return mImageNamer.getUri();
@@ -414,7 +425,8 @@ public class SnapshotManager {
 
     public String getNamerTitle() {
         if (mImageNamer == null) {
-            // ImageNamer can be dead if the user exitted the app. We restart it temporarily.
+            // ImageNamer can be dead if the user exitted the app.
+            // We restart it temporarily.
             mImageNamer = new ImageNamer();
         }
         return mImageNamer.getTitle();
@@ -423,7 +435,8 @@ public class SnapshotManager {
     public void saveImage(Uri uri, String title, int width, int height,
                           int orientation, byte[] jpegData) {
         if (mImageSaver == null) {
-            // ImageSaver can be dead if the user exitted the app. We restart it temporarily.
+            // ImageSaver can be dead if the user exitted the app.
+            // We restart it temporarily.
             mImageSaver = new ImageSaver();
         }
         mImageSaver.addImage(jpegData, uri, title, null,
@@ -452,7 +465,8 @@ public class SnapshotManager {
         if (mSnapshotsQueue.size() == 2) return; // No more than 2 shots at a time
 
         // If we use Samsung HDR, we must set exposure level, as it corresponds to the HDR bracket
-        if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR)) {
+        if (mContext.getResources().getBoolean(R.bool.config_useSamsungHDR) &&
+            SimpleToggleWidget.isWidgetEnabled(mContext, mCameraManager, "scene-mode", "hdr")) {
             exposureCompensation = mCameraManager.getParameters().getMaxExposureCompensation();
             mResetExposure = mCameraManager.getParameters().getExposureCompensation();
         }
@@ -465,7 +479,8 @@ public class SnapshotManager {
 
         Camera.Parameters params = mCameraManager.getParameters();
         if (params != null && params.getExposureCompensation() != exposureCompensation) {
-            mCameraManager.setParameterAsync("exposure-compensation", Integer.toString(exposureCompensation));
+            mCameraManager.setParameterAsync("exposure-compensation",
+                    Integer.toString(exposureCompensation));
             mWaitExposureSettle = true;
         }
         mSnapshotsQueue.add(info);
@@ -854,11 +869,11 @@ public class SnapshotManager {
                 }
 
                 Util.broadcastNewPicture(mContext, uri);
+            }
 
-                if (snap != null) {
-                    for (SnapshotListener listener : mListeners) {
-                        listener.onSnapshotSaved(snap);
-                    }
+            if (snap != null) {
+                for (SnapshotListener listener : mListeners) {
+                    listener.onSnapshotSaved(snap);
                 }
             }
         }
@@ -880,7 +895,7 @@ public class SnapshotManager {
 
         // Runs in main thread
         public synchronized void prepareUri(ContentResolver resolver,
-                                            long dateTaken, int width, int height, int rotation) {
+                long dateTaken, int width, int height, int rotation) {
             if (rotation % 180 != 0) {
                 int tmp = width;
                 width = height;
@@ -901,11 +916,11 @@ public class SnapshotManager {
                 try {
                     wait();
                 } catch (InterruptedException ex) {
-                    // ignore.
+                    // Do nothing here
                 }
             }
 
-            // return the uri generated
+            // Return the uri generated
             Uri uri = mUri;
             mUri = null;
             return uri;
@@ -1003,7 +1018,7 @@ public class SnapshotManager {
                     try {
                         wait();
                     } catch (InterruptedException ex) {
-                        // ignore.
+                        // Do nothing here
                     }
                     continue;
                 }

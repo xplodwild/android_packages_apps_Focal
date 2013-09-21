@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Starta Focal</string>
+    <string name="shutter_button">Avtryckare</string>
+    <string name="cannot_connect_hal">Kan inte kontakta kameran</string>
+    <string name="recording">Inspelning</string>
+    <string name="double_tap_to_snapshot">Dubbelklicka för att ta en bild</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">OK</string>
+    <string name="no_gles20_support">Din enhet stöder inte GLES2</string>
+    <string name="no_gyroscope">Din enhet har inget gyroskop</string>
+    <string name="ps_long_press_to_stop">Långtryck på avtryckaren för att slutföra din sfär.</string>
+    <string name="disabled">Avaktiverad</string>
+    <string name="enabled">Aktiverad</string>
+    <string name="no_video_player">Kan inte spela videon, ingen spelare funnen</string>
+    <string name="fullscreen_shutter_info">Tryck var som helst för att ta en bild</string>
+    <string name="please_wait">Var god vänta\u2026</string>
+    <string name="retouch">RETUSCHERA</string>
+    <string name="open_in_gallery">GALLERI</string>
+    <string name="mode_photo">Foto</string>
+    <string name="mode_video">Video</string>
+    <string name="mode_picsphere">Fotosfär</string>
+    <string name="mode_panorama">Panorama</string>
+    <string name="mode_switchcam">Frontkamera</string>
+    <string name="widget_burstmode_count_shots">Sekvensfota %d bilder</string>
+    <string name="widget_burstmode_off">Avaktivera sekvensläge</string>
+    <string name="widget_burstmode_infinite">Oändlig sekvens</string>
+    <string name="widget_hdr_aebracket">Autogaffling</string>
+    <string name="widget_settings_choose_widgets">Välj widgets i sidmenyn</string>
+    <string name="widget_settings_choose_widgets_button">Välj widgets</string>
+    <string name="widget_settings_picture_size">Bildstorlek</string>
+    <string name="widget_settings_exposure_ring">Visa exponeringsring</string>
+    <string name="widget_settings_autoenhance">Auto-förbättring</string>
+    <string name="widget_settings_ruleofthirds">Tredjedelsregeln</string>
+    <string name="widget_autoexposure">Exponeringsmätarläge</string>
+    <string name="widget_burstmode">Sekvensläge</string>
+    <string name="widget_effect">Färgeffekter</string>
+    <string name="widget_enhancements">Färgförbättringar</string>
+    <string name="widget_exposure_compensation">Exponeringskompensation</string>
+    <string name="widget_flash">Blixtläge</string>
+    <string name="widget_hdr">High Dynamic Range</string>
+    <string name="widget_iso">ISO-grader</string>
+    <string name="widget_scenemode">Scenläge</string>
+    <string name="widget_settings">Inställningar</string>
+    <string name="widget_shutter_speed">Slutartid</string>
+    <string name="widget_skintone">Hudtonsförbättring</string>
+    <string name="widget_softwarehdr">High Dynamic Range</string>
+    <string name="widget_timermode">Självutlösare</string>
+    <string name="widget_videofr">Framerate</string>
+    <string name="widget_videohdr">Video High Dynamic Range</string>
+    <string name="widget_whitebalance">Vitbalans</string>
+    <string name="pano_panorama_rendering_failed">Lyckades inte rendera panorama.\nFörsök att ta en kortare.</string>
+    <string name="pano_panorama_rendering">Renderar panorama\u2026</string>
+    <string name="picsphere_undo_button">ÅNGRA</string>
+    <string name="picsphere_start_hint">Ta en bild för att påbörja en sfär</string>
+    <string name="picsphere_already_rendering">Var god vänta medan den nuvarande bildsfären renderas</string>
+    <string name="picsphere_rendering_progress">Renderar\u2026 (%d %%)</string>
+    <string name="picsphere_toast_background_render">Rendering påbörjad\u2026</string>
+    <string name="picsphere_notif_title">Renderar bildsfär\u2026</string>
+    <string name="picsphere_failed">Lyckades inte rendera bildsfär</string>
+    <string name="picsphere_failed_details">Kontrollera att bilderna endast överlappar vid kanterna.</string>
+    <string name="picsphere_need_two_pics">Du behöver åtminstone två bilder.</string>
+    <string name="picsphere_step_preparing">Förbereder\u2026</string>
+    <string name="picsphere_step_autooptimiser">Optimerar matchningar\u2026</string>
+    <string name="picsphere_step_ptclean">Rensar matchningspunkter\u2026</string>
+    <string name="picsphere_step_panomodify">Beskär tomma områden\u2026</string>
+    <string name="picsphere_step_nona">Sömmar bilder\u2026</string>
+    <string name="picsphere_step_enblend">Förenar bilder\u2026</string>
+    <string name="software_hdr_notif_title">Beräknar HDR-bild\u2026</string>
+    <string name="software_hdr_failed">HDR-renderingen misslyckades</string>
+    <string name="software_hdr_failed_details">Originalbilderna har sparats.</string>
+    <string name="showcase_welcome_1_title">Välkommen!</string>
+    <string name="showcase_welcome_1_body">Inställningarna finns i sidmenyn,\nsvep bara fram den.</string>
+    <string name="showcase_welcome_2_title">Avtryckare</string>
+    <string name="showcase_welcome_2_body">Tryck på avtryckaren för att ta en bild.\nSvep från den för att komma åt andra kameralägen.</string>
+    <string name="showcase_panorama_title">Panoramaläge</string>
+    <string name="showcase_panorama_body">Tryck på avtryckaren för att börja din panorama,\npanorera sedan det du vill fota.\nNär du är klar, tryck på avtryckaren igen.</string>
+    <string name="showcase_picsphere_title">Bildsfärläge</string>
+    <string name="showcase_picsphere_body">Ta din första bild var du vill,\ntryck sedan på avtryckaren för att övriga bilder\nav sfären. De blå prickarna är\nreferenspunkter som du kan följa.\nLångtryck på avtryckaren när du är klar.</string>
+</resources>

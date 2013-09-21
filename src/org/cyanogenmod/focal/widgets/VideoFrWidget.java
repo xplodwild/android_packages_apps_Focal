@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.widgets;
@@ -21,14 +22,14 @@ package org.cyanogenmod.focal.widgets;
 import android.content.Context;
 
 import org.cyanogenmod.focal.CameraManager;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 
 public class VideoFrWidget extends SimpleToggleWidget {
 
     public VideoFrWidget(CameraManager cam, Context context) {
         super(cam, context, "video-hfr", R.drawable.ic_widget_videofr);
 
-        // for video only
+        // For video only
         setVideoOnly(true);
 
         // TODO: Needs filtering depending on resolution (see video-hfr-size)

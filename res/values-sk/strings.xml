@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Spustiť Focal</string>
+    <string name="shutter_button">Tlačidlo spúšte</string>
+    <string name="cannot_connect_hal">Nepodarilo sa pripojiť k fotoaparátu</string>
+    <string name="recording">Zaznamenáva sa</string>
+    <string name="double_tap_to_snapshot">Dvojitým ťuknutím zachyťte snímku</string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">OK</string>
+    <string name="no_gles20_support">Vaše zariadenie nepodporuje GLES2</string>
+    <string name="no_gyroscope">Vaše zariadenie neobsahuje gyroskop</string>
+    <string name="ps_long_press_to_stop">Dlhým stlačením spúšte\ndokončíte sféru.</string>
+    <string name="disabled">Zakázané</string>
+    <string name="enabled">Povolené</string>
+    <string name="no_video_player">Nedá sa prehrať video, nenašiel sa žiadny prehrávač</string>
+    <string name="fullscreen_shutter_info">Ťuknite kamkoľvek na zachytenie snímky</string>
+    <string name="please_wait">Prosím, čakajte\u2026</string>
+    <string name="retouch">ŤUKNITE ZNOVU</string>
+    <string name="open_in_gallery">GALÉRIA</string>
+    <string name="mode_photo">Fotografia</string>
+    <string name="mode_video">Video</string>
+    <string name="mode_picsphere">PicSphere</string>
+    <string name="mode_panorama">Panoráma</string>
+    <string name="mode_switchcam">Predný fotoaparát</string>
+    <string name="widget_burstmode_count_shots">Dávka %d snímkov</string>
+    <string name="widget_burstmode_off">Zakázať dávkový režim</string>
+    <string name="widget_burstmode_infinite">Nekonečná dávka</string>
+    <string name="widget_hdr_aebracket">Auto bracketing</string>
+    <string name="widget_settings_choose_widgets">Zvoľte miniaplikácie v bočnej lište</string>
+    <string name="widget_settings_choose_widgets_button">Zvolenie miniaplikácií</string>
+    <string name="widget_settings_picture_size">Veľkosť obrázka</string>
+    <string name="widget_settings_exposure_ring">Zobrazenie kruhu expozície</string>
+    <string name="widget_settings_autoenhance">Automatické vylepšenie</string>
+    <string name="widget_settings_ruleofthirds">Rozdelenie na tretiny</string>
+    <string name="widget_autoexposure">Režim merania expozície</string>
+    <string name="widget_burstmode">Dávkový režim</string>
+    <string name="widget_effect">Farebné efekty</string>
+    <string name="widget_enhancements">Vylepšenie farieb</string>
+    <string name="widget_exposure_compensation">Vyrovnanie expozície</string>
+    <string name="widget_flash">Režim blesku</string>
+    <string name="widget_hdr">Veľmi dynamický rozsah</string>
+    <string name="widget_iso">Citlivosť ISO</string>
+    <string name="widget_scenemode">Režim scény</string>
+    <string name="widget_settings">Nastavenia</string>
+    <string name="widget_shutter_speed">Rýchlosť spúšte</string>
+    <string name="widget_skintone">Vylepšenie odtieňu pleti</string>
+    <string name="widget_softwarehdr">Veľmi dynamický rozsah</string>
+    <string name="widget_timermode">Režim časovača</string>
+    <string name="widget_videofr">Snímková frekvencia videa</string>
+    <string name="widget_videohdr">Veľmi dynamický rozsah videa</string>
+    <string name="widget_whitebalance">Vyváženie bielej</string>
+    <string name="pano_panorama_rendering_failed">Zlyhalo vykreslenie panorámy.\nSkúste zachytiť kratšiu.</string>
+    <string name="pano_panorama_rendering">Vykresľuje sa panoráma\u2026</string>
+    <string name="picsphere_undo_button">VRÁTIŤ SPÄŤ</string>
+    <string name="picsphere_start_hint">Zachytením snímky spustíte sféru</string>
+    <string name="picsphere_already_rendering">Prosím, počkajte na vykreslenie aktuálnej PicSphere</string>
+    <string name="picsphere_rendering_progress">Vykresľuje sa... (%d %%)</string>
+    <string name="picsphere_toast_background_render">Vykresľovanie bolo spustené\u2026</string>
+    <string name="picsphere_notif_title">Vykresľovanie PicSphere\u2026</string>
+    <string name="picsphere_failed">Vykresľovanie PicSphere zlyhalo</string>
+    <string name="picsphere_failed_details">Uistite sa, že sa obrázky prelínajú iba v rohoch.</string>
+    <string name="picsphere_need_two_pics">Potrebujete aspoň dva snímky.</string>
+    <string name="picsphere_step_preparing">Pripravuje sa\u2026</string>
+    <string name="picsphere_step_ptogen">Generujú sa metaúdaje\u2026</string>
+    <string name="picsphere_step_ptovar">Zapisuje sa otočenie fotoaparátu\u2026</string>
+    <string name="picsphere_step_cpfind">Hľadajú sa kontrolné body\u2026</string>
+    <string name="picsphere_step_autooptimiser">Optimalizujú sa zhody\u2026</string>
+    <string name="picsphere_step_ptclean">Čistia sa body zhôd\u2026</string>
+    <string name="picsphere_step_panomodify">Orezávajú sa prázdne plochy\u2026</string>
+    <string name="picsphere_step_nona">Spájajú sa snímky\u2026</string>
+    <string name="picsphere_step_enblend">Tvarujú sa snímky\u2026</string>
+    <string name="software_hdr_notif_title">Vypočítavanie HDR snímky\u2026</string>
+    <string name="software_hdr_failed">Vykresľovanie HDR zlyhalo</string>
+    <string name="software_hdr_failed_details">Pôvodná snímka bola uchovaná.</string>
+    <string name="showcase_welcome_1_title">Vitajte!</string>
+    <string name="showcase_welcome_1_body">Voľby sú v bočnej lište,\nstačí ju potiahnúť.</string>
+    <string name="showcase_welcome_2_title">Tlačidlo spúšte</string>
+    <string name="showcase_welcome_2_body">Ťuknutím na tlačidlo spúšte zachytíte snímku.\nJeho potiahnútím sprístupníte ostatné režimy snímania.</string>
+    <string name="showcase_panorama_title">Režim panorámy</string>
+    <string name="showcase_panorama_body">Ťuknutím na tlačidlo spúšte spustíte vašu panorámu,\npotom posúvajte na to, čo chcete zachytiť.\nNa dokončenie ťuknite znovu na tlačidlo spúšte.</string>
+    <string name="showcase_picsphere_title">Režim PicSphere</string>
+    <string name="showcase_picsphere_body">Zarovnajte vašu prvú snímku podľa potreby,\npotom ťuknite na spúšť na zachytenie každej snímky\nsféry. Modré bodky sú referenčné\nbody, ktoré môžete nasledovať.\nDlhším stlačením spúšte dokončíte sféru.</string>
+    <string name="iso_hint_auto">Automatické ISO</string>
+    <string name="iso_hint_hjr">ISO odstraňujúce chvenie rúk</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
+</resources>

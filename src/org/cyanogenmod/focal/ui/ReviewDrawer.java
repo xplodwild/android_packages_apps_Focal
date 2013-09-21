@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.ui;
@@ -25,10 +26,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -37,44 +38,37 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import org.cyanogenmod.focal.CameraActivity;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class handles the review drawer that can be opened by swiping down
  */
-public class ReviewDrawer extends LinearLayout {
+public class ReviewDrawer extends RelativeLayout {
     public final static String TAG = "ReviewDrawer";
 
     private final static long DRAWER_TOGGLE_DURATION = 400;
-    private final static int DRAWER_QUICK_REVIEW_SIZE_DP = 120;
     private final static String GALLERY_CAMERA_BUCKET = "Camera";
-    private int mThumbnailSize;
 
     private List<Integer> mImages;
 
     private Handler mHandler;
-    private ListView mImagesList;
-    private ImageView mReviewedImage;
-    private ViewGroup mReviewedImageContainer;
-    private int mReviewedImageOrientation;
     private ImageListAdapter mImagesListAdapter;
-    private Bitmap mReviewedBitmap;
     private int mReviewedImageId;
     private int mCurrentOrientation;
+    private final Object mImagesLock = new Object();
     private boolean mIsOpen;
-    private GestureDetector mGestureDetector;
-
+    private ViewPager mViewPager;
 
     public ReviewDrawer(Context context) {
         super(context);
@@ -94,7 +88,6 @@ public class ReviewDrawer extends LinearLayout {
     private void initialize() {
         mHandler = new Handler();
         mImages = new ArrayList<Integer>();
-        mThumbnailSize = getContext().getResources().getDimensionPixelSize(R.dimen.review_drawer_thumb_size);
 
         setOrientation(LinearLayout.VERTICAL);
 
@@ -109,47 +102,58 @@ public class ReviewDrawer extends LinearLayout {
 
         // Setup the list adapter
         mImagesListAdapter = new ImageListAdapter();
-
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        mImagesList = (ListView) findViewById(R.id.list_reviewed_images);
-        if (mImagesList == null) return;
-
-        mImagesList.setAdapter(mImagesListAdapter);
-        mImagesList.setOnItemClickListener(new ImageListClickListener());
-
-        mReviewedImage = (ImageView) findViewById(R.id.reviewed_image);
-        mReviewedImageContainer = (ViewGroup) findViewById(R.id.reviewed_image_container);
-
         // Load pictures or videos from gallery
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-            updateFromGallery(false);
+            updateFromGallery(false, 0);
         } else {
-            updateFromGallery(true);
+            updateFromGallery(true, 0);
         }
 
         // Make sure drawer is initially closed
         setTranslationY(-99999);
 
-        // Setup gesture detection
-        mGestureDetector = new GestureDetector(getContext(), new ReviewedGestureListener());
-        View.OnTouchListener touchListener = new View.OnTouchListener() {
+        ImageButton editImageButton = (ImageButton) findViewById(R.id.button_retouch);
+        editImageButton.setOnClickListener(new OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent ev) {
-                if (ev.getActionMasked() == MotionEvent.ACTION_UP) {
-                    clampReviewedImageSliding();
-                }
-                mGestureDetector.onTouchEvent(ev);
-
-                return true;
+            public void onClick(View view) {
+                editInGallery(mReviewedImageId);
             }
-        };
+        });
 
-        mReviewedImageContainer.setOnTouchListener(touchListener);
+        ImageButton openImageButton = (ImageButton) findViewById(R.id.button_open_in_gallery);
+        openImageButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openInGallery(mReviewedImageId);
+            }
+        });
+
+        mViewPager = (ViewPager) findViewById(R.id.reviewed_image);
+        mViewPager.setAdapter(mImagesListAdapter);
+        mViewPager.setPageMargin((int) Util.dpToPx(getContext(), 8));
+        mViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i2) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                mReviewedImageId = mImages.get(i);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
     }
 
     /**
@@ -157,11 +161,12 @@ public class ReviewDrawer extends LinearLayout {
      * This method is threaded!
      *
      * @param images True to get images, false to get videos
+     * @param scrollPos Position to scroll to, or 0 to get latest image
      */
-    public void updateFromGallery(final boolean images) {
+    public void updateFromGallery(final boolean images, final int scrollPos) {
         new Thread() {
             public void run() {
-                updateFromGallerySynchronous(images);
+                updateFromGallerySynchronous(images, scrollPos);
             }
         }.start();
     }
@@ -171,64 +176,73 @@ public class ReviewDrawer extends LinearLayout {
      * This method is synchronous, see updateFromGallery for the threaded one.
      *
      * @param images True to get images, false to get videos
+     * @param scrollPos Position to scroll to, or 0 to get latest image
      */
-    public void updateFromGallerySynchronous(boolean images) {
-        mImages.clear();
-
-        String[] columns = null;
-        String orderBy = null;
-        if (images) {
-            columns = new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID};
-            orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
-        } else {
-            columns = new String[]{MediaStore.Video.Media.DATA, MediaStore.Video.Media._ID};
-            orderBy = MediaStore.Video.Media.DATE_TAKEN + " ASC";
-        }
-
-        // Select only the images that has been taken from the Camera
-        ContentResolver cr = getContext().getContentResolver();
-        if (cr == null) {
-            Log.e(TAG, "No content resolver!");
-            return;
-        }
-        Cursor cursor = null;
-
-        if (images) {
-            cursor = cr.query(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
-                    new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
-        } else {
-            cursor = cr.query(
-                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI, columns, MediaStore.Video.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
-                    new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
-        }
-
-        if (cursor == null) {
-            Log.e(TAG, "Null cursor from MediaStore!");
-            return;
-        }
-
-        final int imageColumnIndex = cursor.getColumnIndex(images ? MediaStore.Images.Media._ID : MediaStore.Video.Media._ID);
-        final Cursor finalCursor = cursor;
-
+    public void updateFromGallerySynchronous(final boolean images, final int scrollPos) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < finalCursor.getCount(); i++) {
-                    finalCursor.moveToPosition(i);
+                synchronized (mImagesLock) {
+                    mImages.clear();
+                    mImagesListAdapter.notifyDataSetChanged();
+                }
 
-                    int id = finalCursor.getInt(imageColumnIndex);
+                String[] columns;
+                String orderBy;
+                if (images) {
+                    columns = new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID};
+                    orderBy = MediaStore.Images.Media.DATE_TAKEN + " ASC";
+                } else {
+                    columns = new String[]{MediaStore.Video.Media.DATA, MediaStore.Video.Media._ID};
+                    orderBy = MediaStore.Video.Media.DATE_TAKEN + " ASC";
+                }
+
+                // Select only the images that has been taken from the Camera
+                Context ctx = getContext();
+                if (ctx == null) return;
+                ContentResolver cr = ctx.getContentResolver();
+                if (cr == null) {
+                    Log.e(TAG, "No content resolver!");
+                    return;
+                }
+
+                Cursor cursor;
+
+                if (images) {
+                    cursor = cr.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns,
+                            MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
+                            new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
+                } else {
+                    cursor = cr.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, columns,
+                            MediaStore.Video.Media.BUCKET_DISPLAY_NAME + " LIKE ?",
+                            new String[]{GALLERY_CAMERA_BUCKET}, orderBy);
+                }
+
+                if (cursor == null) {
+                    Log.e(TAG, "Null cursor from MediaStore!");
+                    return;
+                }
+
+                final int imageColumnIndex = cursor.getColumnIndex(images ?
+                        MediaStore.Images.Media._ID : MediaStore.Video.Media._ID);
+
+                for (int i = 0; i < cursor.getCount(); i++) {
+                    cursor.moveToPosition(i);
+
+                    int id = cursor.getInt(imageColumnIndex);
+                    if (mReviewedImageId <= 0) {
+                        mReviewedImageId = id;
+                    }
                     addImageToList(id);
+                    mImagesListAdapter.notifyDataSetChanged();
+                }
+
+                if (scrollPos < mImages.size()) {
+                    mViewPager.setCurrentItem(scrollPos+1, false);
+                    mViewPager.setCurrentItem(scrollPos, true);
                 }
             }
         });
-
-        if (cursor.getCount() > 0) {
-            // Set the default reviewed image to the last image
-            cursor.moveToLast();
-            final int firstPictureId = cursor.getInt(imageColumnIndex);
-            setPreviewedImage(firstPictureId);
-        }
     }
 
     /**
@@ -245,7 +259,8 @@ public class ReviewDrawer extends LinearLayout {
                     .appendPath(Integer.toString(id)).build();;
             String[] orientationColumn = new String[]{MediaStore.Images.Media.ORIENTATION};
 
-            Cursor cur = getContext().getContentResolver().query(uri, orientationColumn, null, null, null);
+            Cursor cur = getContext().getContentResolver().query(uri,
+                    orientationColumn, null, null, null);
             if (cur != null && cur.moveToFirst()) {
                 return cur.getInt(cur.getColumnIndex(orientationColumn[0]));
             } else {
@@ -254,70 +269,77 @@ public class ReviewDrawer extends LinearLayout {
         }
     }
 
-    /**
-     * Sets the previewed image in the review drawer
-     *
-     * @param id The id the of the image
-     */
-    public void setPreviewedImage(final int id) {
-        new Thread() {
-            public void run() {
-                if (mReviewedBitmap != null) {
-                    recycleBitmap(mReviewedBitmap);
-                }
-                mReviewedImageId = id;
-                if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-                    mReviewedBitmap = MediaStore.Video.Thumbnails.getThumbnail(
-                            getContext().getContentResolver(), id,
-                            MediaStore.Video.Thumbnails.MINI_KIND, null);
-                } else {
-                    mReviewedBitmap = MediaStore.Images.Thumbnails.getThumbnail(
-                            getContext().getContentResolver(), id,
-                            MediaStore.Images.Thumbnails.MINI_KIND, null);
-                }
-
-                mReviewedImageOrientation = getCameraPhotoOrientation(id);
-
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mReviewedImage.setImageBitmap(mReviewedBitmap);
-                        notifyOrientationChanged(mCurrentOrientation);
-                    }
-                });
-            }
-        }.start();
-    }
 
     /**
      * Add an image at the head of the image ribbon
      *
      * @param id The id of the image from the MediaStore
      */
-    public void addImageToList(int id) {
+    public void addImageToList(final int id) {
         mImagesListAdapter.addImage(id);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mImagesListAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
-    public void notifyOrientationChanged(int orientation) {
+    public void scrollToLatestImage() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mViewPager.setCurrentItem(0);
+            }
+        });
+    }
+
+    public void notifyOrientationChanged(final int orientation) {
         mCurrentOrientation = orientation;
-        mReviewedImage.animate().rotation(mReviewedImageOrientation + orientation)
-                .setDuration(200).setInterpolator(new DecelerateInterpolator())
-                .start();
     }
 
-    private void openInGallery(int imageId) {
+    private void openInGallery(final int imageId) {
         if (imageId > 0) {
-            Uri uri = null;
+            Uri uri;
             if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-                uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
+                uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                        .appendPath(Integer.toString(imageId)).build();
             } else {
-                uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath(Integer.toString(imageId)).build();
+                uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                        .appendPath(Integer.toString(imageId)).build();
             }
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             try {
-                getContext().startActivity(intent);
+                Context ctx = getContext();
+                if (ctx != null) {
+                    ctx.startActivity(intent);
+                }
             } catch (ActivityNotFoundException e) {
                 CameraActivity.notify(getContext().getString(R.string.no_video_player), 2000);
+            }
+        }
+    }
+
+    private void editInGallery(final int imageId) {
+        if (imageId > 0) {
+            Intent editIntent = new Intent(Intent.ACTION_EDIT);
+
+            // Get URI
+            Uri uri = null;
+            if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
+                uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                        .appendPath(Integer.toString(imageId)).build();
+            } else {
+                uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                        .appendPath(Integer.toString(imageId)).build();
+            }
+
+            // Start gallery edit activity
+            editIntent.setDataAndType(uri, "image/*");
+            editIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Context ctx = getContext();
+            if (ctx != null) {
+                ctx.startActivity(Intent.createChooser(editIntent, null));
             }
         }
     }
@@ -328,7 +350,7 @@ public class ReviewDrawer extends LinearLayout {
      *
      * @param enabled To hide or not to hide, that is the question
      */
-    public void setTemporaryHide(boolean enabled) {
+    public void setTemporaryHide(final boolean enabled) {
         float alpha = (enabled ? 0.2f : 1.0f);
         animate().alpha(alpha).setDuration(200).start();
     }
@@ -345,11 +367,11 @@ public class ReviewDrawer extends LinearLayout {
      * Normally opens the review drawer (animation)
      */
     public void open() {
-        mReviewedImage.setVisibility(View.VISIBLE);
+        //mReviewedImage.setVisibility(View.VISIBLE);
         openImpl(1.0f);
     }
 
-    private void openImpl(float alpha) {
+    private void openImpl(final float alpha) {
         mIsOpen = true;
         setVisibility(View.VISIBLE);
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new AccelerateInterpolator())
@@ -362,41 +384,40 @@ public class ReviewDrawer extends LinearLayout {
     public void close() {
         mIsOpen = false;
         animate().setDuration(DRAWER_TOGGLE_DURATION).setInterpolator(new DecelerateInterpolator())
-                .translationY(-getMeasuredHeight()).alpha(0.0f).setListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
+                .translationY(-getMeasuredHeight()).alpha(0.0f)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
 
-            }
+                    }
 
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                setVisibility(View.GONE);
-            }
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        setVisibility(View.GONE);
+                    }
 
-            @Override
-            public void onAnimationCancel(Animator animator) {
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
 
-            }
+                    }
 
-            @Override
-            public void onAnimationRepeat(Animator animator) {
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
 
-            }
-        }).start();
+                    }
+                }).start();
     }
 
     /**
      * Slide the review drawer of the specified distance on the X axis
      *
-     * @param distance
+     * @param distance The distance to slide
      */
-    public void slide(float distance) {
-        if (distance > 1) {
-            mReviewedImage.setVisibility(View.VISIBLE);
-        }
-
+    public void slide(final float distance) {
         float finalPos = getTranslationY() + distance;
-        if (finalPos > 0) finalPos = 0;
+        if (finalPos > 0) {
+            finalPos = 0;
+        }
 
         setTranslationY(finalPos);
 
@@ -414,31 +435,17 @@ public class ReviewDrawer extends LinearLayout {
         }
     }
 
-    public void clampReviewedImageSliding() {
-        if (mReviewedImage.getTranslationY() < -mReviewedImage.getHeight() / 4) {
-            mReviewedImage.animate().translationY(-mReviewedImage.getHeight()).alpha(0.0f)
-                    .setDuration(300).start();
-            removeReviewedImage();
-        } else if (mReviewedImage.getTranslationY() > mReviewedImage.getHeight() / 4) {
-            mReviewedImage.animate().translationY(mReviewedImage.getHeight()).alpha(0.0f)
-                    .setDuration(300).start();
-            removeReviewedImage();
-        } else {
-            mReviewedImage.animate().translationY(0).alpha(1.0f)
-                    .setDuration(300).start();
-        }
-    }
-
     /**
      * Removes the currently reviewed image from the
      * internal memory.
      */
     public void removeReviewedImage() {
         Util.removeFromGallery(getContext().getContentResolver(), mReviewedImageId);
+        int position = mViewPager.getCurrentItem();
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-            updateFromGallery(false);
+            updateFromGallery(false, position);
         } else {
-            updateFromGallery(true);
+            updateFromGallery(true, position);
         }
 
         mHandler.postDelayed(new Runnable() {
@@ -446,118 +453,46 @@ public class ReviewDrawer extends LinearLayout {
             public void run() {
                 if (mImages.size() > 0) {
                     int imageId = mImages.get(0);
-                    setPreviewedImage(imageId);
                     mReviewedImageId = imageId;
-                    mReviewedImage.animate().translationY(0.0f).alpha(1.0f).setDuration(300).start();
                 }
             }
         }, 300);
         // XXX: Undo popup
     }
 
-    private void recycleBitmap(final Bitmap bmp) {
-        // We delay the recycle a bit to avoid crashes when scrolling or doing things too fast
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                bmp.recycle();
-            }
-        }, 1000);
-    }
-
     /**
      * Open the drawer in Quick Review mode
      */
     public void openQuickReview() {
-        mReviewedImage.setVisibility(View.GONE);
         openImpl(0.5f);
     }
-
-
-    /**
-     * Class that handles the clicks on the image list
-     */
-    private class ImageListClickListener implements AdapterView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            int imageId = mImages.get(i);
-            setPreviewedImage(imageId);
-            mReviewedImageId = imageId;
-        }
-    }
-
-    /**
-     * Handles the swipe and tap gestures on the reviewed image
-     */
-    public class ReviewedGestureListener extends GestureDetector.SimpleOnGestureListener {
-        private static final int SWIPE_MIN_DISTANCE = 10;
-        private final float DRAG_MIN_DISTANCE = Util.dpToPx(getContext(), 5.0f);
-        private static final int SWIPE_MAX_OFF_PATH = 80;
-        private static final int SWIPE_THRESHOLD_VELOCITY = 800;
-
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent e) {
-            openInGallery(mReviewedImageId);
-
-            return super.onSingleTapConfirmed(e);
-        }
-
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            return super.onDoubleTap(e);
-        }
-
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-                                float distanceY) {
-            try {
-                float dY = e2.getY() - e1.getY();
-
-                if (Math.abs(e1.getX() - e2.getX()) < SWIPE_MAX_OFF_PATH) {
-                    if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MIN_DISTANCE) {
-                        mReviewedImage.setTranslationY(dY);
-                    }
-                }
-            } catch (Exception e) {
-                // nothing
-            }
-
-            float alpha = 1.0f - Math.abs(mReviewedImage.getTranslationY() / mReviewedImage.getMeasuredHeight());
-            mReviewedImage.setAlpha(alpha);
-
-            mReviewedImage.invalidate();
-            return true;
-        }
-    }
-
 
     /**
      * Adapter responsible for showing the images in the list of the review drawer
      */
-    private class ImageListAdapter extends BaseAdapter {
-        public ImageListAdapter() {
+    private class ImageListAdapter extends android.support.v4.view.PagerAdapter {
+        private Map<ImageView, Integer> mViewsToId;
 
+        public ImageListAdapter() {
+            mViewsToId = new HashMap<ImageView, Integer>();
         }
 
         public void addImage(int id) {
-            mImages.add(0, id);
-            mHandler.post(new Runnable() {
-                public void run() {
-                    ImageListAdapter.this.notifyDataSetChanged();
-                }
-            });
+            synchronized (mImagesLock) {
+                mImages.add(0, id);
+            }
         }
 
         @Override
-        public boolean areAllItemsEnabled() {
-            return true;
-        }
+        public int getItemPosition(Object object) {
+            ImageView img = (ImageView) object;
 
-        @Override
-        public boolean isEnabled(int i) {
-            return true;
+            if (mImages.indexOf(mViewsToId.get(img)) >= 0) {
+                return mImages.indexOf(mViewsToId.get(img));
+            } else {
+                return POSITION_NONE;
+            }
         }
-
 
         @Override
         public int getCount() {
@@ -565,76 +500,187 @@ public class ReviewDrawer extends LinearLayout {
         }
 
         @Override
-        public Integer getItem(int i) {
-            return mImages.get(i);
+        public boolean isViewFromObject(View view, Object o) {
+            return view == o;
         }
 
         @Override
-        public long getItemId(int i) {
-            return mImages.get(i);
-        }
+        public Object instantiateItem(ViewGroup container, final int position) {
+            final ImageView imageView = new ImageView(getContext());
+            container.addView(imageView);
 
-        @Override
-        public View getView(final int i, View convertView, ViewGroup viewGroup) {
-            ImageView imageView;
+            imageView.setOnTouchListener(new ThumbnailTouchListener(imageView));
 
-            // Recycle the view if any exists, remove and recycle its bitmap
-            if (convertView == null) {
-                imageView = new ImageView(getContext());
-            } else {
-                imageView = (ImageView) convertView;
-                BitmapDrawable bitmapDrawable = ((BitmapDrawable) imageView.getDrawable());
-
-                if (bitmapDrawable != null) {
-                    Bitmap bmp = bitmapDrawable.getBitmap();
-                    if (bmp != null) {
-                        recycleBitmap(bmp);
-                    }
-                }
-
-                imageView.setImageBitmap(null);
-            }
-
-            // Hide the image for a nice transition while scrolling
-            imageView.setAlpha(0.0f);
-            imageView.setMinimumHeight(mThumbnailSize);
-
-            // Thread the loading to not hang the UI
-            final ImageView finalImageView = imageView;
             new Thread() {
                 public void run() {
-                    final Bitmap thumbnail = CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO ?
-                            (MediaStore.Video.Thumbnails.getThumbnail(
-                            getContext().getContentResolver(), mImages.get(i),
-                            MediaStore.Video.Thumbnails.MICRO_KIND, null)) :
-                            (MediaStore.Images.Thumbnails.getThumbnail(
-                            getContext().getContentResolver(), mImages.get(i),
-                            MediaStore.Images.Thumbnails.MICRO_KIND, null));
-
-                    if (thumbnail == null) {
-                        Log.e(TAG, "Thumbnail is null!");
-                        return;
+                    int imageId = -1;
+                    synchronized (mImagesLock) {
+                        try {
+                            imageId = mImages.get(position);
+                        } catch (IndexOutOfBoundsException e) {
+                            return;
+                        }
                     }
 
-                    // Thumbnail is ready, apply it to the ImageView in the UI thread and animate it
-                    mHandler.post(new Runnable() {
-                        public void run() {
-                            // If we shoot really fast, the thumbnail might be recycled
-                            // even before we displayed it, resulting in a crash
-                            if (!thumbnail.isRecycled()) {
-                                finalImageView.setImageBitmap(thumbnail);
-                            }
+                    mViewsToId.put(imageView, imageId);
+                    final Bitmap thumbnail = CameraActivity.getCameraMode() ==
+                            CameraActivity.CAMERA_MODE_VIDEO ? (MediaStore.Video.Thumbnails
+                            .getThumbnail(getContext().getContentResolver(),
+                                    mImages.get(position), MediaStore.Video.Thumbnails.MINI_KIND, null))
+                            : (MediaStore.Images.Thumbnails.getThumbnail(getContext()
+                            .getContentResolver(), imageId,
+                            MediaStore.Images.Thumbnails.MINI_KIND, null));
 
-                            finalImageView.animate().alpha(1.0f).setDuration(100).start();
+                    final int rotation = getCameraPhotoOrientation(imageId);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageView.setImageBitmap(thumbnail);
+                            imageView.setRotation(rotation);
                         }
                     });
-
                 }
             }.start();
 
             return imageView;
         }
 
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            // Remove viewpager_item.xml from ViewPager
+            container.removeView((ImageView) object);
 
+        }
+    }
+
+    /**
+     * Pager transition animation
+     */
+    public class ZoomOutPageTransformer implements ViewPager.PageTransformer {
+        private final float MIN_SCALE = 0.85f;
+        private final float MIN_ALPHA = 0.5f;
+
+        public void transformPage(View view, float position) {
+            int pageWidth = view.getWidth();
+            int pageHeight = view.getHeight();
+
+            if (position < -1) { // [-Infinity,-1)
+                // This page is way off-screen to the left.
+                view.setAlpha(0);
+
+            } else if (position <= 1) { // [-1,1]
+                // Modify the default slide transition to shrink the page as well
+                float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
+                float vertMargin = pageHeight * (1 - scaleFactor) / 2;
+                float horzMargin = pageWidth * (1 - scaleFactor) / 2;
+                if (position < 0) {
+                    view.setTranslationX(horzMargin - vertMargin / 2);
+                } else {
+                    view.setTranslationX(-horzMargin + vertMargin / 2);
+                }
+
+                // Scale the page down (between MIN_SCALE and 1)
+                view.setScaleX(scaleFactor);
+                view.setScaleY(scaleFactor);
+
+                // Fade the page relative to its size.
+                view.setAlpha(MIN_ALPHA +
+                        (scaleFactor - MIN_SCALE) /
+                                (1 - MIN_SCALE) * (1 - MIN_ALPHA));
+
+            } else { // (1,+Infinity]
+                // This page is way off-screen to the right.
+                view.setAlpha(0);
+            }
+        }
+    }
+
+    public class ThumbnailTouchListener implements OnTouchListener {
+        private final GestureDetector mGestureDetector;
+        private ImageView mImageView;
+        private GestureDetector.SimpleOnGestureListener mListener =
+                new GestureDetector.SimpleOnGestureListener() {
+                    private final float DRIFT_THRESHOLD = 80.0f;
+                    private final int SWIPE_THRESHOLD_VELOCITY = 800;
+
+                    @Override
+                    public boolean onDown(MotionEvent motionEvent) {
+                        return true;
+                    }
+
+                    @Override
+                    public void onShowPress(MotionEvent motionEvent) {
+
+                    }
+
+                    @Override
+                    public boolean onSingleTapUp(MotionEvent motionEvent) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onScroll(MotionEvent ev1, MotionEvent ev2, float vX, float vY) {
+                        if (Math.abs(ev2.getX() - ev1.getX()) > DRIFT_THRESHOLD) {
+                            return false;
+                        }
+
+                        mImageView.setTranslationY(ev2.getRawY() - ev1.getRawY());
+                        float alpha = Math.max(0.0f, 1.0f - Math.abs(mImageView.getTranslationY()
+                                / mImageView.getMeasuredHeight())*2.0f);
+                        mImageView.setAlpha(alpha);
+
+                        return true;
+                    }
+
+                    @Override
+                    public void onLongPress(MotionEvent motionEvent) {
+
+                    }
+
+                    @Override
+                    public boolean onFling(MotionEvent ev1, MotionEvent ev2, float vX, float vY) {
+                        if (Math.abs(ev2.getX() - ev1.getX()) > DRIFT_THRESHOLD) {
+                            return false;
+                        }
+
+                        if (Math.abs(vY) > SWIPE_THRESHOLD_VELOCITY) {
+                            mImageView.animate().translationY(-mImageView.getHeight()).alpha(0.0f)
+                                    .setDuration(300).start();
+                            removeReviewedImage();
+                            return true;
+                        }
+
+                        return false;
+                    }
+                };
+
+        public ThumbnailTouchListener(ImageView iv) {
+            mImageView = iv;
+            mGestureDetector = new GestureDetector(getContext(), mListener);
+        }
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
+                if (mImageView.getTranslationY() > mImageView.getMeasuredHeight()*0.5f) {
+                    mImageView.animate().translationY(-mImageView.getHeight()).alpha(0.0f)
+                            .setDuration(300).start();
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mImageView.setTranslationY(0.0f);
+                            mImageView.setTranslationX(mImageView.getWidth());
+                            mImageView.animate().translationX(0.0f).alpha(1.0f).start();
+                        }
+                    }, 400);
+                    removeReviewedImage();
+                } else {
+                    mImageView.animate().translationY(0).alpha(1.0f)
+                            .setDuration(300).start();
+                }
+            }
+
+            return mGestureDetector.onTouchEvent(motionEvent);
+        }
     }
 }

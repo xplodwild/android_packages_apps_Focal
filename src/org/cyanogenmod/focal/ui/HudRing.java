@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.ui;
@@ -84,6 +85,7 @@ public class HudRing extends ImageView implements View.OnTouchListener {
     }
 
     public void animateWorking(long duration) {
-        animate().rotationBy(45.0f).setDuration(duration).setInterpolator(new DecelerateInterpolator()).start();
+        animate().rotationBy(45.0f).setDuration(duration).setInterpolator(
+                new DecelerateInterpolator()).start();
     }
 }

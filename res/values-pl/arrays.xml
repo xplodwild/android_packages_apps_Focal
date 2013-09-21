@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string-array name="transformer_timer_voice_words">
+        <item>Cid</item>
+        <item>Civ</item>
+        <item>Whiskey</item>
+        <item>Cheese</item>
+    </string-array>
+
+    <string-array name="widget_flash_hints">
+        <item>Automatyczny</item>
+        <item>Wyłączony</item>
+        <item>Włączony</item>
+        <item>Latarka</item>
+        <item>Redukcja czerwonych oczu</item>
+    </string-array>
+
+    <string-array name="widget_effects_hints">
+        <item>Wyłączony</item>
+        <item>Czarny &amp; Biały</item>
+        <item>Negatyw</item>
+        <item>Solaryzacja</item>
+        <item>Sepia</item>
+        <item>Posteryzacja</item>
+        <item>Czarna tablica</item>
+        <item>Biała tablica</item>
+        <item>Woda</item>
+        <item>Wyrycie</item>
+        <item>Szkic</item>
+        <item>Neon</item>
+    </string-array>
+
+    <string-array name="widget_scenemode_hints">
+        <item>Automatyczny</item>
+        <item>Redukcja rozmycia w ruchu</item>
+        <item>Rozszerzona rzeczywistość</item>
+        <item>Najlepsze zdjęcie</item>
+        <item>Dziecko</item>
+        <item>Pod światło</item>
+        <item>Porter pod światło</item>
+        <item>Kod kreskowy</item>
+        <item>Plaża</item>
+        <item>Światło świecy</item>
+        <item>Mrok</item>
+        <item>Jedzenie</item>
+        <item>Dokument</item>
+        <item>Fajerwerki</item>
+        <item>Kwiaty</item>
+        <item>Zmierzch</item>
+        <item>HDR</item>
+        <item>Wysoka czułość</item>
+        <item>Krajobraz</item>
+        <item>Noc</item>
+        <item>Nocny portret</item>
+        <item>Nocny portret</item>
+        <item>Impreza</item>
+        <item>Zwierzę</item>
+        <item>Portret</item>
+        <item>Śnieg</item>
+        <item>Miękka skóra</item>
+        <item>Sport</item>
+        <item>Reflektor</item>
+        <item>Stacjonarne zdjęcie</item>
+        <item>Zachód słońca</item>
+        <item>Zszyta panorama</item>
+        <item>Teatr</item>
+    </string-array>
+
+    <string-array name="widget_whitebalance_hints">
+        <item>Automatyczny</item>
+        <item>Pochmurno</item>
+        <item>Rozżarzony</item>
+        <item>Fluorescencyjny</item>
+        <item>Światło dzienne</item>
+        <item>Zachmurzony dzień</item>
+    </string-array>
+
+    <string-array name="widget_autoexposure_hints">
+        <item>Średnia pola</item>
+        <item>Centralnie ważony</item>
+        <item>Punktowy</item>
+    </string-array>
+</resources>

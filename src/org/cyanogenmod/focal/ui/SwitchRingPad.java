@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.ui;
@@ -35,7 +36,7 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.Util;
 
 public class SwitchRingPad extends View implements AnimatorUpdateListener {
@@ -188,9 +189,12 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(4.0f);
         mPaint.setARGB((int) (255.0f - 255.0f * mHintProgress), 255, 255, 255);
-        canvas.drawCircle(width / 2, height - mEdgePadding + buttonOffset, mHintProgress * mRingRadius, mPaint);
-        canvas.drawCircle(width / 2, height - mEdgePadding + buttonOffset, mHintProgress * mRingRadius * 0.66f, mPaint);
-        canvas.drawCircle(width / 2, height - mEdgePadding + buttonOffset, mHintProgress * mRingRadius * 0.33f, mPaint);
+        canvas.drawCircle(width / 2, height - mEdgePadding + buttonOffset, mHintProgress
+                * mRingRadius, mPaint);
+        canvas.drawCircle(width / 2, height - mEdgePadding + buttonOffset, mHintProgress
+                * mRingRadius * 0.66f, mPaint);
+        canvas.drawCircle(width / 2, height - mEdgePadding + buttonOffset, mHintProgress
+                * mRingRadius * 0.33f, mPaint);
 
         final float ringRadius = mRingRadius * mOpenProgress;
 
@@ -216,16 +220,20 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
 
             final float y = (float) (height + ringRadius * Math.cos(radAngle) - mButtonSize);
             // We remove the button edge
-            final float x = (float) (width / 2 - button.mNormalBitmap.getWidth() / 2 - ringRadius * Math.sin(radAngle));
+            final float x = (float) (width / 2 - button.mNormalBitmap.getWidth() / 2
+                    - ringRadius * Math.sin(radAngle));
 
             canvas.save();
-            canvas.translate(x + button.mNormalBitmap.getWidth() / 2, y + button.mNormalBitmap.getWidth() / 2);
+            canvas.translate(x + button.mNormalBitmap.getWidth() / 2,
+                    y + button.mNormalBitmap.getWidth() / 2);
             canvas.rotate(mCurrentOrientation);
 
             if (button.mIsHovering) {
-                canvas.drawBitmap(button.mHoverBitmap, -button.mNormalBitmap.getWidth() / 2, -button.mNormalBitmap.getWidth() / 2, mPaint);
+                canvas.drawBitmap(button.mHoverBitmap, -button.mNormalBitmap.getWidth() / 2,
+                        -button.mNormalBitmap.getWidth() / 2, mPaint);
             } else {
-                canvas.drawBitmap(button.mNormalBitmap, -button.mNormalBitmap.getWidth() / 2, -button.mNormalBitmap.getWidth() / 2, mPaint);
+                canvas.drawBitmap(button.mNormalBitmap, -button.mNormalBitmap.getWidth() / 2,
+                        -button.mNormalBitmap.getWidth() / 2, mPaint);
             }
             canvas.restore();
 
@@ -264,10 +272,14 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!mIsOpen) return false;
+
         if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
             for (int i = 0; i < SLOT_MAX; i++) {
                 PadButton button = mButtons[i];
-                if (button == null) continue;
+                if (button == null) {
+                    continue;
+                }
 
                 RectF btnRect = new RectF(button.mLastDrawnX, button.mLastDrawnY,
                         button.mLastDrawnX + button.mNormalBitmap.getWidth(),
@@ -294,12 +306,13 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         }
 
         invalidate();
-
         return super.onTouchEvent(event);
     }
 
     private void animateAlpha(boolean in, final PadButton button) {
-        if (button.mHintAnimationDirection == in) return;
+        if (button.mHintAnimationDirection == in) {
+            return;
+        }
 
         button.mHintAnimationDirection = in;
         ValueAnimator anim = new ValueAnimator();
@@ -337,7 +350,9 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
     }
 
     public void animateOpen() {
-        if (mIsOpen) return;
+        if (mIsOpen) {
+            return;
+        }
 
         mAnimator.cancel();
         mAnimator.setFloatValues(0, 1);
@@ -347,7 +362,9 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
     }
 
     public void animateClose() {
-        if (!mIsOpen) return;
+        if (!mIsOpen) {
+            return;
+        }
 
         mAnimator.cancel();
         mAnimator.setFloatValues(1, 0);
@@ -356,7 +373,8 @@ public class SwitchRingPad extends View implements AnimatorUpdateListener {
         mIsOpen = false;
     }
 
-    public void addRingPad(Bitmap iconNormal, Bitmap iconHover, int eventId, int slot, String hint) {
+    public void addRingPad(Bitmap iconNormal, Bitmap iconHover,
+            int eventId, int slot, String hint) {
         mButtons[slot] = new PadButton();
         mButtons[slot].mNormalBitmap = iconNormal;
         mButtons[slot].mHoverBitmap = iconHover;

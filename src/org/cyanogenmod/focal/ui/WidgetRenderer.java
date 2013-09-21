@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.ui;
@@ -25,7 +26,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.widgets.WidgetBase;
 
 import java.util.ArrayList;
@@ -63,7 +64,6 @@ public class WidgetRenderer extends FrameLayout {
         mTotalHeight = WIDGETS_MARGIN;
         mSpacing = getResources().getDimension(R.dimen.widget_spacing);
     }
-
 
     /**
      * Rotate the contents of open widgets
@@ -104,11 +104,14 @@ public class WidgetRenderer extends FrameLayout {
         for (int i = 0; i < mOpenWidgets.size(); i++) {
             WidgetBase.WidgetContainer tested = mOpenWidgets.get(i);
 
-            if (tested == widget) continue;
+            if (tested == widget) {
+                continue;
+            }
 
             if (widget.getY() < tested.getFinalY() + tested.getMeasuredHeight()) {
                 // Don't try to go before the first if we're already it
-                if (isFirst && widget.getY() + widget.getHeight() < tested.getFinalY() - tested.getHeight() / 2)
+                if (isFirst && widget.getY() + widget.getHeight() < tested.getFinalY()
+                        - tested.getHeight() / 2)
                     break;
 
                 // Move the widget in our list
@@ -137,8 +140,9 @@ public class WidgetRenderer extends FrameLayout {
         for (int i = 0; i < mOpenWidgets.size(); i++) {
             WidgetBase.WidgetContainer widget = mOpenWidgets.get(i);
 
-            if (widget != ignore)
+            if (widget != ignore) {
                 widget.setYSmooth(mTotalHeight);
+            }
 
             mTotalHeight += widget.getMeasuredHeight() + mSpacing;
         }
@@ -158,10 +162,10 @@ public class WidgetRenderer extends FrameLayout {
 
         mOpenWidgets.add(widget);
 
-        // make sure the widget is properly oriented
+        // Make sure the widget is properly oriented
         widget.notifyOrientationChanged(mOrientation, true);
 
-        // position it properly
+        // Position it properly
         widget.forceFinalY(mTotalHeight - WIDGETS_MARGIN);
         widget.setY(mTotalHeight - WIDGETS_MARGIN);
         mTotalHeight += widget.getMeasuredHeight() + mSpacing;
@@ -176,7 +180,7 @@ public class WidgetRenderer extends FrameLayout {
     public void widgetClosed(WidgetBase.WidgetContainer widget) {
         mOpenWidgets.remove(widget);
 
-        // reposition all the widgets
+        // Reposition all the widgets
         reorderWidgets(null);
     }
 
@@ -204,12 +208,14 @@ public class WidgetRenderer extends FrameLayout {
 
     public void notifySidebarSlideClose() {
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
-        animate().translationX(-params.leftMargin).setDuration(SideBar.SLIDE_ANIMATION_DURATION_MS).start();
+        animate().translationX(-params.leftMargin).setDuration(
+                SideBar.SLIDE_ANIMATION_DURATION_MS).start();
     }
 
     public void notifySidebarSlideOpen() {
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
-        animate().translationX(params.leftMargin).setDuration(SideBar.SLIDE_ANIMATION_DURATION_MS).start();
+        animate().translationX(params.leftMargin).setDuration(
+                SideBar.SLIDE_ANIMATION_DURATION_MS).start();
     }
 
     public void hideWidgets() {
@@ -239,5 +245,4 @@ public class WidgetRenderer extends FrameLayout {
     public int getWidgetsCount() {
         return mOpenWidgets.size();
     }
-
 }

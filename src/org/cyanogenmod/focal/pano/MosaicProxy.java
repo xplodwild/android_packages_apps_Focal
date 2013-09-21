@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal.pano;
@@ -41,7 +42,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import org.cyanogenmod.focal.CameraActivity;
-import org.cyanogenmod.focal.R;
+import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SnapshotManager;
 import org.cyanogenmod.focal.Storage;
 import org.cyanogenmod.focal.Util;
@@ -210,11 +211,13 @@ public class MosaicProxy extends CaptureTransformer
         int pixels = mActivity.getResources().getInteger(R.integer.config_panoramaDefaultWidth)
                 * mActivity.getResources().getInteger(R.integer.config_panoramaDefaultHeight);
 
-        Point size = Util.findBestPanoPreviewSize(params.getSupportedPreviewSizes(), true, true, pixels);
+        Point size = Util.findBestPanoPreviewSize(
+                params.getSupportedPreviewSizes(), true, true, pixels);
         mPreviewWidth = size.x;
         mPreviewHeight = size.y;
 
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
+        FrameLayout.LayoutParams layoutParams =
+                (FrameLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
         layoutParams.width = FrameLayout.LayoutParams.WRAP_CONTENT;
         layoutParams.height = FrameLayout.LayoutParams.WRAP_CONTENT;
         layoutParams.gravity = Gravity.CENTER;
@@ -225,7 +228,6 @@ public class MosaicProxy extends CaptureTransformer
         layoutParams.height = FrameLayout.LayoutParams.WRAP_CONTENT;
         layoutParams.gravity = Gravity.CENTER;
         mGLSurfaceView.setLayoutParams(layoutParams);
-
     }
 
     // This function will be called upon the first camera frame is available.
@@ -258,7 +260,8 @@ public class MosaicProxy extends CaptureTransformer
 
     private void configMosaicPreview() {
         boolean isLandscape = (mCamManager.getOrientation() != -90);
-        Log.d(TAG, "isLandscape ? " + isLandscape + " (orientation: " + mCamManager.getOrientation() + ")");
+        Log.d(TAG, "isLandscape ? " + isLandscape +
+                " (orientation: " + mCamManager.getOrientation() + ")");
 
         int viewWidth = mGLRootView.getMeasuredWidth();
         int viewHeight = mGLRootView.getMeasuredHeight();
@@ -293,7 +296,6 @@ public class MosaicProxy extends CaptureTransformer
         if (mCaptureState == CAPTURE_STATE_MOSAIC) {
             stopCapture(false);
             Util.fadeOut(button);
-
         } else {
             startCapture();
             button.setImageResource(R.drawable.btn_shutter_stop);
@@ -349,7 +351,8 @@ public class MosaicProxy extends CaptureTransformer
 
     public int getPreviewBufSize() {
         PixelFormat pixelInfo = new PixelFormat();
-        PixelFormat.getPixelFormatInfo(mActivity.getCamManager().getParameters().getPreviewFormat(), pixelInfo);
+        PixelFormat.getPixelFormatInfo(mActivity.getCamManager()
+                .getParameters().getPreviewFormat(), pixelInfo);
         // TODO: remove this extra 32 byte after the driver bug is fixed.
         return (mPreviewWidth * mPreviewHeight * pixelInfo.bitsPerPixel / 8) + 32;
     }
@@ -383,17 +386,22 @@ public class MosaicProxy extends CaptureTransformer
         mPanoProgressBar.setIndicatorColor(mIndicatorColor);
 
         boolean isLandscape = (mCamManager.getOrientation() != -90);
-        Log.d(TAG, "isLandscape ? " + isLandscape + " (orientation: " + mCamManager.getOrientation() + ")");
+        Log.d(TAG, "isLandscape ? " + isLandscape + " (orientation: "
+                + mCamManager.getOrientation() + ")");
         mMosaicPreviewRenderer.setLandscape(isLandscape);
 
         mCurrentOrientation = mActivity.getCamManager().getOrientation();
-        if (mCurrentOrientation == -90) mCurrentOrientation = 90;
-        if (mCurrentOrientation < 0) mCurrentOrientation += 360;
+        if (mCurrentOrientation == -90) {
+            mCurrentOrientation = 90;
+        }
+        if (mCurrentOrientation < 0) {
+            mCurrentOrientation += 360;
+        }
 
         mMosaicFrameProcessor.setProgressListener(new MosaicFrameProcessor.ProgressListener() {
             @Override
             public void onProgress(boolean isFinished, float panningRateX, float panningRateY,
-                                   float progressX, float progressY) {
+                    float progressX, float progressY) {
                 float accumulatedHorizontalAngle = progressX * mHorizontalViewAngle;
                 float accumulatedVerticalAngle = progressY * mVerticalViewAngle;
                 if (isFinished
@@ -461,7 +469,6 @@ public class MosaicProxy extends CaptureTransformer
                 }
             });
         }
-        //keepScreenOnAwhile();
     }
 
     /**
@@ -544,7 +551,7 @@ public class MosaicProxy extends CaptureTransformer
                     Uri uri = savePanorama(jpeg.data, jpeg.width, jpeg.height, mCurrentOrientation);
                     if (uri != null) {
                         Util.broadcastNewPicture(mActivity, uri);
-                        mActivity.getReviewDrawer().updateFromGallery(true);
+                        mActivity.getReviewDrawer().updateFromGallery(true, 0);
                     }
 
                     mMainHandler.sendMessage(
@@ -578,8 +585,8 @@ public class MosaicProxy extends CaptureTransformer
             }
 
             int jpegLength = (int) (new File(filePath).length());
-            return Storage.getStorage().addImage(mActivity.getContentResolver(), filename, mTimeTaken,
-                    null, orientation, jpegLength, filePath, width, height);
+            return Storage.getStorage().addImage(mActivity.getContentResolver(), filename,
+                    mTimeTaken, null, orientation, jpegLength, filePath, width, height);
         }
         return null;
     }
@@ -611,7 +618,7 @@ public class MosaicProxy extends CaptureTransformer
     }
 
     private void updateProgress(float panningRateXInDegree, float panningRateYInDegree,
-                                float progressHorizontalAngle, float progressVerticalAngle) {
+            float progressHorizontalAngle, float progressVerticalAngle) {
         mGLRootView.invalidate();
 
         if ((Math.abs(panningRateXInDegree) > PANNING_SPEED_THRESHOLD)

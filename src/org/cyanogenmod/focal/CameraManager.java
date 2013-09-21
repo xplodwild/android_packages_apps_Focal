@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 The CyanogenMod Project
  *
  * This program is free software; you can redistribute it and/or
@@ -13,12 +13,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 package org.cyanogenmod.focal;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -29,17 +31,26 @@ import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.AutoFocusMoveCallback;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.opengl.GLES11Ext;
+import android.opengl.GLES20;
+import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
+import fr.xplod.focal.R;
 
 /**
  * This class is responsible for interacting with the Camera HAL.
@@ -65,11 +76,12 @@ public class CameraManager {
     private CameraReadyListener mCameraReadyListener;
     private Handler mHandler;
     private Context mContext;
-    private long mLastPreviewFrameTime;
-    private boolean mCameraOpen;
     private boolean mIsModeSwitching;
     private List<NameValuePair> mPendingParameters;
     private boolean mIsResuming;
+    private CameraRenderer mRenderer;
+    private boolean mIsRecordingHint;
+    private boolean mIsPreviewStarted;
 
     public interface PreviewPauseListener {
         /**
@@ -106,7 +118,7 @@ public class CameraManager {
                     try {
                         wait();
                     } catch (InterruptedException e) {
-                        // do nothing
+                        // Do nothing here
                     }
 
                     List<NameValuePair> copy = new ArrayList<NameValuePair>(mPendingParameters);
@@ -117,17 +129,23 @@ public class CameraManager {
                         String val = pair.getValue();
                         Log.v(TAG, "Asynchronously setting parameter " + key+ " to " + val);
                         Camera.Parameters params = getParameters();
+                        if (params == null) {
+                            // The camera died, just forget about these settings
+                            return;
+                        }
                         String workingValue = params.get(key);
                         params.set(key, val);
 
                         try {
                             mCamera.setParameters(params);
                         } catch (RuntimeException e) {
-                            Log.e(TAG, "Could not set parameter " + key + " to '" + val + "', restoring '"
+                            Log.e(TAG, "Could not set parameter " + key
+                                    + " to '" + val + "', restoring '"
                                     + workingValue + "'", e);
 
                             // Reset the parameter back in storage
-                            SettingsStorage.storeCameraSetting(mContext, mCurrentFacing, key, workingValue);
+                            SettingsStorage.storeCameraSetting(
+                                    mContext, mCurrentFacing, key, workingValue);
 
                             // Reset the camera as it likely crashed if we reached here
                             open(mCurrentFacing);
@@ -142,7 +160,7 @@ public class CameraManager {
     };
 
     public CameraManager(Context context) {
-        mPreview = new CameraPreview(context);
+        mPreview = new CameraPreview();
         mMediaRecorder = new MediaRecorder();
         mCameraReady = true;
         mHandler = new Handler();
@@ -151,13 +169,15 @@ public class CameraManager {
         mPendingParameters = new ArrayList<NameValuePair>();
         mParametersThread.start();
         mIsResuming = false;
-        mCameraOpen = false;
+        mIsRecordingHint = false;
+        mRenderer = new CameraRenderer();
+        mIsPreviewStarted = false;
     }
 
     /**
      * Opens the camera and show its preview in the preview
      *
-     * @param cameraId
+     * @param cameraId The facing of the camera
      * @return true if the operation succeeded, false otherwise
      */
     public boolean open(final int cameraId) {
@@ -181,7 +201,6 @@ public class CameraManager {
                         return;
                     }
                     mCamera = Camera.open(cameraId);
-                    mCameraOpen = true;
                     Log.v(TAG, "Camera is open");
 
                     mCamera.enableShutterSound(false);
@@ -205,6 +224,7 @@ public class CameraManager {
                     if (mCameraReadyListener != null) {
                         mCameraReadyListener.onCameraFailed();
                     }
+
                     return;
                 }
 
@@ -214,7 +234,6 @@ public class CameraManager {
                 if (mCameraReadyListener != null) {
                     mCameraReadyListener.onCameraReady();
                 }
-
                 if (mPreviewPauseListener != null) {
                     mPreviewPauseListener.onPreviewResume();
                 }
@@ -243,6 +262,13 @@ public class CameraManager {
      */
     public CameraPreview getPreviewSurface() {
         return mPreview;
+    }
+
+    /**
+     * @return The GLES20-compatible renderer for the camera preview
+     */
+    public CameraRenderer getRenderer() {
+        return mRenderer;
     }
 
     /**
@@ -280,20 +306,33 @@ public class CameraManager {
     public void pause() {
         mPreview.setPauseCopyFrame(true);
         releaseCamera();
-        //mParametersThread.interrupt();
+        // TODO: Release parameters thread
     }
 
     public void resume() {
         mIsResuming = true;
         reconnectToCamera();
-        //mParametersThread.start();
+    }
+
+    /**
+     * Used by CameraApplication safeguard to release the camera when the app crashes.
+     */
+    public void forceCloseCamera() {
+        if (mCamera != null) {
+            try {
+                mCamera.release();
+                mCamera = null;
+                mParameters = null;
+            } catch (Exception e) {
+                // Do nothing
+            }
+        }
     }
 
     private void releaseCamera() {
         if (mCamera != null && mCameraReady) {
             Log.v(TAG, "Releasing camera facing " + mCurrentFacing);
             mCamera.release();
-            mCameraOpen = false;
             mCamera = null;
             mParameters = null;
             mPreview.notifyCameraChanged(false);
@@ -321,13 +360,14 @@ public class CameraManager {
             if (!mIsModeSwitching) {
                 synchronized (mParametersThread) {
                     try {
-                        mCamera.stopPreview();
+                        safeStopPreview();
                         mParameters = params;
                         mCamera.setParameters(mParameters);
                         mPreview.notifyPreviewSize(width, height);
 
                         if (mIsResuming) {
-                            mCamera.startPreview();
+                            updateDisplayOrientation();
+                            safeStartPreview();
                             mIsResuming = false;
                         }
 
@@ -340,6 +380,20 @@ public class CameraManager {
         }
     }
 
+    private void safeStartPreview() {
+        if (!mIsPreviewStarted && mCamera != null) {
+            mCamera.startPreview();
+            mIsPreviewStarted = true;
+        }
+    }
+
+    private void safeStopPreview() {
+        if (mIsPreviewStarted && mCamera != null) {
+            mCamera.stopPreview();
+            mIsPreviewStarted = false;
+        }
+    }
+
     public void setParameterAsync(String key, String value) {
         synchronized (mParametersThread) {
             mPendingParameters.add(new BasicNameValuePair(key, value));
@@ -349,7 +403,7 @@ public class CameraManager {
 
     /**
      * Sets a parameters class in a synchronous way. Use with caution, prefer setParameterAsync.
-     * @param params
+     * @param params Parameters
      */
     public void setParameters(Camera.Parameters params) {
         synchronized (mParametersThread) {
@@ -386,7 +440,7 @@ public class CameraManager {
                     try {
                         mCamera.setParameters(params);
                     } catch (RuntimeException e) {
-
+                        // Do nothing here
                     }
                 }
             }
@@ -416,7 +470,7 @@ public class CameraManager {
         int previewHeight = previewSize.height;
 
         // Convert YUV420SP preview data to RGB
-        if (data != null) {
+        if (data != null && data.length > 8) {
             Bitmap bitmap = Util.decodeYUV420SP(mContext, data, previewWidth, previewHeight);
             if (mCurrentFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 // Frontcam has the image flipped, flip it back to not look weird in portrait
@@ -432,15 +486,6 @@ public class CameraManager {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Returns the system time of when the last preview frame was received
-     *
-     * @return long
-     */
-    public long getLastPreviewFrameTime() {
-        return mLastPreviewFrameTime;
     }
 
     public Context getContext() {
@@ -468,17 +513,29 @@ public class CameraManager {
         int width = Integer.parseInt(splat[0]);
         int height = Integer.parseInt(splat[1]);
 
-        setParameterAsync("picture-size", Integer.toString(width) + "x" + Integer.toString(height));
+        setParameterAsync("picture-size", Integer.toString(width)
+                + "x" + Integer.toString(height));
     }
 
     /**
      * Takes a snapshot
      */
-    public void takeSnapshot(Camera.ShutterCallback shutterCallback, Camera.PictureCallback raw,
-                             Camera.PictureCallback jpeg) {
+    public void takeSnapshot(final Camera.ShutterCallback shutterCallback,
+                             final Camera.PictureCallback raw, final Camera.PictureCallback jpeg) {
         Log.v(TAG, "takePicture");
+        if (getContext().getResources().getBoolean(R.bool.config_stopPreviewBetweenShots)) {
+            safeStopPreview();
+        }
+
         SoundManager.getSingleton().play(SoundManager.SOUND_SHUTTER);
-        mCamera.takePicture(shutterCallback, raw, jpeg);
+
+        if (mCamera != null) {
+            new Thread() {
+                public void run() {
+                    mCamera.takePicture(shutterCallback, raw, jpeg);
+                }
+            }.start();
+        }
     }
 
     /**
@@ -500,12 +557,10 @@ public class CameraManager {
         mMediaRecorder.setProfile(profile);
         mMediaRecorder.setOutputFile(fileName);
         // Set maximum file size.
-        long maxFileSize = Storage.getStorage().getAvailableSpace() - Storage.LOW_STORAGE_THRESHOLD;
+        long maxFileSize = Storage.getStorage().getAvailableSpace()
+                - Storage.LOW_STORAGE_THRESHOLD;
         mMediaRecorder.setMaxFileSize(maxFileSize);
         mMediaRecorder.setMaxDuration(0); // infinite
-
-
-        mMediaRecorder.setPreviewDisplay(mPreview.getSurfaceHolder().getSurface());
 
         try {
             mMediaRecorder.prepare();
@@ -528,16 +583,16 @@ public class CameraManager {
         Log.v(TAG, "stopVideoRecording");
         try {
             mMediaRecorder.stop();
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            Log.e(TAG, "Cannot stop MediaRecorder", e);
+        }
         mCamera.lock();
         mMediaRecorder.reset();
         mPreview.postCallbackBuffer();
     }
 
     /**
-     * Returns the orientation of the device
-     *
-     * @return
+     * @return The orientation of the device
      */
     public int getOrientation() {
         return mOrientation;
@@ -548,13 +603,15 @@ public class CameraManager {
      * @param orientation The orientation, in degrees
      */
     public void setOrientation(int orientation) {
+        if (mOrientation == orientation) return;
+
         mOrientation = orientation;
 
         // Rotate the pictures accordingly (display is kept at 90 degrees)
         Camera.CameraInfo info =
                 new android.hardware.Camera.CameraInfo();
         Camera.getCameraInfo(mCurrentFacing, info);
-        orientation = (orientation + 45) / 90 * 90;
+        //orientation = (360 - orientation + 45) / 90 * 90;
         int rotation = 0;
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             rotation = (info.orientation - orientation + 360) % 360;
@@ -570,11 +627,16 @@ public class CameraManager {
             public void run() {
                 synchronized (mParametersThread) {
                     try {
+                        // Normally, we should use safeStartPreview everywhere. However, some
+                        // cameras implicitly stops preview, and we don't know. So we just force
+                        // it here.
                         mCamera.startPreview();
                         mPreview.setPauseCopyFrame(false);
                     } catch (Exception e) {
                         // ignore
                     }
+
+                    mIsPreviewStarted = true;
                 }
             }
         }.start();
@@ -596,18 +658,29 @@ public class CameraManager {
                     Camera.Parameters params = getParameters();
 
                     if (params == null) {
-                        // We're likely in the middle of a transient state. Just do that again
-                        // shortly when the camera will be available.
+                        // We're likely in the middle of a transient state.
+                        // Just do that again shortly when the camera will
+                        // be available.
                         return;
                     }
 
-                    if (mode == CameraActivity.CAMERA_MODE_VIDEO) {
-                        params.setRecordingHint(true);
-                    } else {
-                        params.setRecordingHint(false);
-                    }
+                    boolean shouldStartPreview = false;
 
-                    mCamera.stopPreview();
+                    if (mode == CameraActivity.CAMERA_MODE_VIDEO) {
+                        if (!mIsRecordingHint) {
+                            params.setRecordingHint(true);
+                            mIsRecordingHint = true;
+                            safeStopPreview();
+                            shouldStartPreview = true;
+                        }
+                    } else {
+                        if (mIsRecordingHint) {
+                            params.setRecordingHint(false);
+                            mIsRecordingHint = false;
+                            safeStopPreview();
+                            shouldStartPreview = true;
+                        }
+                    }
 
                     if (mode == CameraActivity.CAMERA_MODE_PANO) {
                         // Apply special settings for panorama mode
@@ -618,32 +691,30 @@ public class CameraManager {
                     }
 
                     if (mode == CameraActivity.CAMERA_MODE_PICSPHERE) {
-                        // If we are in PicSphere mode, set pic size to 640x480 to avoid using
-                        // all the phone's resources when rendering, as well as not take 15 min
-                        // to render. Eventually, we could put up a setting somewhere to let users
-                        // rendering super high quality pictures.
-                        params.setPictureSize(640, 480);
+                        // If we are in PicSphere mode, we look for a correct 4:3 resolution. We
+                        // default the preview size to 640x480 however, as we don't need anything
+                        // bigger than that. We prefer to have a smaller resolution in case our
+                        // recommended resolution isn't available, as it will be faster to render.
+                        Point size = Util.findBestPicSpherePictureSize(params.getSupportedPictureSizes(), true);
+                        params.setPictureSize(size.x, size.y);
                         params.setPreviewSize(640, 480);
 
                         // Set focus mode to infinity
                         setInfinityFocus(params);
                     } else {
-                        params.setPreviewSize(mTargetSize.x, mTargetSize.y);
+                        setPreviewSize(mTargetSize.x, mTargetSize.y);
                     }
 
-                    mCamera.setParameters(params);
-                    mParameters = mCamera.getParameters();
                     try {
-                        // PicSphere and Pano renders to a texture, so the preview will be started
-                        // once the SurfaceTexture is ready to receive frames
-                        if (mode != CameraActivity.CAMERA_MODE_PICSPHERE
-                                && mode != CameraActivity.CAMERA_MODE_PANO) {
-                            mCamera.startPreview();
-                        }
+                        mCamera.setParameters(params);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Unable to set parameters", e);
+                    }
+                    mParameters = mCamera.getParameters();
 
-                        mPreview.notifyPreviewSize(mTargetSize.x, mTargetSize.y);
-                    } catch (RuntimeException e) {
-                        Log.e(TAG, "Unable to start preview", e);
+                    if (shouldStartPreview) {
+                        updateDisplayOrientation();
+                        safeStartPreview();
                     }
                 }
 
@@ -655,6 +726,25 @@ public class CameraManager {
                 }
             }
         }.start();
+    }
+
+    /**
+     * Updates the orientation of the display
+     */
+    public void updateDisplayOrientation() {
+        android.hardware.Camera.CameraInfo info =
+                new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(mCurrentFacing, info);
+        int degrees = 0; //Util.getDisplayRotation(null);
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        mCamera.setDisplayOrientation(result);
     }
 
     /**
@@ -673,32 +763,31 @@ public class CameraManager {
         parameters.setPreviewSize(previewSize.x, previewSize.y);
         mTargetSize = previewSize;
 
-        List<Camera.Size> supportedPicSizes = parameters.getSupportedPictureSizes();
-        if (supportedPicSizes.contains(mTargetSize)) {
-            parameters.setPictureSize(mTargetSize.x, mTargetSize.y);
-        }
-
         List<int[]> frameRates = parameters.getSupportedPreviewFpsRange();
-        int last = frameRates.size() - 1;
-        int minFps = (frameRates.get(last))[Camera.Parameters.PREVIEW_FPS_MIN_INDEX];
-        int maxFps = (frameRates.get(last))[Camera.Parameters.PREVIEW_FPS_MAX_INDEX];
-        parameters.setPreviewFpsRange(minFps, maxFps);
-        Log.v(TAG, "preview fps: " + minFps + ", " + maxFps);
+        if (frameRates != null) {
+            int last = frameRates.size() - 1;
+            int minFps = (frameRates.get(last))[Camera.Parameters.PREVIEW_FPS_MIN_INDEX];
+            int maxFps = (frameRates.get(last))[Camera.Parameters.PREVIEW_FPS_MAX_INDEX];
+            parameters.setPreviewFpsRange(minFps, maxFps);
+            Log.v(TAG, "preview fps: " + minFps + ", " + maxFps);
+        }
 
         setInfinityFocus(parameters);
 
-        parameters.set("recording-hint", "false");
+        parameters.setRecordingHint(false);
         mParameters = parameters;
     }
 
     private void setInfinityFocus(Camera.Parameters parameters) {
         List<String> supportedFocusModes = parameters.getSupportedFocusModes();
-        if (supportedFocusModes.indexOf(Camera.Parameters.FOCUS_MODE_INFINITY) >= 0) {
+        if (supportedFocusModes != null
+                && supportedFocusModes.indexOf(Camera.Parameters.FOCUS_MODE_INFINITY) >= 0) {
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_INFINITY);
         } else {
             // Use the default focus mode and log a message
-            Log.w(TAG, "Cannot set the focus mode to " + Camera.Parameters.FOCUS_MODE_INFINITY +
-                    " because the mode is not supported.");
+            Log.w(TAG, "Cannot set the focus mode to "
+                    + Camera.Parameters.FOCUS_MODE_INFINITY
+                    + " because the mode is not supported.");
         }
     }
 
@@ -711,17 +800,19 @@ public class CameraManager {
     public boolean doAutofocus(final AutoFocusCallback cb) {
         if (mCamera != null) {
             try {
-                // make sure our auto settings aren't locked
+                // Make sure our auto settings aren't locked
                 setLockSetup(false);
 
-                // trigger af
+                // Trigger af
                 mCamera.cancelAutoFocus();
 
                 mHandler.post(new Runnable() {
                     public void run() {
                         try {
                             mCamera.autoFocus(cb);
-                        } catch (Exception e) { }
+                        } catch (Exception e) {
+                            // Do nothing here
+                        }
                     }
                 });
 
@@ -789,7 +880,8 @@ public class CameraManager {
             try {
                 mCamera.setParameters(params);
             } catch (Exception e) {
-                // ignore, we might be setting it too fast since previous attempt
+                // Ignore, we might be setting it too
+                // fast since previous attempt
             }
         }
     }
@@ -813,7 +905,8 @@ public class CameraManager {
             try {
                 mCamera.setParameters(params);
             } catch (Exception e) {
-                // ignore, we might be setting it too fast since previous attempt
+                // Ignore, we might be setting it too
+                // fast since previous attempt
             }
         }
     }
@@ -821,7 +914,8 @@ public class CameraManager {
     public void setAutoFocusMoveCallback(AutoFocusMoveCallback cb) {
         mAutoFocusMoveCallback = cb;
 
-        if (mCamera != null && mParameters.getSupportedFocusModes().contains(
+        List<String> focusModes = mParameters.getSupportedFocusModes();
+        if (mCamera != null && focusModes != null && focusModes.contains(
                 Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             mCamera.setAutoFocusMoveCallback(cb);
         }
@@ -829,11 +923,13 @@ public class CameraManager {
 
     /**
      * Enable the device image stabilization system.
-     * @param enabled
+     * @param enabled True to stabilize
      */
     public void setStabilization(boolean enabled) {
         Camera.Parameters params = getParameters();
-        if (params == null) return;
+        if (params == null) {
+            return;
+        }
 
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
             // In wrappers: sony has sony-is, HTC has ois_mode, etc.
@@ -848,7 +944,9 @@ public class CameraManager {
 
         try {
             mCamera.setParameters(params);
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            // Do nothing here
+        }
     }
 
     /**
@@ -862,33 +960,18 @@ public class CameraManager {
     }
 
     /**
-     * Redirect the camera preview callbacks to the specified preview callback rather than the
-     * default preview callback.
-     * @param cb The callback
-     */
-    public void deviatePreviewCallbackWithBuffer(Camera.PreviewCallback cb) {
-        mCamera.setPreviewCallbackWithBuffer(cb);
-    }
-
-    /**
      * The CameraPreview class handles the Camera preview feed
      * and setting the surface holder.
      */
-    public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Camera.PreviewCallback {
+    public class CameraPreview implements Camera.PreviewCallback {
         private final static String TAG = "CameraManager.CameraPreview";
 
-        private SurfaceHolder mHolder;
         private SurfaceTexture mTexture;
         private byte[] mLastFrameBytes;
         private boolean mPauseCopyFrame;
 
-        public CameraPreview(Context context) {
-            super(context);
+        public CameraPreview() {
 
-            // Install a SurfaceHolder.Callback so we get notified when the
-            // underlying surface is created and destroyed.
-            mHolder = getHolder();
-            mHolder.addCallback(this);
         }
 
         /**
@@ -897,14 +980,10 @@ public class CameraManager {
          * Note that you have to restart camera preview manually after setting this.
          * Set to null to reset render to the SurfaceHolder.
          *
-         * @param texture
+         * @param texture The target texture
          */
         public void setRenderToTexture(SurfaceTexture texture) {
             mTexture = texture;
-        }
-
-        public SurfaceTexture getSurfaceTexture() {
-            return mTexture;
         }
 
         public void setPauseCopyFrame(boolean pause) {
@@ -917,107 +996,35 @@ public class CameraManager {
 
         public void notifyPreviewSize(int width, int height) {
             mLastFrameBytes = new byte[(int) (width * height * 1.5 + 0.5)];
-            requestLayout();
+
+            // Update preview aspect ratio
+            mRenderer.updateRatio((float) width/(float) height);
         }
 
         public byte[] getLastFrameBytes() {
             return mLastFrameBytes;
         }
 
-        public SurfaceHolder getSurfaceHolder() {
-            return mHolder;
-        }
-
         public void notifyCameraChanged(boolean startPreview) {
             synchronized (mParametersThread) {
                 if (mCamera != null) {
                     if (startPreview) {
-                        mCamera.stopPreview();
+                        safeStopPreview();
                     }
 
                     setupCamera();
 
                     try {
-                        if (mTexture != null) {
-                            mCamera.setPreviewTexture(mTexture);
-                        } else {
-                            mCamera.setPreviewDisplay(mHolder);
-                        }
+                        mCamera.setPreviewTexture(mTexture);
 
                         if (startPreview) {
-                            mCamera.startPreview();
+                            updateDisplayOrientation();
+                            safeStartPreview();
                             postCallbackBuffer();
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Error setting camera preview: " + e.getMessage());
                     }
-                }
-            }
-        }
-
-        public void surfaceCreated(SurfaceHolder holder) {
-            // The Surface has been created, now tell the camera where to draw the preview.
-            if (mCamera == null)
-                return;
-
-            try {
-                if (mTexture != null) {
-                    mCamera.setPreviewTexture(mTexture);
-                } else {
-                    mCamera.setPreviewDisplay(mHolder);
-                }
-                mCamera.startPreview();
-                postCallbackBuffer();
-            } catch (IOException e) {
-                Log.e(TAG, "Error setting camera preview: " + e.getMessage());
-            }
-        }
-
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            // empty. Take care of releasing the Camera preview in your activity.
-        }
-
-        public void surfaceChanged(final SurfaceHolder holder, final int format, final int w, final int h) {
-            if (mHolder.getSurface() == null) {
-                // preview surface does not exist
-                return;
-            }
-
-            // stop preview before making changes
-            synchronized (this) {
-                try {
-                    mCamera.stopPreview();
-                } catch (Exception e) {
-                    // ignore: tried to stop a non-existent preview
-                }
-
-                if (!mCameraOpen) {
-                    Log.w(TAG, "Camera not open yet, delaying surface update");
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            surfaceChanged(holder, format, w, h);
-                        }
-                    });
-                    return;
-                }
-
-                setupCamera();
-
-                // start preview with new settings
-                try {
-                    if (mTexture != null) {
-                        mCamera.setPreviewTexture(mTexture);
-                    } else {
-                        mCamera.setPreviewDisplay(mHolder);
-                    }
-                    mCamera.startPreview();
-
-                    mParameters = mCamera.getParameters();
-                    postCallbackBuffer();
-                    requestLayout();
-                } catch (Exception e) {
-                    Log.d(TAG, "Error starting camera preview: " + e.getMessage());
                 }
             }
         }
@@ -1038,9 +1045,15 @@ public class CameraManager {
             // Set device-specifics here
             try {
                 Camera.Parameters params = mCamera.getParameters();
+                Resources res = mContext.getResources();
 
-                if (getResources().getBoolean(R.bool.config_qualcommZslCameraMode)) {
-                    params.set("camera-mode", 1);
+                if (res != null) {
+                    if (res.getBoolean(R.bool.config_qualcommZslCameraMode)) {
+                        if (res.getBoolean(R.bool.config_useSamsungZSL)) {
+                            //mCamera.sendRawCommand(1508, 0, 0);
+                        }
+                        params.set("camera-mode", 1);
+                    }
                 }
                 mCamera.setDisplayOrientation(90);
 
@@ -1055,10 +1068,158 @@ public class CameraManager {
 
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            mLastPreviewFrameTime = System.currentTimeMillis();
             if (mCamera != null && !mPauseCopyFrame) {
                 mCamera.addCallbackBuffer(mLastFrameBytes);
             }
+        }
+    }
+
+    public class CameraRenderer implements GLSurfaceView.Renderer {
+        private final float[] mTransformMatrix;
+        int mTexture;
+        private SurfaceTexture mSurface;
+
+        private final static String VERTEX_SHADER =
+                "attribute vec4 vPosition;\n" +
+                        "attribute vec2 a_texCoord;\n" +
+                        "varying vec2 v_texCoord;\n" +
+                        "uniform mat4 u_xform;\n" +
+                        "void main() {\n" +
+                        "  gl_Position = vPosition;\n" +
+                        "  v_texCoord = vec2(u_xform * vec4(a_texCoord, 1.0, 1.0));\n" +
+                        "}\n";
+
+        private final static String FRAGMENT_SHADER =
+                "#extension GL_OES_EGL_image_external : require\n" +
+                        "precision mediump float;\n" +
+                        "uniform samplerExternalOES s_texture;\n" +
+                        "varying vec2 v_texCoord;\n" +
+                        "void main() {\n" +
+                        "  gl_FragColor = texture2D(s_texture, v_texCoord);\n" +
+                        "}\n";
+
+        private FloatBuffer mVertexBuffer, mTextureVerticesBuffer;
+        private int mProgram;
+        private int mPositionHandle;
+        private int mTextureCoordHandle;
+        private int mTransformHandle;
+        private int mWidth;
+        private int mHeight;
+        private float mRatio = 4.0f/3.0f;
+        private float mUpdateRatioTo = -1;
+
+        // Number of coordinates per vertex in this array
+        static final int COORDS_PER_VERTEX = 2;
+
+        private float mSquareVertices[];
+
+        private final float mTextureVertices[] =
+                { 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f };
+
+        public CameraRenderer() {
+            mTransformMatrix = new float[16];
+        }
+
+        public void updateRatio(float ratio) {
+            mUpdateRatioTo = ratio;
+        }
+
+        public void onSurfaceCreated(GL10 unused, EGLConfig config) {
+            mTexture = createTexture();
+            mSurface = new SurfaceTexture(mTexture);
+            GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+
+            setRenderToTexture(mSurface);
+
+            ByteBuffer bb2 = ByteBuffer.allocateDirect(mTextureVertices.length * 4);
+            bb2.order(ByteOrder.nativeOrder());
+            mTextureVerticesBuffer = bb2.asFloatBuffer();
+            mTextureVerticesBuffer.put(mTextureVertices);
+            mTextureVerticesBuffer.position(0);
+
+            // Load shaders
+            int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
+            int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
+
+            mProgram = GLES20.glCreateProgram();             // create empty OpenGL ES Program
+            GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
+            GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
+            GLES20.glLinkProgram(mProgram);
+
+            // Since we only use one program/texture/vertex array, we bind them once here
+            // and then we only draw what we need in onDrawFrame
+            GLES20.glUseProgram(mProgram);
+
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mTexture);
+
+            // Setup vertex buffer. Use a default 4:3 ratio, this will get updated once we have
+            // a preview aspect ratio.
+            // Regenerate vertexes
+            mSquareVertices = new float[]{ 1.0f * 1.0f,
+                    1.0f, -1.0f,
+                    1.0f, -1.0f,
+                    -1.0f,
+                    1.0f * 1.0f, -1.0f };
+
+            ByteBuffer bb = ByteBuffer.allocateDirect(mSquareVertices.length * 4);
+            bb.order(ByteOrder.nativeOrder());
+            mVertexBuffer = bb.asFloatBuffer();
+            mVertexBuffer.put(mSquareVertices);
+            mVertexBuffer.position(0);
+
+            mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
+            GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
+                    false, 0, mVertexBuffer);
+            GLES20.glEnableVertexAttribArray(mPositionHandle);
+
+            mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "a_texCoord");
+            GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
+                    false, 0, mTextureVerticesBuffer);
+            GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
+
+            mTransformHandle = GLES20.glGetUniformLocation(mProgram, "u_xform");
+        }
+
+        public void onDrawFrame(GL10 unused) {
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+
+            if (mUpdateRatioTo > 0) {
+                GLES20.glViewport(0, 0, (int) (mWidth*mRatio), mHeight);
+                mUpdateRatioTo = -1;
+            }
+
+            if (mSurface != null) {
+                mSurface.updateTexImage();
+                mSurface.getTransformMatrix(mTransformMatrix);
+                GLES20.glUniformMatrix4fv(mTransformHandle, 1, false, mTransformMatrix, 0);
+            }
+
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 4);
+        }
+
+        public void onSurfaceChanged(GL10 unused, int width, int height) {
+            mWidth = width;
+            mHeight = height;
+            GLES20.glViewport(0, 0, width, height);
+        }
+
+        public int loadShader(int type, String shaderCode) {
+            int shader = GLES20.glCreateShader(type);
+
+            GLES20.glShaderSource(shader, shaderCode);
+            GLES20.glCompileShader(shader);
+
+            return shader;
+        }
+
+        private int createTexture() {
+            int[] texture = new int[1];
+
+            GLES20.glGenTextures(1,texture, 0);
+            GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, texture[0]);
+
+            return texture[0];
         }
     }
 }
