@@ -19,11 +19,11 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         package="fr.xplod.focal"
-        android:versionCode="2"
-        android:versionName="1.0.1">
+        android:versionCode="3"
+        android:versionName="1.0-">
 
     <uses-sdk
-        android:minSdkVersion="17"
+        android:minSdkVersion="16"
         android:targetSdkVersion="18" />
 
     <uses-permission android:name="android.permission.CAMERA" />
@@ -79,7 +79,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".WidgetProvider" >
+        <receiver android:name="org.cyanogenmod.focal.WidgetProvider" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
