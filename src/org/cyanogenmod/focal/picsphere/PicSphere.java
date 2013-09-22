@@ -270,7 +270,7 @@ public class PicSphere {
         // leaving this here as a hack until I fix it properly in cpfind source
         String fullCommand = String.format("PATH=%s; LD_LIBRARY_PATH=%s; cd /storage/emulated/0/DCIM/Camera/; %s 2>&1",
                 mPathPrefix+":/system/bin",
-                mPathPrefix+":/system/lib",
+                mPathPrefix+":"+mPathPrefix+"/../lib/"+":/system/lib",
                 command);
 
         Log.v(TAG, "Running: " + fullCommand);
