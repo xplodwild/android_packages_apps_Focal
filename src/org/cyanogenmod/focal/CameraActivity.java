@@ -1341,8 +1341,10 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             // A single tap equals to touch-to-focus in photo/video
             if ((mCameraMode == CAMERA_MODE_PHOTO && !mIsFullscreenShutter)
                     || mCameraMode == CAMERA_MODE_VIDEO) {
-                mFocusHudRing.setPosition(e.getRawX(), e.getRawY());
-                mFocusManager.refocus();
+                if (mFocusManager != null) {
+                    mFocusHudRing.setPosition(e.getRawX(), e.getRawY());
+                    mFocusManager.refocus();
+                }
             } else if (mCameraMode == CAMERA_MODE_PHOTO && mIsFullscreenShutter) {
                 // We are in fullscreen shutter mode, so just take a picture
                 mSnapshotManager.queueSnapshot(true, 0);

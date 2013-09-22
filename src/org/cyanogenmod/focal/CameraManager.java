@@ -547,7 +547,12 @@ public class CameraManager {
         if (mCamera != null) {
             new Thread() {
                 public void run() {
-                    mCamera.takePicture(shutterCallback, raw, jpeg);
+                    try {
+                        mCamera.takePicture(shutterCallback, raw, jpeg);
+                    } catch (RuntimeException e) {
+                        Log.e(TAG, "Unable to take picture", e);
+                        CameraActivity.notify("Unable to take picture", 1000);
+                    }
                 }
             }.start();
         }
@@ -1046,8 +1051,10 @@ public class CameraManager {
                             safeStartPreview();
                             postCallbackBuffer();
                         }
+                    } catch (RuntimeException e) {
+                        Log.e(TAG, "Cannot set preview texture", e);
                     } catch (IOException e) {
-                        Log.e(TAG, "Error setting camera preview: " + e.getMessage());
+                        Log.e(TAG, "Error setting camera preview", e);
                     }
                 }
             }
