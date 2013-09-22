@@ -264,34 +264,44 @@ public class SnapshotManager {
                             // XXX: PixelBuffer has to be created every time because the GL context
                             // can only be used from its original thread. It's not very intense, but
                             // ideally we would be re-using the same thread every time.
-                            mOffscreenGL = new PixelBuffer(mContext, s.width, s.height);
-                            mAutoPicEnhancer = new AutoPictureEnhancer(mContext);
-                            mOffscreenGL.setRenderer(mAutoPicEnhancer);
-                            mAutoPicEnhancer.setTexture(BitmapFactory.decodeByteArray(finalData,
-                                    0, finalData.length));
+                            try {
+                                mOffscreenGL = new PixelBuffer(mContext, s.width, s.height);
+                                mAutoPicEnhancer = new AutoPictureEnhancer(mContext);
+                                mOffscreenGL.setRenderer(mAutoPicEnhancer);
+                                mAutoPicEnhancer.setTexture(BitmapFactory.decodeByteArray(finalData,
+                                        0, finalData.length));
 
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            mOffscreenGL.getBitmap().compress(Bitmap.CompressFormat.JPEG, 90, baos);
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                mOffscreenGL.getBitmap().compress(Bitmap.CompressFormat.JPEG, 90, baos);
 
-                            if (mImageSaver != null) {
-                                mImageSaver.addImage(baos.toByteArray(), uri, title, null,
-                                        width, height, correctedOrientation, tagsList, snap);
-                            } else {
-                                Log.e(TAG, "ImageSaver was null: couldn't save image!");
+                                if (mImageSaver != null) {
+                                    mImageSaver.addImage(baos.toByteArray(), uri, title, null,
+                                            width, height, correctedOrientation, tagsList, snap);
+                                } else {
+                                    Log.e(TAG, "ImageSaver was null: couldn't save image!");
+                                }
+
+                                if (mPaused && mImageSaver != null) {
+                                    // We were paused, stop the saver now
+                                    mImageSaver.finish();
+                                    mImageSaver = null;
+                                }
+
+                                mImageIsProcessing = false;
                             }
-
-                            if (mPaused) {
-                                // We were paused, stop the saver now
-                                mImageSaver.finish();
-                                mImageSaver = null;
+                            catch (Exception e) {
+                                // The rendering failed, the device might not be compatible for
+                                // whatever reason. We just save the original file.
+                                if (mImageSaver != null) {
+                                    mImageSaver.addImage(finalData, uri, title, null,
+                                            width, height, correctedOrientation, snap);
+                                }
                             }
-
-                            mImageIsProcessing = false;
                         }
                     }.start();
                 } else {
                     // Just save it as is
-                    mImageSaver.addImage(jpegData, uri, title, null,
+                    mImageSaver.addImage(finalData, uri, title, null,
                             width, height, correctedOrientation, snap);
                 }
             }

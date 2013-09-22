@@ -60,7 +60,7 @@ public class ExposureCompensationWidget extends WidgetBase implements
 
     @Override
     public boolean isSupported(Camera.Parameters params) {
-        return params.get(KEY_PARAMETER) != null;
+        return params != null && params.get(KEY_PARAMETER) != null;
     }
 
     public int getExposureValue() {
@@ -68,7 +68,11 @@ public class ExposureCompensationWidget extends WidgetBase implements
     }
 
     public int getMinExposureValue() {
-        return Integer.parseInt(mCamManager.getParameters().get(KEY_MIN_PARAMETER));
+        try {
+            return Integer.parseInt(mCamManager.getParameters().get(KEY_MIN_PARAMETER));
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public int getMaxExposureValue() {

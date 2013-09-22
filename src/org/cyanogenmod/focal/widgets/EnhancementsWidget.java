@@ -21,6 +21,7 @@ package org.cyanogenmod.focal.widgets;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 
@@ -148,7 +149,12 @@ public class EnhancementsWidget extends WidgetBase {
         String value = params.get(key);
 
         if (value != null) {
-            return Integer.parseInt(value);
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                Log.e(TAG, value + " is not a valid number, returning 0");
+                return 0;
+            }
         } else {
             return 0;
         }

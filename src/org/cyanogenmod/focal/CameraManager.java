@@ -290,12 +290,24 @@ public class CameraManager {
                 return null;
             }
 
-            if (mParameters == null) {
+            int tries = 0;
+            while (mParameters == null) {
                 try {
                     mParameters = mCamera.getParameters();
+                    break;
                 } catch (RuntimeException e) {
                     Log.e(TAG, "Error while getting parameters: ", e);
-                    return null;
+                    if (tries < 3) {
+                        tries++;
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                    } else {
+                        Log.e(TAG, "Failed to get parameters after 3 tries");
+                        break;
+                    }
                 }
             }
         }
@@ -575,7 +587,12 @@ public class CameraManager {
 
     public void startVideoRecording() {
         Log.v(TAG, "startVideoRecording");
-        mMediaRecorder.start();
+        try {
+            mMediaRecorder.start();
+        } catch (Exception e) {
+            Log.e(TAG, "Unable to start recording", e);
+            CameraActivity.notify("Error while starting recording", 1000);
+        }
         mPreview.postCallbackBuffer();
     }
 
@@ -917,7 +934,11 @@ public class CameraManager {
         List<String> focusModes = mParameters.getSupportedFocusModes();
         if (mCamera != null && focusModes != null && focusModes.contains(
                 Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-            mCamera.setAutoFocusMoveCallback(cb);
+            try {
+                mCamera.setAutoFocusMoveCallback(cb);
+            } catch (RuntimeException e) {
+                Log.e(TAG, "Unable to set AutoFocusMoveCallback", e);
+            }
         }
     }
 
@@ -1033,7 +1054,7 @@ public class CameraManager {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (mCamera != null) {
+                    if (mCamera != null && !mPauseCopyFrame) {
                         mCamera.addCallbackBuffer(mLastFrameBytes);
                         mCamera.setPreviewCallbackWithBuffer(CameraPreview.this);
                     }

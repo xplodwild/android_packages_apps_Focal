@@ -22,6 +22,7 @@ package org.cyanogenmod.focal.widgets;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.hardware.Camera;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -104,8 +105,8 @@ public class SimpleToggleWidget extends WidgetBase implements OnClickListener {
         String values = params.get(mKey + "-values");
 
         // If we don't have a -values provided, or if it contains the value, add it.
-        if ((values == null && filterDeviceSpecific(value))
-                || Arrays.asList(values.split(",")).contains(value)) {
+        if ((values == null || Arrays.asList(values.split(",")).contains(value))
+                && filterDeviceSpecific(value)) {
             WidgetBase.WidgetOptionButton button =
                     new WidgetBase.WidgetOptionButton(resId, mContext);
             button.setOnClickListener(this);
