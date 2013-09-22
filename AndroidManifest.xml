@@ -20,7 +20,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         package="fr.xplod.focal"
         android:versionCode="3"
-        android:versionName="1.0-">
+        android:versionName="1.0-51c064f">
 
     <uses-sdk
         android:minSdkVersion="16"

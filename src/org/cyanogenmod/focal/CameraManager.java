@@ -34,6 +34,7 @@ import android.media.MediaRecorder;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
@@ -203,7 +204,9 @@ public class CameraManager {
                     mCamera = Camera.open(cameraId);
                     Log.v(TAG, "Camera is open");
 
-                    mCamera.enableShutterSound(false);
+                    if (Build.VERSION.SDK_INT >= 17) {
+                        mCamera.enableShutterSound(false);
+                    }
                     mCamera.setPreviewCallback(mPreview);
                     mCurrentFacing = cameraId;
                     mParameters = mCamera.getParameters();
