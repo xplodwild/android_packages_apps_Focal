@@ -155,6 +155,7 @@ public class CameraManager {
 
                         // Reset the camera as it likely crashed if we reached here
                         open(mCurrentFacing);
+                        mParameters = getParameters();
                         mParameters.unflatten(existingParameters);
                         mCamera.setParameters(mParameters);
                     }
