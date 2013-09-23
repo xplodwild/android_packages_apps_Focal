@@ -218,6 +218,13 @@ public class CameraManager {
                         params = params.substring(step);
                     }
 
+                    // Mako hack to raise FPS
+                    if (Build.DEVICE.equals("mako")) {
+                        Camera.Size maxSize = mParameters.getSupportedPictureSizes().get(0);
+                        mParameters.setPictureSize(maxSize.width, maxSize.height);
+                        mCamera.setParameters(mParameters);
+                    }
+
                     if (mAutoFocusMoveCallback != null) {
                         setAutoFocusMoveCallback(mAutoFocusMoveCallback);
                     }
