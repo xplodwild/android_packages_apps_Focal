@@ -205,16 +205,26 @@ public class MosaicProxy extends CaptureTransformer
 
         // Initialization
         Camera.Parameters params = mActivity.getCamManager().getParameters();
-        mHorizontalViewAngle = params.getHorizontalViewAngle();
-        mVerticalViewAngle = params.getVerticalViewAngle();
+        if (params != null) {
+            mHorizontalViewAngle = params.getHorizontalViewAngle();
+            mVerticalViewAngle = params.getVerticalViewAngle();
+        } else {
+            mHorizontalViewAngle = 50;
+            mHorizontalViewAngle = 30;
+        }
 
         int pixels = mActivity.getResources().getInteger(R.integer.config_panoramaDefaultWidth)
                 * mActivity.getResources().getInteger(R.integer.config_panoramaDefaultHeight);
 
-        Point size = Util.findBestPanoPreviewSize(
-                params.getSupportedPreviewSizes(), true, true, pixels);
-        mPreviewWidth = size.x;
-        mPreviewHeight = size.y;
+        if (params != null) {
+            Point size = Util.findBestPanoPreviewSize(
+                    params.getSupportedPreviewSizes(), true, true, pixels);
+            mPreviewWidth = size.x;
+            mPreviewHeight = size.y;
+        } else {
+            mPreviewWidth = 640;
+            mPreviewHeight = 480;
+        }
 
         FrameLayout.LayoutParams layoutParams =
                 (FrameLayout.LayoutParams) mGLSurfaceView.getLayoutParams();

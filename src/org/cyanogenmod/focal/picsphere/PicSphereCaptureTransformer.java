@@ -19,6 +19,7 @@
 
 package org.cyanogenmod.focal.picsphere;
 
+import android.hardware.Camera;
 import android.util.Log;
 
 import org.cyanogenmod.focal.CameraActivity;
@@ -63,7 +64,12 @@ public class PicSphereCaptureTransformer extends CaptureTransformer {
         if (mPicSphere == null) {
             // Initialize a new sphere
             mPicSphere = mPicSphereManager.createPicSphere();
-            float horizontalAngle = mCamManager.getParameters().getHorizontalViewAngle();
+            Camera.Parameters params = mCamManager.getParameters();
+            float horizontalAngle = 0;
+
+            if (params != null) {
+                horizontalAngle = mCamManager.getParameters().getHorizontalViewAngle();
+            }
 
             // In theory, drivers should return a proper value for horizontal angle. However,
             // some careless OEMs put "0" or "360" to pass CTS, so we just check if the value

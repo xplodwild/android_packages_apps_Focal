@@ -23,6 +23,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.CursorIndexOutOfBoundsException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
@@ -209,6 +210,11 @@ public class SnapshotManager {
             int orientation = mCameraManager.getOrientation();
             final int width = s.width,
                     height = s.height;
+
+            if (mSnapshotsQueue.size() == 0) {
+                Log.e(TAG, "DERP! Why is snapshotqueue empty? Two JPEG callbacks!?");
+                return;
+            }
 
             final SnapshotInfo snap = mSnapshotsQueue.get(0);
 
@@ -888,6 +894,8 @@ public class SnapshotManager {
                         exifIf.saveAttributes();
                     } catch (IOException e) {
                         Log.e(TAG, "Couldn't write exif", e);
+                    } catch (CursorIndexOutOfBoundsException e) {
+                        Log.e(TAG, "Couldn't find original picture", e);
                     }
                 }
 
