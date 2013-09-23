@@ -492,7 +492,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         }
         mCaptureTransformer = transformer;
 
-        if (mCaptureTransformer != null) {
+        if (mCaptureTransformer != null && mSnapshotManager != null) {
             mSnapshotManager.addListener(transformer);
         }
     }
@@ -816,7 +816,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
      * Turns off the panorama (mosaic) subsystem
      */
     public void resetPanorama() {
-        mMosaicProxy.tearDown();
+        if (mMosaicProxy != null) {
+            mMosaicProxy.tearDown();
+        }
         setGLRenderer(mCamManager.getRenderer());
     }
 

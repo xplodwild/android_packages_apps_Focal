@@ -511,20 +511,26 @@ public class CameraManager {
         int previewHeight = previewSize.height;
 
         // Convert YUV420SP preview data to RGB
-        if (data != null && data.length > 8) {
-            Bitmap bitmap = Util.decodeYUV420SP(mContext, data, previewWidth, previewHeight);
-            if (mCurrentFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                // Frontcam has the image flipped, flip it back to not look weird in portrait
-                Matrix m = new Matrix();
-                m.preScale(-1, 1);
-                Bitmap dst = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                        bitmap.getHeight(), m, false);
-                bitmap.recycle();
-                bitmap = dst;
-            }
+        try {
+            if (data != null && data.length > 8) {
+                Bitmap bitmap = Util.decodeYUV420SP(mContext, data, previewWidth, previewHeight);
+                if (mCurrentFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                    // Frontcam has the image flipped, flip it back to not look weird in portrait
+                    Matrix m = new Matrix();
+                    m.preScale(-1, 1);
+                    Bitmap dst = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                            bitmap.getHeight(), m, false);
+                    bitmap.recycle();
+                    bitmap = dst;
+                }
 
-            return bitmap;
-        } else {
+                return bitmap;
+            } else {
+                return null;
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // TODO: FIXME: On some devices, the resolution of the preview might abruptly change,
+            // thus the YUV420SP data is not the size we expect, causing OOB exception
             return null;
         }
     }
@@ -923,7 +929,7 @@ public class CameraManager {
     public void setFocusPoint(int x, int y) {
         Camera.Parameters params = getParameters();
 
-        if (params.getMaxNumFocusAreas() > 0) {
+        if (params != null && params.getMaxNumFocusAreas() > 0) {
             List<Camera.Area> focusArea = new ArrayList<Camera.Area>();
             focusArea.add(new Camera.Area(new Rect(x, y, x + FOCUS_WIDTH, y + FOCUS_HEIGHT), 1000));
 

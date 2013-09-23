@@ -236,6 +236,8 @@ public class ReviewDrawer extends RelativeLayout {
                     mImagesListAdapter.notifyDataSetChanged();
                 }
 
+                cursor.close();
+
                 if (scrollPos < mImages.size()) {
                     mViewPager.setCurrentItem(scrollPos+1, false);
                     mViewPager.setCurrentItem(scrollPos, true);

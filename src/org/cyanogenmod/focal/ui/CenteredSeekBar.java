@@ -434,7 +434,7 @@ public class CenteredSeekBar extends ImageView {
      */
     private void drawThumb(float screenCoord, boolean pressed, Canvas canvas) {
         canvas.drawBitmap(pressed ? thumbPressedImage : thumbImage, screenCoord
-                - thumbHalfWidth, (float) ((0.5f * getHeight()) - thumbHalfHeight), paint);
+                - thumbHalfWidth, (float) ((0.5f * getMeasuredHeight()) - thumbHalfHeight), paint);
     }
 
     /**

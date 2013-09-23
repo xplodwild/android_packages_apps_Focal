@@ -297,6 +297,18 @@ public class SnapshotManager {
                                     mImageSaver.addImage(finalData, uri, title, null,
                                             width, height, correctedOrientation, snap);
                                 }
+
+                                CameraActivity.notify("Auto-enhance failed: Original shot saved", 2000);
+                            }
+                            catch (OutOfMemoryError e) {
+                                // The rendering failed, the device might not be compatible for
+                                // whatever reason. We just save the original file.
+                                if (mImageSaver != null) {
+                                    mImageSaver.addImage(finalData, uri, title, null,
+                                            width, height, correctedOrientation, snap);
+                                }
+
+                                CameraActivity.notify("Error: Out of memory. Original shot saved", 2000);
                             }
                         }
                     }.start();

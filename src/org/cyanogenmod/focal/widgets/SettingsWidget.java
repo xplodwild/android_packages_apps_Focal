@@ -155,10 +155,12 @@ public class SettingsWidget extends WidgetBase {
                 }
             });
 
-            for (int i = 0; i < mResolutions.size(); i++) {
-                if (mResolutions.get(i).equals(actualSz)) {
-                    mNumberPicker.setValue(i);
-                    break;
+            if (mResolutions != null) {
+                for (int i = 0; i < mResolutions.size(); i++) {
+                    if (mResolutions.get(i).equals(actualSz)) {
+                        mNumberPicker.setValue(i);
+                        break;
+                    }
                 }
             }
 
