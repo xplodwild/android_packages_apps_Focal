@@ -628,6 +628,7 @@ public class CameraManager {
      * @param orientation The orientation, in degrees
      */
     public void setOrientation(int orientation) {
+        orientation += 90;
         if (mOrientation == orientation) return;
 
         mOrientation = orientation;
@@ -644,7 +645,7 @@ public class CameraManager {
             rotation = (info.orientation + orientation) % 360;
         }
 
-        setParameterAsync("rotation", Integer.toString(rotation));
+        //setParameterAsync("rotation", Integer.toString(rotation));
     }
 
     public void restartPreviewIfNeeded() {
