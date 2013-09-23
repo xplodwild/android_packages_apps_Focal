@@ -83,6 +83,7 @@ public class CameraManager {
     private CameraRenderer mRenderer;
     private boolean mIsRecordingHint;
     private boolean mIsPreviewStarted;
+    private boolean mParametersBatch;
 
     public interface PreviewPauseListener {
         /**
@@ -122,35 +123,40 @@ public class CameraManager {
                         // Do nothing here
                     }
 
+                    Log.v(TAG, "Batch parameter setting starting.");
+
+                    String existingParameters = getParameters().flatten();
+
+                    // If the camera died, just forget about this.
+                    if (existingParameters == null) continue;
+
                     List<NameValuePair> copy = new ArrayList<NameValuePair>(mPendingParameters);
                     mPendingParameters.clear();
+
+                    Camera.Parameters params = getParameters();
 
                     for (NameValuePair pair : copy) {
                         String key = pair.getName();
                         String val = pair.getValue();
-                        Log.v(TAG, "Asynchronously setting parameter " + key+ " to " + val);
-                        Camera.Parameters params = getParameters();
-                        if (params == null) {
-                            // The camera died, just forget about these settings
-                            return;
-                        }
-                        String workingValue = params.get(key);
+                        Log.v(TAG, "Setting parameter " + key+ " to " + val);
+
                         params.set(key, val);
+                    }
 
-                        try {
-                            mCamera.setParameters(params);
-                        } catch (RuntimeException e) {
-                            Log.e(TAG, "Could not set parameter " + key
-                                    + " to '" + val + "', restoring '"
-                                    + workingValue + "'", e);
 
-                            // Reset the parameter back in storage
-                            SettingsStorage.storeCameraSetting(
-                                    mContext, mCurrentFacing, key, workingValue);
+                    try {
+                        mCamera.setParameters(params);
+                    } catch (RuntimeException e) {
+                        Log.e(TAG, "Could not set parameters batch, restoring working ones", e);
 
-                            // Reset the camera as it likely crashed if we reached here
-                            open(mCurrentFacing);
-                        }
+                        // Reset the parameter back in storage
+                        //SettingsStorage.storeCameraSetting(
+                        //        mContext, mCurrentFacing, key, workingValue);
+
+                        // Reset the camera as it likely crashed if we reached here
+                        open(mCurrentFacing);
+                        mParameters.unflatten(existingParameters);
+                        mCamera.setParameters(mParameters);
                     }
 
                     // Read them from sensor
@@ -416,10 +422,23 @@ public class CameraManager {
         }
     }
 
+    public void startParametersBatch() {
+        mParametersBatch = true;
+    }
+
+    public void stopParametersBatch() {
+        mParametersBatch = false;
+        synchronized (mParametersThread) {
+            mParametersThread.notifyAll();
+        }
+    }
+
     public void setParameterAsync(String key, String value) {
         synchronized (mParametersThread) {
             mPendingParameters.add(new BasicNameValuePair(key, value));
-            mParametersThread.notifyAll();
+            if (!mParametersBatch) {
+                mParametersThread.notifyAll();
+            }
         }
     }
 

@@ -527,6 +527,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                         mHandler.postDelayed(this, 100);
                     }
                 } else {
+                    mCamManager.startParametersBatch();
+
                     // Close all widgets
                     mWidgetRenderer.closeAllWidgets();
 
@@ -539,6 +541,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
                     // Set orientation
                     updateInterfaceOrientation();
+
+                    mCamManager.stopParametersBatch();
                 }
             }
         });
