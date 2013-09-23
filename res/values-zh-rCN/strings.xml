@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources>
+    <string name="app_name">Focal相机</string>
+    <string name="launch_app">启动 Focal 相机</string>
+    <string name="shutter_button">快门按钮</string>
+    <string name="cannot_connect_hal">无法连接到相机</string>
+    <string name="recording">正在录制</string>
+    <string name="double_tap_to_snapshot">双击拍照</string>
+    <string name="video_res_1080p">超高清 (1080p)</string>
+    <string name="video_res_720p">高清 (720p)</string>
+    <string name="video_res_480p">标准 (480p)</string>
+    <string name="video_res_mms">彩信 (288p)</string>
+    <string name="ok">确定</string>
+    <string name="no_gles20_support">您的设备不支持 GLES2</string>
+    <string name="no_gyroscope">您的设备没有陀螺仪</string>
+    <string name="ps_long_press_to_stop">长按快门按钮\n完成扫描。</string>
+    <string name="disabled">已禁用</string>
+    <string name="enabled">已启用</string>
+    <string name="no_video_player">未找到播放器，无法播放视频</string>
+    <string name="fullscreen_shutter_info">点击任意处拍照</string>
+    <string name="please_wait">请稍候\u2026</string>
+    <string name="retouch">修整</string>
+    <string name="open_in_gallery">相册</string>
+
+    <string name="mode_photo">拍照</string>
+    <string name="mode_video">视频</string>
+    <string name="mode_picsphere">球影照片</string>
+    <string name="mode_panorama">全景拍照</string>
+    <string name="mode_switchcam">自拍模式</string>
+
+    <!-- Widgets hints for non-arrayed widgets -->
+    <string name="widget_burstmode_count_shots">连拍 %d 张</string>
+    <string name="widget_burstmode_off">禁用连拍模式</string>
+    <string name="widget_burstmode_infinite">无限连拍</string>
+
+    <string name="widget_hdr_aebracket">自动包围曝光</string>
+
+    <string name="widget_settings_choose_widgets">选择侧边栏小部件</string>
+    <string name="widget_settings_choose_widgets_button">选择小部件</string>
+    <string name="widget_settings_picture_size">图片大小</string>
+    <string name="widget_settings_exposure_ring">显示曝光环</string>
+    <string name="widget_settings_autoenhance">自动增强</string>
+    <string name="widget_settings_ruleofthirds">三等分</string>
+
+    <string name="widget_autoexposure">曝光测量模式</string>
+    <string name="widget_burstmode">连拍模式</string>
+    <string name="widget_effect">色彩效果</string>
+    <string name="widget_enhancements">色彩增强</string>
+    <string name="widget_exposure_compensation">曝光补偿</string>
+    <string name="widget_flash">闪光模式</string>
+    <string name="widget_hdr">超高动态范围</string>
+    <string name="widget_iso">ISO 灵敏度</string>
+    <string name="widget_scenemode">场景模式</string>
+    <string name="widget_settings">设置</string>
+    <string name="widget_shutter_speed">快门速度</string>
+    <string name="widget_skintone">增强肤色</string>
+    <string name="widget_softwarehdr">超高动态范围</string>
+    <string name="widget_timermode">定时器模式</string>
+    <string name="widget_videofr">视频帧率</string>
+    <string name="widget_videohdr">视频高动态范围</string>
+    <string name="widget_whitebalance">白平衡</string>
+
+    <!-- Panorama mode -->
+    <!-- Filename prefix for panorama output -->
+    <string name="pano_panorama_rendering_failed">无法呈现全景。\n请尝试拍短点。</string>
+    <string name="pano_panorama_rendering">正在呈现全景\u2026</string>
+
+    <!-- PicSphere status -->
+    <string name="picsphere_undo_button">撤销</string>
+    <string name="picsphere_start_hint">使用360全景拍照</string>
+    <string name="picsphere_already_rendering">当前360度全景拍照即将呈现</string>
+    <string name="picsphere_rendering_progress">正在呈现\u2026 (%d %%)</string>
+    <string name="picsphere_toast_background_render">正在呈现\u2026</string>
+    <string name="picsphere_notif_title">正在呈现360度全景\u2026</string>
+    <string name="picsphere_failed">360度全景呈现失败</string>
+    <string name="picsphere_failed_details">确保照片只有其边缘重叠。</string>
+    <string name="picsphere_need_two_pics">您需要拍摄至少2张照片。</string>
+    <string name="picsphere_step_preparing">正在准备\u2026</string>
+    <string name="picsphere_step_ptogen">元数据生成中\u2026</string>
+    <string name="picsphere_step_ptovar">相机方位写入中\u2026</string>
+    <string name="picsphere_step_cpfind">正在寻找控制点\u2026</string>
+    <string name="picsphere_step_autooptimiser">正在优化匹配\u2026</string>
+    <string name="picsphere_step_ptclean">正在清理匹配斑点\u2026</string>
+    <string name="picsphere_step_panomodify">正在裁剪空白区域\u2026</string>
+    <string name="picsphere_step_nona">正在拼接图片\u2026</string>
+    <string name="picsphere_step_enblend">正在混合图片\u2026</string>
+
+    <!-- Software HDR status -->
+    <string name="software_hdr_notif_title">正在计算 HDR 照片\u2026</string>
+    <string name="software_hdr_failed">HDR 呈现失败</string>
+    <string name="software_hdr_failed_details">源照片已被保留。</string>
+
+    <!-- Showcase text -->
+    <string name="showcase_welcome_1_title">欢迎使用！</string>
+    <string name="showcase_welcome_1_body">选项都在侧边栏里，\n轻轻滑动马上呈现。</string>
+    <string name="showcase_welcome_2_title">快门按钮</string>
+    <string name="showcase_welcome_2_body">点击快门按钮进行拍照，\n滑动可以访问其他的拍摄模式。</string>
+    <string name="showcase_panorama_title">全景模式</string>
+    <string name="showcase_panorama_body">点击快门开始全景模式，\n然后平移摄像头来捕获你想要的场景。\n完成后，再次点击快门即可。</string>
+    <string name="showcase_picsphere_title">360度全景模式</string>
+    <string name="showcase_picsphere_body">对准您喜欢的地方拍摄第1张照片，\n点击快门再拍1张360度全景照片。\n拍摄时你可以将蓝色的斑点作为参考，\n完成后长按快门按钮。</string>
+
+    <!-- ISO Value Hints -->
+    <string name="iso_hint_auto">Automatic ISO</string>
+    <string name="iso_hint_hjr">Hands-Jitter Reduction ISO</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
+</resources>
