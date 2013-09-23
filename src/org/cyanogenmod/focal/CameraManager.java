@@ -147,17 +147,7 @@ public class CameraManager {
                     try {
                         mCamera.setParameters(params);
                     } catch (RuntimeException e) {
-                        Log.e(TAG, "Could not set parameters batch, restoring working ones", e);
-
-                        // Reset the parameter back in storage
-                        //SettingsStorage.storeCameraSetting(
-                        //        mContext, mCurrentFacing, key, workingValue);
-
-                        // Reset the camera as it likely crashed if we reached here
-                        open(mCurrentFacing);
-                        mParameters = getParameters();
-                        mParameters.unflatten(existingParameters);
-                        mCamera.setParameters(mParameters);
+                        Log.e(TAG, "Could not set parameters batch", e);
                     }
 
                     // Read them from sensor
