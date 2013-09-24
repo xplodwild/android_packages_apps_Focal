@@ -255,19 +255,24 @@ public class ReviewDrawer extends RelativeLayout {
     public int getCameraPhotoOrientation(final int id) {
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
             return 0;
-        } else {
-            Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
-                    .appendPath(Integer.toString(id)).build();;
-            String[] orientationColumn = new String[]{MediaStore.Images.Media.ORIENTATION};
-
-            Cursor cur = getContext().getContentResolver().query(uri,
-                    orientationColumn, null, null, null);
-            if (cur != null && cur.moveToFirst()) {
-                return cur.getInt(cur.getColumnIndex(orientationColumn[0]));
-            } else {
-                return 0;
-            }
         }
+        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                .appendPath(Integer.toString(id)).build();
+        String[] orientationColumn = new String[] {
+                ImageColumns.ORIENTATION
+        };
+
+        int orientation = 0;
+        Cursor cur = getContext().getContentResolver().query(uri,
+                orientationColumn, null, null, null);
+        if (cur != null && cur.moveToFirst()) {
+            orientation = cur.getInt(cur.getColumnIndex(orientationColumn[0]));
+        }
+        if (cur != null) {
+            cur.close();
+            cur = null;
+        }
+        return orientation;
     }
 
 
