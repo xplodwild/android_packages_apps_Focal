@@ -918,6 +918,10 @@ public class CameraManager {
      * @param y The Y position of the focus point
      */
     public void setFocusPoint(int x, int y) {
+        if (x < -1000 || x > 1000 || y < -1000 || y > 1000) {
+            Log.e(TAG, "setFocusPoint: values are not ideal " + "x= " + x + " y= " + y);
+            return;
+        }
         Camera.Parameters params = getParameters();
 
         if (params != null && params.getMaxNumFocusAreas() > 0) {
