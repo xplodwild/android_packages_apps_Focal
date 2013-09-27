@@ -259,7 +259,7 @@ public class ReviewDrawer extends RelativeLayout {
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
                 .appendPath(Integer.toString(id)).build();
         String[] orientationColumn = new String[] {
-                ImageColumns.ORIENTATION
+                MediaStore.Images.ImageColumns.ORIENTATION
         };
 
         int orientation = 0;
