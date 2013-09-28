@@ -124,6 +124,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private boolean mIsShutterLongClicked = false;
     private CameraPreviewListener mCamPreviewListener;
     private GLSurfaceView mGLSurfaceView;
+    private boolean mIsFocusing = false;
 
     private final static int SHOWCASE_INDEX_WELCOME_1 = 0;
     private final static int SHOWCASE_INDEX_WELCOME_2 = 1;
@@ -1126,6 +1127,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private class MainFocusListener implements FocusManager.FocusListener {
         @Override
         public void onFocusStart(final boolean smallAdjust) {
+            mIsFocusing = true;
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1136,6 +1138,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         @Override
         public void onFocusReturns(final boolean smallAdjust, final boolean success) {
+            mIsFocusing = false;
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1464,16 +1467,18 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
             if (params == null) return false;
 
-            if (detector.getScaleFactor() > 1.0f) {
-                params.setZoom(Math.min(params.getZoom() + 1, params.getMaxZoom()));
-            } else if (detector.getScaleFactor() < 1.0f) {
-                params.setZoom(Math.max(params.getZoom() - 1, 0));
-            } else {
-                return false;
-            }
+            if (!mIsFocusing) {
+                if (detector.getScaleFactor() > 1.0f) {
+                    params.setZoom(Math.min(params.getZoom() + 1, params.getMaxZoom()));
+                } else if (detector.getScaleFactor() < 1.0f) {
+                    params.setZoom(Math.max(params.getZoom() - 1, 0));
+                } else {
+                    return false;
+                }
 
-            mHasPinchZoomed = true;
-            mCamManager.setParameters(params);
+                mHasPinchZoomed = true;
+                mCamManager.setParameters(params);
+            }
 
             return true;
         }
