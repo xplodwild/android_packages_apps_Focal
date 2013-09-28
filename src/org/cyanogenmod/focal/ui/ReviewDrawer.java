@@ -516,6 +516,11 @@ public class ReviewDrawer extends RelativeLayout {
             final ImageView imageView = new ImageView(getContext());
             container.addView(imageView);
 
+            ViewGroup.LayoutParams params = imageView.getLayoutParams();
+            params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            imageView.setLayoutParams(params);
+
             imageView.setOnTouchListener(new ThumbnailTouchListener(imageView));
 
             new Thread() {
