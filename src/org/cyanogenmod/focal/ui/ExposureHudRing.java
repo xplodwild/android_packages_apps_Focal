@@ -21,6 +21,7 @@ package org.cyanogenmod.focal.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,11 +74,15 @@ public class ExposureHudRing extends HudRing {
 
 
     private void applyExposurePoint() {
-        float centerPointX = getX() + getWidth() / 2.0f;
-        float centerPointY = getY() + getHeight() / 2.0f;
+        ViewGroup parent = (ViewGroup) getParent();
+        if (parent == null) return;
 
-        centerPointX *= 1000.0f / ((ViewGroup) getParent()).getWidth();
-        centerPointY *= 1000.0f / ((ViewGroup) getParent()).getHeight();
+        // We swap X/Y as we have a landscape preview in portrait mode
+        float centerPointX = getY() + getHeight() / 2.0f;
+        float centerPointY = parent.getWidth() - (getX() + getWidth() / 2.0f);
+
+        centerPointX *= 1000.0f / parent.getHeight();
+        centerPointY *= 1000.0f / parent.getWidth();
 
         centerPointX = (centerPointX - 500.0f) * 2.0f;
         centerPointY = (centerPointY - 500.0f) * 2.0f;

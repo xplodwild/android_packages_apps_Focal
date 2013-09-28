@@ -83,12 +83,15 @@ public class FocusHudRing extends HudRing {
 
 
     private void applyFocusPoint() {
-        // We swap X/Y as we have a landscape preview in portrait mode
-        float centerPointX = getHeight() - getY() + getHeight() / 2.0f;
-        float centerPointY = getX() + getWidth() / 2.0f;
+        ViewGroup parent = (ViewGroup) getParent();
+        if (parent == null) return;
 
-        centerPointX *= 1000.0f / ((ViewGroup) getParent()).getHeight();
-        centerPointY *= 1000.0f / ((ViewGroup) getParent()).getWidth();
+        // We swap X/Y as we have a landscape preview in portrait mode
+        float centerPointX = getY() + getHeight() / 2.0f;
+        float centerPointY = parent.getWidth() - (getX() + getWidth() / 2.0f);
+
+        centerPointX *= 1000.0f / parent.getHeight();
+        centerPointY *= 1000.0f / parent.getWidth();
 
         centerPointX = (centerPointX - 500.0f) * 2.0f;
         centerPointY = (centerPointY - 500.0f) * 2.0f;
