@@ -20,9 +20,11 @@
 package org.cyanogenmod.focal.picsphere;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import org.cyanogenmod.focal.PopenHelper;
@@ -269,9 +271,11 @@ public class PicSphere {
         // HACK: We cd to /storage/emulated/0/DCIM/Camera/ because cpfind tries to
         // find it in the current path instead of the actual path provided in the .pto. I'm
         // leaving this here as a hack until I fix it properly in cpfind source
-        String fullCommand = String.format("PATH=%s; LD_LIBRARY_PATH=%s; cd /storage/emulated/0/DCIM/Camera/; %s 2>&1",
+        String dcimPath = "/sdcard/DCIM/Camera";
+        String fullCommand = String.format("PATH=%s; LD_LIBRARY_PATH=%s; cd %s; %s 2>&1",
                 mPathPrefix+":/system/bin",
                 mPathPrefix+":"+mPathPrefix+"/../lib/:/system/lib",
+                dcimPath,
                 command);
 
         Log.v(TAG, "Running: " + fullCommand);
