@@ -186,6 +186,8 @@ public class PicSphereManager implements PicSphere.ProgressListener {
             mCapture3DRenderer.onPause();
         }
 
+        tearDown();
+
         mPicSpheres.clear();
     }
 
