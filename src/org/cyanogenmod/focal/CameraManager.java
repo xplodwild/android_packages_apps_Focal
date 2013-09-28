@@ -561,7 +561,7 @@ public class CameraManager {
     public void takeSnapshot(final Camera.ShutterCallback shutterCallback,
                              final Camera.PictureCallback raw, final Camera.PictureCallback jpeg) {
         Log.v(TAG, "takePicture");
-        if (getContext().getResources().getBoolean(R.bool.config_stopPreviewBetweenShots)) {
+        if (Util.deviceNeedsStopPreviewToShoot()) {
             safeStopPreview();
         }
 
