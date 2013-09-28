@@ -324,6 +324,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             }
         }
 
+        // Reset capture transformers on pause, if we are in
+        // PicSphere mode
+        if (mCameraMode == CAMERA_MODE_PICSPHERE) {
+            mCaptureTransformer = null;
+        }
+
         super.onPause();
     }
 
