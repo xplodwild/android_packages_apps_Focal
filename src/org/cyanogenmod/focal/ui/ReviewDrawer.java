@@ -59,6 +59,7 @@ public class ReviewDrawer extends RelativeLayout {
     public final static String TAG = "ReviewDrawer";
 
     private final static long DRAWER_TOGGLE_DURATION = 400;
+    private final static float MIN_REMOVE_THRESHOLD = 10.0f;
     private final static String GALLERY_CAMERA_BUCKET = "Camera";
 
     private List<Integer> mImages;
@@ -626,7 +627,8 @@ public class ReviewDrawer extends RelativeLayout {
 
                     @Override
                     public boolean onScroll(MotionEvent ev1, MotionEvent ev2, float vX, float vY) {
-                        if (Math.abs(ev2.getX() - ev1.getX()) > DRIFT_THRESHOLD) {
+                        if (Math.abs(ev2.getX() - ev1.getX()) > DRIFT_THRESHOLD
+                                && Math.abs(mImageView.getTranslationY()) < MIN_REMOVE_THRESHOLD) {
                             return false;
                         }
 
