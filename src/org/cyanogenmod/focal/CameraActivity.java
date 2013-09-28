@@ -77,6 +77,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     public final static int CAMERA_MODE_PANO      = 3;
     public final static int CAMERA_MODE_PICSPHERE = 4;
 
+    // whether or not to enable profiling
+    private final static boolean DEBUG_PROFILE = true;
+
     private static int mCameraMode = CAMERA_MODE_PHOTO;
 
     private CameraManager mCamManager;
@@ -609,6 +612,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Profiler.getDefault().start("OnCameraReady");
                 Camera.Parameters params = mCamManager.getParameters();
 
                 if (params == null) {
@@ -663,9 +667,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     }
                 }, 1500);
 
+                Profiler.getDefault().start("OnCameraReady-updateCapa");
                 updateCapabilities();
+                Profiler.getDefault().logProfile("OnCameraReady-updateCapa");
 
                 mSavePinger.stopSaving();
+                Profiler.getDefault().logProfile("OnCameraReady");
             }
         });
     }

@@ -64,6 +64,9 @@ public class CameraManager {
     private final static int FOCUS_WIDTH = 80;
     private final static int FOCUS_HEIGHT = 80;
 
+    private final static boolean DEBUG_LOG_PARAMS = false;
+    private final static boolean DEBUG_PROFILER = false;
+
     private CameraPreview mPreview;
     private Camera mCamera;
     private boolean mCameraReady;
@@ -194,10 +197,12 @@ public class CameraManager {
         new Thread() {
             public void run() {
                 try {
+                    if (DEBUG_PROFILER) Profiler.getDefault().start("CameraOpen");
                     if (mCamera != null) {
                         Log.e(TAG, "Previous camera not closed! Not opening");
                         return;
                     }
+
                     mCamera = Camera.open(cameraId);
                     Log.v(TAG, "Camera is open");
 
@@ -208,18 +213,19 @@ public class CameraManager {
                     mCurrentFacing = cameraId;
                     mParameters = mCamera.getParameters();
 
-                    String params = mCamera.getParameters().flatten();
-                    final int step = params.length() > 256 ? 256 : params.length();
-                    for (int i = 0; i < params.length(); i += step) {
-                        Log.d(TAG, params);
-                        params = params.substring(step);
+                    if (DEBUG_LOG_PARAMS) {
+                        String params = mCamera.getParameters().flatten();
+                        final int step = params.length() > 256 ? 256 : params.length();
+                        for (int i = 0; i < params.length(); i += step) {
+                            Log.d(TAG, params);
+                            params = params.substring(step);
+                        }
                     }
 
                     // Mako hack to raise FPS
                     if (Build.DEVICE.equals("mako")) {
                         Camera.Size maxSize = mParameters.getSupportedPictureSizes().get(0);
                         mParameters.setPictureSize(maxSize.width, maxSize.height);
-                        mCamera.setParameters(mParameters);
                     }
 
                     if (mAutoFocusMoveCallback != null) {
@@ -248,6 +254,7 @@ public class CameraManager {
                 mPreview.setPauseCopyFrame(false);
 
                 mCameraReady = true;
+                if (DEBUG_PROFILER) Profiler.getDefault().logProfile("CameraOpen");
             }
         }.start();
 
@@ -1089,21 +1096,15 @@ public class CameraManager {
         }
 
         public void postCallbackBuffer() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (mCamera != null && !mPauseCopyFrame) {
-                        mCamera.addCallbackBuffer(mLastFrameBytes);
-                        mCamera.setPreviewCallbackWithBuffer(CameraPreview.this);
-                    }
-                }
-            });
+            if (mCamera != null && !mPauseCopyFrame) {
+                mCamera.addCallbackBuffer(mLastFrameBytes);
+                mCamera.setPreviewCallbackWithBuffer(CameraPreview.this);
+            }
         }
 
         private void setupCamera() {
             // Set device-specifics here
             try {
-                Camera.Parameters params = mCamera.getParameters();
                 Resources res = mContext.getResources();
 
                 if (res != null) {
@@ -1111,12 +1112,11 @@ public class CameraManager {
                         if (res.getBoolean(R.bool.config_useSamsungZSL)) {
                             //mCamera.sendRawCommand(1508, 0, 0);
                         }
-                        params.set("camera-mode", 1);
+                        mParameters.set("camera-mode", 1);
                     }
                 }
                 mCamera.setDisplayOrientation(90);
-
-                mCamera.setParameters(params);
+                mCamera.setParameters(mParameters);
 
                 postCallbackBuffer();
             } catch (Exception e) {
