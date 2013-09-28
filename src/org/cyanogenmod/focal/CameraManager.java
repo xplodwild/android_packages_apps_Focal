@@ -1062,7 +1062,7 @@ public class CameraManager {
             mLastFrameBytes = new byte[(int) (width * height * 1.5 + 0.5)];
 
             // Update preview aspect ratio
-            mRenderer.updateRatio((float) width/(float) height);
+            mRenderer.updateRatio((float) height/(float) width);
         }
 
         public byte[] getLastFrameBytes() {

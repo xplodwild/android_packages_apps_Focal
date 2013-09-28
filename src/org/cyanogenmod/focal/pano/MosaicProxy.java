@@ -219,11 +219,11 @@ public class MosaicProxy extends CaptureTransformer
         if (params != null) {
             Point size = Util.findBestPanoPreviewSize(
                     params.getSupportedPreviewSizes(), true, true, pixels);
-            mPreviewWidth = size.x;
-            mPreviewHeight = size.y;
+            mPreviewWidth = size.y;
+            mPreviewHeight = size.x;
         } else {
-            mPreviewWidth = 640;
-            mPreviewHeight = 480;
+            mPreviewWidth = 480;
+            mPreviewHeight = 640;
         }
 
         FrameLayout.LayoutParams layoutParams =

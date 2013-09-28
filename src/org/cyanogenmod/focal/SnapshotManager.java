@@ -207,7 +207,8 @@ public class SnapshotManager {
 
             // Calculate the width and the height of the jpeg.
             final Camera.Size s = mCameraManager.getParameters().getPictureSize();
-            int orientation = mCameraManager.getOrientation();
+            int orientation = CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PANO ? 0 :
+                    mCameraManager.getOrientation();
             final int width = s.width,
                     height = s.height;
 
