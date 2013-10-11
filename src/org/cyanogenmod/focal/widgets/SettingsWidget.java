@@ -133,7 +133,6 @@ public class SettingsWidget extends WidgetBase {
         public void onClick(View view) {
             mInitialOrientation = -1;
 
-            Camera.Size actualSz = mCamManager.getParameters().getPictureSize();
             mNumberPicker = new NumberPicker(mContext);
             String[] names = new String[mResolutionsName.size()];
             mResolutionsName.toArray(names);
@@ -155,11 +154,25 @@ public class SettingsWidget extends WidgetBase {
                 }
             });
 
-            if (mResolutions != null) {
-                for (int i = 0; i < mResolutions.size(); i++) {
-                    if (mResolutions.get(i).equals(actualSz)) {
-                        mNumberPicker.setValue(i);
-                        break;
+            if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO){
+                // TODO set correct menu selection also for video
+                String actualSz = getActualProfileResolution();
+                if (mVideoResolutions != null) {
+                    for (int i = 0; i < mVideoResolutions.size(); i++) {
+                        if (mVideoResolutions.get(i).equals(actualSz)) {
+                            mNumberPicker.setValue(i);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                Camera.Size actualSz = mCamManager.getParameters().getPictureSize();
+                if (mResolutions != null) {
+                    for (int i = 0; i < mResolutions.size(); i++) {
+                        if (mResolutions.get(i).equals(actualSz)) {
+                            mNumberPicker.setValue(i);
+                            break;
+                        }
                     }
                 }
             }
@@ -406,6 +419,11 @@ public class SettingsWidget extends WidgetBase {
             mContext.getSnapManager().setVideoProfile(
                     CamcorderProfile.get(CamcorderProfile.QUALITY_CIF));
         }
+    }
+
+    private String getActualProfileResolution() {
+        CamcorderProfile actualProfile = mContext.getSnapManager().getVideoProfile();
+        return "" + actualProfile.videoFrameWidth + "x" + actualProfile.videoFrameHeight;
     }
 
     private void openWidgetsToggleDialog() {

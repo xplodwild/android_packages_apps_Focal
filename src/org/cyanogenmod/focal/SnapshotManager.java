@@ -535,6 +535,10 @@ public class SnapshotManager {
         return mImageSaver;
     }
 
+    public CamcorderProfile getVideoProfile(){
+        return mProfile;
+    }
+    
     public void setVideoProfile(final CamcorderProfile profile) {
         mProfile = profile;
 
