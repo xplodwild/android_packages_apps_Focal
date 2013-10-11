@@ -179,7 +179,8 @@ public class SettingsWidget extends WidgetBase {
                             || CameraActivity.getCameraMode()
                             == CameraActivity.CAMERA_MODE_PICSPHERE) {
                         // Set picture size
-                        mCamManager.setPictureSize(size);
+                        // TODO: only one method
+                        mCamManager.setPictureSize(""+size.width+"x"+size.height);
 
                         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
                             SettingsStorage.storeCameraSetting(mContext, mCamManager
@@ -281,6 +282,11 @@ public class SettingsWidget extends WidgetBase {
                 mResolutionsName.add(mContext.getString(R.string.video_res_480p));
                 mVideoResolutions.add("720x480");
             }
+
+            // TODO: Restore video size if we have any
+            String resolution = SettingsStorage.getCameraSetting(context,
+                        mCamManager.getCurrentFacing(), "video-size", mVideoResolutions.get(0));
+            applyVideoResolution(resolution);
         }
 
         mResolutionButton = new WidgetOptionButton(

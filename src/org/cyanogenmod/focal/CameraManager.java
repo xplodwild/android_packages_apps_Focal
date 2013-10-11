@@ -19,6 +19,7 @@
 
 package org.cyanogenmod.focal;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -47,6 +48,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -79,7 +82,7 @@ public class CameraManager {
     private PreviewPauseListener mPreviewPauseListener;
     private CameraReadyListener mCameraReadyListener;
     private Handler mHandler;
-    private Context mContext;
+    private Activity mContext;
     private boolean mIsModeSwitching;
     private List<NameValuePair> mPendingParameters;
     private boolean mIsResuming;
@@ -160,7 +163,7 @@ public class CameraManager {
         }
     };
 
-    public CameraManager(Context context) {
+    public CameraManager(Activity context) {
         mPreview = new CameraPreview();
         mMediaRecorder = new MediaRecorder();
         mCameraReady = true;
@@ -373,7 +376,49 @@ public class CameraManager {
             Log.e(TAG, "reconnectToCamera but camera not ready!");
         }
     }
-
+    
+    public void setVideoSize(int width, int height){
+        Log.v(TAG, "setVideoSize " + width + "x" + height);
+        Camera.Parameters params = getParameters();
+        params.set("video-size", "" + width +"x" + height);
+        // TODO: maybe need to set picture-size here too for
+        // video snapshots
+        
+        List<Camera.Size> sizes = params.getSupportedPreviewSizes();
+        Camera.Size preferred = sizes.get(0);
+        // TODO: support of preferred preview size
+        //Camera.Size preferred = params.getPreferredPreviewSizeForVideo();
+        //if (preferred == null) {
+        //    preferred = sizes.get(0);
+        //}
+        
+        Camera.Size optimalPreview = null;
+        int product = preferred.width * preferred.height;
+        Iterator<Camera.Size> it = sizes.iterator();
+        // Remove the preview sizes that are not preferred.
+        while (it.hasNext()) {
+            Camera.Size size = it.next();
+            if (size.width * size.height > product) {
+                it.remove();
+                continue;   
+            }
+            // TODO: workaround for now to choose same size then video
+            if (size.width == width && size.height == height){
+                optimalPreview = size;
+                break;
+            }
+        }
+        
+        if (optimalPreview == null){
+            // TODO: support of preview size different to video size
+            // right now this is crashing e.g. oppo has an preferred
+            // video preview of 1920x1080
+            optimalPreview = Util.getOptimalPreviewSize(mContext, sizes,
+                        (double) width / height);
+        }
+        setPreviewSize(optimalPreview.width, optimalPreview.height);
+    }
+    
     public void setPreviewSize(int width, int height) {
         mTargetSize = new Point(width, height);
 
@@ -389,13 +434,16 @@ public class CameraManager {
                         safeStopPreview();
                         mParameters = params;
                         mCamera.setParameters(mParameters);
+                        // TODO: preview aspect ratio is wrong in video mode
                         mPreview.notifyPreviewSize(width, height);
 
-                        if (mIsResuming) {
+                        // TODO: why dont restart preview here?
+                        // setPreviewSize is called on video mode switching too
+                        //if (mIsResuming) {
                             updateDisplayOrientation();
                             safeStartPreview();
-                            mIsResuming = false;
-                        }
+                            //mIsResuming = false;
+                        //}
 
                         mPreview.setPauseCopyFrame(false);
                     } catch (RuntimeException ex) {
@@ -539,18 +587,6 @@ public class CameraManager {
 
     /**
      * Defines a new size for the recorded picture
-     * XXX: Should it update preview size?!
-     *
-     * @param sz The new picture size
-     */
-    public void setPictureSize(Camera.Size sz) {
-        Camera.Parameters params = getParameters();
-        params.setPictureSize(sz.width, sz.height);
-        mCamera.setParameters(params);
-    }
-
-    /**
-     * Defines a new size for the recorded picture
      * @param sz The size string in format widthxheight
      */
     public void setPictureSize(String sz) {
@@ -558,8 +594,14 @@ public class CameraManager {
         int width = Integer.parseInt(splat[0]);
         int height = Integer.parseInt(splat[1]);
 
-        setParameterAsync("picture-size", Integer.toString(width)
-                + "x" + Integer.toString(height));
+        Log.v(TAG, "setPictureSize " + width + "x" + height);
+        Camera.Parameters params = getParameters();
+        params.setPictureSize(width, height);
+        
+        // set optimal preview - needs preview restart
+        Camera.Size optimalPreview = Util.getOptimalPreviewSize(mContext, params.getSupportedPreviewSizes(),
+            ((float) width / (float) height));
+        setPreviewSize(optimalPreview.width, optimalPreview.height);
     }
 
     /**
@@ -1180,6 +1222,9 @@ public class CameraManager {
         }
 
         public void updateRatio(float ratio) {
+            // TODO: is this correct?
+            // we dont use the new ratio anywhere
+            // preview is stretched in width for 16:9 resolutions
             mUpdateRatioTo = ratio;
         }
 
@@ -1244,6 +1289,7 @@ public class CameraManager {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
             if (mUpdateRatioTo > 0) {
+                // TODO mUpdateRatioTo would be the new ratio but still mRatio is used here
                 GLES20.glViewport(0, 0, (int) (mWidth*mRatio), mHeight);
                 mUpdateRatioTo = -1;
             }
@@ -1279,6 +1325,16 @@ public class CameraManager {
             GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, texture[0]);
 
             return texture[0];
+        }
+    }
+    
+	// TODO: just added for debugging
+    public static void dumpParameter(Camera.Parameters parameters) {
+        String flattened = parameters.flatten();
+        StringTokenizer tokenizer = new StringTokenizer(flattened, ";");
+        Log.d(TAG, "Dump all camera parameters:");
+        while (tokenizer.hasMoreElements()) {
+            Log.d(TAG, tokenizer.nextToken());
         }
     }
 }

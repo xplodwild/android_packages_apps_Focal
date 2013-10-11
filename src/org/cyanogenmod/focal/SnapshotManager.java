@@ -539,7 +539,8 @@ public class SnapshotManager {
         mProfile = profile;
 
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-            mCameraManager.setPreviewSize(profile.videoFrameWidth, profile.videoFrameHeight);
+            // TODO: setVideoSize is handling preview changing
+            mCameraManager.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
         }
     }
 
