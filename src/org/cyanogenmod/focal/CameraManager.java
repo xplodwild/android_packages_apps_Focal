@@ -416,29 +416,29 @@ public class CameraManager {
             }
             mPreviewSize = sz;
             
+            mPreview.notifyPreviewSize(mPreviewSize.x, mPreviewSize.y);
+
             Camera.Parameters params = getParameters();
             params.setPreviewSize(width, height);
 
             Log.v(TAG, "Preview size is " + width + "x" + height);
 
-            if (!mIsModeSwitching) {
-                synchronized (mParametersThread) {
-                    Log.d(TAG, "setPreviewSize - start");
-                    if (mPreviewPauseListener != null) {
-                        mPreviewPauseListener.onPreviewPause();
-                    }
-                    try {
-                        mParameters = params;
-                        mPreview.notifyCameraChanged(true);
-                    } catch (RuntimeException ex) {
-                        Log.e(TAG, "Unable to set Preview Size", ex);
-                    }
-                    if (mPreviewPauseListener != null) {
-                        mPreviewPauseListener.onPreviewResume();
-                    }
-
-                    Log.d(TAG, "setPreviewSize - stop");
+            synchronized (mParametersThread) {
+                Log.d(TAG, "setPreviewSize - start");
+                if (mPreviewPauseListener != null) {
+                    mPreviewPauseListener.onPreviewPause();
                 }
+                try {
+                    mParameters = params;
+                    mPreview.notifyCameraChanged(true);
+                } catch (RuntimeException ex) {
+                    Log.e(TAG, "Unable to set Preview Size", ex);
+                }
+                if (mPreviewPauseListener != null) {
+                    mPreviewPauseListener.onPreviewResume();
+                }
+
+                Log.d(TAG, "setPreviewSize - stop");
             }
         }
     }
@@ -1097,10 +1097,6 @@ public class CameraManager {
                         mCamera.setPreviewTexture(mTexture);
 
                         if (startPreview) {
-                            if (mPreviewSize != null){
-                                notifyPreviewSize(mPreviewSize.x, mPreviewSize.y);
-                            }
-
                             updateDisplayOrientation();
                             safeStartPreview();
                             postCallbackBuffer();
@@ -1182,10 +1178,13 @@ public class CameraManager {
         private int mTextureCoordHandle;
         private int mTransformHandle;
         private int mWidth;
+        private int mNaturalWidth;
         private int mHeight;
+        private int mNaturalHeight;
         private float mNaturalRatio;
         private float mRatio;
         private float mUpdateRatioTo = -1;
+        private Object fSync = new Object();
 
         // Number of coordinates per vertex in this array
         static final int COORDS_PER_VERTEX = 2;
@@ -1200,16 +1199,19 @@ public class CameraManager {
         }
 
         public void updateRatio(int width, int height) {
-            // TODO: is this correct?
-            // we dont use the new ratio anywhere
-            // preview is stretched in width for 16:9 resolutions
-            mUpdateRatioTo = 1;
-            float ratio = (float) width/(float) height;
-            Log.d(TAG, "updateRatio " + width+"x"+height + "r="+ratio);
-            if (ratio != mNaturalRatio){
-                mRatio = ratio;
-            } else {
-                mRatio = 1;
+            synchronized(fSync){
+                mUpdateRatioTo = 1;
+                                    
+                float ratio = (float) width/(float) height;
+
+                if (ratio != mNaturalRatio){
+                    float widthRatio = (float) mNaturalWidth/(float) width;
+                    float heightRatio = (float) mNaturalHeight/(float) height;
+                    mRatio = widthRatio / heightRatio;
+                } else {
+                    mRatio = 1;
+                }
+                Log.d(TAG, "updateRatio " + width+"x"+height + " mRatio="+mRatio);
             }
         }
 
@@ -1272,35 +1274,40 @@ public class CameraManager {
         }
 
         public void onDrawFrame(GL10 unused) {
-            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+            synchronized(fSync){
+                GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-            if (mUpdateRatioTo > 0) {
-                // TODO mUpdateRatioTo would be the new ratio but still mRatio is used here
-                Log.d(TAG, "onDrawFrame " + mWidth+"x"+mHeight + "r="+mRatio);
-                GLES20.glViewport(0, 0, (int) (mWidth*mRatio), mHeight);
-                mUpdateRatioTo = -1;
+                if (mUpdateRatioTo > 0) {
+                    // TODO mUpdateRatioTo would be the new ratio but still mRatio is used here
+                    Log.d(TAG, "onDrawFrame " + " mRatio="+mRatio);
+                    GLES20.glViewport(0, 0, (int) (mWidth * mRatio), mHeight);
+                    mUpdateRatioTo = -1;
+                }
+
+                if (mSurface != null) {
+                    mSurface.updateTexImage();
+                    mSurface.getTransformMatrix(mTransformMatrix);
+                    GLES20.glUniformMatrix4fv(mTransformHandle, 1, false, mTransformMatrix, 0);
+                }
+
+                GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 4);
             }
-
-            if (mSurface != null) {
-                mSurface.updateTexImage();
-                mSurface.getTransformMatrix(mTransformMatrix);
-                GLES20.glUniformMatrix4fv(mTransformHandle, 1, false, mTransformMatrix, 0);
-            }
-
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 4);
         }
 
         public void onSurfaceChanged(GL10 unused, int width, int height) {
             mWidth = width;
             mHeight = height;
             if (mWidth > mHeight){
-                mNaturalRatio = (float) mWidth/(float) mHeight;
+                mNaturalWidth = mWidth;
+                mNaturalHeight = mHeight;
             } else {
-                mNaturalRatio = (float) mHeight/(float) mWidth;
+                mNaturalWidth = mHeight;
+                mNaturalHeight = mWidth;
             }
+            mNaturalRatio = (float) mNaturalWidth/(float) mNaturalHeight;
             mRatio = mNaturalRatio;
             GLES20.glViewport(0, 0, width, height);
-            Log.d(TAG, "onSurfaceChanged " + width+"x"+height + "r="+mNaturalRatio);
+            Log.d(TAG, "onSurfaceChanged " + width+"x"+height + " mNaturalRatio="+mNaturalRatio);
         }
 
         public int loadShader(int type, String shaderCode) {

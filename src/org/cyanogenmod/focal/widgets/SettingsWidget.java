@@ -47,7 +47,7 @@ import java.util.List;
  * Overflow settings widget
  */
 public class SettingsWidget extends WidgetBase {
-    private static final String TAG = "CameraManager";
+    private static final String TAG = "SettingsWidget";
 
     private static final String DRAWABLE_KEY_EXPO_RING = "_Nemesis_ExposureRing=true";
     private static final String DRAWABLE_KEY_AUTO_ENHANCE = "_Nemesis_AutoEnhance=true";
@@ -191,12 +191,12 @@ public class SettingsWidget extends WidgetBase {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     mInitialOrientation = -1;
-                    Camera.Size size = mResolutions.get(mNumberPicker.getValue());
 
                     if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO
                             || CameraActivity.getCameraMode()
                             == CameraActivity.CAMERA_MODE_PICSPHERE) {
                         // Set picture size
+                        Camera.Size size = mResolutions.get(mNumberPicker.getValue());
                         // TODO: only one method
                         mCamManager.setPictureSize(""+size.width+"x"+size.height);
 
@@ -212,9 +212,15 @@ public class SettingsWidget extends WidgetBase {
                         }
                     } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
                         // Set video size
-                        applyVideoResolution(mVideoResolutions.get(mNumberPicker.getValue()));
+                        String size = mVideoResolutions.get(mNumberPicker.getValue());
+                        applyVideoResolution(size);
+                        
+                        String[] splat = size.split("x");
+                        int width = Integer.parseInt(splat[0]);
+                        int height = Integer.parseInt(splat[1]);
+
                         SettingsStorage.storeCameraSetting(mContext, mCamManager.getCurrentFacing(),
-                                "video-size", ""+size.width+"x"+size.height);
+                                "video-size", ""+width+"x"+height);
                     }
                 }
             });
