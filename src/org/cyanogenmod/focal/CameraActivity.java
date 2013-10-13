@@ -1307,6 +1307,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             // Adjust orientationCompensation for the native orientation of the device.
             Configuration config = getResources().getConfiguration();
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
+            // TODO ???
             Util.getDisplayRotation(CameraActivity.this);
 
             boolean nativeLandscape = false;
