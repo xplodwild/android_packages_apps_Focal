@@ -412,6 +412,8 @@ public class CameraManager {
         
             Point sz = new Point(width, height);
             if (sz.equals(mPreviewSize)){
+                // must be done always
+                mPreview.notifyPreviewSize(mPreviewSize.x, mPreviewSize.y);
                 return;
             }
             mPreviewSize = sz;
