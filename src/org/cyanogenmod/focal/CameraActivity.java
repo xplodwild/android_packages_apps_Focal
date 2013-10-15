@@ -642,7 +642,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     Log.e(TAG, "No preview size!! Something terribly wrong with camera!");
                     return;
                 }
-                mCamManager.setPreviewSize(sz.width, sz.height);
+                //mCamManager.setPreviewSize(sz.width, sz.height);
 
                 if (mIsCamSwitching) {
                     mCamManager.restartPreviewIfNeeded();
