@@ -26,6 +26,8 @@ import android.media.CamcorderProfile;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.NumberPicker;
+import android.util.Log;
+import android.graphics.Point;
 
 import org.cyanogenmod.focal.CameraActivity;
 import org.cyanogenmod.focal.CameraCapabilities;
@@ -33,6 +35,7 @@ import org.cyanogenmod.focal.CameraManager;
 import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SettingsStorage;
 import org.cyanogenmod.focal.SnapshotManager;
+import org.cyanogenmod.focal.Util;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -44,6 +47,8 @@ import java.util.List;
  * Overflow settings widget
  */
 public class SettingsWidget extends WidgetBase {
+    private static final String TAG = "SettingsWidget";
+
     private static final String DRAWABLE_KEY_EXPO_RING = "_Nemesis_ExposureRing=true";
     private static final String DRAWABLE_KEY_AUTO_ENHANCE = "_Nemesis_AutoEnhance=true";
     private static final String DRAWABLE_KEY_RULE_OF_THIRDS = "_Nemesis_RuleOfThirds=true";
@@ -133,7 +138,6 @@ public class SettingsWidget extends WidgetBase {
         public void onClick(View view) {
             mInitialOrientation = -1;
 
-            Camera.Size actualSz = mCamManager.getParameters().getPictureSize();
             mNumberPicker = new NumberPicker(mContext);
             String[] names = new String[mResolutionsName.size()];
             mResolutionsName.toArray(names);
@@ -155,11 +159,25 @@ public class SettingsWidget extends WidgetBase {
                 }
             });
 
-            if (mResolutions != null) {
-                for (int i = 0; i < mResolutions.size(); i++) {
-                    if (mResolutions.get(i).equals(actualSz)) {
-                        mNumberPicker.setValue(i);
-                        break;
+            if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO){
+                // TODO set correct menu selection also for video
+                String actualSz = getActualProfileResolution();
+                if (mVideoResolutions != null) {
+                    for (int i = 0; i < mVideoResolutions.size(); i++) {
+                        if (mVideoResolutions.get(i).equals(actualSz)) {
+                            mNumberPicker.setValue(i);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                Camera.Size actualSz = mCamManager.getParameters().getPictureSize();
+                if (mResolutions != null) {
+                    for (int i = 0; i < mResolutions.size(); i++) {
+                        if (mResolutions.get(i).equals(actualSz)) {
+                            mNumberPicker.setValue(i);
+                            break;
+                        }
                     }
                 }
             }
@@ -173,28 +191,36 @@ public class SettingsWidget extends WidgetBase {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     mInitialOrientation = -1;
-                    Camera.Size size = mResolutions.get(mNumberPicker.getValue());
 
                     if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO
                             || CameraActivity.getCameraMode()
                             == CameraActivity.CAMERA_MODE_PICSPHERE) {
                         // Set picture size
-                        mCamManager.setPictureSize(size);
+                        Camera.Size size = mResolutions.get(mNumberPicker.getValue());
+                        // TODO: only one method
+                        mCamManager.setPictureSize(""+size.width+"x"+size.height);
 
                         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO) {
                             SettingsStorage.storeCameraSetting(mContext, mCamManager
                                     .getCurrentFacing(), "picture-size",
                                     ""+size.width+"x"+size.height);
                         } else {
+                            // TODO: should changing be possible for pic sphere???
                             SettingsStorage.storeCameraSetting(mContext,
                                     mCamManager.getCurrentFacing(), "picsphere-picture-size",
                                     ""+size.width+"x"+size.height);
                         }
                     } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
                         // Set video size
-                        applyVideoResolution(mVideoResolutions.get(mNumberPicker.getValue()));
+                        String size = mVideoResolutions.get(mNumberPicker.getValue());
+                        applyVideoResolution(size);
+                        
+                        String[] splat = size.split("x");
+                        int width = Integer.parseInt(splat[0]);
+                        int height = Integer.parseInt(splat[1]);
+
                         SettingsStorage.storeCameraSetting(mContext, mCamManager.getCurrentFacing(),
-                                "video-size", ""+size.width+"x"+size.height);
+                                "video-size", ""+width+"x"+height);
                     }
                 }
             });
@@ -212,7 +238,7 @@ public class SettingsWidget extends WidgetBase {
         mCapabilities = capabilities;
 
         CameraManager cam = context.getCamManager();
-
+        Log.d(TAG, "SettingsWidget -- start");
         getToggleButton().setHintText(R.string.widget_settings);
 
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO
@@ -243,8 +269,12 @@ public class SettingsWidget extends WidgetBase {
                         mCamManager.getCurrentFacing(), "picture-size", ""+mResolutions
                         .get(0).width+"x"+mResolutions.get(0).height);
             } else {
+                // TODO: moved from setCameraMode
+                Point picSphereSize = Util.findBestPicSpherePictureSize(
+                        mCamManager.getParameters().getSupportedPictureSizes(), true);
                 resolution = SettingsStorage.getCameraSetting(context,
-                        mCamManager.getCurrentFacing(), "picsphere-picture-size", "640x480");
+                        mCamManager.getCurrentFacing(), "picsphere-picture-size", 
+                        "" + picSphereSize.x + "x" + picSphereSize.y);
             }
             mCamManager.setPictureSize(resolution);
         } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
@@ -281,8 +311,18 @@ public class SettingsWidget extends WidgetBase {
                 mResolutionsName.add(mContext.getString(R.string.video_res_480p));
                 mVideoResolutions.add("720x480");
             }
-        }
 
+            // TODO: Restore video size if we have any
+            String resolution = SettingsStorage.getCameraSetting(context,
+                        mCamManager.getCurrentFacing(), "video-size", mVideoResolutions.get(0));
+            applyVideoResolution(resolution);
+        } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PANO) {
+            // TODO: Apply special settings for panorama mode
+            // use the same "workflow" as for other modes
+            // only the SettingsWidget will set the correct preview
+            mCamManager.initializePanoramaMode();
+        }
+        
         mResolutionButton = new WidgetOptionButton(
                 R.drawable.ic_widget_settings_resolution, context);
         mResolutionButton.setOnClickListener(mResolutionClickListener);
@@ -358,6 +398,7 @@ public class SettingsWidget extends WidgetBase {
             }
         });
         addViewToContainer(mToggleWidgetsButton);
+        Log.d(TAG, "SettingsWidget -- stop");
     }
 
     @Override
@@ -400,6 +441,11 @@ public class SettingsWidget extends WidgetBase {
             mContext.getSnapManager().setVideoProfile(
                     CamcorderProfile.get(CamcorderProfile.QUALITY_CIF));
         }
+    }
+
+    private String getActualProfileResolution() {
+        CamcorderProfile actualProfile = mContext.getSnapManager().getVideoProfile();
+        return "" + actualProfile.videoFrameWidth + "x" + actualProfile.videoFrameHeight;
     }
 
     private void openWidgetsToggleDialog() {

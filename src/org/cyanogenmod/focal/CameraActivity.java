@@ -452,7 +452,13 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             resetPicSphere();
         } else if (mCameraMode == CAMERA_MODE_PANO) {
             resetPanorama();
-        }
+        } 
+        //else if (mCameraMode == CAMERA_MODE_VIDEO){
+            // must release the camera
+            // to reset internals - at least on find5
+            mCamManager.pause();
+            mCamManager.resume();
+        //}
 
         mCameraMode = newMode;
 
@@ -642,7 +648,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     Log.e(TAG, "No preview size!! Something terribly wrong with camera!");
                     return;
                 }
-                mCamManager.setPreviewSize(sz.width, sz.height);
+                //mCamManager.setPreviewSize(sz.width, sz.height);
 
                 if (mIsCamSwitching) {
                     mCamManager.restartPreviewIfNeeded();
@@ -1307,6 +1313,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             // Adjust orientationCompensation for the native orientation of the device.
             Configuration config = getResources().getConfiguration();
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
+            // TODO ???
             Util.getDisplayRotation(CameraActivity.this);
 
             boolean nativeLandscape = false;
