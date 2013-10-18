@@ -370,7 +370,7 @@ public class CameraManager {
         }
     }
 
-    private void reconnectToCamera() {
+    public void reconnectToCamera() {
         if (mCameraReady) {
             open(mCurrentFacing);
         } else {
@@ -387,6 +387,8 @@ public class CameraManager {
         
         /*List<Camera.Size> sizes = params.getSupportedPreviewSizes();
         // TODO: support of preferred preview size
+        // this is currently breaking camera if preview
+        // size != video-size
         Camera.Size preferred = params.getPreferredPreviewSizeForVideo();
         if (preferred == null) {
             preferred = sizes.get(0);
@@ -411,11 +413,11 @@ public class CameraManager {
         if (mCamera != null) {
         
             Point sz = new Point(width, height);
-            if (sz.equals(mPreviewSize)){
+            /*if (sz.equals(mPreviewSize)){
                 // must be done always
                 mPreview.notifyPreviewSize(mPreviewSize.x, mPreviewSize.y);
                 return;
-            }
+            }*/
             mPreviewSize = sz;
             
             mPreview.notifyPreviewSize(mPreviewSize.x, mPreviewSize.y);
@@ -430,12 +432,10 @@ public class CameraManager {
                 if (mPreviewPauseListener != null) {
                     mPreviewPauseListener.onPreviewPause();
                 }
-                try {
-                    mParameters = params;
-                    mPreview.notifyCameraChanged(true);
-                } catch (RuntimeException ex) {
-                    Log.e(TAG, "Unable to set Preview Size", ex);
-                }
+
+                mParameters = params;
+                mPreview.restartPreview();
+                
                 if (mPreviewPauseListener != null) {
                     mPreviewPauseListener.onPreviewResume();
                 }
@@ -447,6 +447,7 @@ public class CameraManager {
 
     private void safeStartPreview() {
         if (!mIsPreviewStarted && mCamera != null) {
+            Log.d(TAG, "safeStartPreview");
             mCamera.startPreview();
             mIsPreviewStarted = true;
         }
@@ -454,6 +455,7 @@ public class CameraManager {
 
     private void safeStopPreview() {
         if (mIsPreviewStarted && mCamera != null) {
+            Log.d(TAG, "safeStopPreview");
             mCamera.stopPreview();
             mIsPreviewStarted = false;
         }
@@ -588,9 +590,6 @@ public class CameraManager {
         Log.d(TAG, "setPictureSize " + width + "x" + height);
         Camera.Parameters params = getParameters();
         params.setPictureSize(width, height);
-        
-        // TODO: hack workaround to stop crashing
-        params.set("video-size", "1920x1080");
         
         // set optimal preview - needs preview restart
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE || 
@@ -1112,6 +1111,23 @@ public class CameraManager {
             }
         }
 
+        public void restartPreview() {
+            synchronized (mParametersThread) {
+                if (mCamera != null) {
+                    try {
+                        safeStopPreview();
+                        mCamera.setParameters(mParameters);
+                    
+                        updateDisplayOrientation();
+                        safeStartPreview();
+                        setPauseCopyFrame(false);
+
+                    } catch (RuntimeException e) {
+                        Log.e(TAG, "Cannot set preview texture", e);
+                    }
+                }
+            }
+        }
         public void postCallbackBuffer() {
             if (mCamera != null && !mPauseCopyFrame) {
                 mCamera.addCallbackBuffer(mLastFrameBytes);
