@@ -24,8 +24,9 @@ import android.hardware.Camera;
 import android.view.View;
 
 import org.cyanogenmod.focal.CameraManager;
-import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SettingsStorage;
+
+import fr.xplod.focal.R;
 
 /**
  * Shutter speed setup widget
@@ -35,7 +36,7 @@ public class ShutterSpeedWidget extends WidgetBase {
     // according to the value of shutter speed as well as ISO.
     // What is done here (0-12, auto) is sony-specific anyway, so it
     // makes sense to keep it this way
-    private static final String KEY_PARAMETER = "shutter-speed";
+    private static final String KEY_PARAMETER = "sony-shutter-speed";
     private static final String KEY_MAX_PARAMETER = "sony-max-shutter-speed";
     private static final String KEY_MIN_PARAMETER = "sony-min-shutter-speed";
     private static final String KEY_AUTO_VALUE = "auto";

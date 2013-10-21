@@ -453,12 +453,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         } else if (mCameraMode == CAMERA_MODE_PANO) {
             resetPanorama();
         } 
-        //else if (mCameraMode == CAMERA_MODE_VIDEO){
+        else if (mCameraMode == CAMERA_MODE_VIDEO){
             // must release the camera
             // to reset internals - at least on find5
             mCamManager.pause();
             mCamManager.resume();
-        //}
+        }
 
         mCameraMode = newMode;
 

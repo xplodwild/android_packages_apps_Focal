@@ -42,7 +42,6 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import org.cyanogenmod.focal.CameraActivity;
-import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SnapshotManager;
 import org.cyanogenmod.focal.Storage;
 import org.cyanogenmod.focal.Util;
@@ -53,6 +52,8 @@ import org.cyanogenmod.focal.ui.ShutterButton;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+
+import fr.xplod.focal.R;
 
 /**
  * Nemesis interface to interact with Google's mosaic interface
@@ -361,8 +362,7 @@ public class MosaicProxy extends CaptureTransformer
 
     public int getPreviewBufSize() {
         PixelFormat pixelInfo = new PixelFormat();
-        PixelFormat.getPixelFormatInfo(mActivity.getCamManager()
-                .getParameters().getPreviewFormat(), pixelInfo);
+        PixelFormat.getPixelFormatInfo(PixelFormat.RGB_888, pixelInfo);
         // TODO: remove this extra 32 byte after the driver bug is fixed.
         return (mPreviewWidth * mPreviewHeight * pixelInfo.bitsPerPixel / 8) + 32;
     }

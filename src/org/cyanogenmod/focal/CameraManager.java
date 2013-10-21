@@ -19,7 +19,6 @@
 
 package org.cyanogenmod.focal;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -47,8 +46,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -120,7 +119,7 @@ public class CameraManager {
         public void onCameraFailed();
     }
 
-    Thread mParametersThread = new Thread() {
+    private class ParametersThread extends Thread {
         public void run() {
             while (true) {
                 synchronized (this) {
@@ -162,7 +161,9 @@ public class CameraManager {
                 }
             }
         }
-    };
+    }
+
+    private ParametersThread mParametersThread = null;
 
     public CameraManager(CameraActivity context) {
         mPreview = new CameraPreview();
@@ -172,6 +173,7 @@ public class CameraManager {
         mIsModeSwitching = false;
         mContext = context;
         mPendingParameters = new ArrayList<NameValuePair>();
+        mParametersThread = new ParametersThread();
         mParametersThread.start();
         mIsResuming = false;
         mIsRecordingHint = false;
@@ -336,12 +338,15 @@ public class CameraManager {
     public void pause() {
         mPreview.setPauseCopyFrame(true);
         releaseCamera();
-        // TODO: Release parameters thread
+        mParametersThread.interrupt();
+        mParametersThread = null;
     }
 
     public void resume() {
         mIsResuming = true;
         reconnectToCamera();
+        mParametersThread = new ParametersThread();
+        mParametersThread.start();
     }
 
     /**
@@ -385,7 +390,7 @@ public class CameraManager {
         // TODO: maybe need to set picture-size here too for
         // video snapshots
         
-        /*List<Camera.Size> sizes = params.getSupportedPreviewSizes();
+        List<Camera.Size> sizes = params.getSupportedPreviewSizes();
         // TODO: support of preferred preview size
         // this is currently breaking camera if preview
         // size != video-size
@@ -405,8 +410,8 @@ public class CameraManager {
         }
         
         Camera.Size optimalPreview = Util.getOptimalPreviewSize(mContext, sizes,
-                        (double) width / height);*/
-        setPreviewSize(width, height);
+                        (double) width / height);
+        setPreviewSize(optimalPreview.width, optimalPreview.height);
     }
     
     public void setPreviewSize(int width, int height) {
@@ -1075,7 +1080,7 @@ public class CameraManager {
         }
 
         public void notifyPreviewSize(int width, int height) {
-            mLastFrameBytes = new byte[(int) (width * height * 1.5 + 0.5)];
+            mLastFrameBytes = new byte[2048000];
 
             // Update preview aspect ratio
             mRenderer.updateRatio(width, height);
