@@ -127,6 +127,7 @@ public class CameraManager {
                         wait();
                     } catch (InterruptedException e) {
                         // Do nothing here
+                        return;
                     }
 
                     Log.v(TAG, "Batch parameter setting starting.");
@@ -164,6 +165,7 @@ public class CameraManager {
     }
 
     private ParametersThread mParametersThread = null;
+    final Object mParametersSync = new Object();
 
     public CameraManager(CameraActivity context) {
         mPreview = new CameraPreview();
@@ -304,7 +306,7 @@ public class CameraManager {
      * @return Camera.Parameters
      */
     public Camera.Parameters getParameters() {
-        synchronized (mParametersThread) {
+        synchronized (mParametersSync) {
             if (mCamera == null) {
                 Log.w(TAG, "getParameters when camera is null");
                 return null;
@@ -432,7 +434,7 @@ public class CameraManager {
 
             Log.v(TAG, "Preview size is " + width + "x" + height);
 
-            synchronized (mParametersThread) {
+            synchronized (mParametersSync) {
                 Log.d(TAG, "setPreviewSize - start");
                 if (mPreviewPauseListener != null) {
                     mPreviewPauseListener.onPreviewPause();
@@ -472,12 +474,15 @@ public class CameraManager {
 
     public void stopParametersBatch() {
         mParametersBatch = false;
+        if (mParametersThread == null) return;
         synchronized (mParametersThread) {
             mParametersThread.notifyAll();
         }
     }
 
     public void setParameterAsync(String key, String value) {
+        if (mParametersThread == null) return;
+
         synchronized (mParametersThread) {
             mPendingParameters.add(new BasicNameValuePair(key, value));
             if (!mParametersBatch) {
@@ -491,7 +496,7 @@ public class CameraManager {
      * @param params Parameters
      */
     public void setParameters(Camera.Parameters params) {
-        synchronized (mParametersThread) {
+        synchronized (mParametersSync) {
             mCamera.setParameters(params);
         }
     }
@@ -521,7 +526,7 @@ public class CameraManager {
 
         new Thread() {
             public void run() {
-                synchronized (mParametersThread) {
+                synchronized (mParametersSync) {
                     try {
                         mCamera.setParameters(params);
                     } catch (RuntimeException e) {
@@ -729,7 +734,7 @@ public class CameraManager {
     public void restartPreviewIfNeeded() {
         new Thread() {
             public void run() {
-                synchronized (mParametersThread) {
+                synchronized (mParametersSync) {
                     try {
                         // Normally, we should use safeStartPreview everywhere. However, some
                         // cameras implicitly stops preview, and we don't know. So we just force
@@ -753,7 +758,7 @@ public class CameraManager {
 
         new Thread() {
             public void run() {
-                synchronized (mParametersThread) {
+                synchronized (mParametersSync) {
                     Log.d(TAG, "setCameraMode -- start "  + mode);
                     Camera.Parameters params = getParameters();
 
@@ -1091,7 +1096,7 @@ public class CameraManager {
         }
 
         public void notifyCameraChanged(boolean startPreview) {
-            synchronized (mParametersThread) {
+            synchronized (mParametersSync) {
                 if (mCamera != null) {
                     if (startPreview) {
                         safeStopPreview();
@@ -1117,7 +1122,7 @@ public class CameraManager {
         }
 
         public void restartPreview() {
-            synchronized (mParametersThread) {
+            synchronized (mParametersSync) {
                 if (mCamera != null) {
                     try {
                         safeStopPreview();
@@ -1301,9 +1306,10 @@ public class CameraManager {
                 GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
                 if (mUpdateRatioTo > 0) {
-                    // TODO mUpdateRatioTo would be the new ratio but still mRatio is used here
                     Log.d(TAG, "onDrawFrame " + " mRatio="+mRatio);
-                    GLES20.glViewport(0, 0, (int) (mWidth * mRatio), mHeight);
+                    int deltaWidth = (int) Math.abs(mWidth - mWidth * mRatio);
+                    GLES20.glViewport(-deltaWidth / 2, 0,
+                            (int) (mWidth * mRatio + deltaWidth / 2.0f), mHeight);
                     mUpdateRatioTo = -1;
                 }
 
