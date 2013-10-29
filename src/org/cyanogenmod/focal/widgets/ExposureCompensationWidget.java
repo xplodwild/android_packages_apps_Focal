@@ -64,7 +64,11 @@ public class ExposureCompensationWidget extends WidgetBase implements
     }
 
     public int getExposureValue() {
-        return Integer.parseInt(mCamManager.getParameters().get(KEY_PARAMETER));
+        try {
+            return Integer.parseInt(mCamManager.getParameters().get(KEY_PARAMETER));
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public int getMinExposureValue() {
@@ -76,7 +80,11 @@ public class ExposureCompensationWidget extends WidgetBase implements
     }
 
     public int getMaxExposureValue() {
-        return Integer.parseInt(mCamManager.getParameters().get(KEY_MAX_PARAMETER));
+        try {
+            return Integer.parseInt(mCamManager.getParameters().get(KEY_MAX_PARAMETER));
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public void setExposureValue(int value) {

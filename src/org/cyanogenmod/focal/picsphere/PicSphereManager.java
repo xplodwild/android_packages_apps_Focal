@@ -186,6 +186,8 @@ public class PicSphereManager implements PicSphere.ProgressListener {
             mCapture3DRenderer.onPause();
         }
 
+        tearDown();
+
         mPicSpheres.clear();
     }
 
@@ -204,6 +206,7 @@ public class PicSphereManager implements PicSphere.ProgressListener {
      * @return
      */
     private boolean copyBinaries() {
+        boolean result = true;
         try {
             String files[] = {
                     "autooptimiser", "pto_gen", "cpfind", "multiblend", "enfuse", "nona", "pano_modify",
@@ -235,7 +238,7 @@ public class PicSphereManager implements PicSphere.ProgressListener {
                 }
 
                 if (!outFile.getName().endsWith(".so") && !outFile.setExecutable(true)) {
-                    return false;
+                    result = false;
                 }
 
                 os.flush();
@@ -244,9 +247,9 @@ public class PicSphereManager implements PicSphere.ProgressListener {
             }
         } catch (Exception e) {
             Log.e(TAG, "Error copying libraries and binaries", e);
-            return false;
+            result = false;
         }
-        return true;
+        return result;
     }
 
 

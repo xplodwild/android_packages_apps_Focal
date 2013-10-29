@@ -59,6 +59,7 @@ public class ReviewDrawer extends RelativeLayout {
     public final static String TAG = "ReviewDrawer";
 
     private final static long DRAWER_TOGGLE_DURATION = 400;
+    private final static float MIN_REMOVE_THRESHOLD = 10.0f;
     private final static String GALLERY_CAMERA_BUCKET = "Camera";
 
     private List<Integer> mImages;
@@ -236,6 +237,8 @@ public class ReviewDrawer extends RelativeLayout {
                     mImagesListAdapter.notifyDataSetChanged();
                 }
 
+                cursor.close();
+
                 if (scrollPos < mImages.size()) {
                     mViewPager.setCurrentItem(scrollPos+1, false);
                     mViewPager.setCurrentItem(scrollPos, true);
@@ -253,19 +256,24 @@ public class ReviewDrawer extends RelativeLayout {
     public int getCameraPhotoOrientation(final int id) {
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
             return 0;
-        } else {
-            Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
-                    .appendPath(Integer.toString(id)).build();;
-            String[] orientationColumn = new String[]{MediaStore.Images.Media.ORIENTATION};
-
-            Cursor cur = getContext().getContentResolver().query(uri,
-                    orientationColumn, null, null, null);
-            if (cur != null && cur.moveToFirst()) {
-                return cur.getInt(cur.getColumnIndex(orientationColumn[0]));
-            } else {
-                return 0;
-            }
         }
+        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                .appendPath(Integer.toString(id)).build();
+        String[] orientationColumn = new String[] {
+                MediaStore.Images.ImageColumns.ORIENTATION
+        };
+
+        int orientation = 0;
+        Cursor cur = getContext().getContentResolver().query(uri,
+                orientationColumn, null, null, null);
+        if (cur != null && cur.moveToFirst()) {
+            orientation = cur.getInt(cur.getColumnIndex(orientationColumn[0]));
+        }
+        if (cur != null) {
+            cur.close();
+            cur = null;
+        }
+        return orientation;
     }
 
 
@@ -508,6 +516,11 @@ public class ReviewDrawer extends RelativeLayout {
             final ImageView imageView = new ImageView(getContext());
             container.addView(imageView);
 
+            ViewGroup.LayoutParams params = imageView.getLayoutParams();
+            params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            imageView.setLayoutParams(params);
+
             imageView.setOnTouchListener(new ThumbnailTouchListener(imageView));
 
             new Thread() {
@@ -619,7 +632,8 @@ public class ReviewDrawer extends RelativeLayout {
 
                     @Override
                     public boolean onScroll(MotionEvent ev1, MotionEvent ev2, float vX, float vY) {
-                        if (Math.abs(ev2.getX() - ev1.getX()) > DRIFT_THRESHOLD) {
+                        if (Math.abs(ev2.getX() - ev1.getX()) > DRIFT_THRESHOLD
+                                && Math.abs(mImageView.getTranslationY()) < MIN_REMOVE_THRESHOLD) {
                             return false;
                         }
 

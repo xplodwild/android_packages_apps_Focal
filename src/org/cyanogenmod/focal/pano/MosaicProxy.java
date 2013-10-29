@@ -42,7 +42,6 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import org.cyanogenmod.focal.CameraActivity;
-import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SnapshotManager;
 import org.cyanogenmod.focal.Storage;
 import org.cyanogenmod.focal.Util;
@@ -53,6 +52,8 @@ import org.cyanogenmod.focal.ui.ShutterButton;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+
+import fr.xplod.focal.R;
 
 /**
  * Nemesis interface to interact with Google's mosaic interface
@@ -205,16 +206,26 @@ public class MosaicProxy extends CaptureTransformer
 
         // Initialization
         Camera.Parameters params = mActivity.getCamManager().getParameters();
-        mHorizontalViewAngle = params.getHorizontalViewAngle();
-        mVerticalViewAngle = params.getVerticalViewAngle();
+        if (params != null) {
+            mHorizontalViewAngle = params.getHorizontalViewAngle();
+            mVerticalViewAngle = params.getVerticalViewAngle();
+        } else {
+            mHorizontalViewAngle = 50;
+            mHorizontalViewAngle = 30;
+        }
 
         int pixels = mActivity.getResources().getInteger(R.integer.config_panoramaDefaultWidth)
                 * mActivity.getResources().getInteger(R.integer.config_panoramaDefaultHeight);
 
-        Point size = Util.findBestPanoPreviewSize(
-                params.getSupportedPreviewSizes(), true, true, pixels);
-        mPreviewWidth = size.x;
-        mPreviewHeight = size.y;
+        if (params != null) {
+            Point size = Util.findBestPanoPreviewSize(
+                    params.getSupportedPreviewSizes(), true, true, pixels);
+            mPreviewWidth = size.y;
+            mPreviewHeight = size.x;
+        } else {
+            mPreviewWidth = 480;
+            mPreviewHeight = 640;
+        }
 
         FrameLayout.LayoutParams layoutParams =
                 (FrameLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
@@ -351,8 +362,7 @@ public class MosaicProxy extends CaptureTransformer
 
     public int getPreviewBufSize() {
         PixelFormat pixelInfo = new PixelFormat();
-        PixelFormat.getPixelFormatInfo(mActivity.getCamManager()
-                .getParameters().getPreviewFormat(), pixelInfo);
+        PixelFormat.getPixelFormatInfo(PixelFormat.RGB_888, pixelInfo);
         // TODO: remove this extra 32 byte after the driver bug is fixed.
         return (mPreviewWidth * mPreviewHeight * pixelInfo.bitsPerPixel / 8) + 32;
     }

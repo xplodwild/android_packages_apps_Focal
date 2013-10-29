@@ -23,6 +23,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.CursorIndexOutOfBoundsException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
@@ -206,9 +207,15 @@ public class SnapshotManager {
 
             // Calculate the width and the height of the jpeg.
             final Camera.Size s = mCameraManager.getParameters().getPictureSize();
-            int orientation = mCameraManager.getOrientation();
+            int orientation = CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PANO ? 0 :
+                    mCameraManager.getOrientation();
             final int width = s.width,
                     height = s.height;
+
+            if (mSnapshotsQueue.size() == 0) {
+                Log.e(TAG, "DERP! Why is snapshotqueue empty? Two JPEG callbacks!?");
+                return;
+            }
 
             final SnapshotInfo snap = mSnapshotsQueue.get(0);
 
@@ -297,6 +304,18 @@ public class SnapshotManager {
                                     mImageSaver.addImage(finalData, uri, title, null,
                                             width, height, correctedOrientation, snap);
                                 }
+
+                                CameraActivity.notify("Auto-enhance failed: Original shot saved", 2000);
+                            }
+                            catch (OutOfMemoryError e) {
+                                // The rendering failed, the device might not be compatible for
+                                // whatever reason. We just save the original file.
+                                if (mImageSaver != null) {
+                                    mImageSaver.addImage(finalData, uri, title, null,
+                                            width, height, correctedOrientation, snap);
+                                }
+
+                                CameraActivity.notify("Error: Out of memory. Original shot saved", 2000);
                             }
                         }
                     }.start();
@@ -516,11 +535,16 @@ public class SnapshotManager {
         return mImageSaver;
     }
 
+    public CamcorderProfile getVideoProfile(){
+        return mProfile;
+    }
+    
     public void setVideoProfile(final CamcorderProfile profile) {
         mProfile = profile;
 
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
-            mCameraManager.setPreviewSize(profile.videoFrameWidth, profile.videoFrameHeight);
+            // TODO: setVideoSize is handling preview changing
+            mCameraManager.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
         }
     }
 
@@ -876,6 +900,8 @@ public class SnapshotManager {
                         exifIf.saveAttributes();
                     } catch (IOException e) {
                         Log.e(TAG, "Couldn't write exif", e);
+                    } catch (CursorIndexOutOfBoundsException e) {
+                        Log.e(TAG, "Couldn't find original picture", e);
                     }
                 }
 

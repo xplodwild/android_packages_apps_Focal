@@ -46,7 +46,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -64,25 +66,30 @@ public class CameraManager {
     private final static int FOCUS_WIDTH = 80;
     private final static int FOCUS_HEIGHT = 80;
 
+    private final static boolean DEBUG_LOG_PARAMS = false;
+    private final static boolean DEBUG_PROFILER = false;
+
     private CameraPreview mPreview;
     private Camera mCamera;
     private boolean mCameraReady;
     private int mCurrentFacing;
-    private Point mTargetSize;
     private AutoFocusMoveCallback mAutoFocusMoveCallback;
     private Camera.Parameters mParameters;
     private int mOrientation;
+    private int mVideoRotation;
     private MediaRecorder mMediaRecorder;
     private PreviewPauseListener mPreviewPauseListener;
     private CameraReadyListener mCameraReadyListener;
     private Handler mHandler;
-    private Context mContext;
+    private CameraActivity mContext;
     private boolean mIsModeSwitching;
     private List<NameValuePair> mPendingParameters;
     private boolean mIsResuming;
     private CameraRenderer mRenderer;
     private boolean mIsRecordingHint;
     private boolean mIsPreviewStarted;
+    private boolean mParametersBatch;
+    private Point mPreviewSize;
 
     public interface PreviewPauseListener {
         /**
@@ -112,7 +119,7 @@ public class CameraManager {
         public void onCameraFailed();
     }
 
-    Thread mParametersThread = new Thread() {
+    private class ParametersThread extends Thread {
         public void run() {
             while (true) {
                 synchronized (this) {
@@ -120,37 +127,34 @@ public class CameraManager {
                         wait();
                     } catch (InterruptedException e) {
                         // Do nothing here
+                        return;
                     }
+
+                    Log.v(TAG, "Batch parameter setting starting.");
+
+                    String existingParameters = getParameters().flatten();
+
+                    // If the camera died, just forget about this.
+                    if (existingParameters == null) continue;
 
                     List<NameValuePair> copy = new ArrayList<NameValuePair>(mPendingParameters);
                     mPendingParameters.clear();
 
+                    Camera.Parameters params = getParameters();
+
                     for (NameValuePair pair : copy) {
                         String key = pair.getName();
                         String val = pair.getValue();
-                        Log.v(TAG, "Asynchronously setting parameter " + key+ " to " + val);
-                        Camera.Parameters params = getParameters();
-                        if (params == null) {
-                            // The camera died, just forget about these settings
-                            return;
-                        }
-                        String workingValue = params.get(key);
+                        Log.v(TAG, "Setting parameter " + key+ " to " + val);
+
                         params.set(key, val);
+                    }
 
-                        try {
-                            mCamera.setParameters(params);
-                        } catch (RuntimeException e) {
-                            Log.e(TAG, "Could not set parameter " + key
-                                    + " to '" + val + "', restoring '"
-                                    + workingValue + "'", e);
 
-                            // Reset the parameter back in storage
-                            SettingsStorage.storeCameraSetting(
-                                    mContext, mCurrentFacing, key, workingValue);
-
-                            // Reset the camera as it likely crashed if we reached here
-                            open(mCurrentFacing);
-                        }
+                    try {
+                        mCamera.setParameters(params);
+                    } catch (RuntimeException e) {
+                        Log.e(TAG, "Could not set parameters batch", e);
                     }
 
                     // Read them from sensor
@@ -158,9 +162,12 @@ public class CameraManager {
                 }
             }
         }
-    };
+    }
 
-    public CameraManager(Context context) {
+    private ParametersThread mParametersThread = null;
+    final Object mParametersSync = new Object();
+
+    public CameraManager(CameraActivity context) {
         mPreview = new CameraPreview();
         mMediaRecorder = new MediaRecorder();
         mCameraReady = true;
@@ -168,6 +175,7 @@ public class CameraManager {
         mIsModeSwitching = false;
         mContext = context;
         mPendingParameters = new ArrayList<NameValuePair>();
+        mParametersThread = new ParametersThread();
         mParametersThread.start();
         mIsResuming = false;
         mIsRecordingHint = false;
@@ -197,10 +205,12 @@ public class CameraManager {
         new Thread() {
             public void run() {
                 try {
+                    if (DEBUG_PROFILER) Profiler.getDefault().start("CameraOpen");
                     if (mCamera != null) {
                         Log.e(TAG, "Previous camera not closed! Not opening");
                         return;
                     }
+
                     mCamera = Camera.open(cameraId);
                     Log.v(TAG, "Camera is open");
 
@@ -211,18 +221,19 @@ public class CameraManager {
                     mCurrentFacing = cameraId;
                     mParameters = mCamera.getParameters();
 
-                    String params = mCamera.getParameters().flatten();
-                    final int step = params.length() > 256 ? 256 : params.length();
-                    for (int i = 0; i < params.length(); i += step) {
-                        Log.d(TAG, params);
-                        params = params.substring(step);
+                    if (DEBUG_LOG_PARAMS) {
+                        String params = mCamera.getParameters().flatten();
+                        final int step = params.length() > 256 ? 256 : params.length();
+                        for (int i = 0; i < params.length(); i += step) {
+                            Log.d(TAG, params);
+                            params = params.substring(step);
+                        }
                     }
 
                     // Mako hack to raise FPS
                     if (Build.DEVICE.equals("mako")) {
                         Camera.Size maxSize = mParameters.getSupportedPictureSizes().get(0);
                         mParameters.setPictureSize(maxSize.width, maxSize.height);
-                        mCamera.setParameters(mParameters);
                     }
 
                     if (mAutoFocusMoveCallback != null) {
@@ -239,7 +250,7 @@ public class CameraManager {
                 }
 
                 // Update the preview surface holder with the new opened camera
-                mPreview.notifyCameraChanged(false);
+                mPreview.notifyCameraChanged(true);
 
                 if (mCameraReadyListener != null) {
                     mCameraReadyListener.onCameraReady();
@@ -251,6 +262,7 @@ public class CameraManager {
                 mPreview.setPauseCopyFrame(false);
 
                 mCameraReady = true;
+                if (DEBUG_PROFILER) Profiler.getDefault().logProfile("CameraOpen");
             }
         }.start();
 
@@ -294,7 +306,7 @@ public class CameraManager {
      * @return Camera.Parameters
      */
     public Camera.Parameters getParameters() {
-        synchronized (mParametersThread) {
+        synchronized (mParametersSync) {
             if (mCamera == null) {
                 Log.w(TAG, "getParameters when camera is null");
                 return null;
@@ -328,12 +340,15 @@ public class CameraManager {
     public void pause() {
         mPreview.setPauseCopyFrame(true);
         releaseCamera();
-        // TODO: Release parameters thread
+        mParametersThread.interrupt();
+        mParametersThread = null;
     }
 
     public void resume() {
         mIsResuming = true;
         reconnectToCamera();
+        mParametersThread = new ParametersThread();
+        mParametersThread.start();
     }
 
     /**
@@ -362,48 +377,84 @@ public class CameraManager {
         }
     }
 
-    private void reconnectToCamera() {
+    public void reconnectToCamera() {
         if (mCameraReady) {
             open(mCurrentFacing);
         } else {
             Log.e(TAG, "reconnectToCamera but camera not ready!");
         }
     }
-
+    
+    public void setVideoSize(int width, int height){
+        Log.d(TAG, "setVideoSize " + width + "x" + height);
+        Camera.Parameters params = getParameters();
+        params.set("video-size", "" + width +"x" + height);
+        // TODO: maybe need to set picture-size here too for
+        // video snapshots
+        
+        List<Camera.Size> sizes = params.getSupportedPreviewSizes();
+        // TODO: support of preferred preview size
+        // this is currently breaking camera if preview
+        // size != video-size
+        Camera.Size preferred = params.getPreferredPreviewSizeForVideo();
+        if (preferred == null) {
+            preferred = sizes.get(0);
+        }
+        
+        int product = preferred.width * preferred.height;
+        Iterator<Camera.Size> it = sizes.iterator();
+        // Remove the preview sizes that are not preferred.
+        while (it.hasNext()) {
+            Camera.Size size = it.next();
+            if (size.width * size.height > product) {
+                it.remove();
+            }
+        }
+        
+        Camera.Size optimalPreview = Util.getOptimalPreviewSize(mContext, sizes,
+                        (double) width / height);
+        setPreviewSize(optimalPreview.width, optimalPreview.height);
+    }
+    
     public void setPreviewSize(int width, int height) {
-        mTargetSize = new Point(width, height);
-
         if (mCamera != null) {
+        
+            Point sz = new Point(width, height);
+            /*if (sz.equals(mPreviewSize)){
+                // must be done always
+                mPreview.notifyPreviewSize(mPreviewSize.x, mPreviewSize.y);
+                return;
+            }*/
+            mPreviewSize = sz;
+            
+            mPreview.notifyPreviewSize(mPreviewSize.x, mPreviewSize.y);
+
             Camera.Parameters params = getParameters();
             params.setPreviewSize(width, height);
 
             Log.v(TAG, "Preview size is " + width + "x" + height);
 
-            if (!mIsModeSwitching) {
-                synchronized (mParametersThread) {
-                    try {
-                        safeStopPreview();
-                        mParameters = params;
-                        mCamera.setParameters(mParameters);
-                        mPreview.notifyPreviewSize(width, height);
-
-                        if (mIsResuming) {
-                            updateDisplayOrientation();
-                            safeStartPreview();
-                            mIsResuming = false;
-                        }
-
-                        mPreview.setPauseCopyFrame(false);
-                    } catch (RuntimeException ex) {
-                        Log.e(TAG, "Unable to set Preview Size", ex);
-                    }
+            synchronized (mParametersSync) {
+                Log.d(TAG, "setPreviewSize - start");
+                if (mPreviewPauseListener != null) {
+                    mPreviewPauseListener.onPreviewPause();
                 }
+
+                mParameters = params;
+                mPreview.restartPreview();
+                
+                if (mPreviewPauseListener != null) {
+                    mPreviewPauseListener.onPreviewResume();
+                }
+
+                Log.d(TAG, "setPreviewSize - stop");
             }
         }
     }
 
     private void safeStartPreview() {
         if (!mIsPreviewStarted && mCamera != null) {
+            Log.d(TAG, "safeStartPreview");
             mCamera.startPreview();
             mIsPreviewStarted = true;
         }
@@ -411,15 +462,32 @@ public class CameraManager {
 
     private void safeStopPreview() {
         if (mIsPreviewStarted && mCamera != null) {
+            Log.d(TAG, "safeStopPreview");
             mCamera.stopPreview();
             mIsPreviewStarted = false;
         }
     }
 
+    public void startParametersBatch() {
+        mParametersBatch = true;
+    }
+
+    public void stopParametersBatch() {
+        mParametersBatch = false;
+        if (mParametersThread == null) return;
+        synchronized (mParametersThread) {
+            mParametersThread.notifyAll();
+        }
+    }
+
     public void setParameterAsync(String key, String value) {
+        if (mParametersThread == null) return;
+
         synchronized (mParametersThread) {
             mPendingParameters.add(new BasicNameValuePair(key, value));
-            mParametersThread.notifyAll();
+            if (!mParametersBatch) {
+                mParametersThread.notifyAll();
+            }
         }
     }
 
@@ -428,7 +496,7 @@ public class CameraManager {
      * @param params Parameters
      */
     public void setParameters(Camera.Parameters params) {
-        synchronized (mParametersThread) {
+        synchronized (mParametersSync) {
             mCamera.setParameters(params);
         }
     }
@@ -458,7 +526,7 @@ public class CameraManager {
 
         new Thread() {
             public void run() {
-                synchronized (mParametersThread) {
+                synchronized (mParametersSync) {
                     try {
                         mCamera.setParameters(params);
                     } catch (RuntimeException e) {
@@ -492,38 +560,32 @@ public class CameraManager {
         int previewHeight = previewSize.height;
 
         // Convert YUV420SP preview data to RGB
-        if (data != null && data.length > 8) {
-            Bitmap bitmap = Util.decodeYUV420SP(mContext, data, previewWidth, previewHeight);
-            if (mCurrentFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                // Frontcam has the image flipped, flip it back to not look weird in portrait
-                Matrix m = new Matrix();
-                m.preScale(-1, 1);
-                Bitmap dst = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                        bitmap.getHeight(), m, false);
-                bitmap.recycle();
-                bitmap = dst;
-            }
+        try {
+            if (data != null && data.length > 8) {
+                Bitmap bitmap = Util.decodeYUV420SP(mContext, data, previewWidth, previewHeight);
+                if (mCurrentFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                    // Frontcam has the image flipped, flip it back to not look weird in portrait
+                    Matrix m = new Matrix();
+                    m.preScale(-1, 1);
+                    Bitmap dst = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                            bitmap.getHeight(), m, false);
+                    bitmap.recycle();
+                    bitmap = dst;
+                }
 
-            return bitmap;
-        } else {
+                return bitmap;
+            } else {
+                return null;
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // TODO: FIXME: On some devices, the resolution of the preview might abruptly change,
+            // thus the YUV420SP data is not the size we expect, causing OOB exception
             return null;
         }
     }
 
     public Context getContext() {
         return mContext;
-    }
-
-    /**
-     * Defines a new size for the recorded picture
-     * XXX: Should it update preview size?!
-     *
-     * @param sz The new picture size
-     */
-    public void setPictureSize(Camera.Size sz) {
-        Camera.Parameters params = getParameters();
-        params.setPictureSize(sz.width, sz.height);
-        mCamera.setParameters(params);
     }
 
     /**
@@ -535,8 +597,19 @@ public class CameraManager {
         int width = Integer.parseInt(splat[0]);
         int height = Integer.parseInt(splat[1]);
 
-        setParameterAsync("picture-size", Integer.toString(width)
-                + "x" + Integer.toString(height));
+        Log.d(TAG, "setPictureSize " + width + "x" + height);
+        Camera.Parameters params = getParameters();
+        params.setPictureSize(width, height);
+        
+        // set optimal preview - needs preview restart
+        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE || 
+                CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PANO) {
+            setPreviewSize(640, 480);
+        } else {
+            Camera.Size optimalPreview = Util.getOptimalPreviewSize(mContext, params.getSupportedPreviewSizes(),
+                    ((float) width / (float) height));
+            setPreviewSize(optimalPreview.width, optimalPreview.height);
+        }
     }
 
     /**
@@ -545,7 +618,7 @@ public class CameraManager {
     public void takeSnapshot(final Camera.ShutterCallback shutterCallback,
                              final Camera.PictureCallback raw, final Camera.PictureCallback jpeg) {
         Log.v(TAG, "takePicture");
-        if (getContext().getResources().getBoolean(R.bool.config_stopPreviewBetweenShots)) {
+        if (Util.deviceNeedsStopPreviewToShoot()) {
             safeStopPreview();
         }
 
@@ -588,6 +661,7 @@ public class CameraManager {
                 - Storage.LOW_STORAGE_THRESHOLD;
         mMediaRecorder.setMaxFileSize(maxFileSize);
         mMediaRecorder.setMaxDuration(0); // infinite
+        mMediaRecorder.setOrientationHint(mVideoRotation);
 
         try {
             mMediaRecorder.prepare();
@@ -645,20 +719,22 @@ public class CameraManager {
                 new android.hardware.Camera.CameraInfo();
         Camera.getCameraInfo(mCurrentFacing, info);
         //orientation = (360 - orientation + 45) / 90 * 90;
-        int rotation = 0;
+        
+        // mVideoRotation is needed for MediaRecorder!
+        // we dont want the +90 for that
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            rotation = (info.orientation - orientation + 360) % 360;
+            mVideoRotation = (info.orientation - (mOrientation - 90) + 360) % 360;
         } else {  // back-facing camera
-            rotation = (info.orientation + orientation) % 360;
+            mVideoRotation = (info.orientation + (mOrientation - 90)) % 360;
         }
-
+        Log.d(TAG, "mVideoRotation = " + mVideoRotation);
         //setParameterAsync("rotation", Integer.toString(rotation));
     }
 
     public void restartPreviewIfNeeded() {
         new Thread() {
             public void run() {
-                synchronized (mParametersThread) {
+                synchronized (mParametersSync) {
                     try {
                         // Normally, we should use safeStartPreview everywhere. However, some
                         // cameras implicitly stops preview, and we don't know. So we just force
@@ -676,18 +752,14 @@ public class CameraManager {
     }
 
     public void setCameraMode(final int mode) {
-        if (mPreviewPauseListener != null) {
-            mPreviewPauseListener.onPreviewPause();
-        }
-
         // Unlock any exposure/stab lock that was caused by
         // swiping the ring
         setLockSetup(false);
 
         new Thread() {
             public void run() {
-                mIsModeSwitching = true;
-                synchronized (mParametersThread) {
+                synchronized (mParametersSync) {
+                    Log.d(TAG, "setCameraMode -- start "  + mode);
                     Camera.Parameters params = getParameters();
 
                     if (params == null) {
@@ -697,45 +769,29 @@ public class CameraManager {
                         return;
                     }
 
-                    boolean shouldStartPreview = false;
+                    // TODO: shouldnt it be done here?
+                    mIsModeSwitching = true;
 
                     if (mode == CameraActivity.CAMERA_MODE_VIDEO) {
                         if (!mIsRecordingHint) {
                             params.setRecordingHint(true);
                             mIsRecordingHint = true;
-                            safeStopPreview();
-                            shouldStartPreview = true;
                         }
                     } else {
                         if (mIsRecordingHint) {
                             params.setRecordingHint(false);
                             mIsRecordingHint = false;
-                            safeStopPreview();
-                            shouldStartPreview = true;
                         }
                     }
 
-                    if (mode == CameraActivity.CAMERA_MODE_PANO) {
-                        // Apply special settings for panorama mode
-                        initializePanoramaMode();
-                    } else {
+                    if (mode != CameraActivity.CAMERA_MODE_PANO) {
                         // Make sure the Infinity mode from panorama is gone
                         params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
                     }
 
                     if (mode == CameraActivity.CAMERA_MODE_PICSPHERE) {
-                        // If we are in PicSphere mode, we look for a correct 4:3 resolution. We
-                        // default the preview size to 640x480 however, as we don't need anything
-                        // bigger than that. We prefer to have a smaller resolution in case our
-                        // recommended resolution isn't available, as it will be faster to render.
-                        Point size = Util.findBestPicSpherePictureSize(params.getSupportedPictureSizes(), true);
-                        params.setPictureSize(size.x, size.y);
-                        params.setPreviewSize(640, 480);
-
                         // Set focus mode to infinity
                         setInfinityFocus(params);
-                    } else {
-                        setPreviewSize(mTargetSize.x, mTargetSize.y);
                     }
 
                     try {
@@ -745,18 +801,10 @@ public class CameraManager {
                     }
                     mParameters = mCamera.getParameters();
 
-                    if (shouldStartPreview) {
-                        updateDisplayOrientation();
-                        safeStartPreview();
-                    }
+                    Log.d(TAG, "setCameraMode -- end");
                 }
 
-                mPreview.setPauseCopyFrame(false);
                 mIsModeSwitching = false;
-
-                if (mPreviewPauseListener != null) {
-                    mPreviewPauseListener.onPreviewResume();
-                }
             }
         }.start();
     }
@@ -783,18 +831,18 @@ public class CameraManager {
     /**
      * Initializes the Panorama (mosaic) mode
      */
-    private void initializePanoramaMode() {
+    public void initializePanoramaMode() {
         Camera.Parameters parameters = getParameters();
 
-        int pixels = mContext.getResources().getInteger(R.integer.config_panoramaDefaultWidth)
+        // TODO
+        /*int pixels = mContext.getResources().getInteger(R.integer.config_panoramaDefaultWidth)
                 * mContext.getResources().getInteger(R.integer.config_panoramaDefaultHeight);
 
         List<Camera.Size> supportedSizes = parameters.getSupportedPreviewSizes();
         Point previewSize = Util.findBestPanoPreviewSize(supportedSizes, false, false, pixels);
 
-        Log.v(TAG, "preview h = " + previewSize.y + " , w = " + previewSize.x);
-        parameters.setPreviewSize(previewSize.x, previewSize.y);
-        mTargetSize = previewSize;
+        Log.d(TAG, "preview h = " + previewSize.y + " , w = " + previewSize.x);
+        parameters.setPreviewSize(previewSize.x, previewSize.y);*/
 
         List<int[]> frameRates = parameters.getSupportedPreviewFpsRange();
         if (frameRates != null) {
@@ -809,6 +857,7 @@ public class CameraManager {
 
         parameters.setRecordingHint(false);
         mParameters = parameters;
+        setPictureSize("640x480");
     }
 
     private void setInfinityFocus(Camera.Parameters parameters) {
@@ -902,9 +951,13 @@ public class CameraManager {
      * @param y The Y position of the focus point
      */
     public void setFocusPoint(int x, int y) {
+        if (x < -1000 || x > 1000 || y < -1000 || y > 1000) {
+            Log.e(TAG, "setFocusPoint: values are not ideal " + "x= " + x + " y= " + y);
+            return;
+        }
         Camera.Parameters params = getParameters();
 
-        if (params.getMaxNumFocusAreas() > 0) {
+        if (params != null && params.getMaxNumFocusAreas() > 0) {
             List<Camera.Area> focusArea = new ArrayList<Camera.Area>();
             focusArea.add(new Camera.Area(new Rect(x, y, x + FOCUS_WIDTH, y + FOCUS_HEIGHT), 1000));
 
@@ -1032,10 +1085,10 @@ public class CameraManager {
         }
 
         public void notifyPreviewSize(int width, int height) {
-            mLastFrameBytes = new byte[(int) (width * height * 1.5 + 0.5)];
+            mLastFrameBytes = new byte[2048000];
 
             // Update preview aspect ratio
-            mRenderer.updateRatio((float) width/(float) height);
+            mRenderer.updateRatio(width, height);
         }
 
         public byte[] getLastFrameBytes() {
@@ -1043,7 +1096,7 @@ public class CameraManager {
         }
 
         public void notifyCameraChanged(boolean startPreview) {
-            synchronized (mParametersThread) {
+            synchronized (mParametersSync) {
                 if (mCamera != null) {
                     if (startPreview) {
                         safeStopPreview();
@@ -1068,22 +1121,33 @@ public class CameraManager {
             }
         }
 
-        public void postCallbackBuffer() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (mCamera != null && !mPauseCopyFrame) {
-                        mCamera.addCallbackBuffer(mLastFrameBytes);
-                        mCamera.setPreviewCallbackWithBuffer(CameraPreview.this);
+        public void restartPreview() {
+            synchronized (mParametersSync) {
+                if (mCamera != null) {
+                    try {
+                        safeStopPreview();
+                        mCamera.setParameters(mParameters);
+                    
+                        updateDisplayOrientation();
+                        safeStartPreview();
+                        setPauseCopyFrame(false);
+
+                    } catch (RuntimeException e) {
+                        Log.e(TAG, "Cannot set preview texture", e);
                     }
                 }
-            });
+            }
+        }
+        public void postCallbackBuffer() {
+            if (mCamera != null && !mPauseCopyFrame) {
+                mCamera.addCallbackBuffer(mLastFrameBytes);
+                mCamera.setPreviewCallbackWithBuffer(CameraPreview.this);
+            }
         }
 
         private void setupCamera() {
             // Set device-specifics here
             try {
-                Camera.Parameters params = mCamera.getParameters();
                 Resources res = mContext.getResources();
 
                 if (res != null) {
@@ -1091,12 +1155,11 @@ public class CameraManager {
                         if (res.getBoolean(R.bool.config_useSamsungZSL)) {
                             //mCamera.sendRawCommand(1508, 0, 0);
                         }
-                        params.set("camera-mode", 1);
+                        mParameters.set("camera-mode", 1);
                     }
                 }
                 mCamera.setDisplayOrientation(90);
-
-                mCamera.setParameters(params);
+                mCamera.setParameters(mParameters);
 
                 postCallbackBuffer();
             } catch (Exception e) {
@@ -1143,9 +1206,13 @@ public class CameraManager {
         private int mTextureCoordHandle;
         private int mTransformHandle;
         private int mWidth;
+        private int mNaturalWidth;
         private int mHeight;
-        private float mRatio = 4.0f/3.0f;
+        private int mNaturalHeight;
+        private float mNaturalRatio;
+        private float mRatio;
         private float mUpdateRatioTo = -1;
+        private Object fSync = new Object();
 
         // Number of coordinates per vertex in this array
         static final int COORDS_PER_VERTEX = 2;
@@ -1159,11 +1226,25 @@ public class CameraManager {
             mTransformMatrix = new float[16];
         }
 
-        public void updateRatio(float ratio) {
-            mUpdateRatioTo = ratio;
+        public void updateRatio(int width, int height) {
+            synchronized(fSync){
+                mUpdateRatioTo = 1;
+                                    
+                float ratio = (float) width/(float) height;
+
+                if (ratio != mNaturalRatio){
+                    float widthRatio = (float) mNaturalWidth/(float) width;
+                    float heightRatio = (float) mNaturalHeight/(float) height;
+                    mRatio = widthRatio / heightRatio;
+                } else {
+                    mRatio = 1;
+                }
+                Log.d(TAG, "updateRatio " + width+"x"+height + " mRatio="+mRatio);
+            }
         }
 
         public void onSurfaceCreated(GL10 unused, EGLConfig config) {
+            Log.d(TAG, "onSurfaceCreated " + mWidth+"x"+mHeight + "r="+mNaturalRatio);
             mTexture = createTexture();
             mSurface = new SurfaceTexture(mTexture);
             GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -1221,26 +1302,41 @@ public class CameraManager {
         }
 
         public void onDrawFrame(GL10 unused) {
-            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+            synchronized(fSync){
+                GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-            if (mUpdateRatioTo > 0) {
-                GLES20.glViewport(0, 0, (int) (mWidth*mRatio), mHeight);
-                mUpdateRatioTo = -1;
+                if (mUpdateRatioTo > 0) {
+                    Log.d(TAG, "onDrawFrame " + " mRatio="+mRatio);
+                    int deltaWidth = (int) Math.abs(mWidth - mWidth * mRatio);
+                    GLES20.glViewport(-deltaWidth / 2, 0,
+                            (int) (mWidth * mRatio + deltaWidth / 2.0f), mHeight);
+                    mUpdateRatioTo = -1;
+                }
+
+                if (mSurface != null) {
+                    mSurface.updateTexImage();
+                    mSurface.getTransformMatrix(mTransformMatrix);
+                    GLES20.glUniformMatrix4fv(mTransformHandle, 1, false, mTransformMatrix, 0);
+                }
+
+                GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 4);
             }
-
-            if (mSurface != null) {
-                mSurface.updateTexImage();
-                mSurface.getTransformMatrix(mTransformMatrix);
-                GLES20.glUniformMatrix4fv(mTransformHandle, 1, false, mTransformMatrix, 0);
-            }
-
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 4);
         }
 
         public void onSurfaceChanged(GL10 unused, int width, int height) {
             mWidth = width;
             mHeight = height;
+            if (mWidth > mHeight){
+                mNaturalWidth = mWidth;
+                mNaturalHeight = mHeight;
+            } else {
+                mNaturalWidth = mHeight;
+                mNaturalHeight = mWidth;
+            }
+            mNaturalRatio = (float) mNaturalWidth/(float) mNaturalHeight;
+            mRatio = mNaturalRatio;
             GLES20.glViewport(0, 0, width, height);
+            Log.d(TAG, "onSurfaceChanged " + width+"x"+height + " mNaturalRatio="+mNaturalRatio);
         }
 
         public int loadShader(int type, String shaderCode) {
@@ -1259,6 +1355,16 @@ public class CameraManager {
             GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, texture[0]);
 
             return texture[0];
+        }
+    }
+    
+	// TODO: just added for debugging
+    public static void dumpParameter(Camera.Parameters parameters) {
+        String flattened = parameters.flatten();
+        StringTokenizer tokenizer = new StringTokenizer(flattened, ";");
+        Log.d(TAG, "Dump all camera parameters:");
+        while (tokenizer.hasMoreElements()) {
+            Log.d(TAG, tokenizer.nextToken());
         }
     }
 }

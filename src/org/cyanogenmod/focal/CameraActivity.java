@@ -77,6 +77,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     public final static int CAMERA_MODE_PANO      = 3;
     public final static int CAMERA_MODE_PICSPHERE = 4;
 
+    // whether or not to enable profiling
+    private final static boolean DEBUG_PROFILE = true;
+
     private static int mCameraMode = CAMERA_MODE_PHOTO;
 
     private CameraManager mCamManager;
@@ -121,6 +124,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private boolean mIsShutterLongClicked = false;
     private CameraPreviewListener mCamPreviewListener;
     private GLSurfaceView mGLSurfaceView;
+    private boolean mIsFocusing = false;
 
     private final static int SHOWCASE_INDEX_WELCOME_1 = 0;
     private final static int SHOWCASE_INDEX_WELCOME_2 = 1;
@@ -320,6 +324,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             }
         }
 
+        // Reset capture transformers on pause, if we are in
+        // PicSphere mode
+        if (mCameraMode == CAMERA_MODE_PICSPHERE) {
+            mCaptureTransformer = null;
+        }
+
         super.onPause();
     }
 
@@ -442,6 +452,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             resetPicSphere();
         } else if (mCameraMode == CAMERA_MODE_PANO) {
             resetPanorama();
+        } 
+        else if (mCameraMode == CAMERA_MODE_VIDEO){
+            // must release the camera
+            // to reset internals - at least on find5
+            mCamManager.pause();
+            mCamManager.resume();
         }
 
         mCameraMode = newMode;
@@ -492,7 +508,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         }
         mCaptureTransformer = transformer;
 
-        if (mCaptureTransformer != null) {
+        if (mCaptureTransformer != null && mSnapshotManager != null) {
             mSnapshotManager.addListener(transformer);
         }
     }
@@ -527,6 +543,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                         mHandler.postDelayed(this, 100);
                     }
                 } else {
+                    mCamManager.startParametersBatch();
+
                     // Close all widgets
                     mWidgetRenderer.closeAllWidgets();
 
@@ -539,6 +557,8 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
                     // Set orientation
                     updateInterfaceOrientation();
+
+                    mCamManager.stopParametersBatch();
                 }
             }
         });
@@ -605,6 +625,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Profiler.getDefault().start("OnCameraReady");
                 Camera.Parameters params = mCamManager.getParameters();
 
                 if (params == null) {
@@ -627,7 +648,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     Log.e(TAG, "No preview size!! Something terribly wrong with camera!");
                     return;
                 }
-                mCamManager.setPreviewSize(sz.width, sz.height);
+                //mCamManager.setPreviewSize(sz.width, sz.height);
 
                 if (mIsCamSwitching) {
                     mCamManager.restartPreviewIfNeeded();
@@ -659,9 +680,12 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
                     }
                 }, 1500);
 
+                Profiler.getDefault().start("OnCameraReady-updateCapa");
                 updateCapabilities();
+                Profiler.getDefault().logProfile("OnCameraReady-updateCapa");
 
                 mSavePinger.stopSaving();
+                Profiler.getDefault().logProfile("OnCameraReady");
             }
         });
     }
@@ -812,7 +836,9 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
      * Turns off the panorama (mosaic) subsystem
      */
     public void resetPanorama() {
-        mMosaicProxy.tearDown();
+        if (mMosaicProxy != null) {
+            mMosaicProxy.tearDown();
+        }
         setGLRenderer(mCamManager.getRenderer());
     }
 
@@ -1113,6 +1139,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
     private class MainFocusListener implements FocusManager.FocusListener {
         @Override
         public void onFocusStart(final boolean smallAdjust) {
+            mIsFocusing = true;
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1123,6 +1150,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
         @Override
         public void onFocusReturns(final boolean smallAdjust, final boolean success) {
+            mIsFocusing = false;
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1285,6 +1313,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             // Adjust orientationCompensation for the native orientation of the device.
             Configuration config = getResources().getConfiguration();
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
+            // TODO ???
             Util.getDisplayRotation(CameraActivity.this);
 
             boolean nativeLandscape = false;
@@ -1451,16 +1480,18 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
 
             if (params == null) return false;
 
-            if (detector.getScaleFactor() > 1.0f) {
-                params.setZoom(Math.min(params.getZoom() + 1, params.getMaxZoom()));
-            } else if (detector.getScaleFactor() < 1.0f) {
-                params.setZoom(Math.max(params.getZoom() - 1, 0));
-            } else {
-                return false;
-            }
+            if (!mIsFocusing) {
+                if (detector.getScaleFactor() > 1.0f) {
+                    params.setZoom(Math.min(params.getZoom() + 1, params.getMaxZoom()));
+                } else if (detector.getScaleFactor() < 1.0f) {
+                    params.setZoom(Math.max(params.getZoom() - 1, 0));
+                } else {
+                    return false;
+                }
 
-            mHasPinchZoomed = true;
-            mCamManager.setParameters(params);
+                mHasPinchZoomed = true;
+                mCamManager.setParameters(params);
+            }
 
             return true;
         }

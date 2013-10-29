@@ -33,8 +33,10 @@ public class CameraApplication extends Application {
 
     private Thread.UncaughtExceptionHandler mExHandler = new Thread.UncaughtExceptionHandler() {
         public void uncaughtException(Thread thread, Throwable ex) {
-            Log.e(TAG, "Uncaught exception! Closing down camera safely firsthand");
-            mCamManager.forceCloseCamera();
+            if (mCamManager != null) {
+                Log.e(TAG, "Uncaught exception! Closing down camera safely firsthand");
+                mCamManager.forceCloseCamera();
+            }
 
             mDefaultExHandler.uncaughtException(thread, ex);
         }

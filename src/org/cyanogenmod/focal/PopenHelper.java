@@ -25,6 +25,7 @@ package org.cyanogenmod.focal;
  */
 public class PopenHelper {
     static {
+        System.loadLibrary("xmptoolkit");
         System.loadLibrary("popen_helper_jni");
     }
 

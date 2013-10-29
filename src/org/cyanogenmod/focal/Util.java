@@ -47,6 +47,7 @@ import android.view.animation.Animation;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -486,5 +487,19 @@ public class Util {
         }
 
         return output;
+    }
+
+    /**
+     * Older devices need to stop preview before taking a shot
+     * (example: galaxy S, galaxy S2, etc)
+     * @return true if the device is an old one
+     */
+    public static boolean deviceNeedsStopPreviewToShoot() {
+        String[] oldDevices = {"smdk4210", "aries"};
+
+        boolean needs = Arrays.asList(oldDevices).contains(Build.BOARD);
+
+        Log.e(TAG, "Device " + Build.BOARD + (needs ? " needs ": " doesn't need ") + "to stop preview");
+        return needs;
     }
 }
