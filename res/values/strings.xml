@@ -129,4 +129,7 @@
     <string name="iso_hint_400">400 ISO</string>
     <string name="iso_hint_800">800 ISO</string>
     <string name="iso_hint_1600">1600 ISO</string>
+    
+    <string name="widget_settings_ok">OK</string>
+    <string name="widget_settings_cancel">Cancel</string>
 </resources>
