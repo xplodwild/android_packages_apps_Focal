@@ -26,8 +26,6 @@ import android.media.CamcorderProfile;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.NumberPicker;
-import android.util.Log;
-import android.graphics.Point;
 
 import org.cyanogenmod.focal.CameraActivity;
 import org.cyanogenmod.focal.CameraCapabilities;
@@ -35,7 +33,6 @@ import org.cyanogenmod.focal.CameraManager;
 import fr.xplod.focal.R;
 import org.cyanogenmod.focal.SettingsStorage;
 import org.cyanogenmod.focal.SnapshotManager;
-import org.cyanogenmod.focal.Util;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -205,7 +202,6 @@ public class SettingsWidget extends WidgetBase {
                                     .getCurrentFacing(), "picture-size",
                                     ""+size.width+"x"+size.height);
                         } else {
-                            // TODO: should changing be possible for pic sphere???
                             SettingsStorage.storeCameraSetting(mContext,
                                     mCamManager.getCurrentFacing(), "picsphere-picture-size",
                                     ""+size.width+"x"+size.height);
@@ -238,7 +234,7 @@ public class SettingsWidget extends WidgetBase {
         mCapabilities = capabilities;
 
         CameraManager cam = context.getCamManager();
-        Log.d(TAG, "SettingsWidget -- start");
+
         getToggleButton().setHintText(R.string.widget_settings);
 
         if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PHOTO
@@ -269,12 +265,8 @@ public class SettingsWidget extends WidgetBase {
                         mCamManager.getCurrentFacing(), "picture-size", ""+mResolutions
                         .get(0).width+"x"+mResolutions.get(0).height);
             } else {
-                // TODO: moved from setCameraMode
-                Point picSphereSize = Util.findBestPicSpherePictureSize(
-                        mCamManager.getParameters().getSupportedPictureSizes(), true);
                 resolution = SettingsStorage.getCameraSetting(context,
-                        mCamManager.getCurrentFacing(), "picsphere-picture-size", 
-                        "" + picSphereSize.x + "x" + picSphereSize.y);
+                        mCamManager.getCurrentFacing(), "picsphere-picture-size", "640x480");
             }
             mCamManager.setPictureSize(resolution);
         } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_VIDEO) {
@@ -316,13 +308,8 @@ public class SettingsWidget extends WidgetBase {
             String resolution = SettingsStorage.getCameraSetting(context,
                         mCamManager.getCurrentFacing(), "video-size", mVideoResolutions.get(0));
             applyVideoResolution(resolution);
-        } else if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PANO) {
-            // TODO: Apply special settings for panorama mode
-            // use the same "workflow" as for other modes
-            // only the SettingsWidget will set the correct preview
-            mCamManager.initializePanoramaMode();
         }
-        
+
         mResolutionButton = new WidgetOptionButton(
                 R.drawable.ic_widget_settings_resolution, context);
         mResolutionButton.setOnClickListener(mResolutionClickListener);
@@ -398,7 +385,6 @@ public class SettingsWidget extends WidgetBase {
             }
         });
         addViewToContainer(mToggleWidgetsButton);
-        Log.d(TAG, "SettingsWidget -- stop");
     }
 
     @Override

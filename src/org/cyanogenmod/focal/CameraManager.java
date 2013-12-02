@@ -19,6 +19,7 @@
 
 package org.cyanogenmod.focal;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -73,15 +74,15 @@ public class CameraManager {
     private Camera mCamera;
     private boolean mCameraReady;
     private int mCurrentFacing;
+    private Point mTargetSize;
     private AutoFocusMoveCallback mAutoFocusMoveCallback;
     private Camera.Parameters mParameters;
     private int mOrientation;
-    private int mVideoRotation;
     private MediaRecorder mMediaRecorder;
     private PreviewPauseListener mPreviewPauseListener;
     private CameraReadyListener mCameraReadyListener;
     private Handler mHandler;
-    private CameraActivity mContext;
+    private Activity mContext;
     private boolean mIsModeSwitching;
     private List<NameValuePair> mPendingParameters;
     private boolean mIsResuming;
@@ -89,7 +90,6 @@ public class CameraManager {
     private boolean mIsRecordingHint;
     private boolean mIsPreviewStarted;
     private boolean mParametersBatch;
-    private Point mPreviewSize;
 
     public interface PreviewPauseListener {
         /**
@@ -167,7 +167,7 @@ public class CameraManager {
     private ParametersThread mParametersThread = null;
     final Object mParametersSync = new Object();
 
-    public CameraManager(CameraActivity context) {
+    public CameraManager(Activity context) {
         mPreview = new CameraPreview();
         mMediaRecorder = new MediaRecorder();
         mCameraReady = true;
@@ -250,7 +250,7 @@ public class CameraManager {
                 }
 
                 // Update the preview surface holder with the new opened camera
-                mPreview.notifyCameraChanged(true);
+                mPreview.notifyCameraChanged(false);
 
                 if (mCameraReadyListener != null) {
                     mCameraReadyListener.onCameraReady();
@@ -386,7 +386,7 @@ public class CameraManager {
     }
     
     public void setVideoSize(int width, int height){
-        Log.d(TAG, "setVideoSize " + width + "x" + height);
+        Log.v(TAG, "setVideoSize " + width + "x" + height);
         Camera.Parameters params = getParameters();
         params.set("video-size", "" + width +"x" + height);
         // TODO: maybe need to set picture-size here too for
@@ -401,6 +401,7 @@ public class CameraManager {
             preferred = sizes.get(0);
         }
         
+        Camera.Size optimalPreview = null;
         int product = preferred.width * preferred.height;
         Iterator<Camera.Size> it = sizes.iterator();
         // Remove the preview sizes that are not preferred.
@@ -408,43 +409,55 @@ public class CameraManager {
             Camera.Size size = it.next();
             if (size.width * size.height > product) {
                 it.remove();
+                continue;   
+            }
+            // TODO: workaround for now to choose same size then video
+            if (size.width == width && size.height == height){
+                optimalPreview = size;
+                break;
             }
         }
-        
-        Camera.Size optimalPreview = Util.getOptimalPreviewSize(mContext, sizes,
+
+        if (optimalPreview == null){
+            // TODO: support of preview size different to video size
+            // right now this is crashing e.g. oppo has an preferred
+            // video preview of 1920x1080
+            optimalPreview = Util.getOptimalPreviewSize((Activity) mContext, sizes,
                         (double) width / height);
+        }
         setPreviewSize(optimalPreview.width, optimalPreview.height);
     }
     
     public void setPreviewSize(int width, int height) {
-        if (mCamera != null) {
-        
-            Point sz = new Point(width, height);
-            /*if (sz.equals(mPreviewSize)){
-                // must be done always
-                mPreview.notifyPreviewSize(mPreviewSize.x, mPreviewSize.y);
-                return;
-            }*/
-            mPreviewSize = sz;
-            
-            mPreview.notifyPreviewSize(mPreviewSize.x, mPreviewSize.y);
+        mTargetSize = new Point(width, height);
 
+        if (mCamera != null) {
             Camera.Parameters params = getParameters();
             params.setPreviewSize(width, height);
 
             Log.v(TAG, "Preview size is " + width + "x" + height);
 
-            synchronized (mParametersSync) {
-                Log.d(TAG, "setPreviewSize - start");
-                if (mPreviewPauseListener != null) {
-                    mPreviewPauseListener.onPreviewPause();
-                }
+            if (!mIsModeSwitching) {
+                synchronized (mParametersSync) {
+                    try {
+                        safeStopPreview();
+                        mParameters = params;
+                        mCamera.setParameters(mParameters);
+                        // TODO: preview aspect ratio is wrong in video mode
+                        mPreview.notifyPreviewSize(width, height);
 
-                mParameters = params;
-                mPreview.restartPreview();
-                
-                if (mPreviewPauseListener != null) {
-                    mPreviewPauseListener.onPreviewResume();
+                        // TODO: why dont restart preview here?
+                        // setPreviewSize is called on video mode switching too
+                        //if (mIsResuming) {
+                            updateDisplayOrientation();
+                            safeStartPreview();
+                            //mIsResuming = false;
+                        //}
+
+                        mPreview.setPauseCopyFrame(false);
+                    } catch (RuntimeException ex) {
+                        Log.e(TAG, "Unable to set Preview Size", ex);
+                    }
                 }
 
                 Log.d(TAG, "setPreviewSize - stop");
@@ -597,19 +610,14 @@ public class CameraManager {
         int width = Integer.parseInt(splat[0]);
         int height = Integer.parseInt(splat[1]);
 
-        Log.d(TAG, "setPictureSize " + width + "x" + height);
+        Log.v(TAG, "setPictureSize " + width + "x" + height);
         Camera.Parameters params = getParameters();
         params.setPictureSize(width, height);
         
         // set optimal preview - needs preview restart
-        if (CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PICSPHERE || 
-                CameraActivity.getCameraMode() == CameraActivity.CAMERA_MODE_PANO) {
-            setPreviewSize(640, 480);
-        } else {
-            Camera.Size optimalPreview = Util.getOptimalPreviewSize(mContext, params.getSupportedPreviewSizes(),
-                    ((float) width / (float) height));
-            setPreviewSize(optimalPreview.width, optimalPreview.height);
-        }
+        Camera.Size optimalPreview = Util.getOptimalPreviewSize(mContext, params.getSupportedPreviewSizes(),
+            ((float) width / (float) height));
+        setPreviewSize(optimalPreview.width, optimalPreview.height);
     }
 
     /**
@@ -661,7 +669,6 @@ public class CameraManager {
                 - Storage.LOW_STORAGE_THRESHOLD;
         mMediaRecorder.setMaxFileSize(maxFileSize);
         mMediaRecorder.setMaxDuration(0); // infinite
-        mMediaRecorder.setOrientationHint(mVideoRotation);
 
         try {
             mMediaRecorder.prepare();
@@ -719,15 +726,13 @@ public class CameraManager {
                 new android.hardware.Camera.CameraInfo();
         Camera.getCameraInfo(mCurrentFacing, info);
         //orientation = (360 - orientation + 45) / 90 * 90;
-        
-        // mVideoRotation is needed for MediaRecorder!
-        // we dont want the +90 for that
+        int rotation = 0;
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            mVideoRotation = (info.orientation - (mOrientation - 90) + 360) % 360;
+            rotation = (info.orientation - orientation + 360) % 360;
         } else {  // back-facing camera
-            mVideoRotation = (info.orientation + (mOrientation - 90)) % 360;
+            rotation = (info.orientation + orientation) % 360;
         }
-        Log.d(TAG, "mVideoRotation = " + mVideoRotation);
+
         //setParameterAsync("rotation", Integer.toString(rotation));
     }
 
@@ -752,6 +757,10 @@ public class CameraManager {
     }
 
     public void setCameraMode(final int mode) {
+        if (mPreviewPauseListener != null) {
+            mPreviewPauseListener.onPreviewPause();
+        }
+
         // Unlock any exposure/stab lock that was caused by
         // swiping the ring
         setLockSetup(false);
@@ -760,6 +769,7 @@ public class CameraManager {
             public void run() {
                 synchronized (mParametersSync) {
                     Log.d(TAG, "setCameraMode -- start "  + mode);
+                    mIsModeSwitching = true;
                     Camera.Parameters params = getParameters();
 
                     if (params == null) {
@@ -769,29 +779,45 @@ public class CameraManager {
                         return;
                     }
 
-                    // TODO: shouldnt it be done here?
-                    mIsModeSwitching = true;
+                    boolean shouldStartPreview = false;
 
                     if (mode == CameraActivity.CAMERA_MODE_VIDEO) {
                         if (!mIsRecordingHint) {
                             params.setRecordingHint(true);
                             mIsRecordingHint = true;
+                            safeStopPreview();
+                            shouldStartPreview = true;
                         }
                     } else {
                         if (mIsRecordingHint) {
                             params.setRecordingHint(false);
                             mIsRecordingHint = false;
+                            safeStopPreview();
+                            shouldStartPreview = true;
                         }
                     }
 
-                    if (mode != CameraActivity.CAMERA_MODE_PANO) {
+                    if (mode == CameraActivity.CAMERA_MODE_PANO) {
+                        // Apply special settings for panorama mode
+                        initializePanoramaMode();
+                    } else {
                         // Make sure the Infinity mode from panorama is gone
                         params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
                     }
 
                     if (mode == CameraActivity.CAMERA_MODE_PICSPHERE) {
+                        // If we are in PicSphere mode, we look for a correct 4:3 resolution. We
+                        // default the preview size to 640x480 however, as we don't need anything
+                        // bigger than that. We prefer to have a smaller resolution in case our
+                        // recommended resolution isn't available, as it will be faster to render.
+                        Point size = Util.findBestPicSpherePictureSize(params.getSupportedPictureSizes(), true);
+                        params.setPictureSize(size.x, size.y);
+                        params.setPreviewSize(640, 480);
+
                         // Set focus mode to infinity
                         setInfinityFocus(params);
+                    } else {
+                        setPreviewSize(mTargetSize.x, mTargetSize.y);
                     }
 
                     try {
@@ -801,10 +827,18 @@ public class CameraManager {
                     }
                     mParameters = mCamera.getParameters();
 
-                    Log.d(TAG, "setCameraMode -- end");
+                    if (shouldStartPreview) {
+                        updateDisplayOrientation();
+                        safeStartPreview();
+                    }
                 }
 
+                mPreview.setPauseCopyFrame(false);
                 mIsModeSwitching = false;
+
+                if (mPreviewPauseListener != null) {
+                    mPreviewPauseListener.onPreviewResume();
+                }
             }
         }.start();
     }
@@ -831,18 +865,18 @@ public class CameraManager {
     /**
      * Initializes the Panorama (mosaic) mode
      */
-    public void initializePanoramaMode() {
+    private void initializePanoramaMode() {
         Camera.Parameters parameters = getParameters();
 
-        // TODO
-        /*int pixels = mContext.getResources().getInteger(R.integer.config_panoramaDefaultWidth)
+        int pixels = mContext.getResources().getInteger(R.integer.config_panoramaDefaultWidth)
                 * mContext.getResources().getInteger(R.integer.config_panoramaDefaultHeight);
 
         List<Camera.Size> supportedSizes = parameters.getSupportedPreviewSizes();
         Point previewSize = Util.findBestPanoPreviewSize(supportedSizes, false, false, pixels);
 
-        Log.d(TAG, "preview h = " + previewSize.y + " , w = " + previewSize.x);
-        parameters.setPreviewSize(previewSize.x, previewSize.y);*/
+        Log.v(TAG, "preview h = " + previewSize.y + " , w = " + previewSize.x);
+        parameters.setPreviewSize(previewSize.x, previewSize.y);
+        mTargetSize = previewSize;
 
         List<int[]> frameRates = parameters.getSupportedPreviewFpsRange();
         if (frameRates != null) {
@@ -857,7 +891,6 @@ public class CameraManager {
 
         parameters.setRecordingHint(false);
         mParameters = parameters;
-        setPictureSize("640x480");
     }
 
     private void setInfinityFocus(Camera.Parameters parameters) {
@@ -1210,7 +1243,7 @@ public class CameraManager {
         private int mHeight;
         private int mNaturalHeight;
         private float mNaturalRatio;
-        private float mRatio;
+        private float mRatio = 4.0f/3.0f;
         private float mUpdateRatioTo = -1;
         private Object fSync = new Object();
 
@@ -1244,7 +1277,6 @@ public class CameraManager {
         }
 
         public void onSurfaceCreated(GL10 unused, EGLConfig config) {
-            Log.d(TAG, "onSurfaceCreated " + mWidth+"x"+mHeight + "r="+mNaturalRatio);
             mTexture = createTexture();
             mSurface = new SurfaceTexture(mTexture);
             GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -1313,11 +1345,17 @@ public class CameraManager {
                     mUpdateRatioTo = -1;
                 }
 
-                if (mSurface != null) {
-                    mSurface.updateTexImage();
-                    mSurface.getTransformMatrix(mTransformMatrix);
-                    GLES20.glUniformMatrix4fv(mTransformHandle, 1, false, mTransformMatrix, 0);
-                }
+            if (mSurface != null) {
+                mSurface.updateTexImage();
+                mSurface.getTransformMatrix(mTransformMatrix);
+                GLES20.glUniformMatrix4fv(mTransformHandle, 1, false, mTransformMatrix, 0);
+            }
+
+            if (mUpdateRatioTo > 0) {
+                // TODO mUpdateRatioTo would be the new ratio but still mRatio is used here
+                GLES20.glViewport(0, 0, (int) (mWidth*mRatio), mHeight);
+                mUpdateRatioTo = -1;
+            }
 
                 GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 4);
             }
@@ -1326,6 +1364,7 @@ public class CameraManager {
         public void onSurfaceChanged(GL10 unused, int width, int height) {
             mWidth = width;
             mHeight = height;
+
             if (mWidth > mHeight){
                 mNaturalWidth = mWidth;
                 mNaturalHeight = mHeight;

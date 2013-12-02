@@ -33,6 +33,7 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
+import android.renderscript.RSIllegalArgumentException;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.renderscript.Type;
@@ -256,14 +257,18 @@ public class Util {
 
             Allocation allocationOut = Allocation.createTyped(rs, tb.create());
             Allocation allocationIn = Allocation.createSized(rs, Element.U8(rs),
-                    (height * width) + ((height / 2) * (width / 2) * 2));
+                    (height * width) + ((height) * (width) * 2));
 
             script.setInput(allocationIn);
 
             bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            allocationIn.copyFrom(yuv420sp);
-            script.forEach(allocationOut);
-            allocationOut.copyTo(bmp);
+            try {
+                allocationIn.copyFrom(yuv420sp);
+                script.forEach(allocationOut);
+                allocationOut.copyTo(bmp);
+            } catch (RSIllegalArgumentException ex) {
+                Log.e(TAG, "Cannot copy YUV420SP data", ex);
+            }
         } else {
             final int frameSize = width * height;
             int[] rgb = new int[frameSize];
