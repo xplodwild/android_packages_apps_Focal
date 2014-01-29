@@ -40,6 +40,7 @@ import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -1266,7 +1267,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
             mTimerTv = (TextView) findViewById(R.id.recording_timer_text);
             mRecordingStartTimestamp = System.currentTimeMillis();
             mIsRecording = true;
-
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1279,7 +1280,7 @@ public class CameraActivity extends Activity implements CameraManager.CameraRead
         @Override
         public void onVideoRecordingStop() {
             mIsRecording = false;
-
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
