@@ -1184,7 +1184,8 @@ public class CameraManager {
                 Resources res = mContext.getResources();
 
                 if (res != null) {
-                    if (res.getBoolean(R.bool.config_qualcommZslCameraMode)) {
+                    if (res.getBoolean(R.bool.config_qualcommZslCameraMode) &&
+                            !Util.deviceNeedsDisableZSL()) {
                         if (res.getBoolean(R.bool.config_useSamsungZSL)) {
                             //mCamera.sendRawCommand(1508, 0, 0);
                         }

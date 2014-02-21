@@ -507,4 +507,18 @@ public class Util {
         Log.e(TAG, "Device " + Build.BOARD + (needs ? " needs ": " doesn't need ") + "to stop preview");
         return needs;
     }
+
+    /**
+     * Disable ZSL mode on certain Qualcomm models
+     * @return true if the device needs ZSL disabled
+     */
+    public static boolean deviceNeedsDisableZSL() {
+        String[] noZSL = {"apexqtmo", "expressatt", "aegis2vzw"};
+
+        boolean needs = Arrays.asList(noZSL).contains(Build.PRODUCT);
+
+        Log.e(TAG, "Device " + Build.PRODUCT + (needs ? " needs ": " doesn't need ") + "to disable ZSL");
+        return needs;
+    }
+
 }
