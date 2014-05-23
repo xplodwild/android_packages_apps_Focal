@@ -1118,7 +1118,7 @@ public class CameraManager {
         }
 
         public void notifyPreviewSize(int width, int height) {
-            mLastFrameBytes = new byte[2048000];
+            mLastFrameBytes = new byte[2332800];
 
             // Update preview aspect ratio
             mRenderer.updateRatio(width, height);
