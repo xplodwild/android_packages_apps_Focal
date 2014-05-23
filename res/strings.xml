@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Focal相機</string>
+    <string name="launch_app">啟動Focal 相機</string>
+    <string name="shutter_button">快門按鈕</string>
+    <string name="cannot_connect_hal">無法連接到相機</string>
+    <string name="recording">正在錄影</string>
+    <string name="double_tap_to_snapshot">連按兩下拍照</string>
+    <string name="video_res_1080p">超高清 (1080p)</string>
+    <string name="video_res_720p">高清 (720p)</string>
+    <string name="video_res_480p">標準 (480p)</string>
+    <string name="video_res_mms">多媒體簡訊 (288p)</string>
+    <string name="ok">確定</string>
+    <string name="no_gles20_support">您的設備不支持 GLES2</string>
+    <string name="no_gyroscope">您的設備没有陀螺儀</string>
+    <string name="ps_long_press_to_stop">長按快門按鈕完成掃描.</string>
+    <string name="disabled">已禁用</string>
+    <string name="enabled">已啟用</string>
+    <string name="no_video_player">未找到播放器, 無法播放影片</string>
+    <string name="fullscreen_shutter_info">點擊任意處拍照</string>
+    <string name="please_wait">請稍後…</string>
+    <string name="retouch">修整</string>
+    <string name="open_in_gallery">GALLERY</string>
+    <string name="mode_photo">下載區</string>
+    <string name="mode_video">影片</string>
+    <string name="mode_picsphere">球影照片</string>
+    <string name="mode_panorama">全景拍照</string>
+    <string name="mode_switchcam">自拍模式</string>
+    <string name="widget_burstmode_count_shots">連拍%d 張</string>
+    <string name="widget_burstmode_off">禁用連拍模式</string>
+    <string name="widget_burstmode_infinite">無限連拍</string>
+    <string name="widget_hdr_aebracket">自動包圍曝光</string>
+    <string name="widget_settings_choose_widgets">選擇側邊欄小工具</string>
+    <string name="widget_settings_choose_widgets_button">選擇小工具</string>
+    <string name="widget_settings_picture_size">圖片大小</string>
+    <string name="widget_settings_exposure_ring">顯示曝光環</string>
+    <string name="widget_settings_autoenhance">自動增強</string>
+    <string name="widget_settings_ruleofthirds">三等分</string>
+    <string name="widget_autoexposure">曝光測量模式</string>
+    <string name="widget_burstmode">連拍模式</string>
+    <string name="widget_effect">色彩效果</string>
+    <string name="widget_enhancements">色彩增強</string>
+    <string name="widget_exposure_compensation">曝光補償</string>
+    <string name="widget_flash">閃光</string>
+    <string name="widget_hdr">超高動態範圍</string>
+    <string name="widget_iso">ISO 感光度</string>
+    <string name="widget_scenemode">場景模式</string>
+    <string name="widget_settings">設定</string>
+    <string name="widget_shutter_speed">快門速度</string>
+    <string name="widget_skintone">增強膚色</string>
+    <string name="widget_softwarehdr">超高動態範圍</string>
+    <string name="widget_timermode">計時器模式</string>
+    <string name="widget_videofr">影片更新率</string>
+    <string name="widget_videohdr">影片高動態範圍</string>
+    <string name="widget_whitebalance">白平衡</string>
+    <string name="pano_file_name_format">"'PANO'_yyyyMMdd_HHmmss"</string>
+    <string name="pano_panorama_rendering_failed">"無法呈現全景.
+請嘗試拍短點."</string>
+    <string name="pano_panorama_rendering">正在處理全景…</string>
+    <string name="picsphere_undo_button">還原</string>
+    <string name="picsphere_start_hint">使用360全景拍照</string>
+    <string name="picsphere_already_rendering">當前360度全景拍照即將呈現</string>
+    <string name="picsphere_rendering_progress">正在處理... (%d %%)</string>
+    <string name="picsphere_toast_background_render">正在處理…</string>
+    <string name="picsphere_notif_title">正在處理360度全景…</string>
+    <string name="picsphere_failed">360度全景處理失敗</string>
+    <string name="picsphere_failed_details">確保照片只有其邊缘重疊.</string>
+    <string name="picsphere_need_two_pics">至少需要2張圖片.</string>
+    <string name="picsphere_step_preparing">正在準備…</string>
+    <string name="picsphere_step_ptogen">正在配對圖片…</string>
+    <string name="picsphere_step_ptovar">寫作相機的方向…</string>
+    <string name="picsphere_step_cpfind">尋找控制點…</string>
+    <string name="picsphere_step_autooptimiser">對齊圖片…</string>
+    <string name="picsphere_step_ptclean">清洗點…</string>
+    <string name="picsphere_step_panomodify">裁剪空白區域…</string>
+    <string name="picsphere_step_nona">拼接圖片…</string>
+    <string name="picsphere_step_enblend">混合圖片…</string>
+    <string name="software_hdr_notif_title">計算HDR圖片…</string>
+    <string name="software_hdr_failed">HDR渲染失敗</string>
+    <string name="software_hdr_failed_details">畫面來源一直保持.</string>
+    <string name="showcase_welcome_1_title">歡迎使用!</string>
+    <string name="showcase_welcome_1_body">"選項都在側邊欄裡,
+輕輕滑動馬上出現."</string>
+    <string name="showcase_welcome_2_title">快門按鈕</string>
+    <string name="showcase_welcome_2_body">"T點擊快門按鈕進行拍照.
+S滑動可以選擇其他的拍攝模式."</string>
+    <string name="showcase_panorama_title">全景模式</string>
+    <string name="showcase_panorama_body">"點擊快門開始全景模式,
+然後水平移動鏡頭来拍攝你想要的場景.
+O完成後, 再次點擊快門即可."</string>
+    <string name="showcase_picsphere_title">360度全景模式</string>
+    <string name="showcase_picsphere_body">"對準您喜歡的地方拍攝第1張照片,
+然後輕按快門，拍攝每張照片
+的球體。藍色點是點
+你可以按照参考.
+長按一次快門就大功告成了."</string>
+    <string name="iso_hint_auto">自動ISO</string>
+    <string name="iso_hint_hjr">防手震ISO</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
+</resources>
