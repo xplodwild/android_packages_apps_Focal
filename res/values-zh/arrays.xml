@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="widget_flash_hints">
+        <item>自动</item>
+        <item>禁用</item>
+        <item>启用</item>
+        <item>触摸</item>
+        <item>消除红眼</item>
+    </string-array>
+    <string-array name="widget_effects_hints">
+        <item>禁用</item>
+        <item>黑白</item>
+        <item>负片</item>
+        <item>曝光</item>
+        <item>褐色</item>
+        <item>海报</item>
+        <item>黑板</item>
+        <item>白板</item>
+        <item>浅绿</item>
+        <item>拷花</item>
+        <item>素描</item>
+        <item>氖灯</item>
+    </string-array>
+    <string-array name="widget_scenemode_hints">
+        <item>自动</item>
+        <item>减少运动模糊</item>
+        <item>增强现实</item>
+        <item>最佳拍摄</item>
+        <item>小孩</item>
+        <item>背光</item>
+        <item>人像背光</item>
+        <item>条码</item>
+        <item>海滩</item>
+        <item>烛火</item>
+        <item>深色</item>
+        <item>菜</item>
+        <item>文档</item>
+        <item>烟花</item>
+        <item>花</item>
+        <item>掌上黄昏</item>
+        <item>HDR</item>
+        <item>高灵敏度</item>
+        <item>横向</item>
+        <item>夜间</item>
+        <item>夜间人像</item>
+        <item>夜间人像</item>
+        <item>聚会</item>
+        <item>宠物</item>
+        <item>肖像</item>
+        <item>雪</item>
+        <item>柔和肌肤</item>
+        <item>运动</item>
+        <item>聚光灯</item>
+        <item>稳定照片</item>
+        <item>日落</item>
+        <item>扫描线迹</item>
+        <item>剧院</item>
+    </string-array>
+    <string-array name="widget_whitebalance_hints">
+        <item>自动</item>
+        <item>多云</item>
+        <item>白炽灯</item>
+        <item>荧光灯</item>
+        <item>阳光</item>
+        <item>阴天</item>
+    </string-array>
+    <string-array name="widget_autoexposure_hints">
+        <item>帧平均</item>
+        <item>侧重中心</item>
+        <item>点测光</item>
+    </string-array>
+</resources>
