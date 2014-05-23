@@ -458,7 +458,7 @@ public class SettingsWidget extends WidgetBase {
                     }
                 })
                 // Set the action buttons
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setPositiveButton(mContext.getString(R.string.widget_settings_ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // Store the widget visibility status in SharedPreferences, using the
@@ -473,7 +473,7 @@ public class SettingsWidget extends WidgetBase {
                         }
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(mContext.getString(R.string.widget_settings_cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // Restore visibility status from storage
