@@ -29,7 +29,7 @@
         <item>Automatikus</item>
         <item>Letiltva</item>
         <item>Engedélyezve</item>
-        <item>Vaku</item>
+        <item>Zseblámpa</item>
         <item>Vörösszem csökkentés</item>
     </string-array>
     <string-array name="widget_effects_hints">
