@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="hardware_hdr_keys">
+        <item>ae-bracket-hdr</item>
+    </string-array>
+    <string-array name="transformer_timer_voice_words">
+        <item>cid</item>
+        <item>civ</item>
+        <item>whisky</item>
+        <item>whiskey</item>
+        <item>cheese</item>
+        <item>ok cid, take a picture</item>
+    </string-array>
+    <string-array name="widget_flash_values">
+        <item>auto</item>
+        <item>off</item>
+        <item>on</item>
+        <item>torch</item>
+        <item>red-eye</item>
+    </string-array>
+    <array name="widget_flash_icons">
+        <item>@drawable/ic_widget_flash_auto</item>
+        <item>@drawable/ic_widget_flash_off</item>
+        <item>@drawable/ic_widget_flash_on</item>
+        <item>@drawable/ic_widget_flash_torch</item>
+        <item>@drawable/ic_widget_flash_redeye</item>
+    </array>
+    <string-array name="widget_flash_hints">
+        <item>自動</item>
+        <item>禁用</item>
+        <item>啟用</item>
+        <item>觸摸</item>
+        <item>消除紅眼</item>
+    </string-array>
+    <string-array name="widget_effects_values">
+        <item>none</item>
+        <item>mono</item>
+        <item>negative</item>
+        <item>solarize</item>
+        <item>sepia</item>
+        <item>posterize</item>
+        <item>blackboard</item>
+        <item>whiteboard</item>
+        <item>aqua</item>
+        <item>emboss</item>
+        <item>sketch</item>
+        <item>neon</item>
+    </string-array>
+    <array name="widget_effects_icons">
+        <item>@drawable/ic_widget_effect_none</item>
+        <item>@drawable/ic_widget_effect_mono</item>
+        <item>@drawable/ic_widget_effect_negative</item>
+        <item>@drawable/ic_widget_effect_solarize</item>
+        <item>@drawable/ic_widget_effect_sepia</item>
+        <item>@drawable/ic_widget_effect_posterize</item>
+        <item>@drawable/ic_widget_effect_blackboard</item>
+        <item>@drawable/ic_widget_effect_whiteboard</item>
+        <item>@drawable/ic_widget_effect_aqua</item>
+        <item>@drawable/ic_widget_effect_emboss</item>
+        <item>@drawable/ic_widget_effect_sketch</item>
+        <item>@drawable/ic_widget_effect_neon</item>
+    </array>
+    <string-array name="widget_effects_hints">
+        <item>禁用</item>
+        <item>黑白</item>
+        <item>負片</item>
+        <item>曝光</item>
+        <item>褐色</item>
+        <item>海報</item>
+        <item>黑板</item>
+        <item>白板</item>
+        <item>淺綠</item>
+        <item>拷花</item>
+        <item>素描</item>
+        <item>霓虹燈</item>
+    </string-array>
+    <string-array name="widget_iso_values">
+        <item>auto</item>
+        <item>ISO_HJR</item>
+        <item>ISO100</item>
+        <item>ISO200</item>
+        <item>ISO400</item>
+        <item>ISO800</item>
+        <item>ISO1600</item>
+    </string-array>
+    <array name="widget_iso_icons">
+        <item>@drawable/ic_widget_iso_auto</item>
+        <item>@drawable/ic_widget_iso_hjr</item>
+        <item>@drawable/ic_widget_iso_100</item>
+        <item>@drawable/ic_widget_iso_200</item>
+        <item>@drawable/ic_widget_iso_400</item>
+        <item>@drawable/ic_widget_iso_800</item>
+        <item>@drawable/ic_widget_iso_1600</item>
+    </array>
+    <string-array name="widget_iso_hints">
+        <item>@string/iso_hint_auto</item>
+        <item>@string/iso_hint_hjr</item>
+        <item>@string/iso_hint_100</item>
+        <item>@string/iso_hint_200</item>
+        <item>@string/iso_hint_400</item>
+        <item>@string/iso_hint_800</item>
+        <item>@string/iso_hint_1600</item>
+    </string-array>
+    <string-array name="widget_scenemode_values">
+        <item>auto</item>
+        <item>anti-motion-blur</item>
+        <item>AR</item>
+        <item>asd</item>
+        <item>baby</item>
+        <item>backlight</item>
+        <item>backlight-portrait</item>
+        <item>barcode</item>
+        <item>beach</item>
+        <item>candlelight</item>
+        <item>dark</item>
+        <item>dish</item>
+        <item>document</item>
+        <item>fireworks</item>
+        <item>flowers</item>
+        <item>handheld-twilight</item>
+        <item>hdr</item>
+        <item>high-sensitivity</item>
+        <item>landscape</item>
+        <item>night</item>
+        <item>nightportrait</item>
+        <item>night-portrait</item>
+        <item>party</item>
+        <item>pet</item>
+        <item>portrait</item>
+        <item>snow</item>
+        <item>soft-skin</item>
+        <item>sports</item>
+        <item>spot-light</item>
+        <item>steadyphoto</item>
+        <item>sunset</item>
+        <item>sweep-stitch</item>
+        <item>theatre</item>
+    </string-array>
+    <array name="widget_scenemode_icons">
+        <item>@drawable/ic_widget_scenemode_auto</item>
+        <item>@drawable/ic_widget_scenemode_antimotionblur</item>
+        <item>@drawable/ic_widget_scenemode_ar</item>
+        <item>@drawable/ic_widget_scenemode_asd</item>
+        <item>@drawable/ic_widget_scenemode_baby</item>
+        <item>@drawable/ic_widget_scenemode_backlight</item>
+        <item>@drawable/ic_widget_scenemode_backlightportrait</item>
+        <item>@drawable/ic_widget_scenemode_barcode</item>
+        <item>@drawable/ic_widget_scenemode_beach</item>
+        <item>@drawable/ic_widget_scenemode_candlelight</item>
+        <item>@drawable/ic_widget_scenemode_dark</item>
+        <item>@drawable/ic_widget_scenemode_dish</item>
+        <item>@drawable/ic_widget_scenemode_document</item>
+        <item>@drawable/ic_widget_scenemode_fireworks</item>
+        <item>@drawable/ic_widget_scenemode_flowers</item>
+        <item>@drawable/ic_widget_scenemode_handheld</item>
+        <item>@drawable/ic_widget_scenemode_hdr</item>
+        <item>@drawable/ic_widget_scenemode_highsensitivity</item>
+        <item>@drawable/ic_widget_scenemode_landscape</item>
+        <item>@drawable/ic_widget_scenemode_night</item>
+        <item>@drawable/ic_widget_scenemode_nightportrait</item>
+        <item>@drawable/ic_widget_scenemode_nightportrait</item>
+        <item>@drawable/ic_widget_scenemode_party</item>
+        <item>@drawable/ic_widget_scenemode_pet</item>
+        <item>@drawable/ic_widget_scenemode_portrait</item>
+        <item>@drawable/ic_widget_scenemode_snow</item>
+        <item>@drawable/ic_widget_scenemode_softskin</item>
+        <item>@drawable/ic_widget_scenemode_sports</item>
+        <item>@drawable/ic_widget_scenemode_spotlight</item>
+        <item>@drawable/ic_widget_scenemode_steadyphoto</item>
+        <item>@drawable/ic_widget_scenemode_sunset</item>
+        <item>@drawable/ic_widget_scenemode_sweepstitch</item>
+        <item>@drawable/ic_widget_scenemode_theatre</item>
+    </array>
+    <string-array name="widget_scenemode_hints">
+        <item>自動</item>
+        <item>減少運動模糊</item>
+        <item>增強現實</item>
+        <item>最佳拍攝</item>
+        <item>小孩</item>
+        <item>背光</item>
+        <item>人像背光</item>
+        <item>條碼</item>
+        <item>海灘</item>
+        <item>煙火</item>
+        <item>深色</item>
+        <item>菜</item>
+        <item>文件</item>
+        <item>煙火</item>
+        <item>花</item>
+        <item>掌上黄昏</item>
+        <item>HDR</item>
+        <item>高靈敏度</item>
+        <item>橫向</item>
+        <item>夜間</item>
+        <item>夜間人像</item>
+        <item>夜間人像</item>
+        <item>聚會</item>
+        <item>寵物</item>
+        <item>肖像</item>
+        <item>雪</item>
+        <item>柔化肌膚</item>
+        <item>運動</item>
+        <item>聚光燈</item>
+        <item>穩定照片</item>
+        <item>日落</item>
+        <item>掃描線跡</item>
+        <item>劇院</item>
+    </string-array>
+    <string-array name="widget_whitebalance_values">
+        <item>auto</item>
+        <item>cloudy</item>
+        <item>incandescent</item>
+        <item>fluorescent</item>
+        <item>daylight</item>
+        <item>cloudy-daylight</item>
+    </string-array>
+    <array name="widget_whitebalance_icons">
+        <item>@drawable/ic_widget_wb_auto</item>
+        <item>@drawable/ic_widget_wb_cloudy</item>
+        <item>@drawable/ic_widget_wb_incandescent</item>
+        <item>@drawable/ic_widget_wb_fluorescent</item>
+        <item>@drawable/ic_widget_wb_daylight</item>
+        <item>@drawable/ic_widget_wb_cloudy_daylight</item>
+    </array>
+    <string-array name="widget_whitebalance_hints">
+        <item>自動</item>
+        <item>多雲</item>
+        <item>白熾燈</item>
+        <item>螢光燈</item>
+        <item>陰光</item>
+        <item>陰天</item>
+    </string-array>
+    <string-array name="widget_autoexposure_values">
+        <item>frame-average</item>
+        <item>center-weighted</item>
+        <item>spot-metering</item>
+    </string-array>
+    <array name="widget_autoexposure_icons">
+        <item>@drawable/ic_widget_autoexposure_frameaverage</item>
+        <item>@drawable/ic_widget_autoexposure_centerweighted</item>
+        <item>@drawable/ic_widget_autoexposure_spotmetering</item>
+    </array>
+    <string-array name="widget_autoexposure_hints">
+        <item>畫面更新率</item>
+        <item>中心權重</item>
+        <item>中點測光</item>
+    </string-array>
+    <string-array name="widget_shutter_speed_display_values">
+        <item>Auto</item>
+        <item>1\"</item>
+        <item>1/2</item>
+        <item>1/4</item>
+        <item>1/8</item>
+        <item>1/16</item>
+        <item>1/32</item>
+        <item>1/100</item>
+        <item>1/125</item>
+        <item>1/250</item>
+        <item>1/500</item>
+        <item>1/1000</item>
+        <item>1/2000</item>
+        <item>1/3333</item>
+    </string-array>
+</resources>
