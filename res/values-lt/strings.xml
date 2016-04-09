@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+     MA  02110-1301, USA.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+        tools:locale="en">
+    <string name="app_name">Focal</string>
+    <string name="launch_app">Paleisti Focal</string>
+    <string name="shutter_button">Fotografavimo mygtukas</string>
+    <string name="cannot_connect_hal">Negalima pasiekti kameros</string>
+    <string name="recording">Įrašoma</string>
+    <string name="double_tap_to_snapshot">Spustelti du kartus, kad nufotografuoti </string>
+    <string name="video_res_1080p">Full HD (1080p)</string>
+    <string name="video_res_720p">HD (720p)</string>
+    <string name="video_res_480p">SD (480p)</string>
+    <string name="video_res_mms">MMS (288p)</string>
+    <string name="ok">Gerai</string>
+    <string name="no_gles20_support">Jūsų prietaisas nepalaiko GLES2</string>
+    <string name="no_gyroscope">Jūsų prietaisas neturi giroskopo</string>
+    <string name="ps_long_press_to_stop">Long-press the shutter button to\nfinish your sphere.</string>
+    <string name="disabled">Išjungta</string>
+    <string name="enabled">Įjungta</string>
+    <string name="no_video_player">Negalima paleisti vaizdo įrašo, nerastas vaizdo įrašų grotuvas</string>
+    <string name="fullscreen_shutter_info">Paspauskite bet kur, kad fotografuoti</string>
+    <string name="please_wait">Prašome palaukti\u2026</string>
+    <string name="retouch">Retušuoti</string>
+    <string name="open_in_gallery">Galerija</string>
+
+    <string name="mode_photo">Nuotrauka</string>
+    <string name="mode_video">Vaizdo įrašas</string>
+    <string name="mode_picsphere">Sferinis</string>
+    <string name="mode_panorama">Panoraminis</string>
+    <string name="mode_switchcam">Priekinis</string>
+
+    <!-- Widgets hints for non-arrayed widgets -->
+    <string name="widget_burstmode_count_shots">%d kadrų fotografavimas</string>
+    <string name="widget_burstmode_off">Išjungti daug kadrų rėžimą</string>
+    <string name="widget_burstmode_infinite">neriboti kadrai</string>
+
+    <string name="widget_hdr_aebracket">Automatinis serijinis fotografavimas</string>
+
+    <string name="widget_settings_choose_widgets">Pasirinkite valdiklius šoniniame skydelyje</string>
+    <string name="widget_settings_choose_widgets_button">Pasirinkti valdiklius</string>
+    <string name="widget_settings_picture_size">Nuotraukos dydis</string>
+    <string name="widget_settings_exposure_ring">Rodyti išlaikymo žiedą</string>
+    <string name="widget_settings_autoenhance">Automatinis pagerinimas</string>
+    <string name="widget_settings_ruleofthirds">Trijų taisyklė</string>
+
+    <string name="widget_autoexposure">Šviesos matas</string>
+    <string name="widget_burstmode">daugiakadris rėžimas</string>
+    <string name="widget_effect">Efektai</string>
+    <string name="widget_enhancements">Spalvų derinimas</string>
+    <string name="widget_exposure_compensation">Išlaikymas</string>
+    <string name="widget_flash">Žibintuvėlis</string>
+    <string name="widget_hdr">Smarkiai kintanti sritis</string>
+    <string name="widget_iso">ISO</string>
+    <string name="widget_scenemode">Veiksmo rėžimas</string>
+    <string name="widget_settings">Nustatymai</string>
+    <string name="widget_shutter_speed">Fotografavimo mygtuko greitis</string>
+    <string name="widget_skintone">Apvalkalo tono pagerinimas</string>
+    <string name="widget_softwarehdr">Labai kintanti sritis</string>
+    <string name="widget_timermode">Laikmačio rėžimas</string>
+    <string name="widget_videofr">Vaizdo įrašo kadrų dažnis</string>
+    <string name="widget_videohdr">Vaizdo įrašo smarkiai kintanti sritis</string>
+    <string name="widget_whitebalance">Baltos spalvos pusiausvyra</string>
+
+    <!-- Panorama mode -->
+    <!-- Filename prefix for panorama output -->
+    <string name="pano_file_name_format" translatable="false">"'PANO'_yyyyMMdd_HHmmss"</string>
+
+    <string name="pano_panorama_rendering_failed">Nepavyko pateikti panoraminio vaizdo.\nPabandykite trumpesnį.</string>
+    <string name="pano_panorama_rendering">Pateikiamas panoraminis vaizdas\u2026</string>
+
+    <!-- PicSphere status -->
+    <string name="picsphere_undo_button">Atgal</string>
+    <string name="picsphere_start_hint">Take a picture to start a sphere</string>
+    <string name="picsphere_already_rendering">Prašome palaukti dabartinio sferinio paveikslėlio pateikimo</string>
+    <string name="picsphere_rendering_progress">Pateikiama\u2026 (%d %%)</string>
+    <string name="picsphere_toast_background_render">Pateikimas pradėtas\u2026</string>
+    <string name="picsphere_notif_title">Pateikiamas sferinis paveikslėlis\u2026</string>
+    <string name="picsphere_failed">Sferinio paveikslėlio pateikimas nepavyko</string>
+    <string name="picsphere_failed_details">Make sure pictures only overlap on their edges.</string>
+    <string name="picsphere_need_two_pics">You need at least two pictures.</string>
+    <string name="picsphere_step_preparing">Paruošiama\u2026</string>
+    <string name="picsphere_step_ptogen">Generating metadata\u2026</string>
+    <string name="picsphere_step_ptovar">Writing camera orientation\u2026</string>
+    <string name="picsphere_step_cpfind">Finding control points\u2026</string>
+    <string name="picsphere_step_autooptimiser">Aligning images\u2026</string>
+    <string name="picsphere_step_ptclean">Cleaning points\u2026</string>
+    <string name="picsphere_step_panomodify">Cropping empty areas\u2026</string>
+    <string name="picsphere_step_nona">Stitching pictures\u2026</string>
+    <string name="picsphere_step_enblend">Blending pictures\u2026</string>
+
+    <!-- Software HDR status -->
+    <string name="software_hdr_notif_title">Computing HDR picture\u2026</string>
+    <string name="software_hdr_failed">HDR rendering failed</string>
+    <string name="software_hdr_failed_details">The source pictures have been kept.</string>
+
+    <!-- Showcase text -->
+    <string name="showcase_welcome_1_title">Sveiki!</string>
+    <string name="showcase_welcome_1_body">The options are in the sidebar,\njust slide it.</string>
+    <string name="showcase_welcome_2_title">fotografavimo mygtukas</string>
+    <string name="showcase_welcome_2_body">Tap the shutter button to take a picture.\nSlide it to access other capture modes.</string>
+    <string name="showcase_panorama_title">Panoraminis rėžimas</string>
+    <string name="showcase_panorama_body">Tap the shutter to start your panorama,\nthen pan what you want to capture.\nOnce done, tap the shutter button again.</string>
+    <string name="showcase_picsphere_title">Sferinio paveiklėlio rėžimas</string>
+    <string name="showcase_picsphere_body">Align your first picture where you like,\nthen tap the shutter to take each picture\nof the sphere. The blue dots are points\nof reference you can follow.\nLong-press the shutter once you\'re done.</string>
+
+    <!-- ISO Value Hints -->
+    <string name="iso_hint_auto">Automatic ISO</string>
+    <string name="iso_hint_hjr">Hands-Jitter Reduction ISO</string>
+    <string name="iso_hint_100">100 ISO</string>
+    <string name="iso_hint_200">200 ISO</string>
+    <string name="iso_hint_400">400 ISO</string>
+    <string name="iso_hint_800">800 ISO</string>
+    <string name="iso_hint_1600">1600 ISO</string>
+</resources>
